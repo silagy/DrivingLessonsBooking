@@ -20,8 +20,8 @@ This system ends at the Excel file. Booking, assignment, and student notificatio
 | Document | Purpose |
 |---|---|
 | [docs/requirements.md](docs/requirements.md) | Full v1 requirements: personas, domain model, flows, Excel spec, decisions log |
-| docs/tech-stack.md | Implementation constraints (latest .NET, latest Angular, PrimeNG, signals) - pending |
-| docs/decisions/ | Architecture Decision Records, one file per decision - starts with implementation |
+| [docs/tech-stack.md](docs/tech-stack.md) | Implementation constraints: stack (latest .NET, latest Angular, PrimeNG, signals), monorepo layout, single deployable, hosting |
+| [docs/decisions/](docs/decisions/) | Architecture Decision Records: [0001 monorepo + single deployable](docs/decisions/0001-monorepo-single-deployable.md), [0002 hosting on AWS Lightsail](docs/decisions/0002-hosting-aws-lightsail.md) |
  
 ## Status
  
