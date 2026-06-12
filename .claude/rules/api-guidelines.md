@@ -16,7 +16,7 @@ DrivingLessons.Presentation.Web\
 │       ├── {Entity}CommandController.cs
 │       └── {Entity}QueryController.cs
 ├── Filters\
-│   └── DomainExceptionFilter.cs
+│   └── ApiExceptionFilter.cs
 ├── ServiceRegistration\
 │   └── ServiceCollectionExtension.cs
 └── Program.cs
@@ -141,19 +141,21 @@ A single global exception filter maps exception families to `ProblemDetails` —
 
 | Exception family | Status |
 |------------------|--------|
-| `EntityNotFoundException` (base of all `{Entity}NotFoundException`) | 404 Not Found |
+| `AuthenticationFailedException` (login failure — deliberately detail-free) | 401 Unauthorized |
+| `NotFoundException` (base of all `{Entity}NotFoundException`, in `Application\Common\Exceptions`) | 404 Not Found |
 | `DomainException` (invalid state transition, broken business rule) | 409 Conflict |
 | Validation attribute failures (`[Required]`, model binding) | 400 Bad Request |
 | Everything else | 500 Internal Server Error |
 
 ```csharp
-public class DomainExceptionFilter : IExceptionFilter
+public class ApiExceptionFilter : IExceptionFilter
 {
     public void OnException(ExceptionContext context)
     {
         var statusCode = context.Exception switch
         {
-            EntityNotFoundException => StatusCodes.Status404NotFound,
+            AuthenticationFailedException => StatusCodes.Status401Unauthorized,
+            NotFoundException => StatusCodes.Status404NotFound,
             DomainException => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
@@ -179,7 +181,11 @@ public class DomainExceptionFilter : IExceptionFilter
 }
 ```
 
-Register once in `AddControllers(options => options.Filters.Add<DomainExceptionFilter>())`.
+Register once in `AddControllers(options => options.Filters.Add<ApiExceptionFilter>())`.
+
+## Auth Slice Exception (US-01)
+
+The admin sign-in slice (`docs/modules/auth/us-01-admin-sign-in-plan.md`) is deliberately **pre-aggregate infrastructure** — no domain aggregate, and its code style deviates from these rules in places (constructor injection, `Handle(...)` naming). That deviation is accepted **for that slice only**. Every aggregate endpoint (Teacher, WeekSchedule, Publication, Student, Submission) follows these rules: `ExecuteAsync`, `[FromServices]` injection, CQRS controller split, no comments.
 
 ## Swagger
 

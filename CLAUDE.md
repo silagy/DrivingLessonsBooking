@@ -14,6 +14,7 @@ Weekly demand-collection system for a driving school (see [README.md](README.md)
 |-----------|------------------|
 | Any C# code | `.claude/rules/code-style.md` (auto-loaded) |
 | Domain, application, or infrastructure code | `.claude/rules/ddd-architecture.md` (auto-loaded) |
+| Base classes, typed IDs, value objects, entities, events | `.claude/rules/domain-building-blocks.md` (auto-loaded) |
 | Controllers / endpoints | `.claude/rules/api-guidelines.md` (auto-loaded) |
 | Writing or modifying tests | `.claude/rules/domain-testing.md` (auto-loaded) |
 | Any Angular code in `client\` | `.claude/rules/client-architecture.md` + `client-state.md` (auto-loaded) |
@@ -27,7 +28,7 @@ Backend rules govern `src\` and `tests\`; client rules govern `client\`. The cli
 ## Critical Rules
 
 1. **Operations are NOT idempotent** — throw a domain exception if already in the target state
-2. **Domain methods accept resolved entities and value objects, never IDs or primitives**
+2. **Domain methods accept resolved entities, typed IDs, and value objects — never raw Guids or primitives** (raw `Guid` exists only at controller/response boundaries)
 3. **No comments** — code must be self-documenting (test section markers `//given //when //then` are the only exception)
 4. **Always search for existing code** before creating new files
 5. **Test through aggregate roots only** — never instantiate or test child entities directly
@@ -63,10 +64,13 @@ docs\
 
 | Code Type | Path Pattern | Class Name |
 |-----------|--------------|------------|
+| Base types (EntityId, Entity, AggregateRoot, IDomainEvent, DomainException) | `Domain\Common\{BaseType}.cs` | see domain-building-blocks.md |
 | Entity | `Domain\Entities\{Entity}.cs` | `{Entity}` |
+| Typed ID | `Domain\Values\{Entity}Id.cs` | `{Entity}Id` |
 | Value object | `Domain\Values\{Value}.cs` | `{Value}` |
 | Domain event | `Domain\Events\{Entity}{Action}.cs` | `{Entity}{Action}` |
 | Domain exception | `Domain\Exceptions\{Entity}{Rule}Exception.cs` | `{Entity}{Rule}Exception` |
+| Not-found exception | `Application\Common\Exceptions\{Entity}NotFoundException.cs` | `{Entity}NotFoundException` |
 | Repository interface | `Domain\Repositories\I{Entity}Repository.cs` | `I{Entity}Repository` |
 | Command + handler | `Application\Commands\{Op}{Entity}\{Op}{Entity}Interactor.cs` | `{Op}{Entity}Interactor` |
 | Request DTO | `Application\Commands\{Op}{Entity}\{Op}{Entity}Request.cs` | `{Op}{Entity}Request` |
