@@ -1,0 +1,12 @@
+<p-toolbar>
+  <ng-template #start>
+    <strong>{{ 'shell.title' | transloco }}</strong>
+  </ng-template>
+  <ng-template #end>
+    <p-button [label]="'shell.languageToggle' | transloco" (onClick)="language.toggle()" text />
+    <p-button [label]="'shell.logout' | transloco" (onClick)="auth.logout()" severity="secondary" text />
+  </ng-template>
+</p-toolbar>
+<main style="padding: 1rem">
+  <router-outlet />
+</main>

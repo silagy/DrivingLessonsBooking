@@ -1,0 +1,18 @@
+{
+  "auth": {
+    "title": "כניסת מנהל",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "submit": "כניסה",
+    "invalidCredentials": "אימייל או סיסמה שגויים"
+  },
+  "shell": {
+    "title": "מערכת תכנון שיעורי נהיגה",
+    "logout": "התנתקות",
+    "languageToggle": "English"
+  },
+  "dashboard": {
+    "title": "לוח בקרה",
+    "placeholder": "ברוך הבא. יכולות התכנון יגיעו בפרוסות הבאות."
+  }
+}

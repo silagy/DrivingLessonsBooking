@@ -1,0 +1,18 @@
+{
+  "auth": {
+    "title": "Admin Sign In",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "invalidCredentials": "Incorrect email or password"
+  },
+  "shell": {
+    "title": "Driving Lessons Planner",
+    "logout": "Sign out",
+    "languageToggle": "עברית"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "placeholder": "Welcome. Planning features arrive in the next slices."
+  }
+}
