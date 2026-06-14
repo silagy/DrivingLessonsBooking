@@ -1,5 +1,6 @@
 using System.Text;
 using DrivingLessons.Presentation.Web.Filters;
+using DrivingLessons.Presentation.Web.OpenApi;
 using DrivingLessons.Application;
 using DrivingLessons.Infrastructure;
 using DrivingLessons.Infrastructure.Auth;
@@ -10,10 +11,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilter>());
+builder.Services.AddOpenApi(options =>
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -48,6 +52,12 @@ await using (var scope = app.Services.CreateAsyncScope())
     await db.Database.MigrateAsync();
     var adminOptions = scope.ServiceProvider.GetRequiredService<IOptions<AdminOptions>>().Value;
     await AdminSeeder.SeedAsync(db, adminOptions);
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi().AllowAnonymous();
+    app.MapScalarApiReference().AllowAnonymous();
 }
 
 app.UseDefaultFiles();

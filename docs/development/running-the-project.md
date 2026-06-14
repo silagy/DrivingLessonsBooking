@@ -15,6 +15,7 @@ How to run the driving-lessons app locally. Two setups: **Docker Compose** (inte
 | App (Docker, API + SPA) | http://localhost:8080 |
 | API from source (`dotnet run`) | http://localhost:5080 |
 | Angular dev server | http://localhost:4200 |
+| OpenAPI explorer (Scalar, dev only) | http://localhost:5080/scalar/v1 |
 | PostgreSQL | localhost:5432 |
 | Dev admin login | `admin@local.dev` / `DevAdmin#2026` |
 
@@ -54,6 +55,17 @@ cd client && npm start
 ```
 
 Open http://localhost:4200 and sign in with the dev admin credentials above. Edit any `.ts` / `.html` / `.scss` (frontend) or `.cs` (backend) and the change reloads automatically. Toggle EN / עב in the corner to check Hebrew RTL.
+
+## API explorer (Scalar / OpenAPI)
+
+When the API runs from source (Option B), an interactive OpenAPI explorer is served at:
+
+- Scalar UI: http://localhost:5080/scalar/v1
+- Raw spec: http://localhost:5080/openapi/v1.json
+
+It's enabled in the **Development** environment only — the Docker Compose stack (Option A) runs in Production and does **not** expose it. Reach it on the API host (`:5080`) directly, not through the Angular dev server (`:4200`), which only proxies `/api`.
+
+To call secured endpoints: `POST /api/auth/login` with the dev admin credentials, copy the returned `accessToken`, click **Authorize** in Scalar and paste it. Requests then send `Authorization: Bearer <token>`.
 
 ## Build & test
 
