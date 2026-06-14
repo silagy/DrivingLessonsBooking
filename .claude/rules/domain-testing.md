@@ -285,6 +285,7 @@ Cover 100% of logic branches in the domain layer.
 - No underscore-prefixed private fields
 - Never use default parameters in test helpers — pass all arguments explicitly
 - Keep only necessary variables in private fields; prefer locals
+- **Typed IDs in tests**: create identifiers via `{Entity}Id.New()` — never pass raw `Guid.NewGuid()` into a domain call. Raw `Guid` appears only where the test exercises the application boundary (an interactor's `ExecuteAsync(Guid id)`)
 - Application-layer (interactor) tests use FakeItEasy for repository/query fakes:
   ```csharp
   [TestInitialize]
@@ -299,8 +300,9 @@ Cover 100% of logic branches in the domain layer.
   {
       //given
       var id = Guid.NewGuid();
+      var publicationId = PublicationId.Of(id);
 
-      A.CallTo(() => repository.GetAsync(id))
+      A.CallTo(() => repository.GetAsync(publicationId))
           .Returns((Publication?)null);
 
       //when
@@ -310,3 +312,4 @@ Cover 100% of logic branches in the domain layer.
       await Should.ThrowAsync<PublicationNotFoundException>(act);
   }
   ```
+  Typed IDs are records, so FakeItEasy matches `repository.GetAsync(publicationId)` by value — the interactor's internally-converted `PublicationId.Of(id)` is equal to the test's.

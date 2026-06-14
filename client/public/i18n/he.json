@@ -1,0 +1,24 @@
+{
+  "brand": {
+    "appName": "WeekDrive"
+  },
+  "auth": {
+    "title": "כניסה",
+    "subtitle": "גישת מנהל לבית הספר לנהיגה.",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "passwordHint": "שכחת את הסיסמה? פנה לתמיכה.",
+    "submit": "כניסה",
+    "invalidCredentials": "אימייל או סיסמה שגויים",
+    "footnote": "חשבון מנהל יחיד - בעל בית הספר. תלמידים לעולם אינם מתחברים."
+  },
+  "shell": {
+    "title": "מערכת תכנון שיעורי נהיגה",
+    "logout": "התנתקות",
+    "languageToggle": "English"
+  },
+  "dashboard": {
+    "title": "לוח בקרה",
+    "placeholder": "ברוך הבא. יכולות התכנון יגיעו בפרוסות הבאות."
+  }
+}

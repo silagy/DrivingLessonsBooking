@@ -36,10 +36,13 @@ Domain.Test       → Domain
 
 | Code Type | Location | Class Name |
 |-----------|----------|------------|
+| Base types (EntityId, Entity, AggregateRoot, IDomainEvent, DomainException) | `Domain\Common\{BaseType}.cs` | see domain-building-blocks.md |
 | Business rule | `Domain\Entities\{Entity}.cs` | `{Entity}` |
+| Typed ID | `Domain\Values\{Entity}Id.cs` | `{Entity}Id` |
 | Value object | `Domain\Values\{Value}.cs` | `{Value}` |
 | Domain event | `Domain\Events\{Entity}{Action}.cs` | `{Entity}{Action}` |
 | Domain exception | `Domain\Exceptions\{Entity}{Rule}Exception.cs` | `{Entity}{Rule}Exception` |
+| Not-found exception | `Application\Common\Exceptions\{Entity}NotFoundException.cs` | `{Entity}NotFoundException` |
 | Repository interface | `Domain\Repositories\I{Entity}Repository.cs` | `I{Entity}Repository` |
 | Command + handler | `Application\Commands\{Op}{Entity}\{Op}{Entity}Interactor.cs` | `{Op}{Entity}Interactor` |
 | Command request DTO | `Application\Commands\{Op}{Entity}\{Op}{Entity}Request.cs` | `{Op}{Entity}Request` |
@@ -62,41 +65,20 @@ Domain.Test       → Domain
 
 ## Domain Layer
 
-### AggregateRoot Base Class
+### Building Blocks
 
-The domain defines one small base class — no framework package:
+The domain defines its own small base types in `Domain\Common\` — no framework package: `EntityId` (strongly-typed identifiers), `Entity<TId>` (identity equality), `AggregateRoot<TId>` (domain event raising via `AddEvent`/`UncommittedEvents`/`CommitEvents`), and the `IDomainEvent` marker. **Full reference implementations live in `domain-building-blocks.md` — copy them exactly.**
 
-```csharp
-public abstract class AggregateRoot
-{
-    private readonly List<IDomainEvent> uncommittedEvents = [];
-
-    public Guid Id { get; protected init; }
-
-    public IReadOnlyCollection<IDomainEvent> UncommittedEvents => uncommittedEvents.AsReadOnly();
-
-    protected void AddEvent(IDomainEvent domainEvent)
-    {
-        uncommittedEvents.Add(domainEvent);
-    }
-
-    public void CommitEvents()
-    {
-        uncommittedEvents.Clear();
-    }
-}
-
-public interface IDomainEvent;
-```
+Every entity gets its own ID type (`PublicationId`, `SubmissionId`) deriving from `EntityId`; raw `Guid` never appears in domain signatures.
 
 ### Aggregate Template
 
 Aggregates own their invariants. Private constructors, a static `Create` factory that generates the ID and raises the created event, and explicit state guards in every method.
 
 ```csharp
-public class Publication : AggregateRoot
+public class Publication : AggregateRoot<PublicationId>
 {
-    public Guid WeekScheduleId { get; private set; }
+    public WeekScheduleId WeekScheduleId { get; private set; }
     public PublicationState State { get; private set; }
     public ShareableLinkToken LinkToken { get; private set; }
     public SubmissionWindow Window { get; private set; }
@@ -111,14 +93,14 @@ public class Publication : AggregateRoot
     }
 
     private Publication(
-        Guid id,
-        Guid weekScheduleId,
+        PublicationId id,
+        WeekScheduleId weekScheduleId,
         PublicationState state,
         ShareableLinkToken linkToken,
         SubmissionWindow window,
         int excelVersion)
+        : base(id)
     {
-        Id = id;
         WeekScheduleId = weekScheduleId;
         State = state;
         LinkToken = linkToken;
@@ -133,7 +115,7 @@ public class Publication : AggregateRoot
     {
         const PublicationState state = PublicationState.Draft;
         const int excelVersion = 0;
-        var id = Guid.NewGuid();
+        var id = PublicationId.New();
         var linkToken = ShareableLinkToken.New();
 
         return new Publication(id, weekSchedule.Id, state, linkToken, window, excelVersion);
@@ -226,26 +208,26 @@ Transitions only through named methods (`Publish`, `Open`, `Close`, `Reopen`), e
 ```csharp
 public class PublicationMustBeOpenException : DomainException
 {
-    public PublicationMustBeOpenException(Guid id)
-        : base($"Publication {id} must be open.")
+    public PublicationMustBeOpenException(PublicationId id)
+        : base($"Publication {id.Value} must be open.")
     {
     }
 }
 ```
 
-`DomainException` is the single abstract base for all domain rule violations; `EntityNotFoundException` is the base for application-level not-found errors. The API layer maps both (see api-guidelines.md).
+`DomainException` (`Domain\Common\`) is the single abstract base for all domain rule violations; `NotFoundException` (`Application\Common\Exceptions\`) is the base for application-level not-found errors. The API layer maps both (see api-guidelines.md).
 
 ### Owned (Child) Entities
 
 Child entities live inside the aggregate boundary and are only reachable through the root:
 
 ```csharp
-public class Submission : AggregateRoot
+public class Submission : AggregateRoot<SubmissionId>
 {
     private readonly List<SlotRequest> slotRequests = [];
 
-    public Guid PublicationId { get; private set; }
-    public Guid StudentId { get; private set; }
+    public PublicationId PublicationId { get; private set; }
+    public StudentId StudentId { get; private set; }
     public TargetSessionCount TargetCount { get; private set; }
 
     public IReadOnlyCollection<SlotRequest> SlotRequests => slotRequests.AsReadOnly();
@@ -279,10 +261,9 @@ public class Submission : AggregateRoot
     }
 }
 
-public class SlotRequest
+public class SlotRequest : Entity<SlotRequestId>
 {
-    public Guid Id { get; private set; }
-    public Guid SlotId { get; private set; }
+    public SlotId SlotId { get; private set; }
     public SessionType SessionType { get; private set; }
     public SlotConstraint? Constraint { get; private set; }
     public int Rank { get; private set; }
@@ -291,18 +272,18 @@ public class SlotRequest
     {
     }
 
-    private SlotRequest(Guid id, Guid slotId, SessionType sessionType, SlotConstraint? constraint, int rank)
+    private SlotRequest(SlotRequestId id, SlotId slotId, SessionType sessionType, SlotConstraint? constraint, int rank)
+        : base(id)
     {
-        Id = id;
         SlotId = slotId;
         SessionType = sessionType;
         Constraint = constraint;
         Rank = rank;
     }
 
-    internal static SlotRequest Create(Guid slotId, SessionType sessionType, SlotConstraint? constraint, int rank)
+    internal static SlotRequest Create(SlotId slotId, SessionType sessionType, SlotConstraint? constraint, int rank)
     {
-        var id = Guid.NewGuid();
+        var id = SlotRequestId.New();
         return new SlotRequest(id, slotId, sessionType, constraint, rank);
     }
 
@@ -314,6 +295,7 @@ public class SlotRequest
 ```
 
 Key rules:
+- Child entities extend `Entity<TId>` — they have no `AddEvent`, so they physically cannot raise events
 - Child entity methods called by the parent are `internal` — nothing outside the aggregate can mutate a child
 - **Only the aggregate root raises domain events** — children don't know what is business-significant
 - **Law of Demeter**: the aggregate never reaches through a child to manipulate its internals (`request.Constraint.Change(...)` is forbidden) — it calls one `internal` method on the child and the child handles the rest
@@ -383,11 +365,11 @@ Key rules:
 Every meaningful state change raises an event. Events are **simple records created inline** — no event factory classes, no content-class hierarchy:
 
 ```csharp
-public record PublicationCreated(Guid PublicationId, Guid WeekScheduleId, SubmissionWindow Window) : IDomainEvent;
+public record PublicationCreated(PublicationId PublicationId, WeekScheduleId WeekScheduleId, SubmissionWindow Window) : IDomainEvent;
 
-public record PublicationClosed(Guid PublicationId, int ExcelVersion, DateTime ClosedAtUtc) : IDomainEvent;
+public record PublicationClosed(PublicationId PublicationId, int ExcelVersion, DateTime ClosedAtUtc) : IDomainEvent;
 
-public record SlotRequestAdded(Guid SubmissionId, Guid SlotRequestId, Guid SlotId, int Rank) : IDomainEvent;
+public record SlotRequestAdded(SubmissionId SubmissionId, SlotRequestId SlotRequestId, SlotId SlotId, int Rank) : IDomainEvent;
 ```
 
 Key rules:
@@ -404,7 +386,7 @@ One per aggregate, defined in Domain:
 ```csharp
 public interface IPublicationRepository
 {
-    Task<Publication?> GetAsync(Guid id);
+    Task<Publication?> GetAsync(PublicationId id);
 
     Task<Publication?> GetByLinkTokenAsync(ShareableLinkToken token);
 
@@ -440,8 +422,10 @@ public class ClosePublicationInteractor
 
     public async Task ExecuteAsync(Guid id)
     {
-        var publication = await repository.GetAsync(id)
-                          ?? throw new PublicationNotFoundException(id);
+        var publicationId = PublicationId.Of(id);
+
+        var publication = await repository.GetAsync(publicationId)
+                          ?? throw new PublicationNotFoundException(publicationId);
 
         var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
         publication.Close(nowUtc);
@@ -471,8 +455,10 @@ public class CreatePublicationInteractor
 
     public async Task<CreatePublicationResponse> ExecuteAsync(CreatePublicationRequest request)
     {
-        var weekSchedule = await weekScheduleRepository.GetAsync(request.WeekScheduleId)
-                           ?? throw new WeekScheduleNotFoundException(request.WeekScheduleId);
+        var weekScheduleId = WeekScheduleId.Of(request.WeekScheduleId);
+
+        var weekSchedule = await weekScheduleRepository.GetAsync(weekScheduleId)
+                           ?? throw new WeekScheduleNotFoundException(weekScheduleId);
 
         var window = SubmissionWindow.Of(request.WindowStartUtc, request.WindowEndUtc);
         var publication = Publication.Create(weekSchedule, window);
@@ -483,7 +469,7 @@ public class CreatePublicationInteractor
             .UnitOfWork
             .CommitAsync();
 
-        return new CreatePublicationResponse(publication.Id, publication.LinkToken.Value);
+        return new CreatePublicationResponse(publication.Id.Value, publication.LinkToken.Value);
     }
 }
 ```
@@ -492,7 +478,7 @@ Key rules:
 - **No business rules in interactors** — whether something is allowed belongs to the aggregate; the interactor only loads, calls, and saves
 - **Not-found is an application concern** — repository returns `null`, interactor throws `{Entity}NotFoundException`
 - One interactor = one reason to change; each declares only the dependencies it actually needs
-- Value objects are constructed at the application boundary (`SubmissionWindow.Of(...)`) so the domain never sees raw primitives
+- Value objects and typed IDs are constructed at the application boundary (`SubmissionWindow.Of(...)`, `PublicationId.Of(id)`) so the domain never sees raw primitives
 
 ### Queries
 
@@ -548,13 +534,15 @@ public class GetPublicationResponse
     public static Expression<Func<Publication, GetPublicationResponse>> Selector =>
         x => new GetPublicationResponse
         {
-            Id = x.Id,
+            Id = x.Id.Value,
             State = x.State,
             WindowStartUtc = x.Window.StartUtc,
             WindowEndUtc = x.Window.EndUtc
         };
 }
 ```
+
+Response DTOs expose raw `Guid`s (`x.Id.Value`) — typed IDs stop at the application boundary.
 
 ### Unit of Work
 
@@ -612,7 +600,7 @@ public class PublicationRepository : IPublicationRepository
         this.dbContext = dbContext;
     }
 
-    public async Task<Publication?> GetAsync(Guid id)
+    public async Task<Publication?> GetAsync(PublicationId id)
     {
         return await dbContext.Publications.FindAsync(id);
     }
@@ -650,9 +638,11 @@ public class PublicationQueries : IPublicationQueries
 
     public async Task<GetPublicationResponse?> GetAsync(Guid id)
     {
+        var publicationId = PublicationId.Of(id);
+
         return await dbContext
                          .Publications
-                         .Where(x => x.Id == id)
+                         .Where(x => x.Id == publicationId)
                          .Select(GetPublicationResponse.Selector)
                          .FirstOrDefaultAsync();
     }
@@ -664,6 +654,7 @@ public class PublicationQueries : IPublicationQueries
 One `IEntityTypeConfiguration<T>` per aggregate:
 
 - Table and column names in **snake_case**
+- Every typed ID property gets `.HasConversion<{Id}Converter>()` — see domain-building-blocks.md for the converter template
 - Value objects map with `OwnsOne` (or a `ValueConverter` for single-value records like `ShareableLinkToken`)
 - Child collections map with `OwnsMany` to their own table; the parent FK is a **shadow property** (`owner_id`), never a CLR property on the child
 - Enums stored as their numeric value
@@ -674,6 +665,12 @@ public class PublicationConfiguration : IEntityTypeConfiguration<Publication>
     public void Configure(EntityTypeBuilder<Publication> builder)
     {
         builder.ToTable("publications");
+
+        builder
+            .Property(x => x.Id)
+            .HasColumnName("id")
+            .HasConversion<PublicationIdConverter>();
+
         builder.HasKey(x => x.Id);
 
         builder
@@ -706,6 +703,7 @@ public class PublicationConfiguration : IEntityTypeConfiguration<Publication>
 - One shared event class for multiple operations
 - `SingleOrDefaultAsync` anywhere — `FindAsync` for PKs, `FirstOrDefaultAsync` otherwise
 - Generic exceptions (`InvalidOperationException`) for domain rules — every rule gets its own exception type
+- Raw `Guid` flowing past the application boundary — convert to typed IDs on entry (`PublicationId.Of(id)`), back to `Guid` on exit (`x.Id.Value`)
 
 ## Deliberately Omitted (keep it simple)
 

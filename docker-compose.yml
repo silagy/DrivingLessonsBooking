@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: drivinglessons
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d drivinglessons"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=drivinglessons;Username=app;Password=${POSTGRES_PASSWORD}"
+      Admin__Email: ${ADMIN_EMAIL}
+      Admin__Password: ${ADMIN_PASSWORD}
+      Jwt__Issuer: DrivingLessons
+      Jwt__Audience: DrivingLessons
+      Jwt__SigningKey: ${JWT_SIGNING_KEY}
+      Jwt__ExpiryHours: "12"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

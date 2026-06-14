@@ -1,0 +1,32 @@
+:host {
+  display: inline-flex;
+}
+
+.lang {
+  display: inline-flex;
+  background: var(--app-bg-muted);
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.lang__opt {
+  font-family: var(--app-font-text);
+  font-weight: 500;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  padding: 5px 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--app-text-secondary);
+  cursor: pointer;
+}
+
+.lang__opt--active {
+  background: var(--app-bg-card);
+  color: var(--app-ink);
+  border-color: var(--app-border);
+  box-shadow: var(--app-shadow-card);
+}

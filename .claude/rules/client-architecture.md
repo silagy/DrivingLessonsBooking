@@ -177,7 +177,7 @@ export enum PublicationState {
 
 ### Error Handling — ProblemDetails
 
-The backend's `DomainExceptionFilter` maps everything to `ProblemDetails`. One functional interceptor + per-call handling:
+The backend's `ApiExceptionFilter` maps everything to `ProblemDetails`. One functional interceptor + per-call handling:
 
 | Status | Meaning | Client behavior |
 |--------|---------|-----------------|

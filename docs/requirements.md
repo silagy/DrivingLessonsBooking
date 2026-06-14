@@ -1,8 +1,9 @@
 # Requirements Document: Weekly Demand Collection System for Driving Lessons
  
-**Version:** 1.0
-**Date:** 12 June 2026
+**Version:** 1.1
+**Date:** 13 June 2026
 **Status:** Approved scope for v1
+**Changelog:** v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
 **Scope discipline:** This document is technology-agnostic. A separate technology document (latest .NET, latest Angular, PrimeNG, signal-based patterns) will govern implementation.
  
 ---
@@ -20,8 +21,9 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 ## 3. Scope
  
 ### In scope (v1)
-- Admin preparation and publication of weekly availability grids, per teacher
-- Student-facing submission flow via shareable link
+- Admin upload of the student roster as a CSV (national-ID-identified; binds each student to a teacher and car)
+- Admin preparation of weekly availability grids, per teacher, published once per week as a single school-wide link
+- Student-facing submission flow via the shared weekly link, identified by national ID
 - Live admin dashboard during the submission window
 - Excel generation (on-demand download and automatic email at window close)
 - Hebrew + English UI with full RTL support
@@ -31,14 +33,15 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Logins for teachers (teachers are data entities only)
 - Payments, billing, multi-school tenancy
 - Configurable slot windows (hardcoded in v1)
+- Student self-registration: students are known only through the uploaded roster; there is no self-service onboarding
 - Native mobile apps (the student form must be mobile-browser friendly, since links are distributed via WhatsApp)
 ## 4. Personas
  
 | Persona | Description | Authentication |
 |---|---|---|
-| **Administrator** | The school owner. Also a teacher. Performs all planning for all teachers. | Email + password login |
-| **Teacher** | A data entity. Owns one or two cars. Receives a weekly published link and the resulting Excel. No login in v1. | None |
-| **Student** | Receives a teacher-specific link (typically via WhatsApp). Submits weekly session preferences. | Email-based identification, no password (see 8.2) |
+| **Administrator** | The school owner. Also a teacher. Performs all planning for all teachers. Uploads and maintains the student roster. | Email + password login |
+| **Teacher** | A data entity. Owns one or two cars. Receives the resulting Excel. No login in v1. The single weekly link covers all teachers; the student's roster record routes them to the right teacher's grid. | None |
+| **Student** | Receives the single weekly link (typically via WhatsApp). Submits weekly session preferences. Must already exist in the uploaded roster. | National ID identification, validated against the roster, no password (see 8.2) |
  
 ## 5. Domain Model
  
@@ -51,6 +54,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Belongs to exactly one Teacher
 - Transmission: `Automatic` or `Manual`
 - Cars are attributes of a teacher's capability. **Scheduling is per teacher, not per car.**
+- The roster assigns each student a specific car; that car's transmission is the student's transmission. The student is never asked (see 5.5, 7).
 ### 5.3 Week Schedule (per teacher, per calendar week)
 - Grid of **Slots**:
 | Day | Slots |
@@ -63,17 +67,24 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Each slot has a state: `Open` (default) or `Unavailable` (admin-marked).
 - A new week **always starts fully open**. No copying from prior weeks in v1.
 ### 5.4 Publication
-- Belongs to one Week Schedule
-- Generates a unique, unguessable **link** scoped to the teacher and week
-- Carries a **submission window**: start datetime and end datetime (Asia/Jerusalem timezone)
+- Belongs to one **calendar week** and covers **all teachers** for that week. It aggregates the per-teacher Week Schedules (5.3) prepared for the week.
+- Generates a **single, unguessable link** scoped to the week (no longer per teacher). A student opening the link identifies by national ID; their roster record resolves which teacher's grid they see.
+- Carries one **submission window**: start datetime and end datetime (Asia/Jerusalem timezone), applying to all teachers at once.
 - States: `Draft` → `Published (window not yet open)` → `Open` → `Closed`
-- Admin may **extend** the end time or **reopen** a closed window at any time
+- Admin may **extend** the end time or **reopen** a closed window at any time; these act on the whole week.
+- Excel is still generated **per teacher** (one file per teacher per publication; see §9), versioned per teacher on each close.
 ### 5.5 Student
-- Identified uniquely by **email** (per school)
-- First name, last name
-- Transmission preference: `Automatic` or `Manual`
-- **Default teacher association:** the student's regular teacher. Stamped automatically from the teacher-scoped link on the student's first submission and updated to the most recent teacher used. Never asked as a form question, since the link already identifies the teacher.
-- Profile fields are remembered across weeks and prefilled on return visits
+- Identified uniquely by **national ID (ת.ז)** (per school)
+- Students are **pre-loaded from the admin-uploaded roster (CSV)** — there is no self-registration. An ID not in the roster cannot submit (see §7).
+- Profile fields, all sourced from the roster and read-only to the student: full name (single field), phone, assigned teacher, assigned car, address, license type, start date
+- **Transmission** is derived from the assigned car's transmission (via the car / license type), never asked
+- **Teacher association** comes directly from the roster record, never stamped from a link
+- The roster is the single source of truth for every student profile field
+
+### 5.5.1 Student Roster (CSV import)
+- The admin uploads a CSV; each row is one student. Columns map to: full name, national ID (identifier), phone, assigned car, assigned teacher, address, notes, start date, license type (transmission), and admin-only bookkeeping fields.
+- Re-uploading **upserts by national ID**: existing students are updated, new rows are added, and students absent from the new file are **deactivated, not deleted** (historical submissions are preserved).
+- The assigned teacher and car strings in the CSV must resolve to existing Teacher/Car records; unresolved rows are reported as errors and skipped.
 ### 5.6 Submission (per student, per publication)
 - Target session count (integer ≥ 1, no upper limit)
 - An **ordered list of Slot Requests**, ranked by selection sequence
@@ -91,12 +102,12 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 1. Log in.
 2. Create teachers.
 3. Create cars under each teacher, setting transmission per car.
-### 6.2 Weekly preparation (per teacher)
-1. Select a teacher and a target week.
-2. View the fully open grid.
-3. Toggle individual slots to `Unavailable`.
-4. Publish: set the submission window start and end datetimes. The system generates the shareable link.
-5. Distribute the link (outside the system, e.g., WhatsApp).
+4. Upload the student roster (CSV). Re-upload at any time to add students or update assignments; upsert is by national ID (see 5.5.1).
+### 6.2 Weekly preparation
+1. For each teacher, select the target week and view the fully open grid.
+2. Toggle individual slots to `Unavailable` per teacher.
+3. Publish the week **once**: set the submission window start and end datetimes. The system generates **one** shareable link covering all teachers.
+4. Distribute the single link (outside the system, e.g., WhatsApp). Every teacher's students use the same link; the roster routes each student to the right grid.
 ### 6.3 During the window
 - **Dashboard:** the summary grid (day × slot) shows the current request count per slot at any point during the window. Data reflects the state at page load; the admin refreshes the page to see new submissions. No push/auto-refresh requirement.
 ### 6.4 Window close and reopen
@@ -106,26 +117,21 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - The Excel is also available for **on-demand download** from the admin UI at any time, including mid-window.
 ## 7. Student Flow
  
-1. Student opens the teacher-specific link on a mobile or desktop browser.
+1. Student opens the single weekly link on a mobile or desktop browser.
 2. **If the window is not yet open or already closed:** a clear read-only message with the relevant dates. No form.
-3. Student enters their **email**.
-   - Known email: profile is prefilled; any existing submission for this publication is loaded for editing.
-   - New email: student provides first name and last name.
-4. **Teacher and transmission confirmation:**
-   - The form prominently displays the teacher this link belongs to (e.g., "You are submitting availability for Teacher Cohen"). If the teacher's fleet has a single transmission type, that transmission is displayed alongside (e.g., "Automatic").
-   - This gives the student an explicit opt-out point if he received the wrong link for the wrong teacher. A visible "This is not my teacher" action aborts the flow without creating a submission.
-   - For a returning student whose stored default teacher differs from the link's teacher, the form shows a mismatch warning before proceeding.
-   - **Transmission question (conditional):** rendered **only if the teacher owns both an automatic and a manual car.**
-   - If the teacher owns cars of a single transmission type, the field is not shown and the value is stamped silently from the teacher's fleet.
+3. Student enters their **national ID**.
+   - **Known ID (in the roster):** the system resolves their teacher, car, and transmission from the roster; any existing submission for this publication is loaded for editing.
+   - **Unknown ID (not in the roster):** a clear "we don't have you on file — please contact your school" message. No form, no submission. (New students are added by the admin re-uploading the roster.)
+4. **Confirmation (display only):** the form shows the student their resolved details — "You are submitting availability for **Teacher X**" — sourced from the roster. There is no teacher selection, no mismatch warning, no "this is not my teacher" action, and no transmission question; the roster is authoritative.
 5. Student declares the **target session count** for the week.
-6. Student sees the week grid. `Unavailable` slots are visibly blocked and unselectable.
+6. Student sees the week grid for their assigned teacher. `Unavailable` slots are visibly blocked and unselectable.
 7. For each slot picked, the student specifies:
    - `Single` or `Double` session
    - Optional free-text constraint for that slot
 8. Picks accumulate as a **ranked list in selection order**. The student may reorder before submitting. Minimum picks = target count; additional picks are permitted and serve as lower-ranked preferences.
-9. Submit. A confirmation screen states that the submission can be edited via the same link and email until the window closes.
+9. Submit. A confirmation screen states that the submission can be edited via the same link and national ID until the window closes.
 ### Validation rules (student form)
-- Email format validity (uniqueness is the identity mechanism; no verification email in v1)
+- National ID present in the roster (it is both the identity mechanism and the access gate; no verification step in v1)
 - Target count ≥ 1
 - Picks ≥ target count
 - A slot can be picked at most once per submission
@@ -136,8 +142,8 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 A `Double` session counts as **one request** in summary counts, by explicit decision. The detail sheet carries the single/double flag, which is what makes this acceptable. **Standing flag:** if the detail sheet is ever removed, this decision must be revisited, because three doubles and three singles would become indistinguishable.
  
 ### 8.2 Identity and abuse posture
-- Email-only identification, no passwords, no magic links in v1. Accepted risk: anyone holding the link can impersonate a student by entering their email. The blast radius is one teacher's weekly preference list; the mitigation is the teacher knows his students.
-- Re-entering the same email **loads the existing submission for editing**. This is mandatory: without self-service editing, correction requests return to WhatsApp and recreate the manual workload this system exists to eliminate.
+- National-ID identification, no passwords, no magic links in v1. Submission requires the ID to exist in the roster, so random walk-ins cannot submit. Accepted risk: anyone holding the link who knows a roster member's national ID can impersonate that student. National IDs are semi-guessable (9 digits with a check digit), and because the link is now **school-wide**, the blast radius is the **whole school's** weekly preference lists rather than one teacher's. The mitigation remains that the teacher knows his students and reviews the Excel; this mitigation is weaker at school scale and is flagged for revisit if abuse appears.
+- Re-entering the same national ID **loads the existing submission for editing**. This is mandatory: without self-service editing, correction requests return to WhatsApp and recreate the manual workload this system exists to eliminate.
 ### 8.3 Timezone
 - **Instants** (submission window open/close, submission timestamps, audit fields) are stored in **UTC** and presented in Asia/Jerusalem. This is the future-proofing for eventual multi-school generalization.
 - **Wall-clock definitions** (slot windows such as Morning 07:00-12:00) are stored as **local time plus a named timezone (Asia/Jerusalem)**, not UTC. A slot is a recurring local-time concept; converting it to UTC would shift it by an hour across DST transitions, which is a bug, not a simplification.
@@ -162,8 +168,9 @@ One row per slot request, sorted by day, then slot, then student rank:
 |---|---|
 | Day | Sunday-Friday |
 | Slot | Morning / Noon / Afternoon / Evening |
-| Student name | First + last |
-| Email | Identifier |
+| Student name | Full name (from roster) |
+| National ID | Identifier |
+| Phone | Contact number (from roster) |
 | Transmission | Automatic / Manual |
 | Session type | Single / Double |
 | Rank | Position in the student's preference order |
@@ -185,19 +192,23 @@ One row per slot request, sorted by day, then slot, then student rank:
 |---|---|---|
 | 1 | Admin = owner-teacher, single login, no teacher logins | v1 reality: one person plans for everyone |
 | 2 | Single school, architecture should not block later generalization | May generalize later |
-| 3 | Link and schedule scoped per **teacher**, not per car | Teacher may operate two cars; original per-car framing was an error |
+| 3 | Scheduling scoped per **teacher**, not per car (still holds). ~~Link scoped per teacher~~ **superseded by #16** | Teacher may operate two cars; the link is now school-wide (see #16) |
 | 4 | One ranked list + target count, no primary/alternative types | Simpler model, rank carries the same information |
 | 5 | Double = 1 request in summary counts | Detail sheet carries the weight; flagged in 8.1 |
-| 6 | Same email reloads submission for editing | Kills the WhatsApp correction loop |
+| 6 | ~~Same email reloads submission~~ **superseded by #17**: same national ID reloads submission for editing | Kills the WhatsApp correction loop |
 | 7 | Sunday-Friday grid, short Friday (morning + noon) | Israeli work week |
 | 8 | Admin can extend/reopen windows | Operational reality; mitigated by versioned emails |
 | 9 | Every week starts fully open | Explicit choice over copying prior week |
-| 10 | Transmission question rendered only when teacher has both types | Eliminates a redundant or impossible question |
+| 10 | ~~Transmission question rendered only when teacher has both types~~ **superseded by #18**: transmission derived from the roster | Eliminates the question entirely; the roster assigns the car |
 | 11 | Constraints free text scoped per slot request | As originally envisioned |
 | 12 | Dashboard during window, manual page refresh, no push updates | Admin checks demand on demand; real-time push is unjustified complexity |
 | 13 | Booking and student notification out of scope | Excel is the end of this system |
 | 14 | Hebrew + English toggle, RTL-first | Bilingual user base |
 | 15 | Slot windows hardcoded in v1 | Configurability is a v2 concern |
+| 16 | **Single school-wide weekly link** (one Publication per week), replacing per-teacher links | The roster routes each student to their teacher; one link is simpler to publish and distribute (see ADR 0003) |
+| 17 | **National ID is the student identifier**, validated against an admin-uploaded roster (CSV); no self-registration | Customer supplies the student list as data; ID is the school's natural key (see ADR 0003) |
+| 18 | **Transmission and teacher come from the roster**, not the form | The CSV already assigns each student a teacher and car; asking would be redundant (see ADR 0003) |
+| 19 | **Unknown ID is rejected** ("contact your school"); new students added by re-uploading the roster | Roster is authoritative; removes self-service onboarding (see ADR 0003) |
  
 ## 12. Explicitly Deferred (v2 candidates)
  

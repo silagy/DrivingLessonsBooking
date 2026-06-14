@@ -1,0 +1,6 @@
+@import "primeicons/primeicons.css";
+
+@layer app {
+  @import "./styles/tokens";
+  @import "./styles/global";
+}

@@ -1,0 +1,24 @@
+{
+  "brand": {
+    "appName": "WeekDrive"
+  },
+  "auth": {
+    "title": "Sign in",
+    "subtitle": "Admin access for the driving school.",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "Forgot your password? Contact support.",
+    "submit": "Sign in",
+    "invalidCredentials": "Incorrect email or password",
+    "footnote": "One admin account - the school owner. Students never sign in."
+  },
+  "shell": {
+    "title": "Driving Lessons Planner",
+    "logout": "Sign out",
+    "languageToggle": "עברית"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "placeholder": "Welcome. Planning features arrive in the next slices."
+  }
+}

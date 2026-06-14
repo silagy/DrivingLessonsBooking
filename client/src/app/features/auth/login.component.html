@@ -1,0 +1,44 @@
+<div class="login">
+  <header class="login__top">
+    <app-brand-logo />
+    <app-language-toggle />
+  </header>
+
+  <form class="login__card" [formGroup]="form" (ngSubmit)="submit()">
+    <h1 class="login__title">{{ 'auth.title' | transloco }}</h1>
+    <p class="login__subtitle">{{ 'auth.subtitle' | transloco }}</p>
+
+    <div class="login__fields">
+      <div class="field">
+        <label for="email">{{ 'auth.email' | transloco }}</label>
+        <input pInputText id="email" type="email" formControlName="email" autocomplete="username" />
+      </div>
+
+      <div class="field">
+        <label for="password">{{ 'auth.password' | transloco }}</label>
+        <p-password
+          inputId="password"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          styleClass="login__password" />
+        <small class="field__hint">{{ 'auth.passwordHint' | transloco }}</small>
+      </div>
+    </div>
+
+    @if (error()) {
+      <p-message severity="error" [textContent]="'auth.invalidCredentials' | transloco" styleClass="login__error" />
+    }
+
+    <p-button
+      type="submit"
+      [label]="'auth.submit' | transloco"
+      icon="pi pi-arrow-right"
+      iconPos="right"
+      [loading]="loading()"
+      [disabled]="form.invalid"
+      fluid
+      styleClass="login__submit" />
+  </form>
+
+</div>
