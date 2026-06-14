@@ -7,10 +7,21 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { AuthService } from '../../core/auth.service';
+import { BrandLogoComponent } from '../../shared/brand-logo/brand-logo.component';
+import { LanguageToggleComponent } from '../../shared/language-toggle/language-toggle.component';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, TranslocoPipe, InputTextModule, PasswordModule, ButtonModule, MessageModule],
+  imports: [
+    ReactiveFormsModule,
+    TranslocoPipe,
+    InputTextModule,
+    PasswordModule,
+    ButtonModule,
+    MessageModule,
+    BrandLogoComponent,
+    LanguageToggleComponent,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })

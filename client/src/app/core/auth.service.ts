@@ -10,6 +10,18 @@ export interface LoginResponse {
 
 const TOKEN_KEY = 'auth_token';
 
+function readEmailClaim(token: string | null): string | null {
+  if (!token) {
+    return null;
+  }
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1])) as { email?: string };
+    return payload.email ?? null;
+  } catch {
+    return null;
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -17,6 +29,7 @@ export class AuthService {
 
   readonly token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   readonly isAuthenticated = computed(() => this.token() !== null);
+  readonly email = computed(() => readEmailClaim(this.token()));
 
   login(email: string, password: string) {
     return this.http

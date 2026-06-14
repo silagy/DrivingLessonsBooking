@@ -2,10 +2,10 @@ import { ApplicationConfig, provideZonelessChangeDetection, isDevMode } from '@a
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeuix/themes/aura';
 import { provideTransloco } from '@jsverse/transloco';
 
 import { routes } from './app.routes';
+import { AppPreset } from './theme/app-preset';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { authInterceptor } from './core/auth.interceptor';
 
@@ -14,7 +14,15 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
-    providePrimeNG({ theme: { preset: Aura } }),
+    providePrimeNG({
+      theme: {
+        preset: AppPreset,
+        options: {
+          darkModeSelector: false,
+          cssLayer: { name: 'primeng', order: 'primeng, app' },
+        },
+      },
+    }),
     provideTransloco({
       config: {
         availableLangs: ['he', 'en'],

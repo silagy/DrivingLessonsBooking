@@ -1,12 +1,27 @@
-<p-toolbar>
-  <ng-template #start>
-    <strong>{{ 'shell.title' | transloco }}</strong>
-  </ng-template>
-  <ng-template #end>
-    <p-button [label]="'shell.languageToggle' | transloco" (onClick)="language.toggle()" text />
-    <p-button [label]="'shell.logout' | transloco" (onClick)="auth.logout()" severity="secondary" text />
-  </ng-template>
-</p-toolbar>
-<main style="padding: 1rem">
-  <router-outlet />
-</main>
+<div class="shell">
+  <header class="shell__bar">
+    <app-brand-logo />
+
+    <div class="shell__actions">
+      <app-language-toggle />
+
+      <div class="shell__user">
+        <span class="shell__avatar" aria-hidden="true">{{ initials() }}</span>
+        @if (auth.email(); as email) {
+          <span class="shell__email">{{ email }}</span>
+        }
+      </div>
+
+      <p-button
+        [label]="'shell.logout' | transloco"
+        (onClick)="auth.logout()"
+        severity="secondary"
+        size="small"
+        text />
+    </div>
+  </header>
+
+  <main class="shell__main">
+    <router-outlet />
+  </main>
+</div>

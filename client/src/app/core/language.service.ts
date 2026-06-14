@@ -25,4 +25,8 @@ export class LanguageService {
   toggle(): void {
     this.lang.update((l) => (l === 'he' ? 'en' : 'he'));
   }
+
+  use(lang: AppLanguage): void {
+    this.lang.set(lang);
+  }
 }
