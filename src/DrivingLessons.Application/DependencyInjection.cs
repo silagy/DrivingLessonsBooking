@@ -3,6 +3,8 @@ using DrivingLessons.Application.Commands.AddCar;
 using DrivingLessons.Application.Commands.ChangeCarDetails;
 using DrivingLessons.Application.Commands.ChangeTeacherDetails;
 using DrivingLessons.Application.Commands.CreateTeacher;
+using DrivingLessons.Application.Commands.DeleteTeacher;
+using DrivingLessons.Application.Commands.RemoveCar;
 using DrivingLessons.Application.Queries.FindTeachers;
 using DrivingLessons.Application.Queries.GetTeacher;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<AddCarInteractor>();
         services.AddScoped<ChangeTeacherDetailsInteractor>();
         services.AddScoped<ChangeCarDetailsInteractor>();
+        services.AddScoped<DeleteTeacherInteractor>();
+        services.AddScoped<RemoveCarInteractor>();
         services.AddScoped<GetTeacherInteractor>();
         services.AddScoped<FindTeachersInteractor>();
         return services;
