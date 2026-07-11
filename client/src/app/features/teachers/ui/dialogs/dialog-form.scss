@@ -33,3 +33,13 @@
   gap: 0.625rem;
   margin-block-start: 0.5rem;
 }
+
+.dialog-form__actions .dialog-form__delete {
+  margin-inline-end: auto;
+}
+
+.dialog-form__hint {
+  color: var(--app-text-secondary);
+  font-size: 0.75rem;
+  text-align: end;
+}

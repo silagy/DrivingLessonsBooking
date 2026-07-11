@@ -14,6 +14,8 @@ export interface CarFormResult {
     transmission: Transmission;
 }
 
+export type CarFormOutcome = CarFormResult | 'delete';
+
 @Component({
     selector: 'app-car-form-dialog',
     imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, InputTextModule, SelectModule],
@@ -24,8 +26,11 @@ export interface CarFormResult {
 export class CarFormDialog {
     private readonly fb = inject(FormBuilder);
     private readonly ref = inject(DynamicDialogRef);
-    private readonly config = inject(DynamicDialogConfig<{ car?: Car }>);
+    private readonly config = inject(DynamicDialogConfig<{ car?: Car; isLastCar?: boolean }>);
     private readonly transloco = inject(TranslocoService);
+
+    protected readonly isEdit = !!this.config.data?.car;
+    protected readonly isLastCar = this.config.data?.isLastCar ?? false;
 
     protected readonly transmissionOptions = Object.values(Transmission).map((value) => ({
         value,
@@ -45,6 +50,10 @@ export class CarFormDialog {
 
         const result: CarFormResult = this.form.getRawValue();
         this.ref.close(result);
+    }
+
+    protected requestDelete(): void {
+        this.ref.close('delete');
     }
 
     protected cancel(): void {

@@ -41,6 +41,13 @@
     "detailsChanged": "פרטי המורה עודכנו",
     "carAdded": "הרכב נוסף",
     "carChanged": "פרטי הרכב עודכנו",
+    "deleteTeacher": "מחיקת מורה",
+    "removeCar": "מחיקת רכב",
+    "confirmDeleteTeacher": "למחוק את {{name}}? גם הרכבים של המורה יימחקו.",
+    "confirmRemoveCar": "למחוק את {{name}}?",
+    "deleted": "המורה נמחק",
+    "carRemoved": "הרכב נמחק",
+    "lastCarHint": "לא ניתן למחוק את הרכב האחרון של המורה.",
     "loadFailed": "טעינת המורים נכשלה",
     "emptyTitle": "אין מורים עדיין",
     "emptySubtitle": "צרו את המורה הראשון כדי להתחיל לתכנן שבועות."
@@ -52,6 +59,7 @@
   "general": {
     "save": "שמירה",
     "cancel": "ביטול",
+    "delete": "מחיקה",
     "unexpectedError": "משהו השתבש. נסו שוב."
   },
   "formErrors": {

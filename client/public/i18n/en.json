@@ -41,6 +41,13 @@
     "detailsChanged": "Teacher details updated",
     "carAdded": "Car added",
     "carChanged": "Car details updated",
+    "deleteTeacher": "Delete teacher",
+    "removeCar": "Delete car",
+    "confirmDeleteTeacher": "Delete {{name}}? The teacher's cars will be deleted too.",
+    "confirmRemoveCar": "Delete {{name}}?",
+    "deleted": "Teacher deleted",
+    "carRemoved": "Car deleted",
+    "lastCarHint": "The teacher's last car cannot be deleted.",
     "loadFailed": "Loading teachers failed",
     "emptyTitle": "No teachers yet",
     "emptySubtitle": "Create the first teacher to start planning weeks."
@@ -52,6 +59,7 @@
   "general": {
     "save": "Save",
     "cancel": "Cancel",
+    "delete": "Delete",
     "unexpectedError": "Something went wrong. Please try again."
   },
   "formErrors": {
