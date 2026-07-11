@@ -199,4 +199,58 @@ public class TeacherTest
         //then
         Should.Throw<CarNotInTeacherException>(act);
     }
+
+    [TestMethod]
+    public void New_Teacher_Is_Not_Deleted()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+
+        //expected
+        teacher.IsDeleted.ShouldBeFalse();
+    }
+
+    [TestMethod]
+    public void Delete()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+
+        //when
+        teacher.Delete();
+
+        //then
+        teacher.IsDeleted.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Delete__Add_Event()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+
+        //when
+        teacher.Delete();
+
+        //then
+        teacher
+            .UncommittedEvents
+            .OfType<TeacherDeleted>()
+            .Where(x => x.TeacherId == teacher.Id)
+            .ShouldHaveSingleItem();
+    }
+
+    [TestMethod]
+    public void Delete__Must_Not_Be_Deleted()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+        teacher.Delete();
+
+        //when
+        var act = () => teacher.Delete();
+
+        //then
+        Should.Throw<TeacherAlreadyDeletedException>(act);
+    }
 }
