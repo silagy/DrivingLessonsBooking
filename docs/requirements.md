@@ -1,9 +1,9 @@
 # Requirements Document: Weekly Demand Collection System for Driving Lessons
  
-**Version:** 1.1
-**Date:** 13 June 2026
+**Version:** 1.2
+**Date:** 11 July 2026
 **Status:** Approved scope for v1
-**Changelog:** v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
+**Changelog:** v1.2 — teacher car limit removed: a teacher owns **one or more** cars (was 1–2); the minimum-one rule binds as "the last car can never be removed" (see decision #20). v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
 **Scope discipline:** This document is technology-agnostic. A separate technology document (latest .NET, latest Angular, PrimeNG, signal-based patterns) will govern implementation.
  
 ---
@@ -40,14 +40,14 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 | Persona | Description | Authentication |
 |---|---|---|
 | **Administrator** | The school owner. Also a teacher. Performs all planning for all teachers. Uploads and maintains the student roster. | Email + password login |
-| **Teacher** | A data entity. Owns one or two cars. Receives the resulting Excel. No login in v1. The single weekly link covers all teachers; the student's roster record routes them to the right teacher's grid. | None |
+| **Teacher** | A data entity. Owns one or more cars. Receives the resulting Excel. No login in v1. The single weekly link covers all teachers; the student's roster record routes them to the right teacher's grid. | None |
 | **Student** | Receives the single weekly link (typically via WhatsApp). Submits weekly session preferences. Must already exist in the uploaded roster. | National ID identification, validated against the roster, no password (see 8.2) |
  
 ## 5. Domain Model
  
 ### 5.1 Teacher
 - Name, contact email (for receiving the Excel)
-- Owns 1-2 **Cars**
+- Owns one or more **Cars** (at least one; the last car can never be removed — see decision #20)
 ### 5.2 Car
 - **Name:** display label used in the admin UI and Excel (e.g., "Corolla White")
 - **Type:** make/model of the vehicle
@@ -192,7 +192,7 @@ One row per slot request, sorted by day, then slot, then student rank:
 |---|---|---|
 | 1 | Admin = owner-teacher, single login, no teacher logins | v1 reality: one person plans for everyone |
 | 2 | Single school, architecture should not block later generalization | May generalize later |
-| 3 | Scheduling scoped per **teacher**, not per car (still holds). ~~Link scoped per teacher~~ **superseded by #16** | Teacher may operate two cars; the link is now school-wide (see #16) |
+| 3 | Scheduling scoped per **teacher**, not per car (still holds). ~~Link scoped per teacher~~ **superseded by #16** | Teacher may operate multiple cars; the link is now school-wide (see #16) |
 | 4 | One ranked list + target count, no primary/alternative types | Simpler model, rank carries the same information |
 | 5 | Double = 1 request in summary counts | Detail sheet carries the weight; flagged in 8.1 |
 | 6 | ~~Same email reloads submission~~ **superseded by #17**: same national ID reloads submission for editing | Kills the WhatsApp correction loop |
@@ -209,6 +209,7 @@ One row per slot request, sorted by day, then slot, then student rank:
 | 17 | **National ID is the student identifier**, validated against an admin-uploaded roster (CSV); no self-registration | Customer supplies the student list as data; ID is the school's natural key (see ADR 0003) |
 | 18 | **Transmission and teacher come from the roster**, not the form | The CSV already assigns each student a teacher and car; asking would be redundant (see ADR 0003) |
 | 19 | **Unknown ID is rejected** ("contact your school"); new students added by re-uploading the roster | Roster is authoritative; removes self-service onboarding (see ADR 0003) |
+| 20 | **No maximum on cars per teacher** (was 1–2); minimum one binds as "the last car can never be removed" and a teacher may exist carless until their first car is added | Fleet size is the school's business, not a system rule; the minimum only matters once car removal exists |
  
 ## 12. Explicitly Deferred (v2 candidates)
  
