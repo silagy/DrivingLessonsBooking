@@ -13,7 +13,7 @@ public class Teacher : AggregateRoot<TeacherId>
     public Email ContactEmail { get; private set; }
     public bool IsDeleted { get; private set; }
 
-    public IReadOnlyCollection<Car> Cars => cars.AsReadOnly();
+    public IReadOnlyCollection<Car> Cars => cars.Where(x => !x.IsRemoved).ToList();
 
     private Teacher()
     {
@@ -65,6 +65,16 @@ public class Teacher : AggregateRoot<TeacherId>
         AddEvent(new CarDetailsChanged(Id, car.Id, name, type, transmission));
     }
 
+    public void RemoveCar(Car car)
+    {
+        MustOwnCar(car);
+        MustNotRemoveLastCar();
+
+        car.Remove();
+
+        AddEvent(new CarRemoved(Id, car.Id));
+    }
+
     public void Delete()
     {
         MustNotBeDeleted();
@@ -76,9 +86,19 @@ public class Teacher : AggregateRoot<TeacherId>
 
     private void MustOwnCar(Car car)
     {
-        if (!cars.Contains(car))
+        var ownsCar = Cars.Contains(car);
+
+        if (!ownsCar)
         {
             throw new CarNotInTeacherException(Id, car.Id);
+        }
+    }
+
+    private void MustNotRemoveLastCar()
+    {
+        if (Cars.Count == 1)
+        {
+            throw new LastCarCannotBeRemovedException(Id);
         }
     }
 
