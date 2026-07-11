@@ -22,7 +22,7 @@
 - Create: `src/DrivingLessons.Application/Queries/FindTeachers/` (`ItemForFindTeachersResponse.cs`, `FindTeachersInteractor.cs`)
 - Modify: `src/DrivingLessons.Application/DependencyInjection.cs`
 
-- [ ] **Step 1: `src/DrivingLessons.Application/Common/IUnitOfWork.cs`**
+- [x] **Step 1: `src/DrivingLessons.Application/Common/IUnitOfWork.cs`**
 
 ```csharp
 namespace DrivingLessons.Application.Common;
@@ -33,7 +33,7 @@ public interface IUnitOfWork
 }
 ```
 
-- [ ] **Step 2: Not-found exceptions**
+- [x] **Step 2: Not-found exceptions**
 
 `src/DrivingLessons.Application/Common/Exceptions/TeacherNotFoundException.cs`:
 
@@ -67,7 +67,7 @@ public class CarNotFoundException : NotFoundException
 }
 ```
 
-- [ ] **Step 3: CreateTeacher command**
+- [x] **Step 3: CreateTeacher command**
 
 `src/DrivingLessons.Application/Commands/CreateTeacher/CreateTeacherRequest.cs`:
 
@@ -121,7 +121,7 @@ public class CreateTeacherInteractor
 }
 ```
 
-- [ ] **Step 4: AddCar command**
+- [x] **Step 4: AddCar command**
 
 `src/DrivingLessons.Application/Commands/AddCar/AddCarRequest.cs`:
 
@@ -180,7 +180,7 @@ public class AddCarInteractor
 }
 ```
 
-- [ ] **Step 5: ChangeTeacherDetails command**
+- [x] **Step 5: ChangeTeacherDetails command**
 
 `src/DrivingLessons.Application/Commands/ChangeTeacherDetails/ChangeTeacherDetailsRequest.cs`:
 
@@ -227,7 +227,7 @@ public class ChangeTeacherDetailsInteractor
 }
 ```
 
-- [ ] **Step 6: ChangeCarDetails command**
+- [x] **Step 6: ChangeCarDetails command**
 
 `src/DrivingLessons.Application/Commands/ChangeCarDetails/ChangeCarDetailsRequest.cs`:
 
@@ -280,7 +280,7 @@ public class ChangeCarDetailsInteractor
 }
 ```
 
-- [ ] **Step 7: `src/DrivingLessons.Application/Queries/ITeacherQueries.cs`**
+- [x] **Step 7: `src/DrivingLessons.Application/Queries/ITeacherQueries.cs`**
 
 ```csharp
 using DrivingLessons.Application.Queries.FindTeachers;
@@ -296,7 +296,7 @@ public interface ITeacherQueries
 }
 ```
 
-- [ ] **Step 8: GetTeacher query**
+- [x] **Step 8: GetTeacher query**
 
 `src/DrivingLessons.Application/Queries/GetTeacher/GetTeacherResponse.cs`:
 
@@ -373,7 +373,7 @@ public class GetTeacherInteractor
 }
 ```
 
-- [ ] **Step 9: FindTeachers query**
+- [x] **Step 9: FindTeachers query**
 
 `src/DrivingLessons.Application/Queries/FindTeachers/ItemForFindTeachersResponse.cs`:
 
@@ -439,7 +439,7 @@ public class FindTeachersInteractor
 }
 ```
 
-- [ ] **Step 10: Register the interactors — `src/DrivingLessons.Application/DependencyInjection.cs`**
+- [x] **Step 10: Register the interactors — `src/DrivingLessons.Application/DependencyInjection.cs`**
 
 Add the six registrations to the existing `AddApplication` method (keep the `LoginInteractor` line):
 
@@ -471,7 +471,7 @@ public static class DependencyInjection
 }
 ```
 
-- [ ] **Step 11: Verify + commit**
+- [x] **Step 11: Verify + commit**
 
 Run: `dotnet build` — expected: success.
 Run: `dotnet test` — expected: all tests still PASS.
