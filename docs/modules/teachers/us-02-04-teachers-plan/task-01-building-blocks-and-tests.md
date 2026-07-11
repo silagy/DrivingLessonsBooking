@@ -15,7 +15,7 @@
 - Create: `tests/DrivingLessons.Domain.Test/` project + `Common/Faker.cs`
 - Modify: `DrivingLessons.sln`
 
-- [ ] **Step 1: `src/DrivingLessons.Domain/Common/EntityId.cs`**
+- [x] **Step 1: `src/DrivingLessons.Domain/Common/EntityId.cs`**
 
 ```csharp
 namespace DrivingLessons.Domain.Common;
@@ -36,7 +36,7 @@ public abstract record EntityId
 }
 ```
 
-- [ ] **Step 2: `src/DrivingLessons.Domain/Common/Entity.cs`**
+- [x] **Step 2: `src/DrivingLessons.Domain/Common/Entity.cs`**
 
 ```csharp
 namespace DrivingLessons.Domain.Common;
@@ -104,7 +104,7 @@ public abstract class Entity<TId>
 
 Note: `Id` is non-nullable and assigned only in the id-taking constructor; the parameterless constructor exists for EF materialization, which sets `Id` afterwards. If the build treats the resulting CS8618 as an error, add `= null!;` to the property initializer — do not make `Id` nullable.
 
-- [ ] **Step 3: `src/DrivingLessons.Domain/Common/AggregateRoot.cs`**
+- [x] **Step 3: `src/DrivingLessons.Domain/Common/AggregateRoot.cs`**
 
 ```csharp
 namespace DrivingLessons.Domain.Common;
@@ -137,7 +137,7 @@ public abstract class AggregateRoot<TId> : Entity<TId>
 }
 ```
 
-- [ ] **Step 4: `src/DrivingLessons.Domain/Common/IDomainEvent.cs`**
+- [x] **Step 4: `src/DrivingLessons.Domain/Common/IDomainEvent.cs`**
 
 ```csharp
 namespace DrivingLessons.Domain.Common;
@@ -145,7 +145,7 @@ namespace DrivingLessons.Domain.Common;
 public interface IDomainEvent;
 ```
 
-- [ ] **Step 5: Scaffold the test project**
+- [x] **Step 5: Scaffold the test project**
 
 ```
 dotnet new mstest -n DrivingLessons.Domain.Test -o tests/DrivingLessons.Domain.Test -f net10.0
@@ -156,7 +156,7 @@ dotnet add tests/DrivingLessons.Domain.Test package Shouldly
 
 Delete the template's sample test file (`Test1.cs` or `UnitTest1.cs` — whatever `dotnet new mstest` generated).
 
-- [ ] **Step 6: `tests/DrivingLessons.Domain.Test/Common/Faker.cs`**
+- [x] **Step 6: `tests/DrivingLessons.Domain.Test/Common/Faker.cs`**
 
 ```csharp
 namespace DrivingLessons.Domain.Test.Common;
@@ -175,7 +175,7 @@ public static class Faker
 }
 ```
 
-- [ ] **Step 7: Verify + commit**
+- [x] **Step 7: Verify + commit**
 
 Run: `dotnet build` — expected: success.
 Run: `dotnet test` — expected: success (zero tests is fine at this point).
