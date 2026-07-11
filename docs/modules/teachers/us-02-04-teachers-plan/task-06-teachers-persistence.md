@@ -1,4 +1,4 @@
-# Task 6 of 12: Teachers persistence — converters, configuration, repository, queries, migration
+﻿# Task 6 of 12: Teachers persistence — converters, configuration, repository, queries, migration
 
 > Part of [US-02–04: Teachers Module](README.md) ([parent plan](../us-02-04-teachers-plan.md)). Requires tasks 1–5 complete. Work on branch `3-us-02-04-teachers-module`, commands from the repo root.
 
@@ -19,7 +19,7 @@
 - Modify: `src/DrivingLessons.Infrastructure/DependencyInjection.cs` (two registrations)
 - Create (generated): `EntityFramework/Migrations/*_AddTeachers.*`
 
-- [ ] **Step 1: The six converters — one file each in `EntityConfigurations/Converters/`**
+- [x] **Step 1: The six converters — one file each in `EntityConfigurations/Converters/`**
 
 `TeacherIdConverter.cs`:
 
@@ -135,7 +135,7 @@ public class CarTypeConverter : ValueConverter<CarType, string>
 }
 ```
 
-- [ ] **Step 2: `EntityConfigurations/TeacherConfiguration.cs`**
+- [x] **Step 2: `EntityConfigurations/TeacherConfiguration.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Entities;
@@ -205,7 +205,7 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
 }
 ```
 
-- [ ] **Step 3: Add the DbSet — `EntityFramework/DrivingLessonsDbContext.cs`**
+- [x] **Step 3: Add the DbSet — `EntityFramework/DrivingLessonsDbContext.cs`**
 
 Add below the existing `AdminUsers` property (plus `using DrivingLessons.Domain.Entities;`):
 
@@ -213,7 +213,7 @@ Add below the existing `AdminUsers` property (plus `using DrivingLessons.Domain.
     public DbSet<Teacher> Teachers => Set<Teacher>();
 ```
 
-- [ ] **Step 4: `EntityFramework/Repositories/TeacherRepository.cs`**
+- [x] **Step 4: `EntityFramework/Repositories/TeacherRepository.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Entities;
@@ -243,7 +243,7 @@ public class TeacherRepository : ITeacherRepository
 }
 ```
 
-- [ ] **Step 5: `EntityFramework/Queries/TeacherQueries.cs`**
+- [x] **Step 5: `EntityFramework/Queries/TeacherQueries.cs`**
 
 ```csharp
 using DrivingLessons.Application.Queries;
@@ -284,7 +284,7 @@ public class TeacherQueries : ITeacherQueries
 }
 ```
 
-- [ ] **Step 6: Register — `src/DrivingLessons.Infrastructure/DependencyInjection.cs`**
+- [x] **Step 6: Register — `src/DrivingLessons.Infrastructure/DependencyInjection.cs`**
 
 Add two `using` lines and two registrations next to the existing gateway registration:
 
@@ -300,7 +300,7 @@ using DrivingLessons.Infrastructure.EntityFramework.Repositories;
         services.AddScoped<ITeacherQueries, TeacherQueries>();
 ```
 
-- [ ] **Step 7: Generate and review the migration**
+- [x] **Step 7: Generate and review the migration**
 
 ```
 dotnet build
@@ -310,7 +310,7 @@ dotnet ef migrations script --project src/DrivingLessons.Infrastructure --startu
 
 Review the generated migration and script. Expected: two new tables — `teachers` (`id uuid` PK, `name text`, `contact_email text`) and `cars` (`id uuid` PK, `teacher_id uuid` FK → teachers, cascade delete, index on `teacher_id`, `name text`, `type text`, `transmission integer`). No changes to `admin_users`. If `admin_users` appears in the diff, task 5 left drift — stop and fix there first.
 
-- [ ] **Step 8: Verify + commit**
+- [x] **Step 8: Verify + commit**
 
 Run: `dotnet test` — expected: all tests PASS.
 
