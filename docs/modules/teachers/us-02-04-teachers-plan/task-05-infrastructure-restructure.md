@@ -19,7 +19,7 @@
 - Modify: `src/DrivingLessons.Infrastructure/DependencyInjection.cs`, `Auth/AdminAccountGateway.cs`, `Auth/AdminSeeder.cs`
 - Modify: `src/DrivingLessons.Presentation.Web/Program.cs`
 
-- [ ] **Step 1: Move the folder with git so history follows**
+- [x] **Step 1: Move the folder with git so history follows**
 
 ```bash
 git mv src/DrivingLessons.Infrastructure/Persistence src/DrivingLessons.Infrastructure/EntityFramework
@@ -27,7 +27,7 @@ git mv src/DrivingLessons.Infrastructure/EntityFramework/AppDbContext.cs src/Dri
 git mv src/DrivingLessons.Infrastructure/EntityFramework/Migrations/AppDbContextModelSnapshot.cs src/DrivingLessons.Infrastructure/EntityFramework/Migrations/DrivingLessonsDbContextModelSnapshot.cs
 ```
 
-- [ ] **Step 2: `src/DrivingLessons.Infrastructure/EntityFramework/DrivingLessonsDbContext.cs` (full replacement)**
+- [x] **Step 2: `src/DrivingLessons.Infrastructure/EntityFramework/DrivingLessonsDbContext.cs` (full replacement)**
 
 `CommitAsync` is `SaveChangesAsync` only — no event dispatch until the first real handler exists (locked decision). Note the class is no longer `sealed` and mapping moves to configuration classes.
 
@@ -59,7 +59,7 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 }
 ```
 
-- [ ] **Step 3: `src/DrivingLessons.Infrastructure/EntityFramework/EntityConfigurations/AdminUserConfiguration.cs`**
+- [x] **Step 3: `src/DrivingLessons.Infrastructure/EntityFramework/EntityConfigurations/AdminUserConfiguration.cs`**
 
 Byte-identical model to the old inline mapping — change nothing but the location.
 
@@ -83,7 +83,7 @@ public class AdminUserConfiguration : IEntityTypeConfiguration<AdminUser>
 }
 ```
 
-- [ ] **Step 4: Fix the migration files (namespace + context references ONLY)**
+- [x] **Step 4: Fix the migration files (namespace + context references ONLY)**
 
 `Migrations/20260613173834_InitialCreate.cs` — change the namespace line only:
 
@@ -124,7 +124,7 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
 
 The `BuildTargetModel`/`BuildModel` bodies stay untouched.
 
-- [ ] **Step 5: `src/DrivingLessons.Infrastructure/DependencyInjection.cs` (full replacement)**
+- [x] **Step 5: `src/DrivingLessons.Infrastructure/DependencyInjection.cs` (full replacement)**
 
 Registers the context under its new name and exposes it as `IUnitOfWork`.
 
@@ -168,7 +168,7 @@ public static class DependencyInjection
 }
 ```
 
-- [ ] **Step 6: Update the two auth-slice consumers**
+- [x] **Step 6: Update the two auth-slice consumers**
 
 `src/DrivingLessons.Infrastructure/Auth/AdminAccountGateway.cs` — replace the `using DrivingLessons.Infrastructure.Persistence;` line with `using DrivingLessons.Infrastructure.EntityFramework;` and the constructor/field type `AppDbContext` with `DrivingLessonsDbContext`.
 
@@ -178,7 +178,7 @@ public static class DependencyInjection
 public static async Task SeedAsync(DrivingLessonsDbContext dbContext, AdminOptions options, CancellationToken cancellationToken = default)
 ```
 
-- [ ] **Step 7: `src/DrivingLessons.Presentation.Web/Program.cs` — two changes**
+- [x] **Step 7: `src/DrivingLessons.Presentation.Web/Program.cs` — two changes**
 
 Replace the `using DrivingLessons.Infrastructure.Persistence;` line with:
 
@@ -192,7 +192,7 @@ Replace the startup-scope resolution:
     var db = scope.ServiceProvider.GetRequiredService<DrivingLessonsDbContext>();
 ```
 
-- [ ] **Step 8: Verify — build, migration list, zero drift**
+- [x] **Step 8: Verify — build, migration list, zero drift**
 
 ```
 dotnet build
@@ -203,7 +203,7 @@ dotnet ef migrations has-pending-model-changes --project src/DrivingLessons.Infr
 
 Expected: build succeeds; the list shows exactly `20260613173834_InitialCreate`; the drift check reports **no pending model changes** (proves the `AdminUserConfiguration` move is byte-identical). If it reports changes, diff the snapshot against the configuration before proceeding — do not add a migration.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A src
