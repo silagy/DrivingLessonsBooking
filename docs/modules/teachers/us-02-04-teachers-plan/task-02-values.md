@@ -15,7 +15,7 @@
 - Create: `src/DrivingLessons.Domain/Exceptions/TeacherNameMustNotBeEmptyException.cs`, `EmailMustBeValidException.cs`, `CarNameMustNotBeEmptyException.cs`, `CarTypeMustNotBeEmptyException.cs`
 - Test: `tests/DrivingLessons.Domain.Test/Values/TeacherIdTest.cs`, `TeacherNameTest.cs`, `EmailTest.cs`, `CarNameTest.cs`, `CarTypeTest.cs`
 
-- [ ] **Step 1: Write the failing tests — `tests/DrivingLessons.Domain.Test/Values/TeacherIdTest.cs`**
+- [x] **Step 1: Write the failing tests — `tests/DrivingLessons.Domain.Test/Values/TeacherIdTest.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Values;
@@ -62,7 +62,7 @@ public class TeacherIdTest
 }
 ```
 
-- [ ] **Step 2: `tests/DrivingLessons.Domain.Test/Values/TeacherNameTest.cs`**
+- [x] **Step 2: `tests/DrivingLessons.Domain.Test/Values/TeacherNameTest.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Exceptions;
@@ -103,7 +103,7 @@ public class TeacherNameTest
 }
 ```
 
-- [ ] **Step 3: `tests/DrivingLessons.Domain.Test/Values/EmailTest.cs`**
+- [x] **Step 3: `tests/DrivingLessons.Domain.Test/Values/EmailTest.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Exceptions;
@@ -153,7 +153,7 @@ public class EmailTest
 }
 ```
 
-- [ ] **Step 4: `tests/DrivingLessons.Domain.Test/Values/CarNameTest.cs`**
+- [x] **Step 4: `tests/DrivingLessons.Domain.Test/Values/CarNameTest.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Exceptions;
@@ -194,7 +194,7 @@ public class CarNameTest
 }
 ```
 
-- [ ] **Step 5: `tests/DrivingLessons.Domain.Test/Values/CarTypeTest.cs`**
+- [x] **Step 5: `tests/DrivingLessons.Domain.Test/Values/CarTypeTest.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Exceptions;
@@ -235,11 +235,11 @@ public class CarTypeTest
 }
 ```
 
-- [ ] **Step 6: Run the tests — expected: compilation failures (types do not exist yet)**
+- [x] **Step 6: Run the tests — expected: compilation failures (types do not exist yet)**
 
 Run: `dotnet test`
 
-- [ ] **Step 7: `src/DrivingLessons.Domain/Values/TeacherId.cs`**
+- [x] **Step 7: `src/DrivingLessons.Domain/Values/TeacherId.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Common;
@@ -265,7 +265,7 @@ public record TeacherId : EntityId
 }
 ```
 
-- [ ] **Step 8: `src/DrivingLessons.Domain/Values/CarId.cs`**
+- [x] **Step 8: `src/DrivingLessons.Domain/Values/CarId.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Common;
@@ -291,7 +291,7 @@ public record CarId : EntityId
 }
 ```
 
-- [ ] **Step 9: `src/DrivingLessons.Domain/Values/TeacherName.cs`**
+- [x] **Step 9: `src/DrivingLessons.Domain/Values/TeacherName.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Exceptions;
@@ -321,7 +321,7 @@ public record TeacherName
 }
 ```
 
-- [ ] **Step 10: `src/DrivingLessons.Domain/Values/Email.cs`**
+- [x] **Step 10: `src/DrivingLessons.Domain/Values/Email.cs`**
 
 ```csharp
 using System.Net.Mail;
@@ -357,7 +357,7 @@ public record Email
 }
 ```
 
-- [ ] **Step 11: `src/DrivingLessons.Domain/Values/CarName.cs`**
+- [x] **Step 11: `src/DrivingLessons.Domain/Values/CarName.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Exceptions;
@@ -387,7 +387,7 @@ public record CarName
 }
 ```
 
-- [ ] **Step 12: `src/DrivingLessons.Domain/Values/CarType.cs`**
+- [x] **Step 12: `src/DrivingLessons.Domain/Values/CarType.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Exceptions;
@@ -417,7 +417,7 @@ public record CarType
 }
 ```
 
-- [ ] **Step 13: `src/DrivingLessons.Domain/Values/Transmission.cs`**
+- [x] **Step 13: `src/DrivingLessons.Domain/Values/Transmission.cs`**
 
 ```csharp
 namespace DrivingLessons.Domain.Values;
@@ -429,7 +429,7 @@ public enum Transmission
 }
 ```
 
-- [ ] **Step 14: The four exception classes**
+- [x] **Step 14: The four exception classes**
 
 `src/DrivingLessons.Domain/Exceptions/TeacherNameMustNotBeEmptyException.cs`:
 
@@ -495,7 +495,7 @@ public class CarTypeMustNotBeEmptyException : DomainException
 }
 ```
 
-- [ ] **Step 15: Verify + commit**
+- [x] **Step 15: Verify + commit**
 
 Run: `dotnet test` — expected: all tests PASS.
 
