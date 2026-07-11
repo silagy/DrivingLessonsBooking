@@ -20,5 +20,14 @@
   "dashboard": {
     "title": "לוח בקרה",
     "placeholder": "ברוך הבא. יכולות התכנון יגיעו בפרוסות הבאות."
+  },
+  "general": {
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "unexpectedError": "משהו השתבש. נסו שוב."
+  },
+  "formErrors": {
+    "required": "שדה חובה",
+    "emailInvalid": "יש להזין כתובת אימייל תקינה"
   }
 }

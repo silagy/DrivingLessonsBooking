@@ -20,5 +20,14 @@
   "dashboard": {
     "title": "Dashboard",
     "placeholder": "Welcome. Planning features arrive in the next slices."
+  },
+  "general": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "unexpectedError": "Something went wrong. Please try again."
+  },
+  "formErrors": {
+    "required": "This field is required",
+    "emailInvalid": "Enter a valid email address"
   }
 }

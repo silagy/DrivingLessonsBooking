@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
+import { AppRoutes } from '../shared/config/app-routes';
 
 export interface LoginResponse {
   accessToken: string;
@@ -45,6 +46,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     this.token.set(null);
-    void this.router.navigate(['/login']);
+    void this.router.navigate(['/', AppRoutes.login]);
   }
 }
