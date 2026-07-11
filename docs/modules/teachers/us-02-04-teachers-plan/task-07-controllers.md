@@ -15,7 +15,7 @@
 - Create: `src/DrivingLessons.Presentation.Web/Controllers/Teacher/TeacherQueryController.cs`
 - Modify: `src/DrivingLessons.Presentation.Web/Program.cs` (JSON enum converter)
 
-- [ ] **Step 1: `Controllers/Teacher/TeacherCommandController.cs`**
+- [x] **Step 1: `Controllers/Teacher/TeacherCommandController.cs`**
 
 ```csharp
 using System.ComponentModel.DataAnnotations;
@@ -93,7 +93,7 @@ public class TeacherCommandController : ControllerBase
 }
 ```
 
-- [ ] **Step 2: `Controllers/Teacher/TeacherQueryController.cs`**
+- [x] **Step 2: `Controllers/Teacher/TeacherQueryController.cs`**
 
 ```csharp
 using DrivingLessons.Application.Queries.FindTeachers;
@@ -131,7 +131,7 @@ public class TeacherQueryController : ControllerBase
 
 Note: the controller class name collides with the `Teacher` entity only via namespace — the `DrivingLessons.Presentation.Web.Controllers.Teacher` namespace never imports `DrivingLessons.Domain.Entities`, so no conflict arises. If an analyzer complains, do not rename the namespace; alias the entity where needed.
 
-- [ ] **Step 3: Enum serialization — `src/DrivingLessons.Presentation.Web/Program.cs`**
+- [x] **Step 3: Enum serialization — `src/DrivingLessons.Presentation.Web/Program.cs`**
 
 Add `using System.Text.Json;` and `using System.Text.Json.Serialization;` to the top, then extend the existing `AddControllers` call:
 
@@ -142,7 +142,7 @@ builder.Services
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 ```
 
-- [ ] **Step 4: Verify via Scalar**
+- [x] **Step 4: Verify via Scalar**
 
 Start Postgres (per `docs/development/running-the-project.md`), then run the API in Development and open `/scalar/v1`:
 
@@ -161,7 +161,7 @@ Walkthrough (authorize with a bearer token from `POST api/auth/login` first):
 7. `POST api/teachers` with `"contactEmail": "not-an-email"` → **409** (EmailMustBeValid).
 8. `GET api/teachers/find` → **200**, cars nested, transmission rendered as `"automatic"`/`"manual"`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src
