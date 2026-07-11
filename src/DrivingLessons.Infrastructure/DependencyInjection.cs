@@ -1,7 +1,8 @@
 using DrivingLessons.Application.Auth;
+using DrivingLessons.Application.Common;
 using DrivingLessons.Infrastructure.Auth;
+using DrivingLessons.Infrastructure.EntityFramework;
 using DrivingLessons.Infrastructure.Options;
-using DrivingLessons.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +13,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(o =>
+        services.AddDbContext<DrivingLessonsDbContext>(o =>
             o.UseNpgsql(configuration.GetConnectionString("Default")));
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DrivingLessonsDbContext>());
 
         services.AddOptions<AdminOptions>()
             .Bind(configuration.GetSection(AdminOptions.SectionName))

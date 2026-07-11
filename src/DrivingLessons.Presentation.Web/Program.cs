@@ -5,7 +5,7 @@ using DrivingLessons.Application;
 using DrivingLessons.Infrastructure;
 using DrivingLessons.Infrastructure.Auth;
 using DrivingLessons.Infrastructure.Options;
-using DrivingLessons.Infrastructure.Persistence;
+using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +48,7 @@ var app = builder.Build();
 
 await using (var scope = app.Services.CreateAsyncScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<DrivingLessonsDbContext>();
     await db.Database.MigrateAsync();
     var adminOptions = scope.ServiceProvider.GetRequiredService<IOptions<AdminOptions>>().Value;
     await AdminSeeder.SeedAsync(db, adminOptions);

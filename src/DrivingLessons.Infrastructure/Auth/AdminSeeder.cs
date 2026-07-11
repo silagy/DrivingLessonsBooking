@@ -1,5 +1,5 @@
 using DrivingLessons.Infrastructure.Options;
-using DrivingLessons.Infrastructure.Persistence;
+using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +7,7 @@ namespace DrivingLessons.Infrastructure.Auth;
 
 public static class AdminSeeder
 {
-    public static async Task SeedAsync(AppDbContext dbContext, AdminOptions options, CancellationToken cancellationToken = default)
+    public static async Task SeedAsync(DrivingLessonsDbContext dbContext, AdminOptions options, CancellationToken cancellationToken = default)
     {
         var hasher = new PasswordHasher<AdminUser>();
         var normalizedEmail = options.Email.Trim().ToLowerInvariant();

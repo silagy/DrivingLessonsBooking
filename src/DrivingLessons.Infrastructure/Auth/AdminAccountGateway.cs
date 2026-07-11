@@ -1,10 +1,10 @@
 using DrivingLessons.Application.Auth;
-using DrivingLessons.Infrastructure.Persistence;
+using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingLessons.Infrastructure.Auth;
 
-public sealed class AdminAccountGateway(AppDbContext dbContext) : IAdminAccountGateway
+public sealed class AdminAccountGateway(DrivingLessonsDbContext dbContext) : IAdminAccountGateway
 {
     public async Task<AdminAccount?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
     {
