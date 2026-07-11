@@ -1,4 +1,6 @@
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using DrivingLessons.Presentation.Web.Filters;
 using DrivingLessons.Presentation.Web.OpenApi;
 using DrivingLessons.Application;
@@ -15,7 +17,10 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilter>());
+builder.Services
+    .AddControllers(options => options.Filters.Add<ApiExceptionFilter>())
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 builder.Services.AddApplication();
