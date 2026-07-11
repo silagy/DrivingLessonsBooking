@@ -29,6 +29,10 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
             .HasColumnName("contact_email")
             .HasConversion<EmailConverter>();
 
+        builder
+            .Property(x => x.IsDeleted)
+            .HasColumnName("is_deleted");
+
         builder.OwnsMany(
             x => x.Cars,
             cars =>
@@ -62,10 +66,16 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
                 cars
                     .Property(c => c.Transmission)
                     .HasColumnName("transmission");
+
+                cars
+                    .Property(c => c.IsRemoved)
+                    .HasColumnName("is_removed");
             });
 
         builder
             .Navigation(x => x.Cars)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

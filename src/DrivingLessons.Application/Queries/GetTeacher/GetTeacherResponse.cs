@@ -18,6 +18,7 @@ public class GetTeacherResponse
             Name = x.Name.Value,
             ContactEmail = x.ContactEmail.Value,
             Cars = x.Cars
+                       .Where(car => !car.IsRemoved)
                        .Select(car => new CarForGetTeacherResponse
                        {
                            Id = car.Id.Value,
