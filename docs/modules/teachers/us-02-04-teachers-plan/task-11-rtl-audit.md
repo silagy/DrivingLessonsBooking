@@ -8,7 +8,7 @@
 
 ---
 
-- [ ] **Step 1: Static sweep of the new code**
+- [x] **Step 1: Static sweep of the new code**
 
 Search every file added in tasks 8–10 for physical CSS properties — all of these must be zero hits (logical equivalents only):
 
@@ -18,7 +18,7 @@ grep -rnE "margin-(left|right)|padding-(left|right)|text-align: (left|right)|[^-
 
 Fix any hit with the logical equivalent (`margin-inline-start`, `padding-inline-end`, `inset-inline-*`, `text-align: start`).
 
-- [ ] **Step 2: Runtime pass in Hebrew**
+- [x] **Step 2: Runtime pass in Hebrew**
 
 With API + client running, switch the language toggle to עברית and walk the teachers screen:
 
@@ -29,11 +29,11 @@ With API + client running, switch the language toggle to עברית and walk the
 5. Dialogs: labels right-aligned naturally, action buttons at the inline-end, select opens correctly.
 6. Toasts appear translated in Hebrew.
 
-- [ ] **Step 3: Missing-key check**
+- [x] **Step 3: Missing-key check**
 
 With the browser console open, walk every screen and dialog in both languages — zero Transloco missing-key warnings. Add any missing key to **both** `en.json` and `he.json`.
 
-- [ ] **Step 4: Commit (only if changes were needed)**
+- [x] **Step 4: Commit (only if changes were needed)**
 
 ```bash
 git add client

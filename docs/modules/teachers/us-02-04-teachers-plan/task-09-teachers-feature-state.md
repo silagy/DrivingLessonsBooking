@@ -15,7 +15,7 @@
 - Create: `client/src/app/features/teachers/data/create-teacher.request.ts`, `create-teacher.response.ts`, `add-car.request.ts`, `add-car.response.ts`, `change-teacher-details.request.ts`, `change-car-details.request.ts`, `item-for-find-teachers.response.ts`, `teachers-api.service.ts`
 - Create: `client/src/app/features/teachers/state/teachers.store.ts`
 
-- [ ] **Step 1: `domain/transmission.enum.ts`**
+- [x] **Step 1: `domain/transmission.enum.ts`**
 
 ```typescript
 export enum Transmission {
@@ -24,7 +24,7 @@ export enum Transmission {
 }
 ```
 
-- [ ] **Step 2: `domain/car.model.ts`**
+- [x] **Step 2: `domain/car.model.ts`**
 
 ```typescript
 import { Transmission } from './transmission.enum';
@@ -37,7 +37,7 @@ export interface Car {
 }
 ```
 
-- [ ] **Step 3: `domain/teacher.model.ts`**
+- [x] **Step 3: `domain/teacher.model.ts`**
 
 ```typescript
 import { Car } from './car.model';
@@ -50,7 +50,7 @@ export interface Teacher {
 }
 ```
 
-- [ ] **Step 4: Request/response interfaces in `data/`**
+- [x] **Step 4: Request/response interfaces in `data/`**
 
 `create-teacher.request.ts`:
 
@@ -130,7 +130,7 @@ export interface ItemForFindTeachersResponse {
 }
 ```
 
-- [ ] **Step 5: `data/teachers-api.service.ts`**
+- [x] **Step 5: `data/teachers-api.service.ts`**
 
 ```typescript
 import { Injectable, inject } from '@angular/core';
@@ -171,7 +171,7 @@ export class TeachersApiService {
 }
 ```
 
-- [ ] **Step 6: `state/teachers.store.ts`**
+- [x] **Step 6: `state/teachers.store.ts`**
 
 Cars are sorted client-side for stable order (owned-collection order from the DB is nondeterministic). The spinner should only show on first load — during a `reload()` the resource keeps serving the previous value.
 
@@ -246,7 +246,7 @@ export class TeachersStore {
 }
 ```
 
-- [ ] **Step 7: Verify (no commit)**
+- [x] **Step 7: Verify (no commit)**
 
 Run from `client\`: `npm run build` — expected: success (the store compiles even though nothing consumes it yet; if the linter flags unused code, proceed to task 10 before committing).
 

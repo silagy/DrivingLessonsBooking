@@ -21,7 +21,7 @@
 - Modify: `client/src/app/features/admin-shell/admin.routes.ts`, `admin-shell.component.ts`, `.html`, `.scss`
 - Modify: `client/public/i18n/en.json`, `client/public/i18n/he.json`
 
-- [ ] **Step 1: `ui/dialogs/teacher-form/teacher-form.dialog.ts`**
+- [x] **Step 1: `ui/dialogs/teacher-form/teacher-form.dialog.ts`**
 
 ```typescript
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
@@ -69,7 +69,7 @@ export class TeacherFormDialog {
 }
 ```
 
-- [ ] **Step 2: `ui/dialogs/teacher-form/teacher-form.dialog.html`**
+- [x] **Step 2: `ui/dialogs/teacher-form/teacher-form.dialog.html`**
 
 ```html
 <form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
@@ -93,7 +93,7 @@ export class TeacherFormDialog {
 </form>
 ```
 
-- [ ] **Step 3: `ui/dialogs/car-form/car-form.dialog.ts`**
+- [x] **Step 3: `ui/dialogs/car-form/car-form.dialog.ts`**
 
 Transmission options carry labels translated at open time (point-in-time strings, same rule as dialog headers).
 
@@ -153,7 +153,7 @@ export class CarFormDialog {
 }
 ```
 
-- [ ] **Step 4: `ui/dialogs/car-form/car-form.dialog.html`**
+- [x] **Step 4: `ui/dialogs/car-form/car-form.dialog.html`**
 
 ```html
 <form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
@@ -185,7 +185,7 @@ export class CarFormDialog {
 </form>
 ```
 
-- [ ] **Step 5: `ui/dialogs/dialog-form.scss` (shared by both dialogs)**
+- [x] **Step 5: `ui/dialogs/dialog-form.scss` (shared by both dialogs)**
 
 ```scss
 .dialog-form {
@@ -225,7 +225,7 @@ export class CarFormDialog {
 }
 ```
 
-- [ ] **Step 6: `ui/components/car-row/car-row.component.ts`**
+- [x] **Step 6: `ui/components/car-row/car-row.component.ts`**
 
 ```typescript
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
@@ -249,7 +249,7 @@ export class CarRowComponent {
 }
 ```
 
-- [ ] **Step 7: `ui/components/car-row/car-row.component.html`**
+- [x] **Step 7: `ui/components/car-row/car-row.component.html`**
 
 ```html
 <button type="button" class="car" (click)="edit.emit()">
@@ -264,7 +264,7 @@ export class CarRowComponent {
 </button>
 ```
 
-- [ ] **Step 8: `ui/components/car-row/car-row.component.scss`**
+- [x] **Step 8: `ui/components/car-row/car-row.component.scss`**
 
 ```scss
 .car {
@@ -328,7 +328,7 @@ export class CarRowComponent {
 }
 ```
 
-- [ ] **Step 9: `ui/components/teacher-card/teacher-card.component.ts`**
+- [x] **Step 9: `ui/components/teacher-card/teacher-card.component.ts`**
 
 ```typescript
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
@@ -363,7 +363,7 @@ export class TeacherCardComponent {
 }
 ```
 
-- [ ] **Step 10: `ui/components/teacher-card/teacher-card.component.html`**
+- [x] **Step 10: `ui/components/teacher-card/teacher-card.component.html`**
 
 ```html
 <article class="card">
@@ -401,7 +401,7 @@ export class TeacherCardComponent {
 </article>
 ```
 
-- [ ] **Step 11: `ui/components/teacher-card/teacher-card.component.scss`**
+- [x] **Step 11: `ui/components/teacher-card/teacher-card.component.scss`**
 
 ```scss
 .card {
@@ -468,7 +468,7 @@ export class TeacherCardComponent {
 }
 ```
 
-- [ ] **Step 12: `ui/pages/teachers-list/teachers-list.page.ts`**
+- [x] **Step 12: `ui/pages/teachers-list/teachers-list.page.ts`**
 
 ```typescript
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
@@ -562,7 +562,7 @@ export class TeachersListPage {
 }
 ```
 
-- [ ] **Step 13: `ui/pages/teachers-list/teachers-list.page.html`**
+- [x] **Step 13: `ui/pages/teachers-list/teachers-list.page.html`**
 
 ```html
 <div class="teachers">
@@ -601,7 +601,7 @@ export class TeachersListPage {
 </div>
 ```
 
-- [ ] **Step 14: `ui/pages/teachers-list/teachers-list.page.scss`**
+- [x] **Step 14: `ui/pages/teachers-list/teachers-list.page.scss`**
 
 ```scss
 .teachers__header {
@@ -670,7 +670,7 @@ export class TeachersListPage {
 }
 ```
 
-- [ ] **Step 15: `client/src/app/features/teachers/teachers.routes.ts`**
+- [x] **Step 15: `client/src/app/features/teachers/teachers.routes.ts`**
 
 ```typescript
 import { Routes } from '@angular/router';
@@ -679,7 +679,7 @@ import { TeachersListPage } from './ui/pages/teachers-list/teachers-list.page';
 export default [{ path: '', component: TeachersListPage }] satisfies Routes;
 ```
 
-- [ ] **Step 16: Wire the route — `client/src/app/features/admin-shell/admin.routes.ts` (full replacement)**
+- [x] **Step 16: Wire the route — `client/src/app/features/admin-shell/admin.routes.ts` (full replacement)**
 
 ```typescript
 import { Routes } from '@angular/router';
@@ -702,7 +702,7 @@ export const ADMIN_ROUTES: Routes = [
 ];
 ```
 
-- [ ] **Step 17: Shell topbar navigation**
+- [x] **Step 17: Shell topbar navigation**
 
 `client/src/app/features/admin-shell/admin-shell.component.ts` (full replacement):
 
@@ -827,7 +827,7 @@ export class AdminShellComponent {
 
 If `--app-ocean` is not defined in `client/src/styles/_tokens.scss`, add it there (`--app-ocean: #00bbc7;`) rather than hardcoding twice.
 
-- [ ] **Step 18: i18n — add to BOTH files in the same change**
+- [x] **Step 18: i18n — add to BOTH files in the same change**
 
 `client/public/i18n/en.json` — add inside `shell` and as a new top-level `teachers` namespace:
 
@@ -905,7 +905,7 @@ If `--app-ocean` is not defined in `client/src/styles/_tokens.scss`, add it ther
   }
 ```
 
-- [ ] **Step 19: Verify end-to-end in the browser**
+- [x] **Step 19: Verify end-to-end in the browser**
 
 Run the API (`dotnet run --project src/DrivingLessons.Presentation.Web`) and the client (`npm start` from `client\`, proxying `/api` per the existing dev setup). Sign in, then:
 
@@ -917,7 +917,7 @@ Run the API (`dotnet run --project src/DrivingLessons.Presentation.Web`) and the
 6. Force a 409 (e.g. temporarily submit an invalid email past the form by relaxing the client validator) → red toast shows the backend message. Revert any temporary change.
 7. Toggle to Hebrew — layout mirrors, all strings translated.
 
-- [ ] **Step 20: Commit tasks 9–10 together**
+- [x] **Step 20: Commit tasks 9–10 together**
 
 ```bash
 git add client
