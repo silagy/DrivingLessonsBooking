@@ -1,0 +1,8 @@
+<div class="confirm">
+  <p class="confirm__message">{{ messageKey | transloco: messageParams }}</p>
+
+  <div class="confirm__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+    <p-button [label]="'general.delete' | transloco" severity="danger" type="button" (onClick)="confirm()" />
+  </div>
+</div>
