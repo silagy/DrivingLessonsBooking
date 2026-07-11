@@ -15,7 +15,35 @@
   "shell": {
     "title": "Driving Lessons Planner",
     "logout": "Sign out",
-    "languageToggle": "עברית"
+    "languageToggle": "עברית",
+    "nav": {
+      "dashboard": "Dashboard",
+      "teachers": "Teachers & cars"
+    }
+  },
+  "teachers": {
+    "title": "Teachers & cars",
+    "subtitle": "Scheduling is per teacher; the roster assigns each student a car.",
+    "addTeacher": "Add teacher",
+    "editTeacher": "Edit",
+    "addCar": "Add car",
+    "editCar": "Edit car",
+    "name": "Name",
+    "contactEmail": "Contact email",
+    "carName": "Car name",
+    "carType": "Vehicle type",
+    "transmission": "Transmission",
+    "transmissions": {
+      "automatic": "Automatic",
+      "manual": "Manual"
+    },
+    "created": "Teacher created",
+    "detailsChanged": "Teacher details updated",
+    "carAdded": "Car added",
+    "carChanged": "Car details updated",
+    "loadFailed": "Loading teachers failed",
+    "emptyTitle": "No teachers yet",
+    "emptySubtitle": "Create the first teacher to start planning weeks."
   },
   "dashboard": {
     "title": "Dashboard",

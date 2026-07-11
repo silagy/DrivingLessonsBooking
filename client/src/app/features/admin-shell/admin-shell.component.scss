@@ -20,6 +20,36 @@
   padding-inline: 2.25rem;
 }
 
+.shell__nav {
+  display: flex;
+  gap: 1.625rem;
+  align-self: stretch;
+}
+
+.shell__nav-link {
+  display: flex;
+  align-items: center;
+  position: relative;
+  font-size: 0.9rem;
+  color: var(--app-text-secondary);
+  text-decoration: none;
+}
+
+.shell__nav-link--active {
+  color: var(--app-ink);
+  font-weight: 500;
+}
+
+.shell__nav-link--active::after {
+  content: '';
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  height: 3px;
+  background: var(--app-grad-sky);
+  border-radius: 3px 3px 0 0;
+}
+
 .shell__actions {
   margin-inline-start: auto;
   display: flex;
