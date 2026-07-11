@@ -52,6 +52,14 @@ export class TeachersStore {
         );
     }
 
+    async delete(teacherId: string): Promise<void> {
+        await this.executeCommand(() => this.api.deleteTeacher(teacherId), 'teachers.deleted');
+    }
+
+    async removeCar(teacherId: string, carId: string): Promise<void> {
+        await this.executeCommand(() => this.api.removeCar(teacherId, carId), 'teachers.carRemoved');
+    }
+
     private async executeCommand(command: () => Observable<unknown>, successKey: string): Promise<void> {
         this.mutating.set(true);
 

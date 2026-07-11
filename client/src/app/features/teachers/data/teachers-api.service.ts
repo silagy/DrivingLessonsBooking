@@ -33,4 +33,12 @@ export class TeachersApiService {
     changeCarDetails(teacherId: string, carId: string, request: ChangeCarDetailsRequest): Observable<void> {
         return this.http.put<void>(`${this.baseUrl}/${teacherId}/cars/${carId}`, request);
     }
+
+    deleteTeacher(teacherId: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${teacherId}`);
+    }
+
+    removeCar(teacherId: string, carId: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${teacherId}/cars/${carId}`);
+    }
 }
