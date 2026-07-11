@@ -1,4 +1,4 @@
-# Task 3 of 12: Teacher aggregate + Car child + events (TDD)
+﻿# Task 3 of 12: Teacher aggregate + Car child + events (TDD)
 
 > Part of [US-02–04: Teachers Module](README.md) ([parent plan](../us-02-04-teachers-plan.md)). Requires tasks 1–2 complete. Work on branch `3-us-02-04-teachers-module`, commands from the repo root.
 
@@ -17,7 +17,7 @@
 - Create: `src/DrivingLessons.Domain/Repositories/ITeacherRepository.cs`
 - Test: `tests/DrivingLessons.Domain.Test/Entities/TeacherTest.cs`, `tests/DrivingLessons.Domain.Test/Entities/Fake/TeacherFakeBuilder.cs`
 
-- [ ] **Step 1: Write the FakeBuilder — `tests/DrivingLessons.Domain.Test/Entities/Fake/TeacherFakeBuilder.cs`**
+- [x] **Step 1: Write the FakeBuilder — `tests/DrivingLessons.Domain.Test/Entities/Fake/TeacherFakeBuilder.cs`**
 
 Deviation from the FakeBuilder template noted: `Teacher` has no state enum, so there is no `StateBuilders` dictionary.
 
@@ -49,7 +49,7 @@ public static class TeacherFakeBuilder
 }
 ```
 
-- [ ] **Step 2: Write the failing tests — `tests/DrivingLessons.Domain.Test/Entities/TeacherTest.cs`**
+- [x] **Step 2: Write the failing tests — `tests/DrivingLessons.Domain.Test/Entities/TeacherTest.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Entities;
@@ -256,11 +256,11 @@ public class TeacherTest
 }
 ```
 
-- [ ] **Step 3: Run the tests — expected: compilation failures**
+- [x] **Step 3: Run the tests — expected: compilation failures**
 
 Run: `dotnet test`
 
-- [ ] **Step 4: The four events — one file each in `src/DrivingLessons.Domain/Events/`**
+- [x] **Step 4: The four events — one file each in `src/DrivingLessons.Domain/Events/`**
 
 `TeacherCreated.cs`:
 
@@ -306,7 +306,7 @@ namespace DrivingLessons.Domain.Events;
 public record CarDetailsChanged(TeacherId TeacherId, CarId CarId, CarName Name, CarType Type, Transmission Transmission) : IDomainEvent;
 ```
 
-- [ ] **Step 5: `src/DrivingLessons.Domain/Exceptions/CarNotInTeacherException.cs`**
+- [x] **Step 5: `src/DrivingLessons.Domain/Exceptions/CarNotInTeacherException.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Common;
@@ -323,7 +323,7 @@ public class CarNotInTeacherException : DomainException
 }
 ```
 
-- [ ] **Step 6: `src/DrivingLessons.Domain/Entities/Car.cs`**
+- [x] **Step 6: `src/DrivingLessons.Domain/Entities/Car.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Common;
@@ -364,7 +364,7 @@ public class Car : Entity<CarId>
 }
 ```
 
-- [ ] **Step 7: `src/DrivingLessons.Domain/Entities/Teacher.cs`**
+- [x] **Step 7: `src/DrivingLessons.Domain/Entities/Teacher.cs`**
 
 ```csharp
 using DrivingLessons.Domain.Common;
@@ -441,7 +441,7 @@ public class Teacher : AggregateRoot<TeacherId>
 }
 ```
 
-- [ ] **Step 8: `src/DrivingLessons.Domain/Repositories/ITeacherRepository.cs`**
+- [x] **Step 8: `src/DrivingLessons.Domain/Repositories/ITeacherRepository.cs`**
 
 No `UnitOfWork` property — locked decision; interactors inject `IUnitOfWork` separately (task 4).
 
@@ -459,7 +459,7 @@ public interface ITeacherRepository
 }
 ```
 
-- [ ] **Step 9: Verify + commit**
+- [x] **Step 9: Verify + commit**
 
 Run: `dotnet test` — expected: all tests PASS.
 
