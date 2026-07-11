@@ -16,7 +16,7 @@
 - Create: `client/src/app/shared/config/app-routes.ts`
 - Modify: `client/src/app/app.ts`, `client/src/app/app.config.ts`, `client/src/app/app.routes.ts`, `client/src/app/core/auth.guard.ts` (only if it hardcodes `'/login'`), `client/public/i18n/en.json`, `client/public/i18n/he.json`
 
-- [ ] **Step 1: `client/src/app/shared/models/problem-details.ts`**
+- [x] **Step 1: `client/src/app/shared/models/problem-details.ts`**
 
 Mirrors what `ApiExceptionFilter` emits (`Status`, `Title`, `Detail` — the domain message lives in `detail`).
 
@@ -28,7 +28,7 @@ export interface ProblemDetails {
 }
 ```
 
-- [ ] **Step 2: `client/src/app/core/services/toast.service.ts`**
+- [x] **Step 2: `client/src/app/core/services/toast.service.ts`**
 
 ```typescript
 import { Injectable, inject } from '@angular/core';
@@ -64,7 +64,7 @@ export class ToastService {
 }
 ```
 
-- [ ] **Step 3: `client/src/app/shared/config/app-routes.ts`**
+- [x] **Step 3: `client/src/app/shared/config/app-routes.ts`**
 
 ```typescript
 export const AppRoutes = {
@@ -73,7 +73,7 @@ export const AppRoutes = {
 } as const;
 ```
 
-- [ ] **Step 4: Root component hosts the single `<p-toast />` — `client/src/app/app.ts` (full replacement)**
+- [x] **Step 4: Root component hosts the single `<p-toast />` — `client/src/app/app.ts` (full replacement)**
 
 ```typescript
 import { Component, inject } from '@angular/core';
@@ -91,7 +91,7 @@ export class App {
 }
 ```
 
-- [ ] **Step 5: Provide `MessageService` — `client/src/app/app.config.ts`**
+- [x] **Step 5: Provide `MessageService` — `client/src/app/app.config.ts`**
 
 Add the import and provider to the existing config (everything else unchanged):
 
@@ -107,7 +107,7 @@ import { MessageService } from 'primeng/api';
     MessageService,
 ```
 
-- [ ] **Step 6: Route constants — `client/src/app/app.routes.ts` (full replacement)**
+- [x] **Step 6: Route constants — `client/src/app/app.routes.ts` (full replacement)**
 
 ```typescript
 import { Routes } from '@angular/router';
@@ -132,7 +132,7 @@ export const routes: Routes = [
 
 Check `client/src/app/core/auth.guard.ts` and `client/src/app/core/auth.service.ts` for hardcoded `'/login'` navigation strings; if present, import `AppRoutes` and build the path from `AppRoutes.login` (e.g. `createUrlTree(['/', AppRoutes.login])`, `router.navigate(['/', AppRoutes.login])`).
 
-- [ ] **Step 7: i18n keys — add to BOTH files in the same change**
+- [x] **Step 7: i18n keys — add to BOTH files in the same change**
 
 `client/public/i18n/en.json` — add these top-level namespaces (keep existing content):
 
@@ -162,7 +162,7 @@ Check `client/src/app/core/auth.guard.ts` and `client/src/app/core/auth.service.
   }
 ```
 
-- [ ] **Step 8: Verify + commit**
+- [x] **Step 8: Verify + commit**
 
 Run from `client\`: `npm run build` — expected: success.
 Run: `npm test` — expected: existing tests pass.
