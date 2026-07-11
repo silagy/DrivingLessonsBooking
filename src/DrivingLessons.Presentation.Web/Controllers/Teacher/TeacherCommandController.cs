@@ -3,6 +3,8 @@ using DrivingLessons.Application.Commands.AddCar;
 using DrivingLessons.Application.Commands.ChangeCarDetails;
 using DrivingLessons.Application.Commands.ChangeTeacherDetails;
 using DrivingLessons.Application.Commands.CreateTeacher;
+using DrivingLessons.Application.Commands.DeleteTeacher;
+using DrivingLessons.Application.Commands.RemoveCar;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DrivingLessons.Presentation.Web.Controllers.Teacher;
@@ -67,6 +69,35 @@ public class TeacherCommandController : ControllerBase
         [FromBody] [Required] ChangeCarDetailsRequest request)
     {
         await interactor.ExecuteAsync(id, carId, request);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    [EndpointSummary("Delete the teacher")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> DeleteAsync(
+        [FromServices] DeleteTeacherInteractor interactor,
+        [FromRoute] Guid id)
+    {
+        await interactor.ExecuteAsync(id);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}/cars/{carId:guid}")]
+    [EndpointSummary("Remove a car from the teacher")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> RemoveCarAsync(
+        [FromServices] RemoveCarInteractor interactor,
+        [FromRoute] Guid id,
+        [FromRoute] Guid carId)
+    {
+        await interactor.ExecuteAsync(id, carId);
 
         return NoContent();
     }
