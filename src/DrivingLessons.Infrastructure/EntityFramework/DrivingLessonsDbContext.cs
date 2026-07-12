@@ -11,6 +11,8 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public DbSet<Teacher> Teachers => Set<Teacher>();
 
+    public DbSet<WeekSchedule> WeekSchedules => Set<WeekSchedule>();
+
     public DrivingLessonsDbContext(DbContextOptions<DrivingLessonsDbContext> options)
         : base(options)
     {
