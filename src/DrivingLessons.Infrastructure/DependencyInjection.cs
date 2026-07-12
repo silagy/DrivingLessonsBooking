@@ -35,6 +35,8 @@ public static class DependencyInjection
         services.AddScoped<IAdminAccountGateway, AdminAccountGateway>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<ITeacherQueries, TeacherQueries>();
+        services.AddScoped<IWeekScheduleRepository, WeekScheduleRepository>();
+        services.AddScoped<IWeekScheduleQueries, WeekScheduleQueries>();
         services.AddSingleton<IPasswordVerifier, PasswordVerifier>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 

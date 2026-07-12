@@ -1,0 +1,69 @@
+<div class="weekly-prep">
+  <header class="weekly-prep__header">
+    <div>
+      <h2>{{ 'weekSchedules.title' | transloco }}</h2>
+      <p class="weekly-prep__subtitle">{{ 'weekSchedules.subtitle' | transloco }}</p>
+    </div>
+  </header>
+
+  <div class="weekly-prep__selectors">
+    <div class="field">
+      <label for="teacher">{{ 'weekSchedules.teacher' | transloco }}</label>
+      <p-select
+        inputId="teacher"
+        [options]="store.teachers()"
+        optionLabel="name"
+        optionValue="id"
+        [ngModel]="store.selectedTeacherId()"
+        (ngModelChange)="store.selectTeacher($event)"
+        [placeholder]="'weekSchedules.selectTeacher' | transloco" />
+    </div>
+    <div class="field">
+      <label for="week">{{ 'weekSchedules.week' | transloco }}</label>
+      <p-select
+        inputId="week"
+        [options]="store.weekOptions()"
+        optionLabel="label"
+        optionValue="weekStart"
+        [ngModel]="store.selectedWeekStart()"
+        (ngModelChange)="store.selectWeek($event)" />
+    </div>
+  </div>
+
+  @if (store.isLoading()) {
+    <div class="weekly-prep__state"><p-progressSpinner /></div>
+  } @else if (store.loadError(); as errorKey) {
+    <div class="weekly-prep__state">{{ errorKey | transloco }}</div>
+  } @else if (!store.hasSelection()) {
+    <div class="weekly-prep__state">{{ 'weekSchedules.selectTeacherPrompt' | transloco }}</div>
+  } @else if (store.weekSchedule()) {
+    <section class="weekly-prep__card">
+      <app-week-grid
+        [cells]="store.slots()"
+        [weekStart]="store.selectedWeekStart()"
+        [windowTimes]="store.windowTimes()">
+        <ng-template let-slot>
+          <button
+            type="button"
+            class="slot-cell"
+            [class.slot-cell--unavailable]="slot.state === SlotState.unavailable"
+            [disabled]="store.isMutating()"
+            (click)="store.toggleSlot(slot)">
+            {{ (slot.state === SlotState.open ? 'weekSchedules.cellOpen' : 'weekSchedules.cellUnavailable') | transloco }}
+          </button>
+        </ng-template>
+      </app-week-grid>
+
+      <footer class="weekly-prep__footer">
+        <div class="weekly-prep__legend">
+          <span class="legend-item"><span class="legend-swatch legend-swatch--open"></span>{{ 'weekGrid.legend.open' | transloco }}</span>
+          <span class="legend-item"><span class="legend-swatch legend-swatch--unavailable"></span>{{ 'weekGrid.legend.unavailable' | transloco }}</span>
+          <span class="legend-item"><span class="legend-swatch legend-swatch--void"></span>{{ 'weekGrid.legend.outsideGrid' | transloco }}</span>
+        </div>
+        <span class="weekly-prep__count">
+          {{ 'weekSchedules.unavailableCount' | transloco: { count: store.unavailableCount() } }}
+        </span>
+      </footer>
+    </section>
+  }
+</div>

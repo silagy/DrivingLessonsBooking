@@ -47,6 +47,28 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("teachers", (string)null);
                 });
 
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.WeekSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("teacher_id");
+
+                    b.Property<DateOnly>("WeekStart")
+                        .HasColumnType("date")
+                        .HasColumnName("week_start");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherId", "WeekStart")
+                        .IsUnique();
+
+                    b.ToTable("week_schedules", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Infrastructure.Auth.AdminUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -110,6 +132,42 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                         });
 
                     b.Navigation("Cars");
+                });
+
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.WeekSchedule", b =>
+                {
+                    b.OwnsMany("DrivingLessons.Domain.Entities.Slot", "Slots", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<int>("Day")
+                                .HasColumnType("integer")
+                                .HasColumnName("day");
+
+                            b1.Property<int>("State")
+                                .HasColumnType("integer")
+                                .HasColumnName("state");
+
+                            b1.Property<int>("Window")
+                                .HasColumnType("integer")
+                                .HasColumnName("window");
+
+                            b1.Property<Guid>("week_schedule_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("week_schedule_id");
+
+                            b1.ToTable("slots", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("week_schedule_id");
+                        });
+
+                    b.Navigation("Slots");
                 });
 #pragma warning restore 612, 618
         }

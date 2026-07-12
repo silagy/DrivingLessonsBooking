@@ -18,7 +18,8 @@
     "languageToggle": "עברית",
     "nav": {
       "dashboard": "Dashboard",
-      "teachers": "Teachers & cars"
+      "teachers": "Teachers & cars",
+      "weeklyPrep": "Weekly prep"
     }
   },
   "teachers": {
@@ -55,6 +56,39 @@
   "dashboard": {
     "title": "Dashboard",
     "placeholder": "Welcome. Planning features arrive in the next slices."
+  },
+  "weekSchedules": {
+    "title": "Prepare a week",
+    "subtitle": "All slots start Open — click a slot to mark it Unavailable.",
+    "teacher": "Teacher",
+    "week": "Week",
+    "selectTeacher": "Select a teacher",
+    "selectTeacherPrompt": "Select a teacher and week to prepare the grid.",
+    "cellOpen": "Open",
+    "cellUnavailable": "Unavailable",
+    "unavailableCount": "{{count}} slots marked unavailable",
+    "loadFailed": "Failed to load the week schedule."
+  },
+  "weekGrid": {
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday"
+    },
+    "windows": {
+      "morning": "Morning",
+      "noon": "Noon",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "legend": {
+      "open": "Open",
+      "unavailable": "Unavailable",
+      "outsideGrid": "Outside grid (Fri PM, Saturday)"
+    }
   },
   "general": {
     "save": "Save",
