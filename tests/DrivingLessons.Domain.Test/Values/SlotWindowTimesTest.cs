@@ -1,3 +1,4 @@
+using System.Globalization;
 using DrivingLessons.Domain.Values;
 using Shouldly;
 
@@ -14,7 +15,7 @@ public class SlotWindowTimesTest
     public void Start_Of(SlotWindowType window, string time)
     {
         //given
-        var expectedStart = TimeOnly.Parse(time);
+        var expectedStart = TimeOnly.Parse(time, CultureInfo.InvariantCulture);
 
         //when
         var start = SlotWindowTimes.StartOf(window);
@@ -31,7 +32,7 @@ public class SlotWindowTimesTest
     public void End_Of(SlotWindowType window, string time)
     {
         //given
-        var expectedEnd = TimeOnly.Parse(time);
+        var expectedEnd = TimeOnly.Parse(time, CultureInfo.InvariantCulture);
 
         //when
         var end = SlotWindowTimes.EndOf(window);
