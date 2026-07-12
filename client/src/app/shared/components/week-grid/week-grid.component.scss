@@ -1,0 +1,50 @@
+.week-grid {
+  display: grid;
+  grid-template-columns: 118px repeat(6, 1fr);
+  gap: 8px;
+}
+
+.week-grid__day-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-block-end: 10px;
+  font-weight: 700;
+  color: var(--app-ink);
+}
+
+.week-grid__day-date {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--app-text-secondary);
+}
+
+.week-grid__window-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding-inline-end: 14px;
+}
+
+.week-grid__window-name {
+  font-weight: 700;
+  color: var(--app-ink);
+}
+
+.week-grid__window-time {
+  font-size: 0.75rem;
+  color: var(--app-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.week-grid__cell {
+  min-height: 64px;
+  display: flex;
+}
+
+.week-grid__cell--void {
+  background: var(--p-surface-100);
+  border-radius: 6px;
+}

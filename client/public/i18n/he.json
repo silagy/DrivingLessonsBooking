@@ -56,6 +56,27 @@
     "title": "לוח בקרה",
     "placeholder": "ברוך הבא. יכולות התכנון יגיעו בפרוסות הבאות."
   },
+  "weekGrid": {
+    "days": {
+      "sunday": "ראשון",
+      "monday": "שני",
+      "tuesday": "שלישי",
+      "wednesday": "רביעי",
+      "thursday": "חמישי",
+      "friday": "שישי"
+    },
+    "windows": {
+      "morning": "בוקר",
+      "noon": "צהריים",
+      "afternoon": "אחה״צ",
+      "evening": "ערב"
+    },
+    "legend": {
+      "open": "פתוח",
+      "unavailable": "לא זמין",
+      "outsideGrid": "מחוץ לרשת (שישי אחה״צ/ערב, שבת)"
+    }
+  },
   "general": {
     "save": "שמירה",
     "cancel": "ביטול",

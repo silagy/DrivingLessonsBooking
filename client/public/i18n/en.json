@@ -56,6 +56,27 @@
     "title": "Dashboard",
     "placeholder": "Welcome. Planning features arrive in the next slices."
   },
+  "weekGrid": {
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday"
+    },
+    "windows": {
+      "morning": "Morning",
+      "noon": "Noon",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "legend": {
+      "open": "Open",
+      "unavailable": "Unavailable",
+      "outsideGrid": "Outside grid (Fri PM, Saturday)"
+    }
+  },
   "general": {
     "save": "Save",
     "cancel": "Cancel",

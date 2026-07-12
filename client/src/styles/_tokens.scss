@@ -11,6 +11,14 @@
   --app-bg-card: var(--p-surface-0);
   --app-border: var(--p-surface-200);
 
+  --app-slot-unavailable: repeating-linear-gradient(
+    45deg,
+    var(--p-surface-100),
+    var(--p-surface-100) 6px,
+    var(--p-surface-200) 6px,
+    var(--p-surface-200) 12px
+  );
+
   --app-on-accent: var(--p-surface-0);
   --app-steel-light: var(--p-steel-100);
   --app-whale: var(--p-whale-500);

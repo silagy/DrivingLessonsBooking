@@ -1,0 +1,28 @@
+<div class="week-grid">
+    <div class="week-grid__corner"></div>
+    @for (day of days; track day) {
+        <div class="week-grid__day-head">
+            <span class="week-grid__day-name">{{ 'weekGrid.days.' + day | transloco }}</span>
+            @if (dateFor(day); as date) {
+                <span class="week-grid__day-date"><bdi>{{ date }}</bdi></span>
+            }
+        </div>
+    }
+    @for (window of windows; track window) {
+        <div class="week-grid__window-label">
+            <span class="week-grid__window-name">{{ 'weekGrid.windows.' + window | transloco }}</span>
+            @if (windowTimes()[window]; as time) {
+                <span class="week-grid__window-time"><bdi>{{ time }}</bdi></span>
+            }
+        </div>
+        @for (day of days; track day) {
+            @if (cellFor(day, window); as cell) {
+                <div class="week-grid__cell">
+                    <ng-container *ngTemplateOutlet="cellTemplate(); context: { $implicit: cell }" />
+                </div>
+            } @else {
+                <div class="week-grid__cell week-grid__cell--void"></div>
+            }
+        }
+    }
+</div>
