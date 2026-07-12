@@ -1,11 +1,13 @@
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using DrivingLessons.Presentation.Web.Filters;
 using DrivingLessons.Presentation.Web.OpenApi;
 using DrivingLessons.Application;
 using DrivingLessons.Infrastructure;
 using DrivingLessons.Infrastructure.Auth;
 using DrivingLessons.Infrastructure.Options;
-using DrivingLessons.Infrastructure.Persistence;
+using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +17,10 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options => options.Filters.Add<ApiExceptionFilter>());
+builder.Services
+    .AddControllers(options => options.Filters.Add<ApiExceptionFilter>())
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 builder.Services.AddApplication();
@@ -48,7 +53,7 @@ var app = builder.Build();
 
 await using (var scope = app.Services.CreateAsyncScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<DrivingLessonsDbContext>();
     await db.Database.MigrateAsync();
     var adminOptions = scope.ServiceProvider.GetRequiredService<IOptions<AdminOptions>>().Value;
     await AdminSeeder.SeedAsync(db, adminOptions);

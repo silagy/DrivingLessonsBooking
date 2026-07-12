@@ -15,10 +15,55 @@
   "shell": {
     "title": "מערכת תכנון שיעורי נהיגה",
     "logout": "התנתקות",
-    "languageToggle": "English"
+    "languageToggle": "English",
+    "nav": {
+      "dashboard": "לוח בקרה",
+      "teachers": "מורים ורכבים"
+    }
+  },
+  "teachers": {
+    "title": "מורים ורכבים",
+    "subtitle": "התכנון הוא לפי מורה; קובץ התלמידים משייך לכל תלמיד רכב.",
+    "addTeacher": "הוספת מורה",
+    "editTeacher": "עריכה",
+    "addCar": "הוספת רכב",
+    "editCar": "עריכת רכב",
+    "name": "שם",
+    "contactEmail": "אימייל ליצירת קשר",
+    "carName": "שם הרכב",
+    "carType": "סוג הרכב",
+    "transmission": "תיבת הילוכים",
+    "transmissions": {
+      "automatic": "אוטומטי",
+      "manual": "ידני"
+    },
+    "created": "המורה נוצר",
+    "detailsChanged": "פרטי המורה עודכנו",
+    "carAdded": "הרכב נוסף",
+    "carChanged": "פרטי הרכב עודכנו",
+    "deleteTeacher": "מחיקת מורה",
+    "removeCar": "מחיקת רכב",
+    "confirmDeleteTeacher": "למחוק את {{name}}? גם הרכבים של המורה יימחקו.",
+    "confirmRemoveCar": "למחוק את {{name}}?",
+    "deleted": "המורה נמחק",
+    "carRemoved": "הרכב נמחק",
+    "lastCarHint": "לא ניתן למחוק את הרכב האחרון של המורה.",
+    "loadFailed": "טעינת המורים נכשלה",
+    "emptyTitle": "אין מורים עדיין",
+    "emptySubtitle": "צרו את המורה הראשון כדי להתחיל לתכנן שבועות."
   },
   "dashboard": {
     "title": "לוח בקרה",
     "placeholder": "ברוך הבא. יכולות התכנון יגיעו בפרוסות הבאות."
+  },
+  "general": {
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "delete": "מחיקה",
+    "unexpectedError": "משהו השתבש. נסו שוב."
+  },
+  "formErrors": {
+    "required": "שדה חובה",
+    "emailInvalid": "יש להזין כתובת אימייל תקינה"
   }
 }

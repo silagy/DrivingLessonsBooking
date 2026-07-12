@@ -1,0 +1,234 @@
+/* =========================================================================
+   Comply365 Design System — Colors & Type tokens
+   Source: Comply365 Brand Guidelines (pages 04–34) + Deck Template L1R4
+   ========================================================================= */
+
+/* ---- Fonts -------------------------------------------------------------- */
+/* Brand specifies Helvetica Now Display + Helvetica Now Text (licensed — use on
+   the website and digital touchpoints where Comply365 holds the license; check
+   with marketing for any public-facing surface).
+   Per the April 2025 Brand Guidelines, the approved OPEN-SOURCE substitute is
+   Arial (a system font available on virtually every OS). No webfont @import is
+   needed — Arial resolves from the system stack.
+
+   When Helvetica Now files are available to a surface that holds the license,
+   uncomment the block below and point `src:` at the hosted font files. The
+   --font-display / --font-text stacks already list Helvetica Now first, so
+   this is all you need to do — no other CSS changes required.
+*/
+/*
+@font-face {
+  font-family: 'Helvetica Now Display';
+  src: url('/fonts/HelveticaNowDisplay-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Helvetica Now Display';
+  src: url('/fonts/HelveticaNowDisplay-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Helvetica Now Display';
+  src: url('/fonts/HelveticaNowDisplay-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Helvetica Now Text';
+  src: url('/fonts/HelveticaNowText-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Helvetica Now Text';
+  src: url('/fonts/HelveticaNowText-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+:root {
+  /* === Primary === */
+  --c365-dark-gray: #121418;      /* primary text / dark backgrounds */
+  --c365-white:     #FFFFFF;
+
+  /* === Secondary — Sky (primary accent) === */
+  --c365-sky-light:   #7BAEFF;
+  --c365-sky:         #0057FF;
+  --c365-sky-dark:    #003293;
+
+  /* === Secondary — Ocean (teal) === */
+  --c365-ocean-light: #7BF4FB;
+  --c365-ocean:       #00BBC7;
+  --c365-ocean-dark:  #007A82;
+
+  /* === Secondary — Plum === */
+  --c365-plum-light:  #FFA3E3;
+  --c365-plum:        #BA0081;
+  --c365-plum-dark:   #7F0058;
+
+  /* === Secondary — Whale (deep navy-teal) === */
+  --c365-whale-light: #73A7CA;
+  --c365-whale:       #005389;
+  --c365-whale-dark:  #00385D;
+
+  /* === Secondary — Steel (muted blue-grey tints) === */
+  --c365-steel-light: #DBE3F3;
+  --c365-steel:       #C3CFE5;
+  --c365-steel-dark:  #98A5BD;
+
+  /* === Neutrals (cool spectrum) === */
+  --c365-gray-1: #000000;
+  --c365-gray-2: #2C2F37;
+  --c365-gray-3: #52555C;
+  --c365-gray-4: #9FA9BB;
+  --c365-gray-5: #E6E8F6;
+  --c365-gray-6: #F5F6FF;
+  --c365-gray-7: #FBFBFF;
+
+  /* === Utility toggle / system === */
+  --c365-toggle-bg:     #001939;
+  --c365-toggle-on:     #289E49;
+  --c365-toggle-off-bg: #B6C6DA;
+
+  /* === Semantic foreground / background === */
+  --fg-1: var(--c365-dark-gray);      /* primary text on light */
+  --fg-2: var(--c365-gray-3);         /* secondary text */
+  --fg-3: var(--c365-gray-4);         /* tertiary / muted */
+  --fg-inverse: var(--c365-white);
+
+  --bg-page:   var(--c365-white);
+  --bg-subtle: var(--c365-gray-7);
+  --bg-muted:  var(--c365-gray-6);
+  --bg-line:   var(--c365-gray-5);
+  --bg-dark:   var(--c365-dark-gray);
+
+  --border-subtle: var(--c365-gray-5);
+  --border-strong: var(--c365-gray-2);
+
+  --accent:         var(--c365-sky);
+  --accent-hover:   var(--c365-sky-dark);
+  --accent-contrast:var(--c365-white);
+
+  /* === Gradients (canonical, do not recolour) ===
+     Applied as `background-image: var(--grad-soft-sky)` etc. */
+  --grad-soft-sky:    linear-gradient(135deg, #0057FF 0%, #00BBC7 100%);
+  --grad-soft-ocean:  linear-gradient(135deg, #00BBC7 0%, #005389 100%);
+  --grad-soft-plum:   linear-gradient(135deg, #BA0081 0%, #FFA3E3 100%);
+  --grad-soft-whale:  linear-gradient(135deg, #005389 0%, #73A7CA 100%);
+
+  --grad-shine-sky:   linear-gradient(135deg, #0057FF 0%, #121418 100%);
+  --grad-shine-ocean: linear-gradient(135deg, #00BBC7 0%, #121418 100%);
+  --grad-shine-plum:  linear-gradient(135deg, #BA0081 0%, #121418 100%);
+  --grad-shine-whale: linear-gradient(135deg, #005389 0%, #121418 100%);
+
+  --grad-dark-sky:    linear-gradient(135deg, #121418 0%, #00BBC7 100%);
+  --grad-dark-plum:   linear-gradient(135deg, #121418 0%, #BA0081 100%);
+
+  --grad-light-sky:   linear-gradient(135deg, #FFFFFF 0%, #0057FF 100%);
+  --grad-light-ocean: linear-gradient(135deg, #FFFFFF 0%, #00BBC7 100%);
+  --grad-light-plum:  linear-gradient(135deg, #FFFFFF 0%, #BA0081 100%);
+  --grad-light-whale: linear-gradient(135deg, #FFFFFF 0%, #005389 100%);
+
+  /* === Type system (matches brand desktop scale) === */
+  --font-display: 'Helvetica Now Display', 'Helvetica Neue', Arial, 'Liberation Sans', sans-serif;
+  --font-text:    'Helvetica Now Text',    'Helvetica Neue', Arial, 'Liberation Sans', sans-serif;
+
+  /* Desktop scale (from page 16) */
+  --fs-h1: 60px;  --lh-h1: 1.10; --fw-h1: 500; /* Medium */
+  --fs-h2: 50px;  --lh-h2: 1.10; --fw-h2: 500;
+  --fs-h3: 36px;  --lh-h3: 1.30; --fw-h3: 500;
+  --fs-h4: 28px;  --lh-h4: 1.30; --fw-h4: 700; /* Bold */
+  --fs-h5: 24px;  --lh-h5: 1.30; --fw-h5: 700;
+  --fs-h6: 24px;  --lh-h6: 1.20; --fw-h6: 700;
+  --fs-eyebrow-l: 18px; --lh-eyebrow-l: 1.30; --fw-eyebrow: 800; /* XBold */
+  --fs-eyebrow-s: 14px; --lh-eyebrow-s: 1.30;
+  --ls-eyebrow: 0.10em;
+
+  --fs-lead: 24px;    --lh-lead: 1.50;
+  --fs-body: 20px;    --lh-body: 1.50;
+  --fs-body-list: 16px; --lh-body-list: 1.40;
+  --fs-body-s: 16px;  --lh-body-s: 1.50;
+  --fs-caption: 14px; --lh-caption: 1.30;
+  --fs-caption-s: 10px;
+  --fs-quote-l: 28px; --lh-quote-l: 1.50;
+  --fs-quote-s: 18px; --lh-quote-s: 1.50;
+  --fs-button: 16px;  --lh-button: 1.20;
+  --fs-nav: 16px;     --lh-nav: 1.20;   --ls-nav: 0.02em;
+
+  /* Radii / spacing / shadows */
+  --radius-pill:  999px;   /* buttons (corner radius 50pt) */
+  --radius-card:  14px;
+  --radius-s:     6px;
+  --radius-xs:    3px;
+
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+  --space-9: 96px;
+
+  /* Very restrained elevation — brand is flat / crisp */
+  --shadow-card:    0 1px 2px rgba(18, 20, 24, 0.06), 0 2px 8px rgba(18, 20, 24, 0.06);
+  --shadow-lift:    0 4px 16px rgba(18, 20, 24, 0.10), 0 1px 3px rgba(18, 20, 24, 0.06);
+  --shadow-overlay: 0 20px 48px rgba(18, 20, 24, 0.18);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+}
+
+/* ---- Semantic element styles ------------------------------------------- */
+html { font-family: var(--font-text); color: var(--fg-1); background: var(--bg-page); }
+body { font-size: var(--fs-body); line-height: var(--lh-body); margin: 0; }
+
+h1, .h1 { font-family: var(--font-display); font-size: var(--fs-h1); line-height: var(--lh-h1); font-weight: var(--fw-h1); letter-spacing: 0; margin: 0; color: var(--fg-1); }
+h2, .h2 { font-family: var(--font-display); font-size: var(--fs-h2); line-height: var(--lh-h2); font-weight: var(--fw-h2); margin: 0; }
+h3, .h3 { font-family: var(--font-display); font-size: var(--fs-h3); line-height: var(--lh-h3); font-weight: var(--fw-h3); margin: 0; }
+h4, .h4 { font-family: var(--font-display); font-size: var(--fs-h4); line-height: var(--lh-h4); font-weight: var(--fw-h4); margin: 0; }
+h5, .h5 { font-family: var(--font-display); font-size: var(--fs-h5); line-height: var(--lh-h5); font-weight: var(--fw-h5); margin: 0; }
+h6, .h6 { font-family: var(--font-display); font-size: var(--fs-h6); line-height: var(--lh-h6); font-weight: var(--fw-h6); margin: 0; }
+
+.eyebrow-l, .eyebrow { font-family: var(--font-display); font-weight: var(--fw-eyebrow); font-size: var(--fs-eyebrow-l); line-height: var(--lh-eyebrow-l); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; color: var(--fg-1); }
+.eyebrow-s { font-family: var(--font-display); font-weight: var(--fw-eyebrow); font-size: var(--fs-eyebrow-s); line-height: var(--lh-eyebrow-s); letter-spacing: var(--ls-eyebrow); text-transform: uppercase; }
+
+.lead    { font-size: var(--fs-lead); line-height: var(--lh-lead); }
+p        { font-size: var(--fs-body); line-height: var(--lh-body); margin: 0 0 15px 0; }
+.body-s  { font-size: var(--fs-body-s); line-height: var(--lh-body-s); }
+.caption { font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--fg-2); }
+.quote-l { font-size: var(--fs-quote-l); line-height: var(--lh-quote-l); font-weight: 500; }
+.quote-s { font-size: var(--fs-quote-s); line-height: var(--lh-quote-s); font-weight: 500; }
+
+.nav-link    { font-size: var(--fs-nav); line-height: var(--lh-nav); letter-spacing: var(--ls-nav); color: var(--fg-1); text-decoration: none; }
+.button-link { font-size: var(--fs-button); line-height: var(--lh-button); font-weight: 500; }
+
+/* Mobile scale (<= 768px) — from page 17. Headings get tighter + Bold across the board. */
+@media (max-width: 768px) {
+  :root {
+    --fs-h1: 48px; --fw-h1: 700;
+    --fs-h2: 38px; --lh-h2: 1.15;
+    --fs-h3: 30px; --lh-h3: 1.20;
+    --fs-h4: 26px; --lh-h4: 1.20;
+    --fs-h5: 22px; --lh-h5: 1.20;
+    --fs-h6: 18px; --lh-h6: 1.20;
+    --fs-eyebrow-l: 14px;
+    --fs-eyebrow-s: 12px;
+    --fs-lead: 16px;
+    --fs-body: 14px; --lh-body: 1.60;
+    --fs-body-list: 14px;
+    --fs-body-s: 12px;
+    --fs-caption: 11px;
+    --fs-quote-l: 18px;
+    --fs-quote-s: 16px;
+    --fs-button: 14px;
+    --fs-nav: 14px;
+  }
+}

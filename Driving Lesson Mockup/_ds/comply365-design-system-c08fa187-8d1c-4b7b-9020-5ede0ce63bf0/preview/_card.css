@@ -1,0 +1,10 @@
+@import url('../colors_and_type.css');
+html, body { margin: 0; padding: 0; background: #fff; font-family: var(--font-text); color: var(--fg-1); -webkit-font-smoothing: antialiased; }
+.card { padding: 24px; box-sizing: border-box; width: 100%; }
+.row { display: flex; gap: 12px; align-items: stretch; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.swatch { border-radius: 10px; overflow: hidden; border: 1px solid var(--c365-gray-5); flex: 1; min-height: 90px; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 12px; color: #fff; }
+.swatch .name { font-weight: 600; font-size: 13px; letter-spacing: 0; }
+.swatch .hex { font-size: 11px; opacity: 0.9; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--c365-gray-3); font-weight: 800; }
+.divider { height: 1px; background: var(--c365-gray-5); margin: 12px 0; }

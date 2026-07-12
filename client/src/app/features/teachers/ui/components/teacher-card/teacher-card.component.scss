@@ -1,0 +1,62 @@
+.card {
+  background: var(--app-bg-card);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  align-self: start;
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card__avatar {
+  inline-size: 2.625rem;
+  block-size: 2.625rem;
+  border-radius: 999px;
+  background: var(--app-steel-light);
+  color: var(--app-whale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--app-font-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.card__identity {
+  min-inline-size: 0;
+  flex: 1;
+}
+
+.card__name {
+  margin: 0;
+  font-family: var(--app-font-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--app-ink);
+}
+
+.card__email {
+  font-size: 0.78rem;
+  color: var(--app-text-secondary);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__cars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card__footer {
+  display: flex;
+}

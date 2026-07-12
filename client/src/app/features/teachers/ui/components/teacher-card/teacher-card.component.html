@@ -1,0 +1,33 @@
+<article class="card">
+  <header class="card__header">
+    <span class="card__avatar" aria-hidden="true">{{ initials() }}</span>
+    <div class="card__identity">
+      <h3 class="card__name">{{ teacher().name }}</h3>
+      <bdi class="card__email">{{ teacher().contactEmail }}</bdi>
+    </div>
+    <p-button
+      [label]="'teachers.editTeacher' | transloco"
+      severity="secondary"
+      size="small"
+      text
+      (onClick)="edit.emit()" />
+  </header>
+
+  @if (teacher().cars.length) {
+    <div class="card__cars">
+      @for (car of teacher().cars; track car.id) {
+        <app-car-row [car]="car" (edit)="editCar.emit(car)" />
+      }
+    </div>
+  }
+
+  <div class="card__footer">
+    <p-button
+      [label]="'teachers.addCar' | transloco"
+      severity="secondary"
+      size="small"
+      outlined
+      icon="pi pi-plus"
+      (onClick)="addCar.emit()" />
+  </div>
+</article>

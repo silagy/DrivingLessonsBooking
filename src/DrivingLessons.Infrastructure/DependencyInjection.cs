@@ -1,7 +1,12 @@
 using DrivingLessons.Application.Auth;
+using DrivingLessons.Application.Common;
+using DrivingLessons.Application.Queries;
+using DrivingLessons.Domain.Repositories;
 using DrivingLessons.Infrastructure.Auth;
+using DrivingLessons.Infrastructure.EntityFramework;
+using DrivingLessons.Infrastructure.EntityFramework.Queries;
+using DrivingLessons.Infrastructure.EntityFramework.Repositories;
 using DrivingLessons.Infrastructure.Options;
-using DrivingLessons.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,8 +17,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(o =>
+        services.AddDbContext<DrivingLessonsDbContext>(o =>
             o.UseNpgsql(configuration.GetConnectionString("Default")));
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DrivingLessonsDbContext>());
 
         services.AddOptions<AdminOptions>()
             .Bind(configuration.GetSection(AdminOptions.SectionName))
@@ -26,6 +33,8 @@ public static class DependencyInjection
             .ValidateOnStart();
 
         services.AddScoped<IAdminAccountGateway, AdminAccountGateway>();
+        services.AddScoped<ITeacherRepository, TeacherRepository>();
+        services.AddScoped<ITeacherQueries, TeacherQueries>();
         services.AddSingleton<IPasswordVerifier, PasswordVerifier>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 

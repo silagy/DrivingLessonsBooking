@@ -109,7 +109,7 @@ Domain.Test       → Domain
 
 Core aggregates (full model in `docs/requirements.md` §5):
 
-- **Teacher** — owns 1–2 Cars (transmission per car); scheduling is per teacher, not per car
+- **Teacher** — owns one or more Cars (transmission per car; min-one binds on removal only, decision #20); scheduling is per teacher, not per car
 - **WeekSchedule** — per teacher per week; grid of Slots (`Open`/`Unavailable`), Sunday–Friday, short Friday
 - **Publication** — per week schedule; state machine `Draft → Published → Open → Closed`, reopenable; carries the unguessable link token and submission window; every close increments the Excel version
 - **Student** — identified by email; remembers profile and default teacher

@@ -1,0 +1,28 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+  <div class="field">
+    <label for="teacher-name">{{ 'teachers.name' | transloco }}</label>
+    <input pInputText id="teacher-name" formControlName="name" />
+  </div>
+
+  <div class="field">
+    <label for="teacher-email">{{ 'teachers.contactEmail' | transloco }}</label>
+    <input pInputText id="teacher-email" formControlName="contactEmail" type="email" dir="ltr" />
+    @if (form.controls.contactEmail.dirty && form.controls.contactEmail.invalid) {
+      <small class="field__error">{{ 'formErrors.emailInvalid' | transloco }}</small>
+    }
+  </div>
+
+  <div class="dialog-form__actions">
+    @if (isEdit) {
+      <p-button
+        class="dialog-form__delete"
+        [label]="'general.delete' | transloco"
+        severity="danger"
+        type="button"
+        text
+        (onClick)="requestDelete()" />
+    }
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+    <p-button [label]="'general.save' | transloco" type="submit" [disabled]="form.invalid" />
+  </div>
+</form>
