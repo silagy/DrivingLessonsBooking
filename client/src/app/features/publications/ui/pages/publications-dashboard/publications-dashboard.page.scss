@@ -1,0 +1,61 @@
+.dashboard__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.dashboard__eyebrow {
+    font-family: var(--app-font-display);
+    font-weight: 800;
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--app-text-muted);
+    margin-block-end: 6px;
+}
+
+.dashboard__title-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.dashboard__actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.dashboard__stats {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-block-start: 18px;
+}
+
+.dashboard__stamp {
+    margin-inline-start: auto;
+    font-size: 0.78rem;
+    color: var(--app-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.dashboard__card {
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    padding: 22px 24px;
+    margin-block-start: 14px;
+}
+
+.dashboard__notice {
+    color: var(--app-text-secondary);
+    line-height: 1.55;
+}
+
+.dashboard__state {
+    display: flex;
+    justify-content: center;
+    padding-block: 48px;
+}

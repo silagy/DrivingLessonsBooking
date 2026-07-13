@@ -1,0 +1,43 @@
+.slot-count {
+    flex: 1;
+    min-height: 62px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    border-radius: 6px;
+    border: 1px solid var(--app-border);
+    background: var(--app-bg-card);
+    box-shadow: var(--app-shadow-card);
+}
+
+.slot-count--blocked {
+    background: var(--app-slot-unavailable);
+    box-shadow: none;
+}
+
+.slot-count__value {
+    font-family: var(--app-font-display);
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--app-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.slot-count__value--empty {
+    color: var(--app-text-muted);
+}
+
+.slot-count__caption {
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-text-muted);
+}
+
+.slot-count__blocked-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--app-text-secondary);
+}

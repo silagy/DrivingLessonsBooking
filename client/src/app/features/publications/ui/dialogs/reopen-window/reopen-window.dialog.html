@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+    <p class="dialog-form__hint">{{ 'publications.reopenDialog.subtitle' | transloco }}</p>
+
+    <div class="field">
+        <label for="reopen-end">{{ 'publications.reopenDialog.newEnd' | transloco }}</label>
+        <p-datepicker
+            inputId="reopen-end"
+            formControlName="end"
+            [showTime]="true"
+            [showIcon]="true"
+            hourFormat="24"
+            dateFormat="D, M d" />
+    </div>
+    <small class="dialog-form__hint">{{ 'publications.timezoneNote' | transloco }}</small>
+
+    <div class="dialog-form__actions">
+        <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+        <p-button [label]="'publications.reopenWindow' | transloco" type="submit" [disabled]="form.invalid" />
+    </div>
+</form>

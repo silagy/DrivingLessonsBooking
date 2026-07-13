@@ -19,7 +19,9 @@
     "nav": {
       "dashboard": "Dashboard",
       "teachers": "Teachers & cars",
-      "weeklyPrep": "Weekly prep"
+      "weeklyPrep": "Weekly prep",
+      "publications": "Publications",
+      "history": "History"
     }
   },
   "teachers": {
@@ -90,10 +92,92 @@
       "outsideGrid": "Outside grid (Fri PM, Saturday)"
     }
   },
+  "publications": {
+    "title": "Publications",
+    "subtitle": "Publish the week, track requests, and share the link.",
+    "teacher": "Teacher",
+    "week": "Week",
+    "selectTeacher": "Select a teacher",
+    "state": {
+      "draft": "Draft",
+      "published": "Published",
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "publish": "Publish week…",
+    "extendWindow": "Extend deadline",
+    "reopen": "Reopen window",
+    "reopenWindow": "Reopen window…",
+    "copyLink": "Copy link",
+    "downloadExcel": "Download Excel",
+    "refresh": "Refresh",
+    "timezoneNote": "All times Asia/Jerusalem.",
+    "shareLink": {
+      "title": "Shareable link",
+      "copy": "Copy link",
+      "copied": "Link copied.",
+      "copyFailed": "Could not copy the link.",
+      "hint": "One link for all teachers — generated on publish. Share it yourself, e.g. in the students' WhatsApp group."
+    },
+    "windowStart": "Opens",
+    "windowEnd": "Closes",
+    "studentsSubmitted": "Students submitted",
+    "totalPicks": "Total picks",
+    "lastSubmission": "Last submission",
+    "latestVersion": "Latest version",
+    "dataAsOf": "Data as of {{time}}",
+    "requestCount": "{{count}} requests",
+    "noPublication": "This week has not been prepared yet.",
+    "published": "Week published",
+    "extended": "Deadline extended",
+    "reopened": "Window reopened",
+    "linkCopied": "Link copied",
+    "excelDownloaded": "Excel downloaded",
+    "loadFailed": "Failed to load the publication.",
+    "publishDialog": {
+      "subtitle": "One window for the whole school — publish {{week}} and share a single link.",
+      "opensAt": "Submissions open",
+      "closesAt": "Submissions close"
+    },
+    "extendDialog": { "newEnd": "New close time" },
+    "reopenDialog": {
+      "subtitle": "Reopening sets a new close time and lets students edit again. The next close emails a fresh version.",
+      "newEnd": "New close time"
+    },
+    "dashboard": {
+      "requests": "requests",
+      "studentsSubmitted": "students submitted",
+      "totalPicks": "total picks",
+      "lastSubmission": "last submission",
+      "dataAsOf": "Data as of",
+      "draftPrompt": "This week is prepared but not published. Publish it to open the submission window and generate the link.",
+      "publishedNotice": "Submissions open automatically at {{opensAt}}.",
+      "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher."
+    },
+    "history": {
+      "title": "Publications history",
+      "week": "Week",
+      "teacher": "Teacher",
+      "state": "State",
+      "version": "Version",
+      "reDownload": "Download",
+      "viewDashboard": "View",
+      "empty": "No past publications yet."
+    },
+    "dialogs": {
+      "publishTitle": "Publish week",
+      "extendTitle": "Extend deadline",
+      "reopenTitle": "Reopen window",
+      "windowStart": "Window opens",
+      "windowEnd": "Window closes",
+      "newEnd": "New closing time"
+    }
+  },
   "general": {
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
+    "refresh": "Refresh",
     "unexpectedError": "Something went wrong. Please try again."
   },
   "formErrors": {

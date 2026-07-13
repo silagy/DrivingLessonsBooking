@@ -1,0 +1,40 @@
+.share-link {
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: var(--app-bg-muted);
+}
+
+.share-link__title {
+    font-family: var(--app-font-display);
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: var(--app-ink);
+}
+
+.share-link__row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-block-start: 8px;
+}
+
+.share-link__value {
+    flex: 1;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 0.82rem;
+    color: var(--app-ink);
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.share-link__hint {
+    font-size: 0.72rem;
+    color: var(--app-text-muted);
+    margin-block-start: 8px;
+}
