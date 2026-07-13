@@ -2,8 +2,6 @@ import { Injectable, computed, inject, resource, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import { ToastService } from '../../../core/services/toast.service';
 import { Teacher } from '../domain/teacher.model';
-import { AddCarRequest } from '../data/add-car.request';
-import { ChangeCarDetailsRequest } from '../data/change-car-details.request';
 import { ChangeTeacherDetailsRequest } from '../data/change-teacher-details.request';
 import { CreateTeacherRequest } from '../data/create-teacher.request';
 import { TeachersApiService } from '../data/teachers-api.service';
@@ -19,14 +17,7 @@ export class TeachersStore {
         loader: () => firstValueFrom(this.api.findTeachers()),
     });
 
-    readonly teachers = computed<Teacher[]>(() => {
-        const teachers = this.teachersResource.value() ?? [];
-
-        return teachers.map((teacher) => ({
-            ...teacher,
-            cars: [...teacher.cars].sort((a, b) => a.name.localeCompare(b.name)),
-        }));
-    });
+    readonly teachers = computed<Teacher[]>(() => this.teachersResource.value() ?? []);
 
     readonly isLoading = computed(() => this.teachersResource.isLoading() && !this.teachersResource.value());
     readonly loadError = computed(() => (this.teachersResource.error() ? 'teachers.loadFailed' : null));
@@ -37,27 +28,12 @@ export class TeachersStore {
         await this.executeCommand(() => this.api.createTeacher(request), 'teachers.created');
     }
 
-    async addCar(teacherId: string, request: AddCarRequest): Promise<void> {
-        await this.executeCommand(() => this.api.addCar(teacherId, request), 'teachers.carAdded');
-    }
-
     async changeDetails(teacherId: string, request: ChangeTeacherDetailsRequest): Promise<void> {
         await this.executeCommand(() => this.api.changeTeacherDetails(teacherId, request), 'teachers.detailsChanged');
     }
 
-    async changeCarDetails(teacherId: string, carId: string, request: ChangeCarDetailsRequest): Promise<void> {
-        await this.executeCommand(
-            () => this.api.changeCarDetails(teacherId, carId, request),
-            'teachers.carChanged',
-        );
-    }
-
     async delete(teacherId: string): Promise<void> {
         await this.executeCommand(() => this.api.deleteTeacher(teacherId), 'teachers.deleted');
-    }
-
-    async removeCar(teacherId: string, carId: string): Promise<void> {
-        await this.executeCommand(() => this.api.removeCar(teacherId, carId), 'teachers.carRemoved');
     }
 
     private async executeCommand(command: () => Observable<unknown>, successKey: string): Promise<void> {

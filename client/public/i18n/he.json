@@ -18,17 +18,24 @@
     "languageToggle": "English",
     "nav": {
       "dashboard": "לוח בקרה",
-      "teachers": "מורים ורכבים",
+      "teachers": "רכבים ומורים",
       "weeklyPrep": "הכנת שבוע"
     }
   },
   "teachers": {
-    "title": "מורים ורכבים",
-    "subtitle": "התכנון הוא לפי מורה; קובץ התלמידים משייך לכל תלמיד רכב.",
+    "title": "רכבים ומורים",
+    "subtitle": "הרכבים הם מאגר משותף — נהלו אותם פעם אחת ושייכו כל רכב למורה אחד או יותר.",
+    "carsSection": "רכבים",
+    "teachersSection": "מורים",
     "addTeacher": "הוספת מורה",
     "editTeacher": "עריכה",
+    "deleteTeacher": "מחיקת מורה",
+    "confirmDeleteTeacher": "למחוק את {{name}}?",
     "addCar": "הוספת רכב",
+    "edit": "עריכה",
     "editCar": "עריכת רכב",
+    "deleteCar": "מחיקת רכב",
+    "confirmDeleteCar": "למחוק את {{name}}?",
     "name": "שם",
     "contactEmail": "אימייל ליצירת קשר",
     "carName": "שם הרכב",
@@ -38,20 +45,27 @@
       "automatic": "אוטומטי",
       "manual": "ידני"
     },
+    "transmissionsShort": {
+      "automatic": "אוטו׳",
+      "manual": "ידני"
+    },
+    "assign": "+ שיוך",
+    "assignToTeachers": "שיוך למורים",
+    "assigned": "משויך",
+    "shared": "משותף",
+    "assignmentsUpdated": "שיוכי המורים עודכנו",
     "created": "המורה נוצר",
     "detailsChanged": "פרטי המורה עודכנו",
-    "carAdded": "הרכב נוסף",
-    "carChanged": "פרטי הרכב עודכנו",
-    "deleteTeacher": "מחיקת מורה",
-    "removeCar": "מחיקת רכב",
-    "confirmDeleteTeacher": "למחוק את {{name}}? גם הרכבים של המורה יימחקו.",
-    "confirmRemoveCar": "למחוק את {{name}}?",
     "deleted": "המורה נמחק",
-    "carRemoved": "הרכב נמחק",
-    "lastCarHint": "לא ניתן למחוק את הרכב האחרון של המורה.",
+    "carCreated": "הרכב נוצר",
+    "carChanged": "פרטי הרכב עודכנו",
+    "carDeleted": "הרכב נמחק",
     "loadFailed": "טעינת המורים נכשלה",
+    "carsLoadFailed": "טעינת הרכבים נכשלה",
     "emptyTitle": "אין מורים עדיין",
-    "emptySubtitle": "צרו את המורה הראשון כדי להתחיל לתכנן שבועות."
+    "emptySubtitle": "צרו את המורה הראשון כדי להתחיל לתכנן שבועות.",
+    "carsEmptyTitle": "אין רכבים עדיין",
+    "carsEmptySubtitle": "הוסיפו את הרכב הראשון כדי לבנות את המאגר המשותף."
   },
   "dashboard": {
     "title": "לוח בקרה",
@@ -94,6 +108,7 @@
     "save": "שמירה",
     "cancel": "ביטול",
     "delete": "מחיקה",
+    "apply": "החלה",
     "unexpectedError": "משהו השתבש. נסו שוב."
   },
   "formErrors": {

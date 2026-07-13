@@ -11,23 +11,23 @@
       size="small"
       text
       (onClick)="edit.emit()" />
+    <p-button
+      icon="pi pi-trash"
+      severity="danger"
+      size="small"
+      text
+      [ariaLabel]="'teachers.deleteTeacher' | transloco"
+      (onClick)="remove.emit()" />
   </header>
 
-  @if (teacher().cars.length) {
+  @if (carChips().length) {
     <div class="card__cars">
-      @for (car of teacher().cars; track car.id) {
-        <app-car-row [car]="car" (edit)="editCar.emit(car)" />
+      @for (chip of carChips(); track chip.id) {
+        <span class="card__chip">
+          {{ chip.name }}
+          <span class="card__chip-tag">{{ chip.transmissionKey | transloco }}</span>
+        </span>
       }
     </div>
   }
-
-  <div class="card__footer">
-    <p-button
-      [label]="'teachers.addCar' | transloco"
-      severity="secondary"
-      size="small"
-      outlined
-      icon="pi pi-plus"
-      (onClick)="addCar.emit()" />
-  </div>
 </article>

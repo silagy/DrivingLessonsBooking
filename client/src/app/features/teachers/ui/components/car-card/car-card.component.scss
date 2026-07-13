@@ -1,0 +1,95 @@
+.car__icon {
+    inline-size: 2.125rem;
+    block-size: 2.125rem;
+    border-radius: 8px;
+    background: var(--app-steel-light);
+    color: var(--app-whale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+}
+
+.car__name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--app-ink);
+}
+
+.car__type {
+    font-size: 0.75rem;
+    color: var(--app-text-secondary);
+}
+
+.car__pill {
+    flex: none;
+    font-family: var(--app-font-display);
+    font-weight: 800;
+    font-size: 0.625rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    background: var(--p-primary-50);
+    color: var(--p-primary-800);
+}
+
+:host-context([dir='rtl']) .car__pill {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: normal;
+}
+
+.car__pill--manual {
+    background: var(--app-border);
+    color: var(--app-text-secondary);
+}
+
+.car {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1rem 1.125rem;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--p-border-radius-lg);
+}
+
+.car__identity {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 10rem;
+}
+
+.car__teachers {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4375rem;
+}
+
+.car__chip {
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.car__shared {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--p-primary-700);
+    background: var(--p-primary-50);
+    border: 1px solid var(--p-primary-100);
+    border-radius: 999px;
+    padding: 0.25rem 0.625rem;
+}
+
+.car__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-inline-start: auto;
+}

@@ -11,8 +11,6 @@ export interface TeacherFormResult {
     contactEmail: string;
 }
 
-export type TeacherFormOutcome = TeacherFormResult | 'delete';
-
 @Component({
     selector: 'app-teacher-form-dialog',
     imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, InputTextModule],
@@ -24,8 +22,6 @@ export class TeacherFormDialog {
     private readonly fb = inject(FormBuilder);
     private readonly ref = inject(DynamicDialogRef);
     private readonly config = inject(DynamicDialogConfig<{ teacher?: Teacher }>);
-
-    protected readonly isEdit = !!this.config.data?.teacher;
 
     protected readonly form = this.fb.nonNullable.group({
         name: [this.config.data?.teacher?.name ?? '', Validators.required],
@@ -39,10 +35,6 @@ export class TeacherFormDialog {
 
         const result: TeacherFormResult = this.form.getRawValue();
         this.ref.close(result);
-    }
-
-    protected requestDelete(): void {
-        this.ref.close('delete');
     }
 
     protected cancel(): void {
