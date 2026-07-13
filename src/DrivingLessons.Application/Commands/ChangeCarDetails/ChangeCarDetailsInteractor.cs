@@ -7,29 +7,25 @@ namespace DrivingLessons.Application.Commands.ChangeCarDetails;
 
 public class ChangeCarDetailsInteractor
 {
-    private readonly ITeacherRepository repository;
+    private readonly ICarRepository repository;
     private readonly IUnitOfWork unitOfWork;
 
-    public ChangeCarDetailsInteractor(ITeacherRepository repository, IUnitOfWork unitOfWork)
+    public ChangeCarDetailsInteractor(ICarRepository repository, IUnitOfWork unitOfWork)
     {
         this.repository = repository;
         this.unitOfWork = unitOfWork;
     }
 
-    public async Task ExecuteAsync(Guid id, Guid carId, ChangeCarDetailsRequest request)
+    public async Task ExecuteAsync(Guid id, ChangeCarDetailsRequest request)
     {
-        var teacherId = TeacherId.Of(id);
+        var carId = CarId.Of(id);
 
-        var teacher = await repository.GetAsync(teacherId)
-                      ?? throw new TeacherNotFoundException(teacherId);
-
-        var resolvedCarId = CarId.Of(carId);
-        var car = teacher.Cars.FirstOrDefault(x => x.Id == resolvedCarId)
-                  ?? throw new CarNotFoundException(resolvedCarId);
+        var car = await repository.GetAsync(carId)
+                  ?? throw new CarNotFoundException(carId);
 
         var name = CarName.Of(request.Name);
         var type = CarType.Of(request.Type);
-        teacher.ChangeCarDetails(car, name, type, request.Transmission);
+        car.ChangeDetails(name, type, request.Transmission);
 
         await unitOfWork.CommitAsync();
     }

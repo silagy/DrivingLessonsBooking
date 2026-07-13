@@ -12,7 +12,7 @@ function MockApp() {
         <DCArtboard id="ad-login" label="1 · Login" width={1180} height={760}>
           <AdminLogin></AdminLogin>
         </DCArtboard>
-        <DCArtboard id="ad-teachers" label="2 · Teachers & cars" width={1180} height={760}>
+        <DCArtboard id="ad-teachers" label="2 · Cars & teachers" width={1180} height={900}>
           <AdminTeachers></AdminTeachers>
         </DCArtboard>
         <DCArtboard id="ad-roster" label="3 · Student roster upload" width={1180} height={860}>

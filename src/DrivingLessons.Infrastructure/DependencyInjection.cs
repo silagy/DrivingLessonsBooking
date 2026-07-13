@@ -48,6 +48,8 @@ public static class DependencyInjection
         services.AddScoped<IAdminAccountGateway, AdminAccountGateway>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<ITeacherQueries, TeacherQueries>();
+        services.AddScoped<ICarRepository, CarRepository>();
+        services.AddScoped<ICarQueries, CarQueries>();
         services.AddScoped<IWeekScheduleRepository, WeekScheduleRepository>();
         services.AddScoped<IWeekScheduleQueries, WeekScheduleQueries>();
         services.AddScoped<IPublicationRepository, PublicationRepository>();

@@ -14,6 +14,8 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public DbSet<Teacher> Teachers => Set<Teacher>();
 
+    public DbSet<Car> Cars => Set<Car>();
+
     public DbSet<WeekSchedule> WeekSchedules => Set<WeekSchedule>();
 
     public DbSet<Publication> Publications => Set<Publication>();

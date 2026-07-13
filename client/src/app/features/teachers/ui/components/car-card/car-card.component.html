@@ -1,0 +1,37 @@
+<article class="car">
+  <span class="car__icon" aria-hidden="true"><i class="pi pi-car"></i></span>
+  <span class="car__identity">
+    <span class="car__name">{{ car().name }}</span>
+    <span class="car__type">{{ car().type }}</span>
+  </span>
+  <span class="car__pill" [class.car__pill--manual]="isManual()">
+    {{ 'teachers.transmissions.' + car().transmission | transloco }}
+  </span>
+  <span class="car__teachers">
+    @for (teacher of car().assignedTeachers; track teacher.id) {
+      <span class="car__chip">{{ teacher.name }}</span>
+    }
+    <app-assign-teachers-popover
+      [teachers]="teachers()"
+      [assignedIds]="assignedIds()"
+      (applied)="assignApplied.emit($event)" />
+  </span>
+  <span class="car__actions">
+    @if (isShared()) {
+      <span class="car__shared">{{ 'teachers.shared' | transloco }}</span>
+    }
+    <p-button
+      [label]="'teachers.edit' | transloco"
+      severity="secondary"
+      size="small"
+      text
+      (onClick)="edit.emit()" />
+    <p-button
+      icon="pi pi-trash"
+      severity="danger"
+      size="small"
+      text
+      [ariaLabel]="'teachers.deleteCar' | transloco"
+      (onClick)="remove.emit()" />
+  </span>
+</article>
