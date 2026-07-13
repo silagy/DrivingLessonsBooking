@@ -40,6 +40,9 @@ public static class DependencyInjection
         services.AddScoped<ITeacherQueries, TeacherQueries>();
         services.AddScoped<IWeekScheduleRepository, WeekScheduleRepository>();
         services.AddScoped<IWeekScheduleQueries, WeekScheduleQueries>();
+        services.AddScoped<IPublicationRepository, PublicationRepository>();
+        services.AddScoped<IPublicationQueries, PublicationQueries>();
+        services.AddScoped<ISubmissionQueries, SubmissionQueries>();
         services.AddSingleton<IPasswordVerifier, PasswordVerifier>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 

@@ -16,6 +16,8 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public DbSet<WeekSchedule> WeekSchedules => Set<WeekSchedule>();
 
+    public DbSet<Publication> Publications => Set<Publication>();
+
     public DrivingLessonsDbContext(DbContextOptions<DrivingLessonsDbContext> options, IDomainEventDispatcher dispatcher)
         : base(options)
     {
