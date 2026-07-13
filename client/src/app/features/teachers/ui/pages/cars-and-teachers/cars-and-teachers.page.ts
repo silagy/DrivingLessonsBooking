@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -12,6 +12,8 @@ import { CarCardComponent } from '../../components/car-card/car-card.component';
 import { TeacherCardComponent } from '../../components/teacher-card/teacher-card.component';
 import { CarFormDialog, CarFormResult } from '../../dialogs/car-form/car-form.dialog';
 import { TeacherFormDialog, TeacherFormResult } from '../../dialogs/teacher-form/teacher-form.dialog';
+
+const noCars: Car[] = [];
 
 @Component({
     selector: 'app-cars-and-teachers-page',
@@ -29,9 +31,11 @@ export class CarsAndTeachersPage {
     private readonly dialogs = inject(DialogService);
     private readonly transloco = inject(TranslocoService);
 
-    protected carsOf(teacher: Teacher): Car[] {
-        return this.carsStore.carsByTeacherId().get(teacher.id) ?? [];
-    }
+    protected readonly teacherRows = computed(() =>
+        this.teachersStore.teachers().map((teacher) => ({
+            teacher,
+            cars: this.carsStore.carsByTeacherId().get(teacher.id) ?? noCars,
+        })));
 
     protected onAddTeacher(): void {
         const ref = this.dialogs.open(TeacherFormDialog, {
@@ -59,7 +63,7 @@ export class CarsAndTeachersPage {
 
         ref?.onClose.subscribe((result?: TeacherFormResult) => {
             if (result) {
-                void this.teachersStore.changeDetails(teacher.id, result);
+                void this.teachersStore.changeDetails(teacher.id, result).then(() => this.carsStore.reload());
             }
         });
     }

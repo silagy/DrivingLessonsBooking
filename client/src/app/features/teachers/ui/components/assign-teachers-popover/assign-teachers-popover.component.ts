@@ -46,13 +46,18 @@ export class AssignTeachersPopoverComponent {
         this.popover().toggle(event);
     }
 
-    protected toggleTeacher(teacherId: string): void {
+    protected setSelected(teacherId: string, checked: boolean): void {
         const current = this.selectedIds();
-        const next = current.includes(teacherId)
-            ? current.filter((id) => id !== teacherId)
-            : [...current, teacherId];
 
-        this.selectedIds.set(next);
+        if (checked) {
+            if (!current.includes(teacherId)) {
+                this.selectedIds.set([...current, teacherId]);
+            }
+
+            return;
+        }
+
+        this.selectedIds.set(current.filter((id) => id !== teacherId));
     }
 
     protected apply(): void {

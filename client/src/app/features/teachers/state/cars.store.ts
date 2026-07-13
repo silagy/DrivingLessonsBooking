@@ -59,6 +59,10 @@ export class CarsStore {
     }
 
     async applyAssignments(carId: string, selectedTeacherIds: string[], currentTeacherIds: string[]): Promise<void> {
+        if (this.mutating()) {
+            return;
+        }
+
         const toAssign = selectedTeacherIds.filter((id) => !currentTeacherIds.includes(id));
         const toUnassign = currentTeacherIds.filter((id) => !selectedTeacherIds.includes(id));
 

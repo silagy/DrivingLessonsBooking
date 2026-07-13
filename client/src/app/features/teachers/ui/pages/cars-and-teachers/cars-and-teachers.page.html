@@ -52,12 +52,12 @@
     </div>
   } @else {
     <div class="fleet__grid">
-      @for (teacher of teachersStore.teachers(); track teacher.id) {
+      @for (row of teacherRows(); track row.teacher.id) {
         <app-teacher-card
-          [teacher]="teacher"
-          [cars]="carsOf(teacher)"
-          (edit)="onEditTeacher(teacher)"
-          (remove)="onDeleteTeacher(teacher)" />
+          [teacher]="row.teacher"
+          [cars]="row.cars"
+          (edit)="onEditTeacher(row.teacher)"
+          (remove)="onDeleteTeacher(row.teacher)" />
       }
     </div>
   }

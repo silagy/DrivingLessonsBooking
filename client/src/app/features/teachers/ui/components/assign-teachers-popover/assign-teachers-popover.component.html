@@ -6,7 +6,7 @@
     <span class="assign__title">{{ 'teachers.assignToTeachers' | transloco }}</span>
     @for (row of rows(); track row.id) {
       <label class="assign__row">
-        <p-checkbox [binary]="true" [ngModel]="row.selected" (ngModelChange)="toggleTeacher(row.id)" />
+        <p-checkbox [binary]="true" [ngModel]="row.selected" (ngModelChange)="setSelected(row.id, $event)" />
         <span class="assign__name">{{ row.name }}</span>
         @if (row.assigned) {
           <span class="assign__hint">{{ 'teachers.assigned' | transloco }}</span>
