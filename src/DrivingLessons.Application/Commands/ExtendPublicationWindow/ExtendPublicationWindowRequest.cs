@@ -1,0 +1,3 @@
+namespace DrivingLessons.Application.Commands.ExtendPublicationWindow;
+
+public record ExtendPublicationWindowRequest(DateTimeOffset NewEndUtc);
