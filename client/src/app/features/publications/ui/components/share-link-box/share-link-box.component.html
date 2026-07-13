@@ -1,0 +1,11 @@
+<div class="share-link">
+    <div class="share-link__title">{{ 'publications.shareLink.title' | transloco }}</div>
+    <div class="share-link__row">
+        <div class="share-link__value" dir="ltr"><bdi>{{ link() }}</bdi></div>
+        <p-button
+            [label]="'publications.shareLink.copy' | transloco"
+            size="small"
+            (onClick)="copyClicked.emit()" />
+    </div>
+    <div class="share-link__hint">{{ 'publications.shareLink.hint' | transloco }}</div>
+</div>

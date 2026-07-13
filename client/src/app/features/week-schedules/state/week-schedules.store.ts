@@ -7,7 +7,9 @@ import { SlotWindow } from '../../../shared/models/slot-window.enum';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { WeekSchedulesApiService } from '../data/week-schedules-api.service';
 import { GetWeekScheduleResponse } from '../data/get-week-schedule.response';
-import { SlotState } from '../domain/slot-state.enum';
+import { SlotState } from '../../../shared/models/slot-state.enum';
+import { PublicationState } from '../../../shared/models/publication-state.enum';
+import { PublicationStatusApiService } from '../data/publication-status-api.service';
 import { Slot } from '../domain/slot.model';
 import { TeacherOption } from '../domain/teacher-option.model';
 import { WeekSchedule } from '../domain/week-schedule.model';
@@ -21,6 +23,7 @@ const TIME_LABEL_LENGTH = 5;
 export class WeekSchedulesStore {
     private readonly api = inject(WeekSchedulesApiService);
     private readonly teachersApi = inject(TeacherOptionsApiService);
+    private readonly publicationApi = inject(PublicationStatusApiService);
     private readonly toast = inject(ToastService);
     private readonly language = inject(LanguageService);
 
@@ -40,6 +43,14 @@ export class WeekSchedulesStore {
         },
         loader: ({ params }) => this.loadOrCreate(params.teacherId, params.weekStart),
     });
+
+    private readonly publicationResource = resource({
+        params: () => this.selectedWeekStartState(),
+        loader: ({ params: week }) => this.loadPublicationState(week),
+    });
+
+    readonly publicationState = computed<PublicationState | undefined>(() => this.publicationResource.value());
+    readonly canPublish = computed(() => this.publicationState() === PublicationState.draft);
 
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
     readonly selectedWeekStart = this.selectedWeekStartState.asReadonly();
@@ -135,6 +146,20 @@ export class WeekSchedulesStore {
         }
 
         return firstValueFrom(this.api.getByTeacherAndWeek(teacherId, weekStart));
+    }
+
+    private async loadPublicationState(week: string): Promise<PublicationState | undefined> {
+        try {
+            const publication = await firstValueFrom(this.publicationApi.getByWeek(week));
+
+            return publication.state;
+        } catch (error) {
+            if (isStatus(error, HTTP_NOT_FOUND)) {
+                return undefined;
+            }
+
+            throw error;
+        }
     }
 }
 

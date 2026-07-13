@@ -17,6 +17,10 @@ export const ADMIN_ROUTES: Routes = [
         path: AppRoutes.weekSchedules,
         loadChildren: () => import('../week-schedules/week-schedules.routes'),
       },
+      {
+        path: AppRoutes.publications,
+        loadChildren: () => import('../publications/publications.routes'),
+      },
     ],
   },
 ];

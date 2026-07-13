@@ -51,6 +51,36 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("cars", (string)null);
                 });
 
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.Publication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("LinkToken")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("link_token");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
+                        .HasColumnName("state");
+
+                    b.Property<DateOnly>("WeekStart")
+                        .HasColumnType("date")
+                        .HasColumnName("week_start");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkToken")
+                        .IsUnique();
+
+                    b.HasIndex("WeekStart")
+                        .IsUnique();
+
+                    b.ToTable("publications", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Domain.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -148,6 +178,61 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                         });
 
                     b.Navigation("TeacherAssignments");
+                });
+
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.Publication", b =>
+                {
+                    b.OwnsOne("DrivingLessons.Domain.Values.SubmissionWindow", "Window", b1 =>
+                        {
+                            b1.Property<Guid>("PublicationId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateTimeOffset>("EndUtc")
+                                .HasColumnType("timestamptz")
+                                .HasColumnName("window_end_utc");
+
+                            b1.Property<DateTimeOffset>("StartUtc")
+                                .HasColumnType("timestamptz")
+                                .HasColumnName("window_start_utc");
+
+                            b1.HasKey("PublicationId");
+
+                            b1.ToTable("publications");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PublicationId");
+                        });
+
+                    b.OwnsMany("DrivingLessons.Domain.Entities.TeacherExcelVersion", "TeacherVersions", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<Guid>("TeacherId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("teacher_id");
+
+                            b1.Property<int>("Version")
+                                .HasColumnType("integer")
+                                .HasColumnName("version");
+
+                            b1.Property<Guid>("publication_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("publication_id");
+
+                            b1.ToTable("publication_teacher_versions", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("publication_id");
+                        });
+
+                    b.Navigation("TeacherVersions");
+
+                    b.Navigation("Window");
                 });
 
             modelBuilder.Entity("DrivingLessons.Domain.Entities.WeekSchedule", b =>

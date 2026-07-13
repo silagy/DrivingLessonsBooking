@@ -1,0 +1,93 @@
+<div class="dashboard">
+    <header class="dashboard__header">
+        <div class="dashboard__heading">
+            <div class="dashboard__eyebrow">{{ store.weekLabel() }}</div>
+            <div class="dashboard__title-row">
+                <p-select
+                    [options]="store.teachers()"
+                    optionLabel="name"
+                    optionValue="id"
+                    [ngModel]="store.selectedTeacherId()"
+                    (ngModelChange)="store.selectTeacher($event)"
+                    [placeholder]="'publications.selectTeacher' | transloco" />
+                @if (store.state(); as state) {
+                    <app-publication-state-tag [state]="state" />
+                }
+            </div>
+        </div>
+
+        <div class="dashboard__actions">
+            @switch (store.state()) {
+                @case (PublicationState.draft) {
+                    <p-button [label]="'publications.publish' | transloco" (onClick)="onPublish()" />
+                }
+                @case (PublicationState.open) {
+                    <p-button [label]="'publications.extendWindow' | transloco" severity="secondary" text size="small" (onClick)="onExtend()" />
+                    <p-button [label]="'general.refresh' | transloco" severity="secondary" size="small" (onClick)="store.refresh()" />
+                    <p-button [label]="'publications.downloadExcel' | transloco" size="small" (onClick)="store.downloadExcel()" />
+                }
+                @case (PublicationState.closed) {
+                    <p-button [label]="'publications.reopenWindow' | transloco" severity="secondary" size="small" (onClick)="onReopen()" />
+                    <p-button [label]="'publications.downloadExcel' | transloco" size="small" (onClick)="store.downloadExcel()" />
+                }
+            }
+        </div>
+    </header>
+
+    @if (store.isLoading()) {
+        <div class="dashboard__state"><p-progressSpinner /></div>
+    } @else if (store.loadError(); as errorKey) {
+        <div class="dashboard__state">{{ errorKey | transloco }}</div>
+    } @else {
+        @switch (store.state()) {
+            @case (PublicationState.draft) {
+                <section class="dashboard__card dashboard__notice">
+                    {{ 'publications.dashboard.draftPrompt' | transloco }}
+                </section>
+            }
+            @case (PublicationState.published) {
+                <section class="dashboard__card">
+                    <p class="dashboard__notice">
+                        {{ 'publications.dashboard.publishedNotice' | transloco: { opensAt: formatInstant(store.dashboard()?.windowStartUtc ?? '') } }}
+                    </p>
+                    <app-share-link-box [link]="store.shareLink()" (copyClicked)="store.copyLink()" />
+                </section>
+            }
+            @case (PublicationState.open) {
+                <div class="dashboard__stats">
+                    <app-publication-stat-chip
+                        [value]="'' + (store.dashboard()?.studentsSubmitted ?? 0)"
+                        [label]="'publications.dashboard.studentsSubmitted' | transloco" />
+                    <app-publication-stat-chip
+                        [value]="'' + (store.dashboard()?.totalPicks ?? 0)"
+                        [label]="'publications.dashboard.totalPicks' | transloco" />
+                    <app-publication-stat-chip
+                        [value]="store.dashboard()?.lastSubmissionAtUtc ? formatInstant(store.dashboard()!.lastSubmissionAtUtc!) : '—'"
+                        [label]="'publications.dashboard.lastSubmission' | transloco" />
+                    <span class="dashboard__stamp">
+                        {{ 'publications.dashboard.dataAsOf' | transloco }} <bdi>{{ store.dataAsOf() }}</bdi>
+                    </span>
+                </div>
+                <section class="dashboard__card">
+                    <app-week-grid [cells]="store.slotCounts()" [weekStart]="store.selectedWeekStart()">
+                        <ng-template let-cell>
+                            <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" />
+                        </ng-template>
+                    </app-week-grid>
+                </section>
+            }
+            @case (PublicationState.closed) {
+                <section class="dashboard__card dashboard__notice">
+                    {{ 'publications.dashboard.closedNotice' | transloco: { closedAt: windowLabel(), version: store.dashboard()?.latestExcelVersion ?? 1 } }}
+                </section>
+                <section class="dashboard__card">
+                    <app-week-grid [cells]="store.slotCounts()" [weekStart]="store.selectedWeekStart()">
+                        <ng-template let-cell>
+                            <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" />
+                        </ng-template>
+                    </app-week-grid>
+                </section>
+            }
+        }
+    }
+</div>

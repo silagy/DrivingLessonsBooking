@@ -1,0 +1,89 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+    <p class="dialog-form__hint">
+        {{ 'publications.publishDialog.subtitle' | transloco: { week: weekLabel } }}
+    </p>
+
+    <div class="dialog-form__grid">
+        <div class="field">
+            <label for="publish-start">{{ 'publications.publishDialog.opensAt' | transloco }}</label>
+            <p-datepicker
+                inputId="publish-start"
+                appendTo="body"
+                formControlName="start"
+                [showTime]="true"
+                [showIcon]="true"
+                hourFormat="24"
+                dateFormat="D, M d" />
+        </div>
+        <div class="field">
+            <label for="publish-end">{{ 'publications.publishDialog.closesAt' | transloco }}</label>
+            <p-datepicker
+                inputId="publish-end"
+                appendTo="body"
+                formControlName="end"
+                [showTime]="true"
+                [showIcon]="true"
+                hourFormat="24"
+                dateFormat="D, M d" />
+        </div>
+    </div>
+    <small class="dialog-form__hint">{{ 'publications.timezoneNote' | transloco }}</small>
+
+    <app-share-link-box [link]="link" (copyClicked)="copyLink()" />
+
+    <ol class="lifecycle">
+        @for (step of steps; track step; let first = $first) {
+            <li class="lifecycle__step" [class.lifecycle__step--current]="step === 'published'">
+                <span class="lifecycle__dot"></span>
+                <span class="lifecycle__label">{{ 'publications.state.' + step | transloco }}</span>
+            </li>
+        }
+    </ol>
+
+    <div class="dialog-form__actions">
+        <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+        <p-button [label]="'publications.publish' | transloco" type="submit" [disabled]="form.invalid" />
+    </div>
+</form>
+
+<style>
+    .lifecycle {
+        display: flex;
+        justify-content: space-between;
+        list-style: none;
+        margin: 0;
+        padding-block-start: 6px;
+        padding-inline: 0;
+    }
+
+    .lifecycle__step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        flex: 1;
+    }
+
+    .lifecycle__dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 3px solid var(--app-border);
+    }
+
+    .lifecycle__step--current .lifecycle__dot {
+        border: none;
+        background: var(--app-grad-sky);
+    }
+
+    .lifecycle__label {
+        font-family: var(--app-font-display);
+        font-size: 0.72rem;
+        color: var(--app-text-secondary);
+    }
+
+    .lifecycle__step--current .lifecycle__label {
+        color: var(--app-ink);
+        font-weight: 700;
+    }
+</style>

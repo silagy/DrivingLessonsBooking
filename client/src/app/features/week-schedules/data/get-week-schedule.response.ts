@@ -1,6 +1,6 @@
 import { DayOfWeek } from '../../../shared/models/day-of-week.enum';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
-import { SlotState } from '../domain/slot-state.enum';
+import { SlotState } from '../../../shared/models/slot-state.enum';
 
 export interface GetWeekScheduleResponse {
     id: string;

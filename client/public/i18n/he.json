@@ -19,7 +19,9 @@
     "nav": {
       "dashboard": "לוח בקרה",
       "teachers": "רכבים ומורים",
-      "weeklyPrep": "הכנת שבוע"
+      "weeklyPrep": "הכנת שבוע",
+      "publications": "פרסומים",
+      "history": "היסטוריה"
     }
   },
   "teachers": {
@@ -80,6 +82,7 @@
     "selectTeacherPrompt": "בחרו מורה ושבוע כדי להכין את הרשת.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
+    "publishWeek": "פרסום שבוע…",
     "unavailableCount": "{{count}} משבצות סומנו כלא זמינות",
     "loadFailed": "טעינת שבוע העבודה נכשלה."
   },
@@ -104,10 +107,95 @@
       "outsideGrid": "מחוץ לרשת (שישי אחה״צ/ערב, שבת)"
     }
   },
+  "publications": {
+    "title": "פרסומים",
+    "subtitle": "פרסמו את השבוע, עקבו אחר הבקשות ושתפו את הקישור.",
+    "teacher": "מורה",
+    "week": "שבוע",
+    "selectTeacher": "בחרו מורה",
+    "state": {
+      "draft": "טיוטה",
+      "published": "פורסם",
+      "open": "פתוח",
+      "closed": "סגור"
+    },
+    "publish": "פרסום שבוע…",
+    "extendWindow": "הארכת מועד",
+    "reopen": "פתיחה מחדש",
+    "reopenWindow": "פתיחה מחדש…",
+    "copyLink": "העתקת קישור",
+    "downloadExcel": "הורדת אקסל",
+    "refresh": "רענון",
+    "timezoneNote": "כל השעות באזור אסיה/ירושלים.",
+    "shareLink": {
+      "title": "קישור לשיתוף",
+      "copy": "העתקת קישור",
+      "copied": "הקישור הועתק.",
+      "copyFailed": "לא ניתן להעתיק את הקישור.",
+      "hint": "קישור אחד לכל המורים — נוצר בעת הפרסום. שתפו אותו בעצמכם, למשל בקבוצת הוואטסאפ של התלמידים."
+    },
+    "windowStart": "נפתח",
+    "windowEnd": "נסגר",
+    "studentsSubmitted": "תלמידים שהגישו",
+    "totalPicks": "סך הבחירות",
+    "lastSubmission": "הגשה אחרונה",
+    "latestVersion": "גרסה אחרונה",
+    "dataAsOf": "הנתונים נכון ל-{{time}}",
+    "requestCount": "{{count}} בקשות",
+    "noPublication": "השבוע הזה עדיין לא הוכן.",
+    "published": "השבוע פורסם",
+    "extended": "המועד הוארך",
+    "reopened": "החלון נפתח מחדש",
+    "linkCopied": "הקישור הועתק",
+    "excelDownloaded": "האקסל הורד",
+    "loadFailed": "טעינת הפרסום נכשלה.",
+    "publishDialog": {
+      "subtitle": "חלון אחד לכל בית הספר — פרסמו את {{week}} ושתפו קישור יחיד.",
+      "opensAt": "פתיחת הגשות",
+      "closesAt": "סגירת הגשות"
+    },
+    "extendDialog": { "newEnd": "מועד סגירה חדש" },
+    "reopenDialog": {
+      "subtitle": "פתיחה מחדש קובעת מועד סגירה חדש ומאפשרת לתלמידים לערוך שוב. הסגירה הבאה תשלח גרסה חדשה.",
+      "newEnd": "מועד סגירה חדש"
+    },
+    "dashboard": {
+      "requests": "בקשות",
+      "studentsSubmitted": "תלמידים הגישו",
+      "totalPicks": "סה״כ בחירות",
+      "lastSubmission": "הגשה אחרונה",
+      "dataAsOf": "נתונים נכון ל־",
+      "draftPrompt": "השבוע הוכן אך טרם פורסם. פרסמו אותו כדי לפתוח את חלון ההגשות וליצור את הקישור.",
+      "publishedNotice": "ההגשות ייפתחו אוטומטית ב־{{opensAt}}.",
+      "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה."
+    },
+    "history": {
+      "title": "היסטוריית פרסומים",
+      "subtitle": "כל שבוע שפורסם, לפי מורה — עם גרסת האקסל האחרונה שנשלחה.",
+      "week": "שבוע",
+      "teacher": "מורה",
+      "window": "חלון הגשה",
+      "status": "סטטוס",
+      "lastExcel": "אקסל אחרון",
+      "redownload": "הורדה חוזרת",
+      "viewDashboard": "צפייה בלוח",
+      "empty": "אין פרסומים עדיין.",
+      "loadFailed": "טעינת ההיסטוריה נכשלה."
+    },
+    "dialogs": {
+      "publishTitle": "פרסום השבוע",
+      "extendTitle": "הארכת מועד",
+      "reopenTitle": "פתיחה מחדש",
+      "windowStart": "החלון נפתח",
+      "windowEnd": "החלון נסגר",
+      "newEnd": "מועד סגירה חדש"
+    }
+  },
   "general": {
     "save": "שמירה",
     "cancel": "ביטול",
     "delete": "מחיקה",
+    "refresh": "רענון",
     "apply": "החלה",
     "unexpectedError": "משהו השתבש. נסו שוב."
   },

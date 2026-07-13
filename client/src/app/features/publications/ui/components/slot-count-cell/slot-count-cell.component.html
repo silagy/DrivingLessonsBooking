@@ -1,0 +1,12 @@
+@if (isUnavailable()) {
+    <div class="slot-count slot-count--blocked">
+        <span class="slot-count__blocked-label">{{ 'weekGrid.legend.unavailable' | transloco }}</span>
+    </div>
+} @else {
+    <div class="slot-count">
+        <span class="slot-count__value" [class.slot-count__value--empty]="isEmpty()">
+            <bdi>{{ requestCount() }}</bdi>
+        </span>
+        <span class="slot-count__caption">{{ 'publications.dashboard.requests' | transloco }}</span>
+    </div>
+}
