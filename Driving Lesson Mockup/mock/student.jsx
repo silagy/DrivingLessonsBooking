@@ -288,7 +288,7 @@ function PickRow({rank, title, time, type, note, top}) {
         <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor"><circle cx="3" cy="2.5" r="1.4"></circle><circle cx="9" cy="2.5" r="1.4"></circle><circle cx="3" cy="7" r="1.4"></circle><circle cx="9" cy="7" r="1.4"></circle><circle cx="3" cy="11.5" r="1.4"></circle><circle cx="9" cy="11.5" r="1.4"></circle></svg>
       </div>
       <div style={{width:21, height:21, borderRadius:999, flex:'none', marginTop:1,
-        backgroundImage:top?mkC.grad:'none', background:top?undefined:mkC.g5,
+        backgroundImage:top?mkC.grad:'none', backgroundColor:top?'transparent':mkC.g5,
         color:top?'#fff':mkC.g3, fontFamily:mkC.display, fontWeight:800, fontSize:11,
         display:'flex', alignItems:'center', justifyContent:'center'}}>{rank}</div>
       <div style={{minWidth:0}}>
