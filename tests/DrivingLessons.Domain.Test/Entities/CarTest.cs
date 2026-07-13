@@ -88,7 +88,7 @@ public class CarTest
         car
             .UncommittedEvents
             .OfType<CarDetailsChanged>()
-            .Where(x => x.CarId == car.Id && x.Name == newName && x.Type == newType)
+            .Where(x => x.CarId == car.Id && x.Name == newName && x.Type == newType && x.Transmission == Transmission.Manual)
             .ShouldHaveSingleItem();
     }
 
@@ -142,7 +142,7 @@ public class CarTest
     }
 
     [TestMethod]
-    public void Assign_Teacher_Supports_Multiple_Teachers()
+    public void Assign_Teacher__Supports_Multiple_Teachers()
     {
         //given
         var (car, first) = CarFakeBuilder.Build().AssignFakeTeacher();
