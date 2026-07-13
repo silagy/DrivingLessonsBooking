@@ -1,4 +1,4 @@
 import { Routes } from '@angular/router';
-import { TeachersListPage } from './ui/pages/teachers-list/teachers-list.page';
+import { CarsAndTeachersPage } from './ui/pages/cars-and-teachers/cars-and-teachers.page';
 
-export default [{ path: '', component: TeachersListPage }] satisfies Routes;
+export default [{ path: '', component: CarsAndTeachersPage }] satisfies Routes;

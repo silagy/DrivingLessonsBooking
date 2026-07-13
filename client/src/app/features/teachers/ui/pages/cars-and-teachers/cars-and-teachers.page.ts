@@ -4,39 +4,46 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ConfirmDialog, ConfirmDialogData } from '../../../../../shared/dialogs/confirm/confirm.dialog';
+import { CarsStore } from '../../../state/cars.store';
 import { TeachersStore } from '../../../state/teachers.store';
 import { Car } from '../../../domain/car.model';
 import { Teacher } from '../../../domain/teacher.model';
+import { CarCardComponent } from '../../components/car-card/car-card.component';
 import { TeacherCardComponent } from '../../components/teacher-card/teacher-card.component';
-import { CarFormDialog, CarFormOutcome, CarFormResult } from '../../dialogs/car-form/car-form.dialog';
-import { TeacherFormDialog, TeacherFormOutcome, TeacherFormResult } from '../../dialogs/teacher-form/teacher-form.dialog';
+import { CarFormDialog, CarFormResult } from '../../dialogs/car-form/car-form.dialog';
+import { TeacherFormDialog, TeacherFormResult } from '../../dialogs/teacher-form/teacher-form.dialog';
 
 @Component({
-    selector: 'app-teachers-list-page',
-    imports: [TranslocoPipe, ButtonModule, ProgressSpinnerModule, TeacherCardComponent],
-    templateUrl: './teachers-list.page.html',
-    styleUrl: './teachers-list.page.scss',
+    selector: 'app-cars-and-teachers-page',
+    imports: [TranslocoPipe, ButtonModule, ProgressSpinnerModule, CarCardComponent, TeacherCardComponent],
+    templateUrl: './cars-and-teachers.page.html',
+    styleUrl: './cars-and-teachers.page.scss',
     providers: [DialogService],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TeachersListPage {
+export class CarsAndTeachersPage {
     private static readonly dialogWidth = '28rem';
 
-    protected readonly store = inject(TeachersStore);
+    protected readonly teachersStore = inject(TeachersStore);
+    protected readonly carsStore = inject(CarsStore);
     private readonly dialogs = inject(DialogService);
     private readonly transloco = inject(TranslocoService);
+
+    protected carsOf(teacher: Teacher): Car[] {
+        return this.carsStore.carsByTeacherId().get(teacher.id) ?? [];
+    }
 
     protected onAddTeacher(): void {
         const ref = this.dialogs.open(TeacherFormDialog, {
             header: this.transloco.translate('teachers.addTeacher'),
-            width: TeachersListPage.dialogWidth,
+            width: CarsAndTeachersPage.dialogWidth,
             modal: true,
             dismissableMask: true,
         });
 
         ref?.onClose.subscribe((result?: TeacherFormResult) => {
             if (result) {
-                void this.store.create(result);
+                void this.teachersStore.create(result);
             }
         });
     }
@@ -44,83 +51,80 @@ export class TeachersListPage {
     protected onEditTeacher(teacher: Teacher): void {
         const ref = this.dialogs.open(TeacherFormDialog, {
             header: this.transloco.translate('teachers.editTeacher'),
-            width: TeachersListPage.dialogWidth,
+            width: CarsAndTeachersPage.dialogWidth,
             modal: true,
             dismissableMask: true,
             data: { teacher },
         });
 
-        ref?.onClose.subscribe((result?: TeacherFormOutcome) => {
-            if (result === 'delete') {
-                this.confirmDeleteTeacher(teacher);
-                return;
-            }
-
+        ref?.onClose.subscribe((result?: TeacherFormResult) => {
             if (result) {
-                void this.store.changeDetails(teacher.id, result);
+                void this.teachersStore.changeDetails(teacher.id, result);
             }
         });
     }
 
-    protected onAddCar(teacher: Teacher): void {
+    protected onDeleteTeacher(teacher: Teacher): void {
+        const data: ConfirmDialogData = {
+            messageKey: 'teachers.confirmDeleteTeacher',
+            messageParams: { name: teacher.name },
+        };
+
+        this.openConfirm('teachers.deleteTeacher', data, async () => {
+            await this.teachersStore.delete(teacher.id);
+            this.carsStore.reload();
+        });
+    }
+
+    protected onAddCar(): void {
         const ref = this.dialogs.open(CarFormDialog, {
             header: this.transloco.translate('teachers.addCar'),
-            width: TeachersListPage.dialogWidth,
+            width: CarsAndTeachersPage.dialogWidth,
             modal: true,
             dismissableMask: true,
         });
 
         ref?.onClose.subscribe((result?: CarFormResult) => {
             if (result) {
-                void this.store.addCar(teacher.id, result);
+                void this.carsStore.create(result);
             }
         });
     }
 
-    protected onEditCar(teacher: Teacher, car: Car): void {
-        const isLastCar = teacher.cars.length === 1;
+    protected onEditCar(car: Car): void {
         const ref = this.dialogs.open(CarFormDialog, {
             header: this.transloco.translate('teachers.editCar'),
-            width: TeachersListPage.dialogWidth,
+            width: CarsAndTeachersPage.dialogWidth,
             modal: true,
             dismissableMask: true,
-            data: { car, isLastCar },
+            data: { car },
         });
 
-        ref?.onClose.subscribe((result?: CarFormOutcome) => {
-            if (result === 'delete') {
-                this.confirmRemoveCar(teacher, car);
-                return;
-            }
-
+        ref?.onClose.subscribe((result?: CarFormResult) => {
             if (result) {
-                void this.store.changeCarDetails(teacher.id, car.id, result);
+                void this.carsStore.changeDetails(car.id, result);
             }
         });
     }
 
-    private confirmDeleteTeacher(teacher: Teacher): void {
+    protected onDeleteCar(car: Car): void {
         const data: ConfirmDialogData = {
-            messageKey: 'teachers.confirmDeleteTeacher',
-            messageParams: { name: teacher.name },
-        };
-
-        this.openConfirm('teachers.deleteTeacher', data, () => void this.store.delete(teacher.id));
-    }
-
-    private confirmRemoveCar(teacher: Teacher, car: Car): void {
-        const data: ConfirmDialogData = {
-            messageKey: 'teachers.confirmRemoveCar',
+            messageKey: 'teachers.confirmDeleteCar',
             messageParams: { name: car.name },
         };
 
-        this.openConfirm('teachers.removeCar', data, () => void this.store.removeCar(teacher.id, car.id));
+        this.openConfirm('teachers.deleteCar', data, () => void this.carsStore.delete(car.id));
+    }
+
+    protected onApplyAssignments(car: Car, selectedTeacherIds: string[]): void {
+        const currentTeacherIds = car.assignedTeachers.map((teacher) => teacher.id);
+        void this.carsStore.applyAssignments(car.id, selectedTeacherIds, currentTeacherIds);
     }
 
     private openConfirm(headerKey: string, data: ConfirmDialogData, onConfirm: () => void): void {
         const ref = this.dialogs.open(ConfirmDialog, {
             header: this.transloco.translate(headerKey),
-            width: TeachersListPage.dialogWidth,
+            width: CarsAndTeachersPage.dialogWidth,
             modal: true,
             dismissableMask: true,
             data,

@@ -1,6 +1,6 @@
 import { Transmission } from '../domain/transmission.enum';
 
-export interface AddCarRequest {
+export interface CreateCarRequest {
     name: string;
     type: string;
     transmission: Transmission;

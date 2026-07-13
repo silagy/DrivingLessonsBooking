@@ -11,8 +11,6 @@ export interface TeacherFormResult {
     contactEmail: string;
 }
 
-export type TeacherFormOutcome = TeacherFormResult | 'delete';
-
 @Component({
     selector: 'app-teacher-form-dialog',
     imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, InputTextModule],
@@ -39,10 +37,6 @@ export class TeacherFormDialog {
 
         const result: TeacherFormResult = this.form.getRawValue();
         this.ref.close(result);
-    }
-
-    protected requestDelete(): void {
-        this.ref.close('delete');
     }
 
     protected cancel(): void {

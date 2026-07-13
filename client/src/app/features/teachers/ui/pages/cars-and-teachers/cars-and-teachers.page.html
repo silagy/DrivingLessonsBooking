@@ -1,0 +1,64 @@
+<div class="fleet">
+  <header class="fleet__header">
+    <div>
+      <h2 class="fleet__title">{{ 'teachers.title' | transloco }}</h2>
+      <p class="fleet__subtitle">{{ 'teachers.subtitle' | transloco }}</p>
+    </div>
+    <div class="fleet__actions">
+      <p-button
+        [label]="'teachers.addTeacher' | transloco"
+        severity="secondary"
+        [disabled]="teachersStore.isMutating()"
+        (onClick)="onAddTeacher()" />
+      <p-button
+        [label]="'teachers.addCar' | transloco"
+        [disabled]="carsStore.isMutating()"
+        (onClick)="onAddCar()" />
+    </div>
+  </header>
+
+  <h3 class="fleet__section">{{ 'teachers.carsSection' | transloco }} · {{ carsStore.cars().length }}</h3>
+  @if (carsStore.isLoading()) {
+    <div class="fleet__loading"><p-progressSpinner /></div>
+  } @else if (carsStore.loadError(); as errorKey) {
+    <p class="fleet__error">{{ errorKey | transloco }}</p>
+  } @else if (carsStore.isEmpty()) {
+    <div class="fleet__empty">
+      <h3>{{ 'teachers.carsEmptyTitle' | transloco }}</h3>
+      <p>{{ 'teachers.carsEmptySubtitle' | transloco }}</p>
+    </div>
+  } @else {
+    <div class="fleet__cars">
+      @for (car of carsStore.cars(); track car.id) {
+        <app-car-card
+          [car]="car"
+          [teachers]="teachersStore.teachers()"
+          (edit)="onEditCar(car)"
+          (remove)="onDeleteCar(car)"
+          (assignApplied)="onApplyAssignments(car, $event)" />
+      }
+    </div>
+  }
+
+  <h3 class="fleet__section">{{ 'teachers.teachersSection' | transloco }} · {{ teachersStore.teachers().length }}</h3>
+  @if (teachersStore.isLoading()) {
+    <div class="fleet__loading"><p-progressSpinner /></div>
+  } @else if (teachersStore.loadError(); as errorKey) {
+    <p class="fleet__error">{{ errorKey | transloco }}</p>
+  } @else if (teachersStore.isEmpty()) {
+    <div class="fleet__empty">
+      <h3>{{ 'teachers.emptyTitle' | transloco }}</h3>
+      <p>{{ 'teachers.emptySubtitle' | transloco }}</p>
+    </div>
+  } @else {
+    <div class="fleet__grid">
+      @for (teacher of teachersStore.teachers(); track teacher.id) {
+        <app-teacher-card
+          [teacher]="teacher"
+          [cars]="carsOf(teacher)"
+          (edit)="onEditTeacher(teacher)"
+          (remove)="onDeleteTeacher(teacher)" />
+      }
+    </div>
+  }
+</div>
