@@ -10,7 +10,7 @@ namespace DrivingLessons.Presentation.Web.Controllers.Teacher;
 public class TeacherQueryController : ControllerBase
 {
     [HttpGet("{id:guid}")]
-    [EndpointSummary("Get a teacher with their cars")]
+    [EndpointSummary("Get a teacher")]
     [ProducesResponseType(typeof(GetTeacherResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<GetTeacherResponse> GetAsync(
@@ -21,7 +21,7 @@ public class TeacherQueryController : ControllerBase
     }
 
     [HttpGet("find")]
-    [EndpointSummary("Find all teachers with their cars")]
+    [EndpointSummary("Find all teachers")]
     [ProducesResponseType(typeof(IReadOnlyCollection<ItemForFindTeachersResponse>), StatusCodes.Status200OK)]
     public async Task<IReadOnlyCollection<ItemForFindTeachersResponse>> FindAsync(
         [FromServices] FindTeachersInteractor interactor)
