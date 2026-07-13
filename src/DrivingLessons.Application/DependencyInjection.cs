@@ -1,4 +1,5 @@
 using DrivingLessons.Application.Auth;
+using DrivingLessons.Application.Common;
 using DrivingLessons.Application.Commands.AddCar;
 using DrivingLessons.Application.Commands.ChangeCarDetails;
 using DrivingLessons.Application.Commands.ChangeTeacherDetails;
@@ -8,9 +9,11 @@ using DrivingLessons.Application.Commands.DeleteTeacher;
 using DrivingLessons.Application.Commands.MarkSlotAvailable;
 using DrivingLessons.Application.Commands.MarkSlotUnavailable;
 using DrivingLessons.Application.Commands.RemoveCar;
+using DrivingLessons.Application.EventHandlers;
 using DrivingLessons.Application.Queries.FindTeachers;
 using DrivingLessons.Application.Queries.GetTeacher;
 using DrivingLessons.Application.Queries.GetWeekSchedule;
+using DrivingLessons.Domain.Events;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DrivingLessons.Application;
@@ -32,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<MarkSlotUnavailableInteractor>();
         services.AddScoped<MarkSlotAvailableInteractor>();
         services.AddScoped<GetWeekScheduleInteractor>();
+        services.AddScoped<IDomainEventHandler<WeekScheduleCreated>, WeekScheduleCreatedHandler>();
         return services;
     }
 }

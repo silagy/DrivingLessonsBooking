@@ -1,6 +1,6 @@
 namespace DrivingLessons.Domain.Common;
 
-public abstract class AggregateRoot<TId> : Entity<TId>
+public abstract class AggregateRoot<TId> : Entity<TId>, IHasDomainEvents
     where TId : EntityId
 {
     private readonly List<IDomainEvent> uncommittedEvents = [];

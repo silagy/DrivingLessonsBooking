@@ -3,6 +3,7 @@ using DrivingLessons.Application.Common;
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Domain.Repositories;
 using DrivingLessons.Infrastructure.Auth;
+using DrivingLessons.Infrastructure.DomainEvents;
 using DrivingLessons.Infrastructure.EntityFramework;
 using DrivingLessons.Infrastructure.EntityFramework.Queries;
 using DrivingLessons.Infrastructure.EntityFramework.Repositories;
@@ -17,6 +18,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+
         services.AddDbContext<DrivingLessonsDbContext>(o =>
             o.UseNpgsql(configuration.GetConnectionString("Default")));
 
