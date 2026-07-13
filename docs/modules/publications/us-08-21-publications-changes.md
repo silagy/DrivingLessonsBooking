@@ -76,3 +76,31 @@ appended to `body` and the dialog has **no** scroll overflow in either axis.
   branch's `TeacherQueries.FindAsync` — unchanged from `main` — cannot query. Verification ran against a
   fresh `drivinglessons_e2e` database so this branch's five migrations built the expected schema. The
   `teachers/find` mismatch is a pre-existing concern on `main`, out of scope for this PR.
+
+## Car shared-pool reconciliation (follow-up to the `teachers/find` note)
+
+The pre-existing `teachers/find` mismatch above turned out to be a branch-topology accident: the car
+shared-pool refactor (PR #58, "Promote Car to shared-pool aggregate") had been merged into
+`6-us-05-07-week-schedules-module` **after** that branch already merged to `main` (#57), so it never
+reached `main`. Every branch cut from main since — including this one — inherited the old owned-cars model.
+
+Reconciled in two steps (strategy: land on main first, then merge):
+
+1. **Shared-pool → `main`** via a fresh PR from `car-shared-pool-refactor` (**PR #60**, merged as `072e3a2`):
+   `Car` becomes its own aggregate with a `car_teachers` many-to-many join, assign/unassign, soft-delete,
+   and the car-centric admin page.
+2. **`main` → this branch** (merge `d2de16f`). Conflicts resolved: `i18n` en/he (union of nav +
+   `general.refresh`/`general.apply`, kept mirrored), `Application/DependencyInjection.cs` (shared-pool car
+   commands `CreateCar`/`DeleteCar`/`AssignCarToTeacher`/`UnassignCarFromTeacher` + publication
+   registrations — the removed `AddCar`/`RemoveCar` usings dropped), and the EF model snapshot. `DbContext`
+   auto-merged (kept `DbSet<Car>` + the publications domain-event dispatch in `CommitAsync`).
+   - **Migration reconciliation:** the branch's `AddPublications` was regenerated on the shared-pool base
+     (`20260713221612_AddPublications`) so the top snapshot reflects *both* `car_teachers` and the
+     publication tables; `has-pending-model-changes` → none.
+   - The publications teacher picker needed **no change** — shared-pool's `ItemForFindTeachersResponse`
+     still exposes `id` + `name`, which is all the picker consumes.
+
+Verified on a fresh DB built from the merged chain: `cars` (no `teacher_id`, `is_deleted`) + `car_teachers`
++ `publications`/`publication_teacher_versions` all present; a car assigned to two teachers (many-to-many),
+and the publications dashboard/teacher-picker working alongside it; `dotnet build` clean, 120 domain tests
+pass, client build clean, no console errors.
