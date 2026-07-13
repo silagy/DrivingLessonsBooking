@@ -159,8 +159,8 @@ function MkLogo({size, name}) {
 /* ===================== Admin desktop shell ===================== */
 function AdminShell({active, children, rtl, minH}) {
   const nav = rtl
-    ? [['teachers','מורים ורכבים'],['roster','רשימת תלמידים'],['prep','הכנת שבוע'],['dash','לוח מעקב'],['history','היסטוריה']]
-    : [['teachers','Teachers & cars'],['roster','Roster'],['prep','Weekly prep'],['dash','Dashboard'],['history','History']];
+    ? [['teachers','רכבים ומורים'],['roster','רשימת תלמידים'],['prep','הכנת שבוע'],['dash','לוח מעקב'],['history','היסטוריה']]
+    : [['teachers','Cars & teachers'],['roster','Roster'],['prep','Weekly prep'],['dash','Dashboard'],['history','History']];
   return (
     <div dir={rtl?'rtl':'ltr'} style={{fontFamily:mkC.text, background:mkC.g7, minHeight:minH||760, display:'flex', flexDirection:'column'}}>
       <div style={{background:'#fff', borderBottom:'1px solid '+mkC.g5, padding:'0 36px', height:62,

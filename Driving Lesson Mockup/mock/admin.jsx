@@ -113,65 +113,133 @@ function AdminLogin() {
   );
 }
 
-/* 2 - Teachers & cars */
-function CarRow({name, kind, trans}) {
+/* 2 - Cars & teachers (shared fleet, many-to-many assignment) */
+function TeacherChip({name, grad}) {
   return (
-    <div style={{display:'flex', alignItems:'center', gap:12, padding:'11px 16px',
-      background:mkC.g7, border:'1px solid '+mkC.g5, borderRadius:8}}>
-      <div style={{width:34, height:34, borderRadius:8, background:mkC.steelLight, color:mkC.whale,
-        display:'flex', alignItems:'center', justifyContent:'center'}}>
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 12.5L4.3 8.2C4.6 7.2 5.5 6.5 6.6 6.5H13.4C14.5 6.5 15.4 7.2 15.7 8.2L17 12.5M3 12.5H17M3 12.5V15M17 12.5V15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"></path><circle cx="6.2" cy="12.5" r="0.4" fill="currentColor" stroke="currentColor"></circle><circle cx="13.8" cy="12.5" r="0.4" fill="currentColor" stroke="currentColor"></circle></svg>
+    <span style={{display:'inline-flex', alignItems:'center', gap:6, border:'1px solid '+mkC.g5, background:'#fff',
+      borderRadius:999, padding:'4px 12px 4px 5px', fontSize:12, fontWeight:500, color:mkC.g2}}>
+      <span style={{width:20, height:20, borderRadius:999, backgroundImage:grad?mkC.grad:'none',
+        backgroundColor:grad?'transparent':mkC.steelLight, color:grad?'#fff':mkC.whale, fontFamily:mkC.display,
+        fontWeight:700, fontSize:9, display:'inline-flex', alignItems:'center', justifyContent:'center'}}>{name.split(' ').map(w=>w[0]).join('')}</span>
+      {name}
+    </span>
+  );
+}
+function MkTrash({title}) {
+  return (
+    <span title={title} style={{width:30, height:30, borderRadius:999, border:'1px solid '+mkC.g5, background:'#fff',
+      color:mkC.plum, display:'inline-flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flex:'none'}}>
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4 5.5h12M8 5.5V4.2c0-.7.5-1.2 1.2-1.2h1.6c.7 0 1.2.5 1.2 1.2v1.3M6 5.5l.7 10c.05.8.7 1.4 1.5 1.4h3.6c.8 0 1.45-.6 1.5-1.4l.7-10M8.4 8.5v5M11.6 8.5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+    </span>
+  );
+}
+function AssignPop({options}) {
+  return (
+    <div style={{position:'absolute', top:'calc(100% + 6px)', insetInlineStart:-8, zIndex:5, width:240,
+      background:'#fff', border:'1px solid '+mkC.g5, borderRadius:10, boxShadow:mkC.overlay, padding:'6px 0'}}>
+      <div style={{fontFamily:mkC.display, fontWeight:800, fontSize:10, letterSpacing:'.08em', textTransform:'uppercase',
+        color:mkC.g4, padding:'7px 14px 5px'}}>Assign to teachers</div>
+      {options.map((o) => (
+        <div key={o[0]} style={{display:'flex', alignItems:'center', gap:10, padding:'8px 14px', cursor:'pointer',
+          background:o[1]?'#F2F7FF':'transparent'}}>
+          <span style={{width:17, height:17, borderRadius:4, boxSizing:'border-box', flex:'none',
+            border:o[1]?'none':'1.5px solid '+mkC.g4, backgroundImage:o[1]?mkC.grad:'none',
+            display:'inline-flex', alignItems:'center', justifyContent:'center'}}>
+            {o[1] ? <MkCheck size={10} color="#fff"></MkCheck> : null}
+          </span>
+          <span style={{fontSize:13, color:mkC.ink, fontWeight:o[1]?500:400}}>{o[0]}</span>
+          {o[2] ? <span style={{marginInlineStart:'auto', fontSize:10.5, color:mkC.g4}}>{o[2]}</span> : null}
+        </div>
+      ))}
+      <div style={{borderTop:'1px solid '+mkC.g6, marginTop:5, padding:'8px 14px 4px', display:'flex', justifyContent:'flex-end', gap:12}}>
+        <span style={{fontSize:12, color:mkC.g3, cursor:'pointer'}}>Cancel</span>
+        <span style={{fontSize:12, color:mkC.sky, fontWeight:500, cursor:'pointer'}}>Apply</span>
       </div>
-      <div>
-        <div style={{fontSize:14, fontWeight:500, color:mkC.ink}}>{name}</div>
+    </div>
+  );
+}
+function CarCard({name, kind, trans, teachers, shared, assignOpen}) {
+  return (
+    <div style={{...adCard, padding:'16px 18px', display:'flex', alignItems:'center', gap:14, position:'relative', zIndex:assignOpen?4:1}}>
+      <div style={{width:40, height:40, borderRadius:10, background:mkC.steelLight, color:mkC.whale, flex:'none',
+        display:'flex', alignItems:'center', justifyContent:'center'}}>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 12.5L4.3 8.2C4.6 7.2 5.5 6.5 6.6 6.5H13.4C14.5 6.5 15.4 7.2 15.7 8.2L17 12.5M3 12.5H17M3 12.5V15M17 12.5V15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"></path><circle cx="6.2" cy="12.5" r="0.4" fill="currentColor" stroke="currentColor"></circle><circle cx="13.8" cy="12.5" r="0.4" fill="currentColor" stroke="currentColor"></circle></svg>
+      </div>
+      <div style={{minWidth:0, width:190, flex:'none'}}>
+        <div style={{fontSize:14.5, fontWeight:500, color:mkC.ink}}>{name}</div>
         <div style={{fontSize:12, color:mkC.g3}}>{kind}</div>
       </div>
-      <span style={{marginInlineStart:'auto', fontFamily:mkC.display, fontWeight:800, fontSize:10, letterSpacing:'.07em',
+      <span style={{flex:'none', fontFamily:mkC.display, fontWeight:800, fontSize:10, letterSpacing:'.07em',
         textTransform:'uppercase', padding:'4px 11px', borderRadius:999,
         background:trans==='Automatic'?'#EAF1FF':mkC.g5, color:trans==='Automatic'?mkC.skyDark:mkC.g2}}>{trans}</span>
+      <div style={{display:'flex', alignItems:'center', gap:7, flexWrap:'wrap', marginInlineStart:10}}>
+        {teachers.map((t) => <TeacherChip key={t[0]} name={t[0]} grad={t[1]}></TeacherChip>)}
+        <span style={{position:'relative'}}>
+          <span style={{fontSize:12, color:mkC.sky, fontWeight:500, cursor:'pointer', padding:'4px 6px',
+            background:assignOpen?'#F2F7FF':'transparent', borderRadius:6}}>+ Assign</span>
+          {assignOpen ? <AssignPop options={[['Teacher Cohen', true, 'assigned'], ['Teacher Levi', false, '']]}></AssignPop> : null}
+        </span>
+      </div>
+      <div style={{marginInlineStart:'auto', display:'flex', alignItems:'center', gap:8}}>
+        {shared ? <span style={{fontFamily:mkC.display, fontWeight:800, fontSize:9.5, letterSpacing:'.07em', textTransform:'uppercase',
+          color:mkC.oceanDark, background:'#E5F8F9', border:'1px solid #C4EEF1', borderRadius:999, padding:'4px 10px'}}>Shared</span> : null}
+        <MkBtn variant="tertiary" small>Edit</MkBtn>
+        <MkTrash title="Delete car"></MkTrash>
+      </div>
+    </div>
+  );
+}
+function TeacherFleetCard({name, email, grad, cars}) {
+  return (
+    <div style={{...adCard, padding:'18px 20px'}}>
+      <div style={{display:'flex', alignItems:'center', gap:12}}>
+        <div style={{width:40, height:40, borderRadius:999, backgroundImage:grad?mkC.grad:'none',
+          backgroundColor:grad?'transparent':mkC.steelLight, color:grad?'#fff':mkC.whale,
+          display:'flex', alignItems:'center', justifyContent:'center', fontFamily:mkC.display, fontWeight:700, fontSize:14}}>{name.split(' ').map(w=>w[0]).join('')}</div>
+        <div>
+          <div style={{fontFamily:mkC.display, fontWeight:700, fontSize:16, color:mkC.ink}}>{name}</div>
+          <div style={{fontSize:12, color:mkC.g3}}>{email}</div>
+        </div>
+        <MkBtn variant="tertiary" small style={{marginInlineStart:'auto'}}>Edit</MkBtn>
+        <MkTrash title="Delete teacher"></MkTrash>
+      </div>
+      <div style={{display:'flex', gap:7, flexWrap:'wrap', marginTop:14}}>
+        {cars.map((c) => (
+          <span key={c[0]} style={{display:'inline-flex', alignItems:'center', gap:6, background:mkC.g7, border:'1px solid '+mkC.g5,
+            borderRadius:999, padding:'5px 13px', fontSize:12, color:mkC.g2}}>
+            {c[0]}
+            <span style={{fontSize:10, color:c[1]==='Automatic'?mkC.skyDark:mkC.g3, fontWeight:700, letterSpacing:'.04em', textTransform:'uppercase'}}>{c[1]==='Automatic'?'Auto':'Manual'}</span>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }
 function AdminTeachers() {
   return (
-    <AdminShell active="teachers">
+    <AdminShell active="teachers" minH={900}>
       <div style={{display:'flex', alignItems:'flex-end', justifyContent:'space-between'}}>
-        <div><h2 style={adH1}>Teachers &amp; cars</h2><div style={adSub}>Scheduling is per teacher; the roster assigns each student a car, so transmission is known - never asked.</div></div>
-        <MkBtn variant="secondary" small>ADD TEACHER</MkBtn>
-      </div>
-      <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginTop:22}}>
-        <div style={{...adCard, padding:24}}>
-          <div style={{display:'flex', alignItems:'center', gap:12}}>
-            <div style={{width:42, height:42, borderRadius:999, backgroundImage:mkC.grad, color:'#fff',
-              display:'flex', alignItems:'center', justifyContent:'center', fontFamily:mkC.display, fontWeight:700, fontSize:15}}>AC</div>
-            <div>
-              <div style={{fontFamily:mkC.display, fontWeight:700, fontSize:17, color:mkC.ink}}>Teacher Cohen</div>
-              <div style={{fontSize:12.5, color:mkC.g3}}>avi.cohen@cohendriving.co.il · owner / admin</div>
-            </div>
-            <MkBtn variant="tertiary" small style={{marginInlineStart:'auto'}}>Edit</MkBtn>
-          </div>
-          <div style={{display:'flex', flexDirection:'column', gap:8, marginTop:18}}>
-            <CarRow name="Corolla White" kind="Sedan" trans="Automatic"></CarRow>
-            <CarRow name="i20 Silver" kind="Hatchback" trans="Manual"></CarRow>
-          </div>
-          <MkNote n={7} style={{marginTop:16}}>Each roster row pins a student to one car → transmission is known. Students are never asked Automatic/Manual; the form just displays it.</MkNote>
-        </div>
-        <div style={{...adCard, padding:24, alignSelf:'start'}}>
-          <div style={{display:'flex', alignItems:'center', gap:12}}>
-            <div style={{width:42, height:42, borderRadius:999, background:mkC.steelLight, color:mkC.whale,
-              display:'flex', alignItems:'center', justifyContent:'center', fontFamily:mkC.display, fontWeight:700, fontSize:15}}>DL</div>
-            <div>
-              <div style={{fontFamily:mkC.display, fontWeight:700, fontSize:17, color:mkC.ink}}>Teacher Levi</div>
-              <div style={{fontSize:12.5, color:mkC.g3}}>dudi.levi@cohendriving.co.il</div>
-            </div>
-            <MkBtn variant="tertiary" small style={{marginInlineStart:'auto'}}>Edit</MkBtn>
-          </div>
-          <div style={{display:'flex', flexDirection:'column', gap:8, marginTop:18}}>
-            <CarRow name="Picanto Red" kind="Hatchback" trans="Automatic"></CarRow>
-          </div>
-          <div style={{fontSize:12, color:mkC.g4, marginTop:14, lineHeight:1.5}}>Levi's students all drive the Picanto - the roster carries the car, so the form shows "Automatic" read-only.</div>
+        <div><h2 style={adH1}>Cars &amp; teachers</h2><div style={adSub}>Cars are a shared pool - manage them once, then assign each to one or more teachers.</div></div>
+        <div style={{display:'flex', gap:10}}>
+          <MkBtn variant="secondary" small>ADD TEACHER</MkBtn>
+          <MkBtn small arrow>ADD CAR</MkBtn>
         </div>
       </div>
+      <div style={{fontFamily:mkC.display, fontWeight:800, fontSize:11, letterSpacing:'.09em', textTransform:'uppercase', color:mkC.g4, marginTop:24}}>Cars · 3</div>
+      <div style={{display:'flex', flexDirection:'column', gap:10, marginTop:10}}>
+        <CarCard name="Corolla White" kind="Sedan" trans="Automatic" assignOpen teachers={[['Teacher Cohen', true]]}></CarCard>
+        <CarCard name="i20 Silver" kind="Hatchback" trans="Manual" shared teachers={[['Teacher Cohen', true], ['Teacher Levi', false]]}></CarCard>
+        <CarCard name="Picanto Red" kind="Hatchback" trans="Automatic" teachers={[['Teacher Levi', false]]}></CarCard>
+      </div>
+      <div style={{fontFamily:mkC.display, fontWeight:800, fontSize:11, letterSpacing:'.09em', textTransform:'uppercase', color:mkC.g4, marginTop:24}}>Teachers · 2</div>
+      <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginTop:10}}>
+        <TeacherFleetCard name="Teacher Cohen" email="avi.cohen@cohendriving.co.il · owner / admin" grad
+          cars={[['Corolla White','Automatic'],['i20 Silver','Manual']]}></TeacherFleetCard>
+        <TeacherFleetCard name="Teacher Levi" email="dudi.levi@cohendriving.co.il"
+          cars={[['i20 Silver','Manual'],['Picanto Red','Automatic']]}></TeacherFleetCard>
+      </div>
+      <MkNote n={7} style={{marginTop:16, maxWidth:820}}>Car ↔ teacher is many-to-many: the i20 Silver serves both Cohen and Levi. The roster still pins each <b>student</b> to exactly one car, so transmission stays known - never asked. Roster rows are validated against this car list.</MkNote>
+      <div style={{fontSize:12, color:mkC.g4, marginTop:10, lineHeight:1.5, maxWidth:820}}>Deleting a car or teacher that roster rows still reference is blocked with a message naming the affected students - reassign them first (re-upload the roster or edit rows).</div>
     </AdminShell>
   );
 }
@@ -198,7 +266,7 @@ function AdminRoster() {
     ['Yael Ben-David','315572904','058-4471130','Picanto Red','Levi','Added'],
   ];
   const errs = [
-    ['47','Lior Avrahami','-','Unknown car “Mazda 2” - not in any teacher’s fleet'],
+    ['47','Lior Avrahami','-','Unknown car “Mazda 2” - not in the school car list'],
     ['52','Gal Hadad','30119','Invalid national ID - must be 9 digits'],
     ['58','(blank)','277418022','Missing assigned teacher'],
   ];
@@ -321,7 +389,7 @@ function LifeStep({label, state}) {
   return (
     <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:7, width:86}}>
       <div style={{width:cur?26:18, height:cur?26:18, borderRadius:999, boxSizing:'border-box',
-        backgroundImage:cur?mkC.grad:'none', background:cur?undefined:(done?mkC.ocean:'#fff'),
+        backgroundImage:cur?mkC.grad:'none', backgroundColor:cur?'transparent':(done?mkC.ocean:'#fff'),
         border:done||cur?'none':'3px solid '+mkC.steel,
         display:'flex', alignItems:'center', justifyContent:'center',
         boxShadow:cur?'0 4px 12px rgba(0,87,255,.3)':'none'}}>

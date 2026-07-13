@@ -1,0 +1,48 @@
+.assign__trigger {
+    border: none;
+    background: transparent;
+    color: var(--p-primary-color);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.25rem 0.375rem;
+    border-radius: var(--p-border-radius-sm);
+}
+
+.assign__panel {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 15rem;
+}
+
+.assign__title {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--app-text-secondary);
+    padding-block-end: 0.375rem;
+}
+
+.assign__row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding-block: 0.375rem;
+    cursor: pointer;
+}
+
+.assign__hint {
+    margin-inline-start: auto;
+    font-size: 0.6875rem;
+    color: var(--app-text-secondary);
+}
+
+.assign__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    border-block-start: 1px solid var(--app-border);
+    margin-block-start: 0.375rem;
+    padding-block-start: 0.5rem;
+}

@@ -1,0 +1,21 @@
+<button type="button" class="assign__trigger" (click)="open($event)">
+  {{ 'teachers.assign' | transloco }}
+</button>
+<p-popover>
+  <div class="assign__panel">
+    <span class="assign__title">{{ 'teachers.assignToTeachers' | transloco }}</span>
+    @for (row of rows(); track row.id) {
+      <label class="assign__row">
+        <p-checkbox [binary]="true" [ngModel]="row.selected" (ngModelChange)="setSelected(row.id, $event)" />
+        <span class="assign__name">{{ row.name }}</span>
+        @if (row.assigned) {
+          <span class="assign__hint">{{ 'teachers.assigned' | transloco }}</span>
+        }
+      </label>
+    }
+    <div class="assign__actions">
+      <p-button [label]="'general.cancel' | transloco" severity="secondary" size="small" text (onClick)="cancel()" />
+      <p-button [label]="'general.apply' | transloco" size="small" (onClick)="apply()" />
+    </div>
+  </div>
+</p-popover>

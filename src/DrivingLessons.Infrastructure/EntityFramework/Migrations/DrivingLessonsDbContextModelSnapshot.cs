@@ -22,6 +22,35 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.Car", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int>("Transmission")
+                        .HasColumnType("integer")
+                        .HasColumnName("transmission");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("cars", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Domain.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -92,46 +121,33 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("admin_users", (string)null);
                 });
 
-            modelBuilder.Entity("DrivingLessons.Domain.Entities.Teacher", b =>
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.Car", b =>
                 {
-                    b.OwnsMany("DrivingLessons.Domain.Entities.Car", "Cars", b1 =>
+                    b.OwnsMany("DrivingLessons.Domain.Entities.TeacherAssignment", "TeacherAssignments", b1 =>
                         {
                             b1.Property<Guid>("Id")
                                 .HasColumnType("uuid")
                                 .HasColumnName("id");
 
-                            b1.Property<bool>("IsRemoved")
-                                .HasColumnType("boolean")
-                                .HasColumnName("is_removed");
+                            b1.Property<Guid>("TeacherId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("teacher_id");
 
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("name");
-
-                            b1.Property<int>("Transmission")
-                                .HasColumnType("integer")
-                                .HasColumnName("transmission");
-
-                            b1.Property<string>("Type")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("type");
-
-                            b1.Property<Guid>("teacher_id")
+                            b1.Property<Guid>("car_id")
                                 .HasColumnType("uuid");
 
                             b1.HasKey("Id");
 
-                            b1.HasIndex("teacher_id");
+                            b1.HasIndex("car_id", "TeacherId")
+                                .IsUnique();
 
-                            b1.ToTable("cars", (string)null);
+                            b1.ToTable("car_teachers", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("teacher_id");
+                                .HasForeignKey("car_id");
                         });
 
-                    b.Navigation("Cars");
+                    b.Navigation("TeacherAssignments");
                 });
 
             modelBuilder.Entity("DrivingLessons.Domain.Entities.WeekSchedule", b =>

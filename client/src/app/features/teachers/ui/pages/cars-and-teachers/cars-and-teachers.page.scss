@@ -1,0 +1,79 @@
+.fleet__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.fleet__title {
+    margin: 0;
+    font-family: var(--app-font-display);
+    font-weight: 500;
+    font-size: 1.625rem;
+    color: var(--app-ink);
+    letter-spacing: -0.01em;
+}
+
+.fleet__subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.84rem;
+    color: var(--app-text-secondary);
+}
+
+.fleet__actions {
+    display: flex;
+    gap: 0.625rem;
+}
+
+.fleet__section {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--app-text-secondary);
+    margin-block: 1.5rem 0.625rem;
+}
+
+.fleet__cars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.fleet__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    gap: 0.875rem;
+}
+
+.fleet__loading {
+    display: flex;
+    justify-content: center;
+    padding-block: 3rem;
+}
+
+.fleet__error {
+    color: var(--p-red-500);
+    margin-block-start: 1.5rem;
+}
+
+.fleet__empty {
+    margin-block-start: 1.375rem;
+    padding: 2.5rem;
+    text-align: center;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: 14px;
+
+    h3 {
+        margin: 0;
+        font-family: var(--app-font-display);
+        color: var(--app-ink);
+    }
+
+    p {
+        margin: 0.5rem 0 0;
+        color: var(--app-text-secondary);
+        font-size: 0.85rem;
+    }
+}
