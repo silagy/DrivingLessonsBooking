@@ -31,14 +31,22 @@ The conventions that intentionally override the rules docs (no `UnitOfWork` prop
 `[EndpointSummary]` over `[SwaggerOperation]`, `FirstOrDefaultAsync`, per-project `DependencyInjection.cs`,
 Transloco lowercase namespaces) are listed in the plan README and were followed as prior slices established.
 
-## Defect found and fixed in verification (task 14)
+## Defects found and fixed in verification (task 14)
 
 | Symptom | Cause | Fix | Commit |
 |---------|-------|-----|--------|
 | A single dashboard **Refresh** click issued **two** `GET .../dashboard` requests (US-13 requires exactly one) | `PublicationsStore.refresh()` reloaded both `publicationResource` and `dashboardResource`; the dashboard resource already reloads via its params dependency on the publication value, so the explicit reload was redundant | Dropped the explicit `dashboardResource.reload()`; the publication reload cascades exactly one dashboard fetch and still surfaces state changes | `fix(client): avoid duplicate dashboard fetch on publications refresh` |
+| **DatePicker calendar rendered in English** (day names `Su…Sa`, month `July`) inside the Hebrew UI — every publish/extend/reopen dialog | No PrimeNG `translation` was configured, so the DatePicker used its built-in English locale | Added Hebrew + English PrimeNG locales in `LanguageService` (`PRIMENG_HE`/`PRIMENG_EN`), applied via `PrimeNG.setTranslation()` on language change, and set the initial Hebrew locale in `providePrimeNG({ translation })` | `fix(client): localize datepicker + float its overlay in dialogs` |
+| **DatePicker overlay overflowed the dialog** — the inline calendar/time panel expanded the dialog into horizontal + vertical scrollbars and clipped the time spinner | The `p-datepicker`s had no `appendTo`, so the overlay rendered inline in the DynamicDialog DOM | Added `appendTo="body"` to all four datepickers so the overlay floats above the dialog instead of growing it | `fix(client): localize datepicker + float its overlay in dialogs` |
 
-Re-verified after the fix: one Refresh → exactly one dashboard GET, the "data as of" stamp updates, and
-no polling (16 s idle → zero background GETs).
+Re-verified after the fixes: one Refresh → exactly one dashboard GET, stamp updates, no polling (16 s idle
+→ zero background GETs); the datepicker calendar shows Hebrew day/month names (Sunday-first), the overlay is
+appended to `body` and the dialog has **no** scroll overflow in either axis.
+
+> These datepicker issues were **missed in the first UI pass** because browser-pane screenshots time out
+> (hidden-pane rAF throttling, see project memory) and the DOM/rect checks used instead confirmed
+> `dir=rtl`, input/button presence, and the timezone note — but not the calendar's locale or the overlay's
+> overflow. They surfaced from user-provided screenshots; the audit method has been noted for next time.
 
 ## Verification method notes
 

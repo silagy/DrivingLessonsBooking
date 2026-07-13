@@ -8,6 +8,7 @@
             <label for="publish-start">{{ 'publications.publishDialog.opensAt' | transloco }}</label>
             <p-datepicker
                 inputId="publish-start"
+                appendTo="body"
                 formControlName="start"
                 [showTime]="true"
                 [showIcon]="true"
@@ -18,6 +19,7 @@
             <label for="publish-end">{{ 'publications.publishDialog.closesAt' | transloco }}</label>
             <p-datepicker
                 inputId="publish-end"
+                appendTo="body"
                 formControlName="end"
                 [showTime]="true"
                 [showIcon]="true"

@@ -9,6 +9,7 @@ import { routes } from './app.routes';
 import { AppPreset } from './theme/app-preset';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { authInterceptor } from './core/auth.interceptor';
+import { PRIMENG_HE } from './core/language.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     MessageService,
     providePrimeNG({
+      translation: PRIMENG_HE,
       theme: {
         preset: AppPreset,
         options: {
