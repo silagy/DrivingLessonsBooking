@@ -1,0 +1,61 @@
+<div class="history">
+    <header class="history__header">
+        <h2>{{ 'publications.history.title' | transloco }}</h2>
+        <p class="history__subtitle">{{ 'publications.history.subtitle' | transloco }}</p>
+    </header>
+
+    @if (store.historyIsLoading()) {
+        <div class="history__state"><p-progressSpinner /></div>
+    } @else if (store.historyError(); as errorKey) {
+        <div class="history__state">{{ errorKey | transloco }}</div>
+    } @else if (store.historyIsEmpty()) {
+        <div class="history__state">{{ 'publications.history.empty' | transloco }}</div>
+    } @else {
+        <div class="history__card">
+            <p-table [value]="store.history()" [rows]="20" styleClass="history__table">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>{{ 'publications.history.week' | transloco }}</th>
+                        <th>{{ 'publications.history.teacher' | transloco }}</th>
+                        <th>{{ 'publications.history.window' | transloco }}</th>
+                        <th>{{ 'publications.history.status' | transloco }}</th>
+                        <th>{{ 'publications.history.lastExcel' | transloco }}</th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row>
+                    <tr>
+                        <td><bdi>{{ row.weekStart }}</bdi></td>
+                        <td>{{ row.teacherName }}</td>
+                        <td class="history__window"><bdi>{{ windowLabel(row) }}</bdi></td>
+                        <td><app-publication-state-tag [state]="row.state" /></td>
+                        <td>
+                            @if (row.latestExcelVersion !== null) {
+                                <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
+                            } @else {
+                                <span class="history__dash">—</span>
+                            }
+                        </td>
+                        <td class="history__action">
+                            @if (canRedownload(row)) {
+                                <p-button
+                                    [label]="'publications.history.redownload' | transloco"
+                                    severity="secondary"
+                                    text
+                                    size="small"
+                                    (onClick)="onRedownload(row)" />
+                            } @else {
+                                <p-button
+                                    [label]="'publications.history.viewDashboard' | transloco"
+                                    severity="secondary"
+                                    text
+                                    size="small"
+                                    (onClick)="onViewDashboard(row)" />
+                            }
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    }
+</div>

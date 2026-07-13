@@ -1,0 +1,43 @@
+.history__subtitle {
+    color: var(--app-text-secondary);
+    margin-block-start: 4px;
+}
+
+.history__card {
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    overflow: hidden;
+    margin-block-start: 20px;
+}
+
+.history__state {
+    display: flex;
+    justify-content: center;
+    padding-block: 48px;
+    color: var(--app-text-secondary);
+}
+
+.history__window {
+    color: var(--app-text-secondary);
+    font-size: 0.82rem;
+}
+
+.history__version-pill {
+    font-family: var(--app-font-display);
+    font-weight: 700;
+    font-size: 0.72rem;
+    background: var(--app-bg-muted);
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-variant-numeric: tabular-nums;
+}
+
+.history__dash {
+    color: var(--app-text-muted);
+}
+
+.history__action {
+    text-align: end;
+}

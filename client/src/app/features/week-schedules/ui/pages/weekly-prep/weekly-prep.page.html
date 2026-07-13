@@ -4,6 +4,19 @@
       <h2>{{ 'weekSchedules.title' | transloco }}</h2>
       <p class="weekly-prep__subtitle">{{ 'weekSchedules.subtitle' | transloco }}</p>
     </div>
+    @if (store.publicationState(); as state) {
+      <div class="weekly-prep__publish">
+        <app-publication-state-tag [state]="state" />
+        @if (store.canPublish()) {
+          <a
+            pButton
+            [label]="'weekSchedules.publishWeek' | transloco"
+            [routerLink]="['/', appRoutes.publications]"
+            [queryParams]="{ teacherId: store.selectedTeacherId(), week: store.selectedWeekStart(), publish: 1 }">
+          </a>
+        }
+      </div>
+    }
   </header>
 
   <div class="weekly-prep__selectors">

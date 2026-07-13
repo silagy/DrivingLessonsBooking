@@ -68,6 +68,7 @@
     "selectTeacherPrompt": "Select a teacher and week to prepare the grid.",
     "cellOpen": "Open",
     "cellUnavailable": "Unavailable",
+    "publishWeek": "Publish week…",
     "unavailableCount": "{{count}} slots marked unavailable",
     "loadFailed": "Failed to load the week schedule."
   },
@@ -156,13 +157,16 @@
     },
     "history": {
       "title": "Publications history",
+      "subtitle": "Every published week, per teacher — with the last emailed Excel version.",
       "week": "Week",
       "teacher": "Teacher",
-      "state": "State",
-      "version": "Version",
-      "reDownload": "Download",
-      "viewDashboard": "View",
-      "empty": "No past publications yet."
+      "window": "Submission window",
+      "status": "Status",
+      "lastExcel": "Last Excel",
+      "redownload": "Re-download",
+      "viewDashboard": "View dashboard",
+      "empty": "No publications yet.",
+      "loadFailed": "Failed to load history."
     },
     "dialogs": {
       "publishTitle": "Publish week",

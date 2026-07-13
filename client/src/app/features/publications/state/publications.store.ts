@@ -11,6 +11,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { ExtendPublicationWindowRequest } from '../data/extend-publication-window.request';
 import { GetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
 import { GetPublicationResponse } from '../data/get-publication.response';
+import { ItemForFindPublicationHistoryResponse } from '../data/item-for-find-publication-history.response';
 import { PublicationsApiService } from '../data/publications-api.service';
 import { PublishPublicationRequest } from '../data/publish-publication.request';
 import { ReopenPublicationRequest } from '../data/reopen-publication.request';
@@ -63,9 +64,18 @@ export class PublicationsStore {
         },
     });
 
+    private readonly historyResource = resource({
+        loader: () => firstValueFrom(this.api.findHistory()),
+    });
+
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
     readonly selectedWeekStart = this.selectedWeekStartState.asReadonly();
     readonly isMutating = this.mutating.asReadonly();
+
+    readonly history = computed<ItemForFindPublicationHistoryResponse[]>(() => this.historyResource.value() ?? []);
+    readonly historyIsLoading = this.historyResource.isLoading;
+    readonly historyError = computed(() => (this.historyResource.error() ? 'publications.history.loadFailed' : null));
+    readonly historyIsEmpty = computed(() => !this.historyIsLoading() && this.history().length === 0);
 
     readonly teachers = computed<TeacherOption[]>(() => {
         const items = this.teachersResource.value() ?? [];
@@ -176,18 +186,18 @@ export class PublicationsStore {
         this.toast.apiError(undefined);
     }
 
-    async downloadExcel(): Promise<void> {
-        const id = this.publication()?.id;
-        const teacherId = this.selectedTeacherIdState();
+    async downloadExcel(publicationId?: string, teacherId?: string): Promise<void> {
+        const id = publicationId ?? this.publication()?.id;
+        const teacher = teacherId ?? this.selectedTeacherIdState();
 
-        if (!id || !teacherId) {
+        if (!id || !teacher) {
             return;
         }
 
         this.mutating.set(true);
 
         try {
-            const blob = await firstValueFrom(this.api.downloadExcel(id, teacherId));
+            const blob = await firstValueFrom(this.api.downloadExcel(id, teacher));
             this.fileDownload.download(blob, `week-${this.selectedWeekStartState()}.xlsx`);
         } catch (error) {
             this.toast.apiError(error);
@@ -199,6 +209,10 @@ export class PublicationsStore {
     refresh(): void {
         this.publicationResource.reload();
         this.dashboardResource.reload();
+    }
+
+    reloadHistory(): void {
+        this.historyResource.reload();
     }
 
     private buildShareLink(token: string): string {

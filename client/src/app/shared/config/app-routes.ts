@@ -3,4 +3,5 @@ export const AppRoutes = {
     teachers: 'teachers',
     weekSchedules: 'week-schedules',
     publications: 'publications',
+    publicationsHistory: 'history',
 } as const;

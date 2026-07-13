@@ -68,6 +68,7 @@
     "selectTeacherPrompt": "בחרו מורה ושבוע כדי להכין את הרשת.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
+    "publishWeek": "פרסום שבוע…",
     "unavailableCount": "{{count}} משבצות סומנו כלא זמינות",
     "loadFailed": "טעינת שבוע העבודה נכשלה."
   },
@@ -156,13 +157,16 @@
     },
     "history": {
       "title": "היסטוריית פרסומים",
+      "subtitle": "כל שבוע שפורסם, לפי מורה — עם גרסת האקסל האחרונה שנשלחה.",
       "week": "שבוע",
       "teacher": "מורה",
-      "state": "מצב",
-      "version": "גרסה",
-      "reDownload": "הורדה",
-      "viewDashboard": "צפייה",
-      "empty": "אין עדיין פרסומים קודמים."
+      "window": "חלון הגשה",
+      "status": "סטטוס",
+      "lastExcel": "אקסל אחרון",
+      "redownload": "הורדה חוזרת",
+      "viewDashboard": "צפייה בלוח",
+      "empty": "אין פרסומים עדיין.",
+      "loadFailed": "טעינת ההיסטוריה נכשלה."
     },
     "dialogs": {
       "publishTitle": "פרסום השבוע",
