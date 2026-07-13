@@ -23,8 +23,6 @@ export class TeacherFormDialog {
     private readonly ref = inject(DynamicDialogRef);
     private readonly config = inject(DynamicDialogConfig<{ teacher?: Teacher }>);
 
-    protected readonly isEdit = !!this.config.data?.teacher;
-
     protected readonly form = this.fb.nonNullable.group({
         name: [this.config.data?.teacher?.name ?? '', Validators.required],
         contactEmail: [this.config.data?.teacher?.contactEmail ?? '', [Validators.required, Validators.email]],

@@ -27,8 +27,6 @@ export class CarFormDialog {
     private readonly config = inject(DynamicDialogConfig<{ car?: Car }>);
     private readonly transloco = inject(TranslocoService);
 
-    protected readonly isEdit = !!this.config.data?.car;
-
     protected readonly transmissionOptions = Object.values(Transmission).map((value) => ({
         value,
         label: this.transloco.translate(`teachers.transmissions.${value}`),
