@@ -1,12 +1,15 @@
+using DrivingLessons.Application.Abstractions;
 using DrivingLessons.Application.Auth;
 using DrivingLessons.Application.Common;
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Domain.Repositories;
 using DrivingLessons.Infrastructure.Auth;
 using DrivingLessons.Infrastructure.DomainEvents;
+using DrivingLessons.Infrastructure.Email;
 using DrivingLessons.Infrastructure.EntityFramework;
 using DrivingLessons.Infrastructure.EntityFramework.Queries;
 using DrivingLessons.Infrastructure.EntityFramework.Repositories;
+using DrivingLessons.Infrastructure.Excel;
 using DrivingLessons.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +38,11 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<EmailOptions>()
+            .Bind(configuration.GetSection(EmailOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddScoped<IAdminAccountGateway, AdminAccountGateway>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<ITeacherQueries, TeacherQueries>();
@@ -43,6 +51,8 @@ public static class DependencyInjection
         services.AddScoped<IPublicationRepository, PublicationRepository>();
         services.AddScoped<IPublicationQueries, PublicationQueries>();
         services.AddScoped<ISubmissionQueries, SubmissionQueries>();
+        services.AddScoped<IExcelGenerator, PlaceholderExcelGenerator>();
+        services.AddScoped<IEmailSender, LoggingEmailSender>();
         services.AddSingleton<IPasswordVerifier, PasswordVerifier>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
