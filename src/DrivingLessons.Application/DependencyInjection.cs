@@ -15,7 +15,11 @@ using DrivingLessons.Application.Commands.PublishPublication;
 using DrivingLessons.Application.Commands.RemoveCar;
 using DrivingLessons.Application.Commands.ReopenPublication;
 using DrivingLessons.Application.EventHandlers;
+using DrivingLessons.Application.Queries.DownloadPublicationExcel;
+using DrivingLessons.Application.Queries.FindPublicationHistory;
 using DrivingLessons.Application.Queries.FindTeachers;
+using DrivingLessons.Application.Queries.GetPublication;
+using DrivingLessons.Application.Queries.GetPublicationDashboard;
 using DrivingLessons.Application.Queries.GetTeacher;
 using DrivingLessons.Application.Queries.GetWeekSchedule;
 using DrivingLessons.Domain.Events;
@@ -45,7 +49,12 @@ public static class DependencyInjection
         services.AddScoped<ReopenPublicationInteractor>();
         services.AddScoped<OpenPublicationInteractor>();
         services.AddScoped<ClosePublicationInteractor>();
+        services.AddScoped<GetPublicationInteractor>();
+        services.AddScoped<GetPublicationDashboardInteractor>();
+        services.AddScoped<FindPublicationHistoryInteractor>();
+        services.AddScoped<DownloadPublicationExcelInteractor>();
         services.AddScoped<IDomainEventHandler<WeekScheduleCreated>, WeekScheduleCreatedHandler>();
+        services.AddScoped<IDomainEventHandler<PublicationClosed>, PublicationClosedHandler>();
         return services;
     }
 }
