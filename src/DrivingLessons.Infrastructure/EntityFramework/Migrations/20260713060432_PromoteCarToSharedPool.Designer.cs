@@ -3,6 +3,7 @@ using System;
 using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
 {
     [DbContext(typeof(DrivingLessonsDbContext))]
-    partial class DrivingLessonsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260713060432_PromoteCarToSharedPool")]
+    partial class PromoteCarToSharedPool
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
