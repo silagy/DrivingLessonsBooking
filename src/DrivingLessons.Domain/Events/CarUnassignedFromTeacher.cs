@@ -3,4 +3,4 @@ using DrivingLessons.Domain.Values;
 
 namespace DrivingLessons.Domain.Events;
 
-public record CarRemoved(TeacherId TeacherId, CarId CarId) : IDomainEvent;
+public record CarUnassignedFromTeacher(CarId CarId, TeacherId TeacherId) : IDomainEvent;

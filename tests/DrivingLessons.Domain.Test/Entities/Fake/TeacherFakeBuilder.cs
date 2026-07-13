@@ -13,13 +13,4 @@ public static class TeacherFakeBuilder
 
         return Teacher.Create(name, contactEmail);
     }
-
-    public static (Teacher Teacher, Car Car) AddFakeCar(this Teacher teacher)
-    {
-        var name = CarName.Of(Faker.FakeString());
-        var type = CarType.Of(Faker.FakeString());
-        var car = teacher.AddCar(name, type, Transmission.Automatic);
-
-        return (teacher, car);
-    }
 }
