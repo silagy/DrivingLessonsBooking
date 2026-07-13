@@ -208,7 +208,6 @@ export class PublicationsStore {
 
     refresh(): void {
         this.publicationResource.reload();
-        this.dashboardResource.reload();
     }
 
     reloadHistory(): void {
