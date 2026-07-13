@@ -11,9 +11,11 @@ using DrivingLessons.Infrastructure.EntityFramework.Queries;
 using DrivingLessons.Infrastructure.EntityFramework.Repositories;
 using DrivingLessons.Infrastructure.Excel;
 using DrivingLessons.Infrastructure.Options;
+using DrivingLessons.Infrastructure.Scheduling;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
 namespace DrivingLessons.Infrastructure;
 
@@ -55,6 +57,17 @@ public static class DependencyInjection
         services.AddScoped<IEmailSender, LoggingEmailSender>();
         services.AddSingleton<IPasswordVerifier, PasswordVerifier>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        services.AddSingleton(TimeProvider.System);
+
+        services.AddQuartz();
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+
+        services.AddTransient<OpenPublicationJob>();
+        services.AddTransient<ClosePublicationJob>();
+        services.AddScoped<IPublicationScheduler, PublicationScheduler>();
+
+        services.AddHostedService<PublicationReconciliationHostedService>();
 
         return services;
     }
