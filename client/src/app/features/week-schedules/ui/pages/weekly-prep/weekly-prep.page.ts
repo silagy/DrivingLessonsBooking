@@ -4,7 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { WeekGridComponent } from '../../../../../shared/components/week-grid/week-grid.component';
-import { SlotState } from '../../../domain/slot-state.enum';
+import { SlotState } from '../../../../../shared/models/slot-state.enum';
 import { WeekSchedulesStore } from '../../../state/week-schedules.store';
 
 @Component({

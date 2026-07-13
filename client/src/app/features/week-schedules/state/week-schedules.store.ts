@@ -7,7 +7,7 @@ import { SlotWindow } from '../../../shared/models/slot-window.enum';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { WeekSchedulesApiService } from '../data/week-schedules-api.service';
 import { GetWeekScheduleResponse } from '../data/get-week-schedule.response';
-import { SlotState } from '../domain/slot-state.enum';
+import { SlotState } from '../../../shared/models/slot-state.enum';
 import { Slot } from '../domain/slot.model';
 import { TeacherOption } from '../domain/teacher-option.model';
 import { WeekSchedule } from '../domain/week-schedule.model';

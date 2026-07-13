@@ -1,5 +1,5 @@
 import { WeekGridCell } from '../../../shared/models/week-grid-cell';
-import { SlotState } from './slot-state.enum';
+import { SlotState } from '../../../shared/models/slot-state.enum';
 
 export interface Slot extends WeekGridCell {
     id: string;
