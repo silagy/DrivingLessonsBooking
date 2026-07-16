@@ -1,0 +1,16 @@
+<aside class="failed-panel">
+    <header class="failed-panel__header">
+        <span>{{ 'roster.failedRows.title' | transloco }}</span>
+        <span class="failed-panel__count"><bdi>{{ failures().length }}</bdi></span>
+    </header>
+    <ul class="failed-panel__list">
+        @for (failure of failures(); track failure.rowNumber) {
+            <li class="failed-panel__row">
+                <span class="failed-panel__label">
+                    {{ 'roster.failedRows.row' | transloco: { number: failure.rowNumber, name: failure.studentName } }}
+                </span>
+                <span class="failed-panel__reason">{{ 'roster.failureReasons.' + failure.reason | transloco }}</span>
+            </li>
+        }
+    </ul>
+</aside>

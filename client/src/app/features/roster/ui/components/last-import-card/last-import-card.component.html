@@ -1,0 +1,10 @@
+<div class="import-card">
+    <i class="pi pi-file import-card__icon" aria-hidden="true"></i>
+    <div class="import-card__details">
+        <span class="import-card__name"><bdi>{{ fileName() }}</bdi></span>
+        <span class="import-card__summary">
+            {{ 'roster.rowsSummary' | transloco: { rows: rows(), time: time() } }}
+        </span>
+    </div>
+    <p-tag severity="success" [value]="'roster.processed' | transloco" />
+</div>
