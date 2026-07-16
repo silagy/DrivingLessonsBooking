@@ -50,4 +50,20 @@ public static class Faker
 
         return today.AddDays(daysUntilSunday + (weeksAhead * 7));
     }
+
+    public static string FakePhoneNumber()
+    {
+        var prefixDigit = Random.Shared.Next(0, 10);
+        var subscriber = Random.Shared.Next(1000000, 10000000);
+
+        return $"05{prefixDigit}-{subscriber}";
+    }
+
+    public static DateOnly FakeDate()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+        var daysAhead = Random.Shared.Next(1, 365);
+
+        return today.AddDays(daysAhead);
+    }
 }
