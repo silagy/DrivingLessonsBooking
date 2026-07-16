@@ -20,6 +20,10 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public DbSet<Publication> Publications => Set<Publication>();
 
+    public DbSet<Student> Students => Set<Student>();
+
+    public DbSet<RosterImport> RosterImports => Set<RosterImport>();
+
     public DrivingLessonsDbContext(DbContextOptions<DrivingLessonsDbContext> options, IDomainEventDispatcher dispatcher)
         : base(options)
     {
