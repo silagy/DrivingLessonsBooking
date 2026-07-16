@@ -1,0 +1,21 @@
+.roster__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.roster__title {
+    margin: 0;
+    font-family: var(--app-font-display);
+    font-weight: 500;
+    font-size: 1.625rem;
+    color: var(--app-ink);
+    letter-spacing: -0.01em;
+}
+
+.roster__subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.84rem;
+    color: var(--app-text-secondary);
+}

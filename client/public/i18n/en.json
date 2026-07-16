@@ -19,6 +19,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "teachers": "Cars & teachers",
+      "roster": "Roster",
       "weeklyPrep": "Weekly prep",
       "publications": "Publications",
       "history": "History"
@@ -68,6 +69,53 @@
     "emptySubtitle": "Create the first teacher to start planning weeks.",
     "carsEmptyTitle": "No cars yet",
     "carsEmptySubtitle": "Add the first car to build the shared pool."
+  },
+  "roster": {
+    "title": "Student roster",
+    "subtitle": "Upload the school's CSV to sync students, their teachers, and cars.",
+    "uploadCsv": "Upload CSV",
+    "processed": "Processed",
+    "rowsSummary": "{{rows}} rows · {{time}}",
+    "stats": {
+      "added": "Added",
+      "updated": "Updated",
+      "deactivated": "Deactivated (missing from file)",
+      "failed": "Failed rows"
+    },
+    "table": {
+      "name": "Name",
+      "nationalId": "National ID",
+      "phone": "Phone",
+      "car": "Car",
+      "teacher": "Teacher",
+      "result": "Result"
+    },
+    "badge": {
+      "added": "Added",
+      "updated": "Updated"
+    },
+    "inactive": "Inactive",
+    "filter": {
+      "all": "All"
+    },
+    "failedRows": {
+      "title": "Failed rows",
+      "row": "Row {{number}} · {{name}}"
+    },
+    "failureReasons": {
+      "invalidNationalId": "Invalid national ID",
+      "duplicateNationalId": "Duplicate national ID in the file",
+      "missingName": "Missing name",
+      "missingPhone": "Missing phone",
+      "missingTeacher": "Missing teacher",
+      "missingCar": "Missing car",
+      "unknownTeacher": "Teacher not found in the system",
+      "unknownCar": "Car not found in the system",
+      "invalidStartDate": "Invalid start date"
+    },
+    "imported": "Roster imported",
+    "loadFailed": "Failed to load the roster.",
+    "empty": "No students yet. Upload the school's CSV to build the roster."
   },
   "dashboard": {
     "title": "Dashboard",
