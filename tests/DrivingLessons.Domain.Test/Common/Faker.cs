@@ -66,4 +66,11 @@ public static class Faker
 
         return today.AddDays(daysAhead);
     }
+
+    public static DateTime FakeUtcDate()
+    {
+        var minutesAhead = Random.Shared.Next(1, 100000);
+
+        return DateTime.UtcNow.AddMinutes(minutesAhead);
+    }
 }
