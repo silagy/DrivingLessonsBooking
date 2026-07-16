@@ -19,6 +19,7 @@
     "nav": {
       "dashboard": "לוח בקרה",
       "teachers": "רכבים ומורים",
+      "roster": "תלמידים",
       "weeklyPrep": "הכנת שבוע",
       "publications": "פרסומים",
       "history": "היסטוריה"
@@ -68,6 +69,53 @@
     "emptySubtitle": "צרו את המורה הראשון כדי להתחיל לתכנן שבועות.",
     "carsEmptyTitle": "אין רכבים עדיין",
     "carsEmptySubtitle": "הוסיפו את הרכב הראשון כדי לבנות את המאגר המשותף."
+  },
+  "roster": {
+    "title": "רשימת תלמידים",
+    "subtitle": "העלו את קובץ ה-CSV של בית הספר כדי לסנכרן תלמידים, מורים ורכבים.",
+    "uploadCsv": "העלאת קובץ CSV",
+    "processed": "נקלט",
+    "rowsSummary": "{{rows}} שורות · {{time}}",
+    "stats": {
+      "added": "נוספו",
+      "updated": "עודכנו",
+      "deactivated": "הושבתו (חסרים בקובץ)",
+      "failed": "שורות שנכשלו"
+    },
+    "table": {
+      "name": "שם",
+      "nationalId": "תעודת זהות",
+      "phone": "טלפון",
+      "car": "רכב",
+      "teacher": "מורה",
+      "result": "תוצאה"
+    },
+    "badge": {
+      "added": "נוסף",
+      "updated": "עודכן"
+    },
+    "inactive": "לא פעיל",
+    "filter": {
+      "all": "הכול"
+    },
+    "failedRows": {
+      "title": "שורות שנכשלו",
+      "row": "שורה {{number}} · {{name}}"
+    },
+    "failureReasons": {
+      "invalidNationalId": "תעודת זהות לא תקינה",
+      "duplicateNationalId": "תעודת זהות כפולה בקובץ",
+      "missingName": "שם חסר",
+      "missingPhone": "טלפון חסר",
+      "missingTeacher": "מורה חסר",
+      "missingCar": "רכב חסר",
+      "unknownTeacher": "מורה לא קיים במערכת",
+      "unknownCar": "רכב לא קיים במערכת",
+      "invalidStartDate": "תאריך התחלה לא תקין"
+    },
+    "imported": "הרשימה יובאה",
+    "loadFailed": "טעינת רשימת התלמידים נכשלה.",
+    "empty": "אין תלמידים עדיין. העלו את קובץ ה-CSV של בית הספר כדי לבנות את הרשימה."
   },
   "dashboard": {
     "title": "לוח בקרה",

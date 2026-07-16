@@ -1,0 +1,39 @@
+.stat-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 18px;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: 10px;
+    box-shadow: var(--app-shadow-card);
+}
+
+.stat-tile__value {
+    font-family: var(--app-font-display);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--app-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-tile__label {
+    font-size: 0.78rem;
+    color: var(--app-text-secondary);
+}
+
+.stat-tile--success .stat-tile__value {
+    color: var(--p-green-600);
+}
+
+.stat-tile--info .stat-tile__value {
+    color: var(--p-blue-600);
+}
+
+.stat-tile--neutral .stat-tile__value {
+    color: var(--app-text-secondary);
+}
+
+.stat-tile--danger .stat-tile__value {
+    color: var(--p-red-600);
+}

@@ -1,0 +1,36 @@
+.import-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-shadow-card);
+}
+
+.import-card__icon {
+    font-size: 1.25rem;
+    color: var(--p-primary-color);
+}
+
+.import-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.import-card__name {
+    font-weight: 600;
+    color: var(--app-ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.import-card__summary {
+    font-size: 0.78rem;
+    color: var(--app-text-secondary);
+}

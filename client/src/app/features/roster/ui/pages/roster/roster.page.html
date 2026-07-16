@@ -1,0 +1,116 @@
+<div class="roster">
+    <header class="roster__header">
+        <div>
+            <h2 class="roster__title">{{ 'roster.title' | transloco }}</h2>
+            <p class="roster__subtitle">{{ 'roster.subtitle' | transloco }}</p>
+        </div>
+        <div class="roster__actions">
+            <input
+                #fileInput
+                type="file"
+                accept=".csv,text/csv"
+                hidden
+                (change)="onFileSelected(fileInput)" />
+            <p-button
+                [label]="'roster.uploadCsv' | transloco"
+                icon="pi pi-upload"
+                [loading]="store.uploading()"
+                (onClick)="fileInput.click()" />
+        </div>
+    </header>
+
+    @if (store.isLoading()) {
+        <div class="roster__state"><p-progressSpinner /></div>
+    } @else if (store.loadError(); as errorKey) {
+        <div class="roster__state">{{ errorKey | transloco }}</div>
+    } @else if (store.isEmpty()) {
+        <div class="roster__empty">
+            <p>{{ 'roster.empty' | transloco }}</p>
+        </div>
+    } @else {
+        @if (store.latestImport(); as latestImport) {
+            <app-last-import-card
+                class="roster__import-card"
+                [fileName]="latestImport.fileName"
+                [rows]="processedRows()"
+                [time]="importedAtLabel()" />
+
+            <div class="roster__stats">
+                <app-roster-stat-tile
+                    [value]="latestImport.added"
+                    [label]="'roster.stats.added' | transloco"
+                    tone="success" />
+                <app-roster-stat-tile
+                    [value]="latestImport.updated"
+                    [label]="'roster.stats.updated' | transloco"
+                    tone="info" />
+                <app-roster-stat-tile
+                    [value]="latestImport.deactivated"
+                    [label]="'roster.stats.deactivated' | transloco"
+                    tone="neutral" />
+                <app-roster-stat-tile
+                    [value]="latestImport.failed"
+                    [label]="'roster.stats.failed' | transloco"
+                    tone="danger" />
+            </div>
+        }
+
+        <div class="roster__content" [class.roster__content--single]="!store.failedRows().length">
+            <section class="roster__table-card">
+                <p-selectbutton
+                    class="roster__filter"
+                    [options]="filterOptions()"
+                    optionValue="id"
+                    [allowEmpty]="false"
+                    [ngModel]="selectedFilter()"
+                    (ngModelChange)="onFilterChange($event)">
+                    <ng-template pTemplate="item" let-option>
+                        @if (option.id === allTeachers) {
+                            {{ 'roster.filter.all' | transloco }}
+                        } @else {
+                            {{ option.name }}
+                        }
+                    </ng-template>
+                </p-selectbutton>
+
+                <p-table [value]="store.filteredStudents()" styleClass="roster__table">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'roster.table.name' | transloco }}</th>
+                            <th>{{ 'roster.table.nationalId' | transloco }}</th>
+                            <th>{{ 'roster.table.phone' | transloco }}</th>
+                            <th>{{ 'roster.table.car' | transloco }}</th>
+                            <th>{{ 'roster.table.teacher' | transloco }}</th>
+                            <th>{{ 'roster.table.result' | transloco }}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row>
+                        <tr [class.roster__row--inactive]="!row.isActive">
+                            <td>
+                                <span class="roster__name">
+                                    {{ row.name }}
+                                    @if (!row.isActive) {
+                                        <p-tag severity="secondary" [value]="'roster.inactive' | transloco" />
+                                    }
+                                </span>
+                            </td>
+                            <td class="roster__ltr-cell">{{ row.nationalId }}</td>
+                            <td class="roster__ltr-cell">{{ row.phone }}</td>
+                            <td>{{ row.carName }}</td>
+                            <td>{{ row.teacherName }}</td>
+                            <td>
+                                @if (store.badgeByNationalId().get(row.nationalId); as outcome) {
+                                    <app-import-result-badge [outcome]="outcome" />
+                                }
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </section>
+
+            @if (store.failedRows().length) {
+                <app-failed-rows-panel [failures]="store.failedRows()" />
+            }
+        </div>
+    }
+</div>

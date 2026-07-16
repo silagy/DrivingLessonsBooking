@@ -1,6 +1,7 @@
 using DrivingLessons.Domain.Entities;
 using DrivingLessons.Domain.Repositories;
 using DrivingLessons.Domain.Values;
+using Microsoft.EntityFrameworkCore;
 
 namespace DrivingLessons.Infrastructure.EntityFramework.Repositories;
 
@@ -16,6 +17,11 @@ public class TeacherRepository : ITeacherRepository
     public async Task<Teacher?> GetAsync(TeacherId id)
     {
         return await dbContext.Teachers.FindAsync(id);
+    }
+
+    public async Task<IReadOnlyCollection<Teacher>> FindActiveAsync()
+    {
+        return await dbContext.Teachers.ToListAsync();
     }
 
     public void Add(Teacher teacher)

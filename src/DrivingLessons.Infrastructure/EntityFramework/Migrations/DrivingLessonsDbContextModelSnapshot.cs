@@ -81,6 +81,95 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("publications", (string)null);
                 });
 
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.RosterImport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("AddedCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("added_count");
+
+                    b.Property<int>("DeactivatedCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("deactivated_count");
+
+                    b.Property<int>("FailedCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("failed_count");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("file_name");
+
+                    b.Property<DateTime>("ImportedAtUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("imported_at_utc");
+
+                    b.Property<int>("UpdatedCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("updated_count");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("roster_imports", (string)null);
+                });
+
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.Student", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("text")
+                        .HasColumnName("address");
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("car_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("LicenseType")
+                        .HasColumnType("text")
+                        .HasColumnName("license_type");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NationalId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("national_id");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("phone");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date")
+                        .HasColumnName("start_date");
+
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("teacher_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NationalId")
+                        .IsUnique();
+
+                    b.ToTable("students", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Domain.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -233,6 +322,76 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.Navigation("TeacherVersions");
 
                     b.Navigation("Window");
+                });
+
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.RosterImport", b =>
+                {
+                    b.OwnsMany("DrivingLessons.Domain.Values.RosterImportEntry", "Entries", b1 =>
+                        {
+                            b1.Property<int>("id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("id"));
+
+                            b1.Property<string>("NationalId")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("national_id");
+
+                            b1.Property<int>("Outcome")
+                                .HasColumnType("integer")
+                                .HasColumnName("outcome");
+
+                            b1.Property<Guid>("roster_import_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("id");
+
+                            b1.HasIndex("roster_import_id");
+
+                            b1.ToTable("roster_import_entries", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("roster_import_id");
+                        });
+
+                    b.OwnsMany("DrivingLessons.Domain.Values.RosterImportFailure", "Failures", b1 =>
+                        {
+                            b1.Property<int>("id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("id"));
+
+                            b1.Property<int>("Reason")
+                                .HasColumnType("integer")
+                                .HasColumnName("reason");
+
+                            b1.Property<int>("RowNumber")
+                                .HasColumnType("integer")
+                                .HasColumnName("row_number");
+
+                            b1.Property<string>("StudentName")
+                                .HasColumnType("text")
+                                .HasColumnName("student_name");
+
+                            b1.Property<Guid>("roster_import_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("id");
+
+                            b1.HasIndex("roster_import_id");
+
+                            b1.ToTable("roster_import_failures", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("roster_import_id");
+                        });
+
+                    b.Navigation("Entries");
+
+                    b.Navigation("Failures");
                 });
 
             modelBuilder.Entity("DrivingLessons.Domain.Entities.WeekSchedule", b =>

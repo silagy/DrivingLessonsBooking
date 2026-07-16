@@ -14,6 +14,10 @@ export const ADMIN_ROUTES: Routes = [
         loadChildren: () => import('../teachers/teachers.routes'),
       },
       {
+        path: AppRoutes.roster,
+        loadChildren: () => import('../roster/roster.routes'),
+      },
+      {
         path: AppRoutes.weekSchedules,
         loadChildren: () => import('../week-schedules/week-schedules.routes'),
       },

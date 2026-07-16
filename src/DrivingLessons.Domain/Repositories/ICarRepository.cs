@@ -7,5 +7,7 @@ public interface ICarRepository
 {
     Task<Car?> GetAsync(CarId id);
 
+    Task<IReadOnlyCollection<Car>> FindActiveAsync();
+
     void Add(Car car);
 }
