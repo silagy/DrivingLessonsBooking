@@ -529,7 +529,7 @@ git add docs/modules/student-form/README.md
 git commit -m "docs(student-form): link slice 1 plan from the roadmap"
 ```
 
-- [ ] **Step 10: Push and open the PR**
+- [x] **Step 10: Push and open the PR**
 
 ```bash
 git push -u origin 24-us-23-public-link-gateway
