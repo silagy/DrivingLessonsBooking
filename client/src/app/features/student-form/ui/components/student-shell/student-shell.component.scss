@@ -1,0 +1,46 @@
+:host {
+    display: block;
+    min-height: 100dvh;
+    background: var(--app-bg-page);
+}
+
+.student-shell {
+    display: flex;
+    flex-direction: column;
+    max-width: 30rem;
+    min-height: 100dvh;
+    margin-inline: auto;
+    background: var(--app-bg-card);
+}
+
+.student-shell__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1rem 0.75rem;
+    border-block-end: 1px solid var(--app-border);
+}
+
+.student-shell__lang {
+    margin-inline-start: auto;
+}
+
+.student-shell__caption {
+    padding: 0.45rem 1rem;
+    background: var(--app-bg-page);
+    border-block-end: 1px solid var(--app-border);
+    font-size: 0.72rem;
+    color: var(--app-text-secondary);
+}
+
+.student-shell__main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+@media screen and (min-width: 30rem) {
+    .student-shell {
+        border-inline: 1px solid var(--app-border);
+    }
+}

@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { AppLanguage, LanguageService } from '../../core/language.service';
 
 @Component({
   selector: 'app-language-toggle',
   imports: [],
   template: `
-    <div class="lang" role="group">
+    <div class="lang" [class.lang--touch]="touch()" role="group">
       @for (option of options; track option.lang) {
         <button
           type="button"
@@ -24,6 +24,8 @@ import { AppLanguage, LanguageService } from '../../core/language.service';
 })
 export class LanguageToggleComponent {
   protected readonly language = inject(LanguageService);
+
+  readonly touch = input(false);
 
   protected readonly options: ReadonlyArray<{ lang: AppLanguage; label: string }> = [
     { lang: 'en', label: 'EN' },

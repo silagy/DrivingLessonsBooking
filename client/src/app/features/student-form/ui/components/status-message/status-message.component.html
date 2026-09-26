@@ -1,0 +1,9 @@
+<section class="status">
+    <span class="status__icon" [class]="toneClass()" aria-hidden="true">
+        <i [class]="icon()"></i>
+    </span>
+    <h1 class="status__heading">{{ heading() }}</h1>
+    <div class="status__body">
+        <ng-content />
+    </div>
+</section>

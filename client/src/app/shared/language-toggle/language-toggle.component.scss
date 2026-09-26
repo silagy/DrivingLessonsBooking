@@ -30,3 +30,8 @@
   border-color: var(--app-border);
   box-shadow: var(--app-shadow-card);
 }
+
+.lang--touch .lang__opt {
+  min-width: 2.75rem;
+  min-height: 2.5rem;
+}

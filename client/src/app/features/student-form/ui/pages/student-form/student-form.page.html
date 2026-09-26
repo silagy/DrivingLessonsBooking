@@ -1,25 +1,65 @@
-<main class="student-form">
+<app-student-shell [caption]="store.isOpen() ? ('studentForm.weekCaption' | transloco: store.weekParams()) : ''">
     @switch (store.view()) {
         @case (views.loading) {
-            <p-progressSpinner [ariaLabel]="'studentForm.loading' | transloco" />
+            <div class="student-form__loading">
+                <p-progressSpinner [ariaLabel]="'studentForm.loading' | transloco" />
+            </div>
         }
         @case (views.notYetOpen) {
-            <h1>{{ 'studentForm.notYetOpen.title' | transloco }}</h1>
-            <p>{{ 'studentForm.notYetOpen.body' | transloco: store.weekParams() }}</p>
+            <app-status-message icon="pi pi-clock" [heading]="'studentForm.notYetOpen.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.notYetOpen.body' | transloco: store.weekParams() }}</p>
+                <dl class="student-form__window">
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.opens' | transloco }}</dt>
+                        <dd>{{ store.opensAt() }}</dd>
+                    </div>
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.closes' | transloco }}</dt>
+                        <dd>{{ store.closesAt() }}</dd>
+                    </div>
+                </dl>
+                <p class="student-form__hint">{{ 'studentForm.notYetOpen.hint' | transloco }}</p>
+            </app-status-message>
         }
         @case (views.open) {
-            <h1>{{ 'studentForm.open.title' | transloco }}</h1>
-            <p>{{ 'studentForm.open.body' | transloco: store.weekParams() }}</p>
+            <app-status-message icon="pi pi-check" tone="success" [heading]="'studentForm.open.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.open.body' | transloco: store.weekParams() }}</p>
+                <dl class="student-form__window">
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.closes' | transloco }}</dt>
+                        <dd>{{ store.closesAt() }}</dd>
+                    </div>
+                </dl>
+            </app-status-message>
         }
         @case (views.closed) {
-            <h1>{{ 'studentForm.closed.title' | transloco }}</h1>
-            <p>{{ 'studentForm.closed.body' | transloco: store.weekParams() }}</p>
+            <app-status-message icon="pi pi-lock" [heading]="'studentForm.closed.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.closed.body' | transloco: store.weekParams() }}</p>
+                <dl class="student-form__window">
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.closed' | transloco }}</dt>
+                        <dd>{{ store.closesAt() }}</dd>
+                    </div>
+                </dl>
+                <p class="student-form__hint">{{ 'studentForm.closed.hint' | transloco }}</p>
+            </app-status-message>
         }
         @case (views.invalidLink) {
-            <h1>{{ 'studentForm.invalidLink.title' | transloco }}</h1>
+            <app-status-message icon="pi pi-link" tone="danger" [heading]="'studentForm.invalidLink.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.invalidLink.body' | transloco }}</p>
+            </app-status-message>
         }
         @case (views.loadFailed) {
-            <h1>{{ 'studentForm.loadFailed.title' | transloco }}</h1>
+            <app-status-message
+                icon="pi pi-exclamation-circle"
+                tone="danger"
+                [heading]="'studentForm.loadFailed.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.loadFailed.body' | transloco }}</p>
+                <p-button
+                    [label]="'studentForm.loadFailed.retry' | transloco"
+                    icon="pi pi-refresh"
+                    (onClick)="store.retry()" />
+            </app-status-message>
         }
     }
-</main>
+</app-student-shell>

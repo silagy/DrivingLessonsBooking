@@ -1,0 +1,14 @@
+<div class="student-shell">
+    <header class="student-shell__bar">
+        <app-brand-logo />
+        <app-language-toggle class="student-shell__lang" [touch]="true" />
+    </header>
+
+    @if (caption()) {
+        <div class="student-shell__caption">{{ caption() }}</div>
+    }
+
+    <main class="student-shell__main">
+        <ng-content />
+    </main>
+</div>
