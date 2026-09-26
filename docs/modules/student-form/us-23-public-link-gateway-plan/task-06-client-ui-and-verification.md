@@ -28,7 +28,7 @@
 
 The layout is a centered single column capped at `30rem`, so the same page reads correctly on a 375px phone and on a desktop browser.
 
-- [ ] **Step 1: Touch-size variant on the shared language toggle**
+- [x] **Step 1: Touch-size variant on the shared language toggle**
 
 The student form needs ≥40px touch targets (client-primeng "Responsive Sizing"); the admin bar keeps the compact toggle. This file uses 2-space indentation — keep it.
 
@@ -80,7 +80,7 @@ Append to `client\src\app\shared\language-toggle\language-toggle.component.scss`
 }
 ```
 
-- [ ] **Step 2: Student shell (dumb)**
+- [x] **Step 2: Student shell (dumb)**
 
 `client\src\app\features\student-form\ui\components\student-shell\student-shell.component.ts`:
 
@@ -171,7 +171,7 @@ export class StudentShellComponent {
 }
 ```
 
-- [ ] **Step 3: Status message (dumb)**
+- [x] **Step 3: Status message (dumb)**
 
 `client\src\app\features\student-form\ui\components\status-message\status-message.component.ts`:
 
@@ -280,7 +280,7 @@ The input is `heading`, not `title`, so it never collides with the native `title
 }
 ```
 
-- [ ] **Step 4: Student form page (smart) — full rewrite of the task-5 skeleton**
+- [x] **Step 4: Student form page (smart) — full rewrite of the task-5 skeleton**
 
 `student-form.page.ts`:
 
@@ -440,7 +440,7 @@ export class StudentFormPage {
 }
 ```
 
-- [ ] **Step 5: Build, test, commit**
+- [x] **Step 5: Build, test, commit**
 
 Run (in `client\`): `npm test -- --watch=false` → all PASS; `npm run build` → success, no new warnings.
 
@@ -452,7 +452,7 @@ Not-yet-open, open, closed, invalid-link and load-failed screens per the
 SWinClosed mockup, with Asia/Jerusalem window dates and 40px touch targets."
 ```
 
-- [ ] **Step 6: Seed an Open → Closed publication**
+- [x] **Step 6: Seed an Open → Closed publication**
 
 Reuse the variables from task 3 Step 4 (`API`, `TOKEN`, `TEACHER_ID`; re-run its login line if the shell is new). Publish a second unused week with a window that started 5 minutes ago and ends in 3 minutes — Quartz fires the past-due open job immediately, then closes it on time. Also create a third week that stays **Draft**:
 
@@ -484,7 +484,7 @@ echo "LINK (published)=$LINK  LINK2 (open, closes $END)=$LINK2  LINK3 (draft)=$L
 
 Expected: two `201`s, `publish week 2: 204`, and the by-link JSON for `LINK2` shows `"state":"open"`. You have ~3 minutes to check the open screen before it closes.
 
-- [ ] **Step 7: Verify in the browser — every state, both languages, 375px**
+- [x] **Step 7: Verify in the browser — every state, both languages, 375px**
 
 With Postgres, API and client running (`http://localhost:4200`), set the Browser pane to the **mobile** preset (375×812) and reload. Verify with `get_page_text`, `read_page`, `find`, and `javascript_tool` (project memory: `screenshot` can hang on this PrimeNG app — try one at the end as proof, fall back to the text/DOM evidence if it times out). Start **logged out** (`localStorage.removeItem('auth_token')`) and in **Hebrew** (the default).
 
@@ -506,7 +506,7 @@ With Postgres, API and client running (`http://localhost:4200`), set the Browser
 
 Reset the viewport to `desktop` when done.
 
-- [ ] **Step 8: Link this plan from the roadmap**
+- [x] **Step 8: Link this plan from the roadmap**
 
 In `docs\modules\student-form\README.md`, change the slice-1 table row's first cell from `1. Public link gateway` to:
 
@@ -514,7 +514,7 @@ In `docs\modules\student-form\README.md`, change the slice-1 table row's first c
 1. Public link gateway — [plan](us-23-public-link-gateway-plan/README.md)
 ```
 
-- [ ] **Step 9: Full check + final commit**
+- [x] **Step 9: Full check + final commit**
 
 ```bash
 dotnet build
