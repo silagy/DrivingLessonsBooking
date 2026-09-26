@@ -38,4 +38,21 @@ public class WeekStartTest
         //then
         Should.Throw<WeekStartMustBeSundayException>(act);
     }
+
+    [TestMethod]
+    [DataRow("2026-06-14", 25)]
+    [DataRow("2026-12-27", 53)]
+    [DataRow("2027-01-03", 1)]
+    [DataRow("2025-12-28", 1)]
+    public void Week_Number_Is_The_Iso_Week_Of_Its_Monday(string sunday, int expectedWeekNumber)
+    {
+        //given
+        var weekStart = WeekStart.Of(DateOnly.Parse(sunday));
+
+        //when
+        var weekNumber = weekStart.WeekNumber;
+
+        //then
+        weekNumber.ShouldBe(expectedWeekNumber);
+    }
 }

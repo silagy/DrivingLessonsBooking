@@ -1,6 +1,7 @@
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.FindPublicationHistory;
 using DrivingLessons.Application.Queries.GetPublication;
+using DrivingLessons.Application.Queries.GetPublicationByLink;
 using DrivingLessons.Application.Queries.GetPublicationDashboard;
 using DrivingLessons.Domain.Values;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,17 @@ public class PublicationQueries : IPublicationQueries
                          .Publications
                          .Where(x => x.WeekStart == resolvedWeekStart)
                          .Select(GetPublicationResponse.Selector)
+                         .FirstOrDefaultAsync();
+    }
+
+    public async Task<GetPublicationByLinkResponse?> GetByLinkTokenExcludingDraftsAsync(string linkToken)
+    {
+        var resolvedLinkToken = ShareableLinkToken.Of(linkToken);
+
+        return await dbContext
+                         .Publications
+                         .Where(x => x.LinkToken == resolvedLinkToken && x.State != PublicationState.Draft)
+                         .Select(GetPublicationByLinkResponse.Selector)
                          .FirstOrDefaultAsync();
     }
 

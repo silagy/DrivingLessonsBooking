@@ -1,0 +1,52 @@
+.student-form__loading {
+    display: flex;
+    justify-content: center;
+    padding-block: 6rem;
+}
+
+.student-form__text,
+.student-form__hint {
+    margin: 0;
+}
+
+.student-form__hint {
+    font-size: 0.78rem;
+    color: var(--app-text-secondary);
+}
+
+.student-form__window {
+    width: 100%;
+    margin: 0.25rem 0 0;
+    padding: 0.25rem 1rem;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-shadow-card);
+
+    dt {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--app-text-secondary);
+    }
+
+    dd {
+        margin: 0;
+        font-family: var(--app-font-display);
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: var(--app-ink);
+        text-align: end;
+    }
+}
+
+.student-form__window-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.75rem;
+}
+
+.student-form__window-row + .student-form__window-row {
+    border-block-start: 1px solid var(--app-bg-muted);
+}

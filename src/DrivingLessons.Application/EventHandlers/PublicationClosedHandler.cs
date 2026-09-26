@@ -1,4 +1,3 @@
-using System.Globalization;
 using DrivingLessons.Application.Abstractions;
 using DrivingLessons.Application.Common;
 using DrivingLessons.Domain.Events;
@@ -34,8 +33,7 @@ public class PublicationClosedHandler : IDomainEventHandler<PublicationClosed>
             return;
         }
 
-        var weekDate = publication.WeekStart.Value.ToDateTime(TimeOnly.MinValue);
-        var week = ISOWeek.GetWeekOfYear(weekDate);
+        var week = publication.WeekStart.WeekNumber;
 
         foreach (var teacherVersion in publication.TeacherVersions)
         {

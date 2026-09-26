@@ -1,0 +1,65 @@
+<app-student-shell [caption]="store.isOpen() ? ('studentForm.weekCaption' | transloco: store.weekParams()) : ''">
+    @switch (store.view()) {
+        @case (views.loading) {
+            <div class="student-form__loading">
+                <p-progressSpinner [ariaLabel]="'studentForm.loading' | transloco" />
+            </div>
+        }
+        @case (views.notYetOpen) {
+            <app-status-message icon="pi pi-clock" [heading]="'studentForm.notYetOpen.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.notYetOpen.body' | transloco: store.weekParams() }}</p>
+                <dl class="student-form__window">
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.opens' | transloco }}</dt>
+                        <dd>{{ store.opensAt() }}</dd>
+                    </div>
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.closes' | transloco }}</dt>
+                        <dd>{{ store.closesAt() }}</dd>
+                    </div>
+                </dl>
+                <p class="student-form__hint">{{ 'studentForm.notYetOpen.hint' | transloco }}</p>
+            </app-status-message>
+        }
+        @case (views.open) {
+            <app-status-message icon="pi pi-check" tone="success" [heading]="'studentForm.open.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.open.body' | transloco: store.weekParams() }}</p>
+                <dl class="student-form__window">
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.closes' | transloco }}</dt>
+                        <dd>{{ store.closesAt() }}</dd>
+                    </div>
+                </dl>
+            </app-status-message>
+        }
+        @case (views.closed) {
+            <app-status-message icon="pi pi-lock" [heading]="'studentForm.closed.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.closed.body' | transloco: store.weekParams() }}</p>
+                <dl class="student-form__window">
+                    <div class="student-form__window-row">
+                        <dt>{{ 'studentForm.window.closed' | transloco }}</dt>
+                        <dd>{{ store.closesAt() }}</dd>
+                    </div>
+                </dl>
+                <p class="student-form__hint">{{ 'studentForm.closed.hint' | transloco }}</p>
+            </app-status-message>
+        }
+        @case (views.invalidLink) {
+            <app-status-message icon="pi pi-link" tone="danger" [heading]="'studentForm.invalidLink.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.invalidLink.body' | transloco }}</p>
+            </app-status-message>
+        }
+        @case (views.loadFailed) {
+            <app-status-message
+                icon="pi pi-exclamation-circle"
+                tone="danger"
+                [heading]="'studentForm.loadFailed.title' | transloco">
+                <p class="student-form__text">{{ 'studentForm.loadFailed.body' | transloco }}</p>
+                <p-button
+                    [label]="'studentForm.loadFailed.retry' | transloco"
+                    icon="pi pi-refresh"
+                    (onClick)="store.retry()" />
+            </app-status-message>
+        }
+    }
+</app-student-shell>

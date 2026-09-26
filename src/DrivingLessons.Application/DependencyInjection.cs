@@ -26,6 +26,7 @@ using DrivingLessons.Application.Queries.FindTeachers;
 using DrivingLessons.Application.Queries.GetCar;
 using DrivingLessons.Application.Queries.GetLatestRosterImport;
 using DrivingLessons.Application.Queries.GetPublication;
+using DrivingLessons.Application.Queries.GetPublicationByLink;
 using DrivingLessons.Application.Queries.GetPublicationDashboard;
 using DrivingLessons.Application.Queries.GetTeacher;
 using DrivingLessons.Application.Queries.GetWeekSchedule;
@@ -61,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<OpenPublicationInteractor>();
         services.AddScoped<ClosePublicationInteractor>();
         services.AddScoped<GetPublicationInteractor>();
+        services.AddScoped<GetPublicationByLinkInteractor>();
         services.AddScoped<GetPublicationDashboardInteractor>();
         services.AddScoped<FindPublicationHistoryInteractor>();
         services.AddScoped<DownloadPublicationExcelInteractor>();
