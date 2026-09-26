@@ -1,10 +1,24 @@
+using System.Globalization;
 using DrivingLessons.Domain.Exceptions;
 
 namespace DrivingLessons.Domain.Values;
 
 public record WeekStart
 {
+    private const int DaysFromSundayToMonday = 1;
+
     public DateOnly Value { get; }
+
+    public int WeekNumber
+    {
+        get
+        {
+            var monday = Value.AddDays(DaysFromSundayToMonday);
+            var mondayDateTime = monday.ToDateTime(TimeOnly.MinValue);
+
+            return ISOWeek.GetWeekOfYear(mondayDateTime);
+        }
+    }
 
     private WeekStart(DateOnly value)
     {
