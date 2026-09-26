@@ -2,6 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
+import { AppRoutes } from '../../../shared/config/app-routes';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
 import { LanguageService } from '../../../core/language.service';
 import { formatInstantInJerusalem } from '../domain/jerusalem-time';
@@ -21,7 +22,6 @@ import { TeacherOption } from '../domain/teacher-option.model';
 import { buildWeekOptions, WeekOption } from '../domain/week-options';
 
 const HTTP_NOT_FOUND = 404;
-const STUDENT_LINK_PREFIX = '/s/';
 
 @Injectable({ providedIn: 'root' })
 export class PublicationsStore {
@@ -215,7 +215,7 @@ export class PublicationsStore {
     }
 
     private buildShareLink(token: string): string {
-        return `${this.document.location.origin}${STUDENT_LINK_PREFIX}${token}`;
+        return `${this.document.location.origin}/${AppRoutes.studentForm}/${token}`;
     }
 
     private async loadByWeek(weekStart: string): Promise<GetPublicationResponse | undefined> {

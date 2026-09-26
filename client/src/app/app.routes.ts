@@ -9,6 +9,10 @@ export const routes: Routes = [
       import('./features/auth/login.component').then((m) => m.LoginComponent),
   },
   {
+    path: AppRoutes.studentForm,
+    loadChildren: () => import('./features/student-form/student-form.routes'),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadChildren: () =>

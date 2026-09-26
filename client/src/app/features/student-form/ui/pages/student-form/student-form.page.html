@@ -1,0 +1,25 @@
+<main class="student-form">
+    @switch (store.view()) {
+        @case (views.loading) {
+            <p-progressSpinner [ariaLabel]="'studentForm.loading' | transloco" />
+        }
+        @case (views.notYetOpen) {
+            <h1>{{ 'studentForm.notYetOpen.title' | transloco }}</h1>
+            <p>{{ 'studentForm.notYetOpen.body' | transloco: store.weekParams() }}</p>
+        }
+        @case (views.open) {
+            <h1>{{ 'studentForm.open.title' | transloco }}</h1>
+            <p>{{ 'studentForm.open.body' | transloco: store.weekParams() }}</p>
+        }
+        @case (views.closed) {
+            <h1>{{ 'studentForm.closed.title' | transloco }}</h1>
+            <p>{{ 'studentForm.closed.body' | transloco: store.weekParams() }}</p>
+        }
+        @case (views.invalidLink) {
+            <h1>{{ 'studentForm.invalidLink.title' | transloco }}</h1>
+        }
+        @case (views.loadFailed) {
+            <h1>{{ 'studentForm.loadFailed.title' | transloco }}</h1>
+        }
+    }
+</main>

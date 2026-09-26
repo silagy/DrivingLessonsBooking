@@ -5,4 +5,5 @@ export const AppRoutes = {
     weekSchedules: 'week-schedules',
     publications: 'publications',
     publicationsHistory: 'history',
+    studentForm: 's',
 } as const;

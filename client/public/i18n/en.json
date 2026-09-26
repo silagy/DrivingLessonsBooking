@@ -239,6 +239,38 @@
       "newEnd": "New closing time"
     }
   },
+  "studentForm": {
+    "loading": "Loading the form…",
+    "weekCaption": "Week {{weekNumber}} · {{weekRange}}",
+    "window": {
+      "opens": "Opens",
+      "closes": "Closes",
+      "closed": "Closed"
+    },
+    "notYetOpen": {
+      "title": "Submissions aren't open yet",
+      "body": "The form for week {{weekNumber}} ({{weekRange}}) isn't open yet.",
+      "hint": "Come back through the same link — no need for a new one."
+    },
+    "open": {
+      "title": "Submissions are open",
+      "body": "The form for week {{weekNumber}} ({{weekRange}}) is open."
+    },
+    "closed": {
+      "title": "Submissions are closed",
+      "body": "The form for week {{weekNumber}} ({{weekRange}}) has closed.",
+      "hint": "If the school reopens the window, this link will work again."
+    },
+    "invalidLink": {
+      "title": "This link isn't valid",
+      "body": "We couldn't find a form for this link. Ask your school for the current link."
+    },
+    "loadFailed": {
+      "title": "Something went wrong",
+      "body": "We couldn't load the form. Check your connection and try again.",
+      "retry": "Try again"
+    }
+  },
   "general": {
     "save": "Save",
     "cancel": "Cancel",
