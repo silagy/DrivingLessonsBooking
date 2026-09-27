@@ -30,6 +30,7 @@ using DrivingLessons.Application.Queries.GetPublicationByLink;
 using DrivingLessons.Application.Queries.GetPublicationDashboard;
 using DrivingLessons.Application.Queries.GetTeacher;
 using DrivingLessons.Application.Queries.GetWeekSchedule;
+using DrivingLessons.Application.Queries.IdentifyStudent;
 using DrivingLessons.Domain.Events;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -68,6 +69,7 @@ public static class DependencyInjection
         services.AddScoped<DownloadPublicationExcelInteractor>();
         services.AddScoped<ImportRosterInteractor>();
         services.AddScoped<FindStudentsInteractor>();
+        services.AddScoped<IdentifyStudentInteractor>();
         services.AddScoped<GetLatestRosterImportInteractor>();
         services.AddScoped<IDomainEventHandler<WeekScheduleCreated>, WeekScheduleCreatedHandler>();
         services.AddScoped<IDomainEventHandler<PublicationClosed>, PublicationClosedHandler>();

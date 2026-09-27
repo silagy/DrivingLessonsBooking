@@ -1,0 +1,144 @@
+using DrivingLessons.Application.Common.Exceptions;
+using DrivingLessons.Application.Queries;
+using DrivingLessons.Application.Queries.GetPublicationByLink;
+using DrivingLessons.Application.Queries.IdentifyStudent;
+using DrivingLessons.Domain.Common;
+using DrivingLessons.Domain.Values;
+using FakeItEasy;
+using Shouldly;
+
+namespace DrivingLessons.Application.Test.Queries;
+
+[TestClass]
+public class IdentifyStudentInteractorTest
+{
+    private const string RosterNationalId = "000000018";
+
+    private IPublicationQueries publicationQueries = null!;
+    private IStudentQueries studentQueries = null!;
+    private IdentifyStudentInteractor interactor = null!;
+    private string linkToken = null!;
+    private DateOnly weekStart;
+
+    [TestInitialize]
+    public void Init()
+    {
+        publicationQueries = A.Fake<IPublicationQueries>();
+        studentQueries = A.Fake<IStudentQueries>();
+        interactor = new IdentifyStudentInteractor(publicationQueries, studentQueries);
+        linkToken = ShareableLinkToken.New().Value;
+        weekStart = new DateOnly(2026, 10, 4);
+
+        var publication = new GetPublicationByLinkResponse
+        {
+            WeekStart = weekStart,
+            WeekNumber = 41,
+            State = PublicationState.Open,
+            WindowStartUtc = new DateTimeOffset(2026, 9, 30, 15, 0, 0, TimeSpan.Zero),
+            WindowEndUtc = new DateTimeOffset(2026, 10, 2, 11, 0, 0, TimeSpan.Zero)
+        };
+
+        A.CallTo(() => publicationQueries.GetByLinkTokenExcludingDraftsAsync(linkToken))
+            .Returns(publication);
+    }
+
+    [TestMethod]
+    public async Task Returns_The_Roster_Student_For_The_Publication_Week()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+        var student = new IdentifyStudentResponse
+        {
+            StudentName = "Test Student",
+            TeacherName = "Teacher Cohen",
+            CarName = "Corolla White",
+            Transmission = Transmission.Automatic
+        };
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns(student);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var response = await interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        response.ShouldBeSameAs(student);
+    }
+
+    [TestMethod]
+    public async Task Publication_Must_Exist_For_The_Link()
+    {
+        //given
+        var unknownLinkToken = ShareableLinkToken.New().Value;
+
+        A.CallTo(() => publicationQueries.GetByLinkTokenExcludingDraftsAsync(unknownLinkToken))
+            .Returns((GetPublicationByLinkResponse?)null);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var act = () => interactor.ExecuteAsync(unknownLinkToken, request);
+
+        //then
+        await Should.ThrowAsync<PublicationLinkNotFoundException>(act);
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(A<NationalId>._, A<DateOnly>._))
+            .MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Student_Must_Be_Active_On_The_Roster()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns((IdentifyStudentResponse?)null);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var act = () => interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        await Should.ThrowAsync<StudentNotFoundException>(act);
+    }
+
+    [TestMethod]
+    public async Task Not_Found_Message_Does_Not_Reveal_The_National_Id()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns((IdentifyStudentResponse?)null);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var act = () => interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        var exception = await Should.ThrowAsync<StudentNotFoundException>(act);
+        exception.Message.ShouldNotContain(RosterNationalId);
+    }
+
+    [TestMethod]
+    [DataRow("000000019")]
+    [DataRow("0000000181")]
+    [DataRow("000 000 018")]
+    public async Task National_Id_Must_Be_Well_Formed(string malformedNationalId)
+    {
+        //given
+        var request = new IdentifyStudentRequest(malformedNationalId);
+
+        //when
+        var act = () => interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        await Should.ThrowAsync<DomainException>(act);
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(A<NationalId>._, A<DateOnly>._))
+            .MustNotHaveHappened();
+    }
+}
