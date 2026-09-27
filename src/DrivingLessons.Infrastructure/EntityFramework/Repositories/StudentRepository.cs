@@ -1,5 +1,6 @@
 using DrivingLessons.Domain.Entities;
 using DrivingLessons.Domain.Repositories;
+using DrivingLessons.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingLessons.Infrastructure.EntityFramework.Repositories;
@@ -16,6 +17,13 @@ public class StudentRepository : IStudentRepository
     public async Task<IReadOnlyCollection<Student>> FindAllAsync()
     {
         return await dbContext.Students.ToListAsync();
+    }
+
+    public async Task<Student?> GetActiveByNationalIdAsync(NationalId nationalId)
+    {
+        return await dbContext
+                         .Students
+                         .FirstOrDefaultAsync(x => x.NationalId == nationalId && x.IsActive);
     }
 
     public void Add(Student student)
