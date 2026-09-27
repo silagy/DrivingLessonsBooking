@@ -242,6 +242,9 @@
   "studentForm": {
     "loading": "טוען את הטופס…",
     "weekCaption": "שבוע {{weekNumber}} · {{weekRange}}",
+    "weekTeacherCaption": "שבוע {{weekNumber}} · {{weekRange}} · {{teacherName}}",
+    "step": "שלב {{current}} מתוך {{total}}",
+    "continue": "המשך",
     "window": {
       "opens": "פתיחה",
       "closes": "סגירה",
@@ -251,10 +254,6 @@
       "title": "ההגשה עוד לא נפתחה",
       "body": "הטופס לשבוע {{weekNumber}} ({{weekRange}}) עוד לא פתוח.",
       "hint": "חזרו דרך אותו הקישור — אין צורך בקישור חדש."
-    },
-    "open": {
-      "title": "ההגשה פתוחה",
-      "body": "הטופס לשבוע {{weekNumber}} ({{weekRange}}) פתוח."
     },
     "closed": {
       "title": "ההגשה נסגרה",
@@ -269,6 +268,32 @@
       "title": "משהו השתבש",
       "body": "לא הצלחנו לטעון את הטופס. בדקו את החיבור ונסו שוב.",
       "retry": "נסו שוב"
+    },
+    "identify": {
+      "title": "הזינו מספר תעודת זהות",
+      "body": "נאתר אתכם ברשימת התלמידים של בית הספר כדי לטעון את הפרטים שלכם — בלי סיסמה.",
+      "label": "תעודת זהות",
+      "hint": "9 ספרות, כפי שרשום בבית הספר",
+      "checking": "בודקים ברשימת התלמידים…",
+      "foundTitle": "מצאנו אתכם — {{studentName}}.",
+      "foundBody": "בואו נאסוף את הזמינות שלכם לשבוע {{weekNumber}} אצל {{teacherName}}.",
+      "notOnRosterTitle": "אינכם מופיעים אצלנו.",
+      "notOnRosterBody": "תעודת הזהות הזו לא מופיעה ברשימת התלמידים של בית הספר, ולכן אין מה להגיש. פנו לבית הספר כדי שיוסיפו אתכם.",
+      "invalidId": "זה לא נראה כמו מספר תעודת זהות תקין. בדקו את הספרות ונסו שוב.",
+      "failed": "לא הצלחנו לבדוק את תעודת הזהות כרגע. בדקו את החיבור ונסו שוב."
+    },
+    "details": {
+      "lead": "אתם מגישים זמינות עבור",
+      "student": "תלמיד/ה",
+      "transmission": "תיבת הילוכים",
+      "car": "רכב",
+      "week": "שבוע",
+      "transmissions": {
+        "automatic": "אוטומטית",
+        "manual": "ידנית"
+      },
+      "noAvailabilityTitle": "עדיין אין שעות לשבוע הזה.",
+      "noAvailabilityBody": "אין עדיין זמינות שפורסמה אצל {{teacherName}} לשבוע הזה. פנו לבית הספר."
     }
   },
   "general": {

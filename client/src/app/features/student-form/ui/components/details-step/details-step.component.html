@@ -1,0 +1,35 @@
+<app-wizard-step [stepNumber]="stepNumber()" [stepCount]="stepCount()">
+    <p class="details__lead">{{ 'studentForm.details.lead' | transloco }}</p>
+    <div class="details__teacher">
+        <span class="details__avatar" aria-hidden="true">{{ teacherInitials() }}</span>
+        <h1 class="details__teacher-name">{{ teacherName() }}</h1>
+    </div>
+
+    <dl class="details__card">
+        <div class="details__row">
+            <dt>{{ 'studentForm.details.student' | transloco }}</dt>
+            <dd class="details__student">{{ studentName() }}</dd>
+        </div>
+        <div class="details__row">
+            <dt>{{ 'studentForm.details.transmission' | transloco }}</dt>
+            <dd class="details__transmission">{{ transmissionKey() | transloco }}</dd>
+        </div>
+        <div class="details__row">
+            <dt>{{ 'studentForm.details.car' | transloco }}</dt>
+            <dd class="details__car">{{ carName() }}</dd>
+        </div>
+        <div class="details__row">
+            <dt>{{ 'studentForm.details.week' | transloco }}</dt>
+            <dd>{{ weekLabel() }}</dd>
+        </div>
+    </dl>
+
+    @if (!hasAvailability()) {
+        <p-message severity="warn" class="details__no-availability">
+            <span>
+                <strong>{{ 'studentForm.details.noAvailabilityTitle' | transloco }}</strong>
+                {{ 'studentForm.details.noAvailabilityBody' | transloco: { teacherName: teacherName() } }}
+            </span>
+        </p-message>
+    }
+</app-wizard-step>
