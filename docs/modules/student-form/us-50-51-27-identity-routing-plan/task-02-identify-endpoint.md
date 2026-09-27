@@ -17,7 +17,7 @@
 
 Mirror `SubmissionQueryController.cs` (same `api/submissions` base, same `[AllowAnonymous]` class attribute — `Program.cs` sets a `RequireAuthenticatedUser` fallback policy). Zero logic, `[FromServices]` on the action, `[FromBody] [Required]` request, action name ends in `Async`. `ApiExceptionFilter` already maps `NotFoundException` → 404 and `DomainException` → 409; nothing changes in `Program.cs`.
 
-- [ ] **Step 1: Controller**
+- [x] **Step 1: Controller**
 
 `src\DrivingLessons.Presentation.Web\Controllers\Submission\SubmissionCommandController.cs`:
 
@@ -54,12 +54,12 @@ public class SubmissionCommandController : ControllerBase
 
 POST (not GET) keeps the national ID out of the URL; the verb puts it in the *Command* controller per api-guidelines, although the interactor is a query (README decision 1). Slice 3 adds `POST`/`PUT` submission actions to this controller.
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `dotnet build`
 Expected: success, no new warnings.
 
-- [ ] **Step 3: Start the API against a throwaway database**
+- [x] **Step 3: Start the API against a throwaway database**
 
 ⚠️ The smoke test uploads a roster, and **a roster upload deactivates every student missing from the file** (decision #19). Never run it against the dev database (`drivinglessons`) — it would deactivate the real roster.
 
@@ -86,7 +86,7 @@ Expected: success, no new warnings.
 
 Keep this server running — task 6 reuses the same database and publication.
 
-- [ ] **Step 4: Seed two teachers' grids, a roster and an open publication (bash / Git Bash)**
+- [x] **Step 4: Seed two teachers' grids, a roster and an open publication (bash / Git Bash)**
 
 The national IDs below are synthetic (`0000000xx` with a valid check digit) — never use real IDs in test data.
 
@@ -147,7 +147,7 @@ Expected:
 
 Roles in the checks below: **A** → Cohen (automatic, all open) · **B** → Levi (manual, Sunday morning blocked) · **C** → a teacher with no grid this week · **D** → deactivated by the second upload.
 
-- [ ] **Step 5: API smoke test — routing, outcomes and PII (same shell)**
+- [x] **Step 5: API smoke test — routing, outcomes and PII (same shell)**
 
 ```bash
 identify() { curl -s -X POST "$API/api/submissions/by-link/$1/identify" -H "Content-Type: application/json" \
@@ -200,11 +200,11 @@ Expected output, in order:
 
 Keep the API running and note `LINK` — task 6 reuses this database and publication (the window stays open for 3 hours; if it has closed by then, re-run the `START`/`END` lines and reopen via `POST api/publications/{PUB_ID}/reopen` with `{"newEndUtc": …}`, or simply repeat Steps 3–4 on a fresh smoke database).
 
-- [ ] **Step 6: Scalar check**
+- [x] **Step 6: Scalar check**
 
 Open `http://localhost:5080/scalar/v1` → the **Submissions** tag lists `POST /api/submissions/by-link/{token}/identify` with 200/400/404/409 and the `IdentifyStudentRequest` body schema. (The lock icon comes from the document-wide bearer scheme — documentation only; Step 5 proved the endpoint is anonymous.)
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/DrivingLessons.Presentation.Web/Controllers/Submission/SubmissionCommandController.cs
