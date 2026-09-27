@@ -10,7 +10,7 @@
 - Consumes: the smoke database, teachers, roster and open publication from task 2 Steps 3–4 (`LINK`); the client from tasks 3–5.
 - Produces: verified slice + PR closing #52, #53, #28.
 
-- [ ] **Step 1: Bring up the stack**
+- [x] **Step 1: Bring up the stack**
 
 1. `api-smoke` running against `drivinglessons_us50_smoke` (task 2 Step 3). Confirm the publication is still open: `curl -s http://localhost:5080/api/submissions/by-link/$LINK` shows `"state":"open"`. If the shell from task 2 is gone, recover the link as the admin: `curl -s "http://localhost:5080/api/publications/by-week?week=2026-10-04" -H "Authorization: Bearer <token>"` → `linkToken`. If the window has closed, extend or reopen it (`POST api/publications/{id}/extend-window` / `…/reopen` with `{"newEndUtc":"…"}`), or re-run task 2 Steps 3–4 on a fresh smoke database.
 2. `preview_start {name:"client"}` → `http://localhost:4200` (proxies `api/` to 5080).
@@ -20,14 +20,14 @@ Verify with `get_page_text`, `read_page`, `find`, `javascript_tool` and `read_ne
 
 National IDs (synthetic, from the task-2 roster): **A** `000000018` → Smoke Cohen · **B** `000000026` → Smoke Levi · **C** `000000034` → Smoke NoWeek (no grid) · **D** `000000042` → deactivated · unknown `000000059` · bad check digit `000000019`.
 
-- [ ] **Step 2: Student A, Hebrew — the whole slice-2 path (US-50, US-27, US-51)**
+- [x] **Step 2: Student A, Hebrew — the whole slice-2 path (US-50, US-27, US-51)**
 
 1. `/s/{LINK}`: `שלב 1 מתוך 3`, heading `הזינו מספר תעודת זהות`, the ID field with hint `9 ספרות…`, **no caption bar**, `המשך` disabled. `document.querySelector('#national-id').inputMode` → `"numeric"`.
 2. Type `000 000 018` (with spaces): within a moment `מצאנו אתכם — Smoke Student A.` and `…לשבוע 41 אצל Smoke Cohen.`; `המשך` enabled. **US-50: no password, no verification step.**
 3. Click `המשך` → details: `שלב 2 מתוך 3`, caption `שבוע 41 · …`, lead `אתם מגישים זמינות עבור`, avatar `SC`, h1 **Smoke Cohen**, card rows תלמיד/ה = Smoke Student A, תיבת הילוכים = **אוטומטית**, רכב = Smoke Auto, שבוע = `שבוע 41 · …`. `find` for `combobox` / `radio` / a second textbox returns nothing — **US-27: read-only, no teacher choice, no transmission question.**
 4. Click `המשך` → slots: `שלב 3 מתוך 3`, heading `השבוע של Smoke Cohen`, caption `שבוע 41 · … · Smoke Cohen` (**US-27 "prominently"**), six day groups ראשון … שישי with dates (4.10 … 9.10), Sunday–Thursday four chips (`בוקר`, `צהריים`, `אחה״צ`, `ערב` with `07:00–12:00` …), Friday two chips with `בוקר וצהריים בלבד`, **no striped chip** (Cohen has everything open).
 
-- [ ] **Step 3: Everyone else on the same link**
+- [x] **Step 3: Everyone else on the same link**
 
 1. **Student B** (reload first) — `000000026` → found `Smoke Student B … Smoke Levi`; details show **Smoke Levi**, **ידנית**, Smoke Manual; slots: `השבוע של Smoke Levi`, and **Sunday morning is striped** (`document.querySelectorAll('.slot-chip--unavailable').length` → `1`, and it is the first chip of ראשון). **US-51: same link, B sees Levi's grid, A saw Cohen's.**
 2. **Short ID** — type `18`: no lookup yet (the Network list has no new `identify` request) and `המשך` enabled; press Enter → found Student A. (**Review Focus 3**)
@@ -45,7 +45,7 @@ National IDs (synthetic, from the task-2 roster): **A** `000000018` → Smoke Co
 11. **Lookup failure + retry** — `preview_stop` the `api-smoke` server, type `000000018` → `לא הצלחנו לבדוק את תעודת הזהות כרגע…`, `המשך` enabled. Start `api-smoke` again, click `המשך` → found Student A without a page reload.
 12. **Stale admin session** — `localStorage.setItem('auth_token', 'not-a-real-jwt')`, reload, identify A → still works (anonymous endpoint, no redirect to `/login`). Remove the key.
 
-- [ ] **Step 4: Hebrew/RTL mechanics at 375px** (`javascript_tool`)
+- [x] **Step 4: Hebrew/RTL mechanics at 375px** (`javascript_tool`)
 
 On each of the three steps (use Student B so the grid has a striped chip):
 - `document.documentElement.dir` → `"rtl"`.
@@ -55,11 +55,11 @@ On each of the three steps (use Student B so the grid has a striped chip):
 - Slots: ראשון chips run from the right edge; `בוקר וצהריים בלבד` sits at the inline end (left) of the שישי header; the time labels read `07:00–12:00` left-to-right.
 - The footer stays pinned while scrolling the slots list only if the list overflows — at 375×812 the identify and details footers sit at the bottom of the viewport.
 
-- [ ] **Step 5: English**
+- [x] **Step 5: English**
 
 Click `EN` on the slots step → `dir` becomes `"ltr"`, the page **stays on the slots step** (`Step 3 of 3`, `Smoke Levi's week`, `Sunday … Friday`, `morning & noon only`), and dates re-render (`10/4` …) without a reload. Reload and walk Student A once in English: `Enter your national ID` → `Found you — Smoke Student A.` → `You are submitting availability for` / **Smoke Cohen** / `Automatic` → `Smoke Cohen's week`. Check the unknown-ID message once in English (`We don't have you on file.`).
 
-- [ ] **Step 6: Desktop and admin unaffected**
+- [x] **Step 6: Desktop and admin unaffected**
 
 - `resize_window` preset `desktop`: the shell is the centered 30rem column; the details card and chips do not stretch edge to edge.
 - Sign in as the admin (`admin@local.dev` / `DevAdmin#2026` — the dev seed from `appsettings.Development.json`), open **Roster**: the four smoke students are listed, D dimmed as inactive. Open **Publications** for week 41: the share link box still shows `{origin}/s/{LINK}`.
@@ -67,7 +67,7 @@ Click `EN` on the slots step → `dir` becomes `"ltr"`, the page **stays on the 
 
 If any check fails, fix it in the owning task's files (with a failing spec first where the behavior is testable), re-run `npm test -- --watch=false`, and commit the fix separately before continuing.
 
-- [ ] **Step 7: Link this plan from the roadmap**
+- [x] **Step 7: Link this plan from the roadmap**
 
 In `docs\modules\student-form\README.md`, change the slice-2 table row's first cell from `2. Identity & routing` to:
 
