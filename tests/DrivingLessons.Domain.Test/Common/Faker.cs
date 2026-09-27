@@ -73,4 +73,11 @@ public static class Faker
 
         return DateTime.UtcNow.AddMinutes(minutesAhead);
     }
+
+    public static DateTimeOffset FakeUtcInstant()
+    {
+        var minutesAgo = Random.Shared.Next(1, 100000);
+
+        return DateTimeOffset.UtcNow.AddMinutes(-minutesAgo);
+    }
 }
