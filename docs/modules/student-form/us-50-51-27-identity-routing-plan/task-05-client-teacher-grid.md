@@ -22,7 +22,7 @@
 
 Precedents: task 4's `details-step` / `wizard-step` components, mockup `student.jsx` → `SlotDayList`, `SlotChip`, `SSlots` (layout only — picking, rank badges and the "Target / Picked" footer are slice 3).
 
-- [ ] **Step 1: Write the failing page-spec cases**
+- [x] **Step 1: Write the failing page-spec cases**
 
 In `ui\pages\student-form\student-form.page.spec.ts`, add this `describe` block **inside** `describe('StudentFormPage', …)`, after the `details step` block:
 
@@ -84,7 +84,7 @@ The two `it.each` rows are the page-level half of US-51 ("A sees Cohen's grid, B
 Run (in `client\`): `npm test -- --watch=false`
 Expected: FAIL — the details step has no Continue button yet (`clickContinue` hits `null`) and `app-slots-step` does not exist. The "no availability" case already passes.
 
-- [ ] **Step 2: Translations (en + he, same commit)**
+- [x] **Step 2: Translations (en + he, same commit)**
 
 In **both** files, add a `"slots"` object inside `"studentForm"`, directly after `"details"` (add the comma after the closing brace of `"details"`).
 
@@ -118,7 +118,7 @@ node -e "const f=(o,p='')=>Object.entries(o).flatMap(([k,v])=>typeof v==='object
 
 Expected: `[] []`.
 
-- [ ] **Step 3: `SlotDayListComponent` (mockup `SlotDayList` / `SlotChip`)**
+- [x] **Step 3: `SlotDayListComponent` (mockup `SlotDayList` / `SlotChip`)**
 
 `ui\components\slot-day-list\slot-day-list.component.ts`:
 
@@ -257,7 +257,7 @@ Notes:
 - Unavailable chips use the existing `--app-slot-unavailable` stripes (same token as the admin grid) plus a visually hidden "Unavailable" for screen readers — the state is never color-only.
 - Chips are list items, not buttons: nothing is pickable until slice 3. `min-height: 2.5rem` already reserves the 40px touch target slice 3 needs.
 
-- [ ] **Step 4: `SlotsStepComponent`**
+- [x] **Step 4: `SlotsStepComponent`**
 
 `ui\components\slots-step\slots-step.component.ts`:
 
@@ -296,7 +296,7 @@ export class SlotsStepComponent {
 
 No footer content in this slice, so the wizard footer collapses (task 4 `:empty` rule). Slice 3 adds the "Target / Picked" footer and the review action here.
 
-- [ ] **Step 5: Details step — Continue to the grid**
+- [x] **Step 5: Details step — Continue to the grid**
 
 In `ui\components\details-step\details-step.component.ts`:
 
@@ -327,7 +327,7 @@ In `ui\components\details-step\details-step.component.html`, add this block afte
 
 A teacher with no grid this week never gets a Continue — the notice is the end of the flow (**Review Focus 2**).
 
-- [ ] **Step 6: Store — grid days and the slots step**
+- [x] **Step 6: Store — grid days and the slots step**
 
 In `state\student-form.store.ts`:
 
@@ -359,7 +359,7 @@ In `state\student-form.store.ts`:
 
 `slotDays` re-computes on a language switch, so day dates re-format without leaving the step. The caption for this step (`studentForm.weekTeacherCaption`) was already mapped in task 4.
 
-- [ ] **Step 7: Wire the page**
+- [x] **Step 7: Wire the page**
 
 In `ui\pages\student-form\student-form.page.ts`, add the import after the `IdentifyStepComponent` import:
 
@@ -386,14 +386,14 @@ In `ui\pages\student-form\student-form.page.html`:
                 }
    ```
 
-- [ ] **Step 8: Run the specs to verify they pass**
+- [x] **Step 8: Run the specs to verify they pass**
 
 Run (in `client\`): `npm test -- --watch=false`
 Expected: every spec PASSES — including the 4 new slots-step cases.
 
 Then `npm run build` → success, no new warnings.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add client/src/app/features/student-form client/public/i18n/en.json client/public/i18n/he.json
