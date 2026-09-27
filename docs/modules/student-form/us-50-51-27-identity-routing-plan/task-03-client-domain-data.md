@@ -30,7 +30,7 @@
 
 `domain\` stays free of Angular and of `data\` imports (layer direction `ui → state → data → domain`): `StudentSlot` is the domain's own shape, and the `SlotForIdentifyStudentResponse` DTO is structurally identical, so the store can pass DTO slots straight in. Precedents: `domain\student-form-view.ts` + `.spec.ts` (pure function + `it.each`), `domain\week-label.ts`, `features\week-schedules\domain\slot.model.ts` (domain slot vs DTO slot), `data\submissions-api.service.ts`.
 
-- [ ] **Step 1: Write the failing domain specs**
+- [x] **Step 1: Write the failing domain specs**
 
 `domain\national-id-input.spec.ts`:
 
@@ -211,12 +211,12 @@ describe('groupSlotsByDay', () => {
 
 `isShortDay` is derived from the data (fewer windows than a full day), not from "is it Friday" — the grid shape stays the backend's (requirements §5.3); the client only labels what it receives. The time label is a wall-clock string slice, never a `Date` (client-i18n rule 6).
 
-- [ ] **Step 2: Run the specs to verify they fail**
+- [x] **Step 2: Run the specs to verify they fail**
 
 Run (in `client\`): `npm test -- --watch=false`
 Expected: FAIL — the four new spec files cannot resolve `./national-id-input`, `./name-initials`, `./student-form-step(.enum)`, `./slot-day`.
 
-- [ ] **Step 3: Enums**
+- [x] **Step 3: Enums**
 
 `domain\transmission.enum.ts`:
 
@@ -252,7 +252,7 @@ export enum StudentFormStep {
 
 `Transmission` duplicates `features\teachers\domain\transmission.enum.ts` on purpose — features never import each other (client-architecture anti-patterns).
 
-- [ ] **Step 4: Wizard steps**
+- [x] **Step 4: Wizard steps**
 
 `domain\student-form-step.ts`:
 
@@ -272,7 +272,7 @@ export function stepNumberOf(step: StudentFormStep): number {
 
 Slice 3 inserts `target` and `review` here; the counter follows automatically (README decision 8).
 
-- [ ] **Step 5: National ID input mask**
+- [x] **Step 5: National ID input mask**
 
 `domain\national-id-input.ts`:
 
@@ -296,7 +296,7 @@ export function isCompleteNationalId(digits: string): boolean {
 
 `\s` covers regular and non-breaking spaces; the bidi marks mirror the set `NationalId.Of` strips on the server. Anything else (a letter) is left in place so the student sees why Continue stays disabled instead of having their input silently rewritten.
 
-- [ ] **Step 6: Name initials**
+- [x] **Step 6: Name initials**
 
 `domain\name-initials.ts`:
 
@@ -317,7 +317,7 @@ export function nameInitials(name: string): string {
 
 Display formatting for the mockup's avatar (`SDetails` → "AC"); `Array.from` keeps a surrogate pair intact.
 
-- [ ] **Step 7: Week date helper**
+- [x] **Step 7: Week date helper**
 
 Replace `domain\week-label.ts` with (behavior of the existing exports is unchanged — `week-label.spec.ts` keeps passing):
 
@@ -352,7 +352,7 @@ export function weekRangeLabel(weekStart: string, locale: string): string {
 
 `weekStart` is a calendar date (`yyyy-MM-dd`), not an instant — building a local `Date` from its parts is correct in any browser zone (same reasoning as slice 1).
 
-- [ ] **Step 8: Slot days**
+- [x] **Step 8: Slot days**
 
 `domain\slot-day.ts`:
 
@@ -439,12 +439,12 @@ function timeLabel(localTime: string): string {
 
 `filter` returns a new array before `sort`, so the input is never mutated. Day names are **not** formatted here — they come from `weekGrid.days.*` translation keys in the template (client-i18n: "day names come from translation keys, not from `Date` formatting").
 
-- [ ] **Step 9: Run the domain specs to verify they pass**
+- [x] **Step 9: Run the domain specs to verify they pass**
 
 Run (in `client\`): `npm test -- --watch=false`
 Expected: every spec PASSES, including the untouched `week-label.spec.ts`, `jerusalem-time.spec.ts`, `student-form-view.spec.ts`, page and routes specs.
 
-- [ ] **Step 10: DTOs**
+- [x] **Step 10: DTOs**
 
 `data\identify-student.request.ts`:
 
@@ -482,7 +482,7 @@ export interface SlotForIdentifyStudentResponse {
 
 Names match the backend classes exactly (client-architecture "DTO Interfaces").
 
-- [ ] **Step 11: Write the failing API-service spec**
+- [x] **Step 11: Write the failing API-service spec**
 
 `data\submissions-api.service.spec.ts`:
 
@@ -524,7 +524,7 @@ This pins **Review Focus 4** on the client side. (A `subscribe()` in a spec is f
 
 Run: `npm test -- --watch=false` → FAIL: `identifyStudent` does not exist on `SubmissionsApiService`.
 
-- [ ] **Step 12: API method**
+- [x] **Step 12: API method**
 
 Replace `data\submissions-api.service.ts` with:
 
