@@ -23,7 +23,7 @@
 
 The interface member and its EF implementation land together: `DrivingLessons.Application.Test` references Infrastructure, so the test project does not compile until `StudentQueries` implements the new member. Precedents to open before coding: `Queries\GetPublicationByLink\GetPublicationByLinkInteractor.cs` (query interactor + link lookup), `Queries\GetWeekSchedule\GetWeekScheduleResponse.cs` (slot DTO with computed local times), `Infrastructure\...\Queries\StudentQueries.cs` (student ⋈ teacher ⋈ car query syntax), `Infrastructure\...\Queries\PublicationQueries.cs` → `GetDashboardAsync` (two-step query, slots via `SelectMany`), `tests\DrivingLessons.Application.Test\Queries\GetPublicationByLinkInteractorTest.cs` (test shape).
 
-- [ ] **Step 1: Write the failing interactor tests**
+- [x] **Step 1: Write the failing interactor tests**
 
 Create `tests\DrivingLessons.Application.Test\Queries\IdentifyStudentInteractorTest.cs`:
 
@@ -179,12 +179,12 @@ Why these tests:
 - `Not_Found_Message_Does_Not_Reveal_The_National_Id` pins Review Focus 4: the exception message becomes the ProblemDetails `detail` returned to an anonymous caller.
 - `Publication_Must_Exist_For_The_Link` explicitly configures `null` — an unconfigured FakeItEasy `Task<T?>` returns a dummy object, not null.
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~IdentifyStudentInteractorTest"`
 Expected: build FAILS — the `IdentifyStudent` namespace, `IdentifyStudentRequest`, `IdentifyStudentResponse`, `IdentifyStudentInteractor`, `StudentNotFoundException`, and `GetActiveByNationalIdAsync` do not exist.
 
-- [ ] **Step 3: Not-found exception**
+- [x] **Step 3: Not-found exception**
 
 `src\DrivingLessons.Application\Common\Exceptions\StudentNotFoundException.cs`:
 
@@ -202,7 +202,7 @@ public class StudentNotFoundException : NotFoundException
 
 Payload-free by design: the only identifier available is the national ID (PII, code-style "never log PII"), and the message is returned to an anonymous caller.
 
-- [ ] **Step 4: Request DTO**
+- [x] **Step 4: Request DTO**
 
 `src\DrivingLessons.Application\Queries\IdentifyStudent\IdentifyStudentRequest.cs`:
 
@@ -214,7 +214,7 @@ public record IdentifyStudentRequest(string NationalId);
 
 Non-nullable `string` makes MVC treat the property as required — a missing or empty `nationalId` is a 400 before the interactor runs (task 2 smoke-tests it).
 
-- [ ] **Step 5: Response DTOs**
+- [x] **Step 5: Response DTOs**
 
 `src\DrivingLessons.Application\Queries\IdentifyStudent\IdentifyStudentResponse.cs`:
 
@@ -256,7 +256,7 @@ public class SlotForIdentifyStudentResponse
 
 Same shape as `SlotForGetWeekScheduleResponse` (computed wall-clock times, requirements §8.3) but a distinct class — Swagger needs globally unique DTO names, and the admin DTO carries ids this student-safe response must not grow into. The top-level response has no `Selector`: it is composed from two queries (Step 8), like `ItemForFindStudentsResponse`.
 
-- [ ] **Step 6: Query interface member**
+- [x] **Step 6: Query interface member**
 
 Replace `src\DrivingLessons.Application\Queries\IStudentQueries.cs` with:
 
@@ -275,7 +275,7 @@ public interface IStudentQueries
 }
 ```
 
-- [ ] **Step 7: Interactor**
+- [x] **Step 7: Interactor**
 
 `src\DrivingLessons.Application\Queries\IdentifyStudent\IdentifyStudentInteractor.cs`:
 
@@ -313,7 +313,7 @@ public class IdentifyStudentInteractor
 
 Order matters: the link is resolved first, so an unknown or draft link is a 404 whatever the body holds (the student never reaches the roster through a dead link). No business rule lives here — "does it exist?" is the application's question (ddd-architecture rule 4); `NationalId.Of` owns validity.
 
-- [ ] **Step 8: EF implementation**
+- [x] **Step 8: EF implementation**
 
 Replace `src\DrivingLessons.Infrastructure\EntityFramework\Queries\StudentQueries.cs` with:
 
@@ -422,7 +422,7 @@ Notes for the implementer:
 - A teacher with no week schedule for the week yields `Slots = []` (README decision 5) — `Where` simply matches nothing.
 - Slots are ordered Sunday→Friday (`DayOfWeek` Sunday = 0) then Morning→Evening (`SlotWindowType` 10…40), matching the admin grid query.
 
-- [ ] **Step 9: Register the interactor**
+- [x] **Step 9: Register the interactor**
 
 In `src\DrivingLessons.Application\DependencyInjection.cs`, add the using after `using DrivingLessons.Application.Queries.GetWeekSchedule;`:
 
@@ -438,14 +438,14 @@ and register it after `services.AddScoped<FindStudentsInteractor>();`:
 
 (`IStudentQueries` and `IPublicationQueries` are already registered in `AddInfrastructure`.)
 
-- [ ] **Step 10: Run tests to verify they pass**
+- [x] **Step 10: Run tests to verify they pass**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~IdentifyStudentInteractorTest"`
 Expected: 7 tests PASS (4 methods + 3 data rows).
 
 Then: `dotnet build` and `dotnet test` — build clean (no new warnings), every test PASS.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add src/DrivingLessons.Application src/DrivingLessons.Infrastructure/EntityFramework/Queries/StudentQueries.cs tests/DrivingLessons.Application.Test/Queries/IdentifyStudentInteractorTest.cs
