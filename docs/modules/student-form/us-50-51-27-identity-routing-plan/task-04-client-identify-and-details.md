@@ -22,7 +22,7 @@
 
 Precedents to open before coding: the current `state\student-form.store.ts` (resource + 404-swallowing loader + `isStatus`), `ui\components\status-message\` (dumb component, content projection), `ui\pages\student-form\student-form.page.html` (dates card styles to mirror for the details card), `features\auth\login.component.html` (`p-message`, `fluid` button), mockup `student.jsx` → `SIdKnown`, `SIdUnknown`, `SDetails`, `shared.jsx` → `MStep`, `MFoot`, `MkField`.
 
-- [ ] **Step 1: Write the failing page spec**
+- [x] **Step 1: Write the failing page spec**
 
 Replace `ui\pages\student-form\student-form.page.spec.ts` with the file below. The read-only table loses its `open` row (the open view now asks for an ID), and new `describe` blocks cover the identify and details steps.
 
@@ -335,12 +335,12 @@ describe('StudentFormPage', () => {
 
 Why these cases: separators (**Review Focus 3**), short-ID submit (leading zero dropped), 404/409/500 each map to their own message (README decision 3), "drops the previous result" is **Review Focus 5**, no-grid teacher is **Review Focus 2**. `TranslocoTestingModule` with empty translations renders keys, so assertions use CSS hooks, directly bound values (teacher/car name), and key names — never English copy. `vi` is a Vitest global in this workspace (the existing specs use `describe`/`it`/`expect` globals).
 
-- [ ] **Step 2: Run the spec to verify it fails**
+- [x] **Step 2: Run the spec to verify it fails**
 
 Run (in `client\`): `npm test -- --watch=false`
 Expected: FAIL — the open view still renders the slice-1 status panel, so `#national-id`, `.identify__*`, `.details__*` are missing (the five read-only rows still pass).
 
-- [ ] **Step 3: Translations (en + he, same commit)**
+- [x] **Step 3: Translations (en + he, same commit)**
 
 In **both** files, replace the whole `"studentForm"` object with the one below (it keeps every slice-1 key except `open`, which the ID step replaces — README decision 13).
 
@@ -476,7 +476,7 @@ node -e "const f=(o,p='')=>Object.entries(o).flatMap(([k,v])=>typeof v==='object
 
 Expected: `[] []`. Also confirm nothing else referenced the deleted keys: `grep -rn "studentForm.open" src` → no matches once Step 7 lands.
 
-- [ ] **Step 4: Store — identify lookup, wizard step, captions**
+- [x] **Step 4: Store — identify lookup, wizard step, captions**
 
 Replace `state\student-form.store.ts` with:
 
@@ -701,7 +701,7 @@ How it behaves (read this before touching it):
 - The national ID lives only in a private signal for the visit — never `localStorage`, never the URL (**Review Focus 4**). The store is page-provided (slice 1 decision 7), so it is gone when the student leaves.
 - `captionKey`/`captionParams` feed the shell caption: none on the ID step, week on details, week · teacher on the slots step (task 5 renders that step).
 
-- [ ] **Step 5: `WizardStepComponent` — counter, heading, intro, sticky footer**
+- [x] **Step 5: `WizardStepComponent` — counter, heading, intro, sticky footer**
 
 `ui\components\wizard-step\wizard-step.component.ts`:
 
@@ -814,7 +814,7 @@ export class WizardStepComponent {
 
 Mockup mapping: `MStep` → counter, `stTitle`/`stBody` → heading/intro (same sizes as slice 1's `status__heading`), `MFoot` → sticky footer. A step with no footer action (details without availability; the slots step in this slice) collapses the empty footer.
 
-- [ ] **Step 6: `IdentifyStepComponent` (mockup `SIdKnown` / `SIdUnknown`)**
+- [x] **Step 6: `IdentifyStepComponent` (mockup `SIdKnown` / `SIdUnknown`)**
 
 `ui\components\identify-step\identify-step.component.ts`:
 
@@ -1019,7 +1019,7 @@ Behavior notes:
 - A disabled submit button also blocks Enter — which is exactly the locked state; in every enabled state, Enter and the button do the same thing.
 - If `[invalid]` is not an input of the installed `pInputText`, fall back to `[class.p-invalid]="isRejected()"` (checked while planning: the installed PrimeNG 21 `InputText` exposes an `invalid()` input).
 
-- [ ] **Step 7: `DetailsStepComponent` (mockup `SDetails`, US-27)**
+- [x] **Step 7: `DetailsStepComponent` (mockup `SDetails`, US-27)**
 
 `ui\components\details-step\details-step.component.ts`:
 
@@ -1182,7 +1182,7 @@ The two-class selector outranks `.details__card dd`, so only the transmission va
 
 US-27 mapping: "You are submitting availability for" + the teacher as the page's `h1` (avatar initials from the roster name), then a read-only card — Student, **Transmission** (from the roster car), Car, Week. There is nothing to choose and nothing to contest: no teacher picker, no "not my teacher", no transmission question (ADR 0003). The Continue button arrives in task 5 together with the step it leads to, so this commit has no dead control.
 
-- [ ] **Step 8: Wire the page**
+- [x] **Step 8: Wire the page**
 
 Replace `ui\pages\student-form\student-form.page.ts` with:
 
@@ -1274,18 +1274,18 @@ In `ui\pages\student-form\student-form.page.html`:
 
 Leave every other `@case` and `student-form.page.scss` untouched. `@let` keeps the caption expression free of function calls (client-state "no function calls in templates except signal reads").
 
-- [ ] **Step 9: Run the spec to verify it passes**
+- [x] **Step 9: Run the spec to verify it passes**
 
 Run (in `client\`): `npm test -- --watch=false`
 Expected: every spec PASSES — the 5 read-only rows, 7 identify-step cases, 2 details-step cases, plus the task-3 domain/API specs and the untouched routes spec.
 
 Then: `npm run build` → success, no new warnings; `grep -rn "studentForm.open" src` → no matches.
 
-- [ ] **Step 10: Quick look in the browser (optional, full verification is task 6)**
+- [x] **Step 10: Quick look in the browser (optional, full verification is task 6)**
 
 With `api-smoke` (task 2) and `client` running, open `/s/{LINK}` at the mobile preset: the ID step shows "שלב 1 מתוך 3", typing `000000018` shows "מצאנו אתכם — Smoke Student A." and Continue leads to the details card for Smoke Cohen. Stop here if anything looks off and fix before committing.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add client/src/app/features/student-form client/public/i18n/en.json client/public/i18n/he.json
