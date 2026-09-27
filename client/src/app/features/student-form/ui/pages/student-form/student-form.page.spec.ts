@@ -375,4 +375,55 @@ describe('StudentFormPage', () => {
             expect(page(fixture).querySelector('.details__no-availability')).not.toBeNull();
         });
     });
+
+    describe('slots step', () => {
+        it.each([
+            { teacherName: 'Teacher Cohen', unavailable: [] as string[] },
+            { teacherName: 'Teacher Levi', unavailable: ['sunday-morning', 'friday-noon'] },
+        ])("shows $teacherName's own week grid", async ({ teacherName, unavailable }) => {
+            //given
+            const student = studentOf(teacherName, Transmission.automatic, weekSlots(unavailable));
+            provideOpenLinkIdentifying(identifyingAs(student));
+            const fixture = await renderPage();
+            await identifyAndContinue(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('app-slots-step')).not.toBeNull();
+            expect(page(fixture).querySelectorAll('.slot-day').length).toBe(6);
+            expect(page(fixture).querySelectorAll('.slot-chip').length).toBe(22);
+            expect(page(fixture).querySelectorAll('.slot-chip--unavailable').length).toBe(unavailable.length);
+            expect(page(fixture).querySelector('.student-shell__caption')?.textContent).toContain(
+                'studentForm.weekTeacherCaption',
+            );
+        });
+
+        it('never offers the grid when the teacher has no availability this week', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(studentOf('Teacher Levi', Transmission.manual, [])));
+            const fixture = await renderPage();
+
+            //when
+            await identifyAndContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('.details__no-availability')).not.toBeNull();
+            expect(continueButton(fixture)).toBeNull();
+        });
+
+        it('keeps the week grid read-only', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await identifyAndContinue(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelectorAll('main button, main input').length).toBe(0);
+        });
+    });
 });

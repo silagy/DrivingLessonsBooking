@@ -47,8 +47,16 @@
                             [carName]="student.carName"
                             [transmission]="student.transmission"
                             [weekLabel]="'studentForm.weekCaption' | transloco: store.weekParams()"
-                            [hasAvailability]="store.hasAvailability()" />
+                            [hasAvailability]="store.hasAvailability()"
+                            (continued)="store.continueToSlots()" />
                     }
+                }
+                @case (steps.slots) {
+                    <app-slots-step
+                        [stepNumber]="store.stepNumber()"
+                        [stepCount]="store.stepCount"
+                        [teacherName]="store.teacherName()"
+                        [days]="store.slotDays()" />
                 }
             }
         }

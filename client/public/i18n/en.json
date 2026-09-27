@@ -294,6 +294,12 @@
       },
       "noAvailabilityTitle": "No lesson slots yet.",
       "noAvailabilityBody": "{{teacherName}} hasn't published availability for this week. Please contact your school."
+    },
+    "slots": {
+      "title": "{{teacherName}}'s week",
+      "body": "These are {{teacherName}}'s slots for this week. Striped slots are unavailable.",
+      "shortDay": "morning & noon only",
+      "unavailable": "Unavailable"
     }
   },
   "general": {

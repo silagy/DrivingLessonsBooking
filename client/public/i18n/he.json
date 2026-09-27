@@ -294,6 +294,12 @@
       },
       "noAvailabilityTitle": "עדיין אין שעות לשבוע הזה.",
       "noAvailabilityBody": "אין עדיין זמינות שפורסמה אצל {{teacherName}} לשבוע הזה. פנו לבית הספר."
+    },
+    "slots": {
+      "title": "השבוע של {{teacherName}}",
+      "body": "אלה השעות של {{teacherName}} לשבוע הזה. שעות מקווקוות אינן זמינות.",
+      "shortDay": "בוקר וצהריים בלבד",
+      "unavailable": "לא זמין"
     }
   },
   "general": {

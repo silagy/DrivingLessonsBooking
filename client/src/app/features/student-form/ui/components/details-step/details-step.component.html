@@ -32,4 +32,10 @@
             </span>
         </p-message>
     }
+
+    @if (hasAvailability()) {
+        <div wizardFooter>
+            <p-button type="button" fluid [label]="'studentForm.continue' | transloco" (onClick)="continued.emit()" />
+        </div>
+    }
 </app-wizard-step>

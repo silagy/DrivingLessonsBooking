@@ -9,6 +9,7 @@ import { IdentifyStatus } from '../domain/identify-status.enum';
 import { formatWindowInstant } from '../domain/jerusalem-time';
 import { nameInitials } from '../domain/name-initials';
 import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-id-input';
+import { groupSlotsByDay } from '../domain/slot-day';
 import { stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
 import { StudentFormStep } from '../domain/student-form-step.enum';
 import { viewForPublicationState } from '../domain/student-form-view';
@@ -127,6 +128,14 @@ export class StudentFormStore {
     readonly teacherName = computed(() => this.student()?.teacherName ?? '');
     readonly teacherInitials = computed(() => nameInitials(this.teacherName()));
     readonly hasAvailability = computed(() => (this.student()?.slots.length ?? 0) > 0);
+    readonly slotDays = computed(() => {
+        const student = this.student();
+        const publication = this.publication();
+
+        return student && publication
+            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang())
+            : [];
+    });
 
     readonly currentStep = this.step.asReadonly();
     readonly stepNumber = computed(() => stepNumberOf(this.step()));
@@ -167,6 +176,14 @@ export class StudentFormStore {
         }
 
         this.step.set(StudentFormStep.details);
+    }
+
+    continueToSlots(): void {
+        if (!this.hasAvailability()) {
+            return;
+        }
+
+        this.step.set(StudentFormStep.slots);
     }
 
     private formatInstant(utcIso: string | undefined): string {
