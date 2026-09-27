@@ -37,7 +37,7 @@ Precedents to open before coding: `Domain\Entities\WeekSchedule.cs` (aggregate w
 
 Target ≥ 1 is already guaranteed by the `TargetSessionCount` type (task 1). Ranks are positions in the pick list, assigned 1…n in selection order (US-37) — there is no primary/alternative type (decision 4). `Revise` is a full replace (roadmap decision 3): the add/remove helpers stay private, and re-sending the same list is allowed (revising is not a state transition, so "not idempotent" does not apply). There is **no "already exists" rule here**: whether a submission exists is the application's question (task 4), like `WeekScheduleAlreadyExistsException` in `CreateWeekScheduleInteractor`.
 
-- [ ] **Step 1: Test helpers — `Faker.FakeUtcInstant`, scenario and fake builder**
+- [x] **Step 1: Test helpers — `Faker.FakeUtcInstant`, scenario and fake builder**
 
 In `tests\DrivingLessons.Domain.Test\Common\Faker.cs`, add after `FakeUtcDate()`:
 
@@ -125,7 +125,7 @@ public static class SubmissionFakeBuilder
 
 A "scenario" is the only valid starting point for a submission: an **open** publication, an **active** student, and **that student's teacher's** week schedule for **that publication's week**. Each guard test breaks exactly one of those facts (`scenario with { … }`). There is no state enum on `Submission`, so there is no `StateBuilders` dictionary.
 
-- [ ] **Step 2: Write the failing aggregate tests**
+- [x] **Step 2: Write the failing aggregate tests**
 
 `tests\DrivingLessons.Domain.Test\Entities\SubmissionTest.cs`:
 
@@ -714,12 +714,12 @@ What these pin (see README Review Focus):
 - `Revise__Moves_To_The_Students_Current_Teachers_Week_Schedule` → README open item 8 (a roster re-upload moved the student mid-week; the revised list lives on the new teacher's grid).
 - `Revise__Must_Be_For_Its_Publication_And_Student` / `Revise__Must_Be_For_Its_Publication` → both halves of `MustBeFor`.
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `dotnet test tests\DrivingLessons.Domain.Test\DrivingLessons.Domain.Test.csproj --filter "FullyQualifiedName~SubmissionTest"`
 Expected: build FAILS — `Submission`, `SlotRequest`, the two events and the eight exceptions do not exist.
 
-- [ ] **Step 4: Events**
+- [x] **Step 4: Events**
 
 `src\DrivingLessons.Domain\Events\SubmissionCreated.cs`:
 
@@ -755,7 +755,7 @@ public record SubmissionRevised(
 
 One event per operation (roadmap decision 3: one `SubmissionRevised`, no per-request add/remove events). No handler exists yet — `DomainEventDispatcher` simply finds none.
 
-- [ ] **Step 5: Exceptions**
+- [x] **Step 5: Exceptions**
 
 Every message is fixed text: these reach an anonymous caller as the ProblemDetails `detail` (the client never renders it — it maps the status), so no id, national ID or constraint text goes in.
 
@@ -891,7 +891,7 @@ public class SubmissionMustBeForPublicationAndStudentException : DomainException
 }
 ```
 
-- [ ] **Step 6: `SlotRequest` child entity**
+- [x] **Step 6: `SlotRequest` child entity**
 
 `src\DrivingLessons.Domain\Entities\SlotRequest.cs`:
 
@@ -938,7 +938,7 @@ public class SlotRequest : Entity<SlotRequestId>
 
 The request references its slot **by id** (the `Slot` belongs to another aggregate, `WeekSchedule`). It has no `internal` mutators: a revision replaces the whole list (roadmap decision 3), and slice 4's reorder will add `internal void SetRank(Rank)` when it needs one.
 
-- [ ] **Step 7: `Submission` aggregate root**
+- [x] **Step 7: `Submission` aggregate root**
 
 `src\DrivingLessons.Domain\Entities\Submission.cs`:
 
@@ -1153,14 +1153,14 @@ Notes for the implementer:
 - `Revise` checks `MustBeFor` first so a wrong student is reported as a wrong student, not as a mismatched grid. It re-points `WeekScheduleId` to the grid it was validated against: if a roster re-upload moved the student to another teacher mid-week, the revised list lives on the new teacher's grid (README open item 8).
 - `index + 1` is named `position` because a rank is the 1-based position (code-style: no bare magic numbers).
 
-- [ ] **Step 8: Run tests to verify they pass**
+- [x] **Step 8: Run tests to verify they pass**
 
 Run: `dotnet test tests\DrivingLessons.Domain.Test\DrivingLessons.Domain.Test.csproj --filter "FullyQualifiedName~SubmissionTest"`
 Expected: 29 tests PASS (17 `Create…` incl. data rows, 12 `Revise…`).
 
 Then: `dotnet build` and `dotnet test` — build clean (no new warnings), every test PASS.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/DrivingLessons.Domain tests/DrivingLessons.Domain.Test
