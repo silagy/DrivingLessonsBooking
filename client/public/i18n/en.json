@@ -242,6 +242,9 @@
   "studentForm": {
     "loading": "Loading the form…",
     "weekCaption": "Week {{weekNumber}} · {{weekRange}}",
+    "weekTeacherCaption": "Week {{weekNumber}} · {{weekRange}} · {{teacherName}}",
+    "step": "Step {{current}} of {{total}}",
+    "continue": "Continue",
     "window": {
       "opens": "Opens",
       "closes": "Closes",
@@ -251,10 +254,6 @@
       "title": "Submissions aren't open yet",
       "body": "The form for week {{weekNumber}} ({{weekRange}}) isn't open yet.",
       "hint": "Come back through the same link — no need for a new one."
-    },
-    "open": {
-      "title": "Submissions are open",
-      "body": "The form for week {{weekNumber}} ({{weekRange}}) is open."
     },
     "closed": {
       "title": "Submissions are closed",
@@ -269,6 +268,38 @@
       "title": "Something went wrong",
       "body": "We couldn't load the form. Check your connection and try again.",
       "retry": "Try again"
+    },
+    "identify": {
+      "title": "Enter your national ID",
+      "body": "We match it to the school roster to load your details — no password needed.",
+      "label": "National ID",
+      "hint": "9 digits, as registered with the school",
+      "checking": "Checking the roster…",
+      "foundTitle": "Found you — {{studentName}}.",
+      "foundBody": "Let's collect your availability for week {{weekNumber}} with {{teacherName}}.",
+      "notOnRosterTitle": "We don't have you on file.",
+      "notOnRosterBody": "This ID isn't on the school's roster, so there's nothing to submit. Please contact your school to be added.",
+      "invalidId": "This doesn't look like a valid national ID. Check the digits and try again.",
+      "failed": "We couldn't check your ID right now. Check your connection and try again."
+    },
+    "details": {
+      "lead": "You are submitting availability for",
+      "student": "Student",
+      "transmission": "Transmission",
+      "car": "Car",
+      "week": "Week",
+      "transmissions": {
+        "automatic": "Automatic",
+        "manual": "Manual"
+      },
+      "noAvailabilityTitle": "No lesson slots yet.",
+      "noAvailabilityBody": "{{teacherName}} hasn't published availability for this week. Please contact your school."
+    },
+    "slots": {
+      "title": "{{teacherName}}'s week",
+      "body": "These are {{teacherName}}'s slots for this week. Striped slots are unavailable.",
+      "shortDay": "morning & noon only",
+      "unavailable": "Unavailable"
     }
   },
   "general": {

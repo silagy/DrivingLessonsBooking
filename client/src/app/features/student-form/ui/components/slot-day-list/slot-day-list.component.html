@@ -1,0 +1,24 @@
+<ol class="slot-days">
+    @for (slotDay of days(); track slotDay.day) {
+        <li class="slot-day">
+            <div class="slot-day__header">
+                <span class="slot-day__name">{{ 'weekGrid.days.' + slotDay.day | transloco }}</span>
+                <span class="slot-day__date">{{ slotDay.dateLabel }}</span>
+                @if (slotDay.isShortDay) {
+                    <span class="slot-day__note">{{ 'studentForm.slots.shortDay' | transloco }}</span>
+                }
+            </div>
+            <ul class="slot-day__chips">
+                @for (chip of slotDay.chips; track chip.id) {
+                    <li class="slot-chip" [class.slot-chip--unavailable]="chip.isUnavailable">
+                        <span class="slot-chip__window">{{ 'weekGrid.windows.' + chip.window | transloco }}</span>
+                        <span class="slot-chip__time" dir="ltr">{{ chip.timeLabel }}</span>
+                        @if (chip.isUnavailable) {
+                            <span class="p-hidden-accessible">{{ 'studentForm.slots.unavailable' | transloco }}</span>
+                        }
+                    </li>
+                }
+            </ul>
+        </li>
+    }
+</ol>

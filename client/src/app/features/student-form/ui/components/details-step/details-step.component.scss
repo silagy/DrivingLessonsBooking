@@ -1,0 +1,81 @@
+:host {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.details__lead {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--app-text-secondary);
+}
+
+.details__teacher {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.details__avatar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 999px;
+    background: var(--app-steel-light);
+    color: var(--app-whale);
+    font-family: var(--app-font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.details__teacher-name {
+    margin: 0;
+    font-family: var(--app-font-display);
+    font-weight: 700;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: var(--app-ink);
+}
+
+.details__card {
+    margin: 0.375rem 0 0;
+    padding: 0.25rem 1rem;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-shadow-card);
+
+    dt {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--app-text-secondary);
+    }
+
+    dd {
+        margin: 0;
+        font-family: var(--app-font-display);
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: var(--app-ink);
+        text-align: end;
+    }
+}
+
+.details__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.75rem;
+}
+
+.details__row + .details__row {
+    border-block-start: 1px solid var(--app-bg-muted);
+}
+
+.details__card .details__transmission {
+    color: var(--p-sky-700);
+}

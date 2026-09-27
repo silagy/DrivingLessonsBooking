@@ -1,5 +1,6 @@
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.FindStudents;
+using DrivingLessons.Application.Queries.IdentifyStudent;
 using DrivingLessons.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,5 +45,50 @@ public class StudentQueries : IStudentQueries
                     };
 
         return await query.ToListAsync();
+    }
+
+    public async Task<IdentifyStudentResponse?> GetActiveByNationalIdAsync(NationalId nationalId, DateOnly weekStart)
+    {
+        var resolvedWeekStart = WeekStart.Of(weekStart);
+
+        var query = from student in dbContext.Students
+                    join teacher in dbContext.Teachers
+                        on student.TeacherId equals teacher.Id
+                    join car in dbContext.Cars
+                        on student.CarId equals car.Id
+                    where student.NationalId == nationalId && student.IsActive
+                    select new
+                    {
+                        TeacherId = teacher.Id,
+                        StudentName = student.Name.Value,
+                        TeacherName = teacher.Name.Value,
+                        CarName = car.Name.Value,
+                        car.Transmission
+                    };
+
+        var identified = await query.FirstOrDefaultAsync();
+
+        if (identified is null)
+        {
+            return null;
+        }
+
+        var slots = await dbContext
+                            .WeekSchedules
+                            .Where(x => x.TeacherId == identified.TeacherId && x.WeekStart == resolvedWeekStart)
+                            .SelectMany(x => x.Slots)
+                            .OrderBy(slot => slot.Day)
+                            .ThenBy(slot => slot.Window)
+                            .Select(SlotForIdentifyStudentResponse.Selector)
+                            .ToListAsync();
+
+        return new IdentifyStudentResponse
+        {
+            StudentName = identified.StudentName,
+            TeacherName = identified.TeacherName,
+            CarName = identified.CarName,
+            Transmission = identified.Transmission,
+            Slots = slots
+        };
     }
 }

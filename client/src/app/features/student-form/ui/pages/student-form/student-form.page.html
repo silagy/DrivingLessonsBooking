@@ -1,4 +1,5 @@
-<app-student-shell [caption]="store.isOpen() ? ('studentForm.weekCaption' | transloco: store.weekParams()) : ''">
+@let captionKey = store.captionKey();
+<app-student-shell [caption]="captionKey ? (captionKey | transloco: store.captionParams()) : ''">
     @switch (store.view()) {
         @case (views.loading) {
             <div class="student-form__loading">
@@ -22,15 +23,42 @@
             </app-status-message>
         }
         @case (views.open) {
-            <app-status-message icon="pi pi-check" tone="success" [heading]="'studentForm.open.title' | transloco">
-                <p class="student-form__text">{{ 'studentForm.open.body' | transloco: store.weekParams() }}</p>
-                <dl class="student-form__window">
-                    <div class="student-form__window-row">
-                        <dt>{{ 'studentForm.window.closes' | transloco }}</dt>
-                        <dd>{{ store.closesAt() }}</dd>
-                    </div>
-                </dl>
-            </app-status-message>
+            @switch (store.currentStep()) {
+                @case (steps.identify) {
+                    <app-identify-step
+                        [stepNumber]="store.stepNumber()"
+                        [stepCount]="store.stepCount"
+                        [status]="store.identifyStatus()"
+                        [studentName]="store.studentName()"
+                        [teacherName]="store.teacherName()"
+                        [weekNumber]="store.weekParams().weekNumber"
+                        (nationalIdChanged)="store.changeNationalId($event)"
+                        (lookupRequested)="store.requestLookup($event)"
+                        (continued)="store.continueToDetails()" />
+                }
+                @case (steps.details) {
+                    @if (store.student(); as student) {
+                        <app-details-step
+                            [stepNumber]="store.stepNumber()"
+                            [stepCount]="store.stepCount"
+                            [teacherName]="student.teacherName"
+                            [teacherInitials]="store.teacherInitials()"
+                            [studentName]="student.studentName"
+                            [carName]="student.carName"
+                            [transmission]="student.transmission"
+                            [weekLabel]="'studentForm.weekCaption' | transloco: store.weekParams()"
+                            [hasAvailability]="store.hasAvailability()"
+                            (continued)="store.continueToSlots()" />
+                    }
+                }
+                @case (steps.slots) {
+                    <app-slots-step
+                        [stepNumber]="store.stepNumber()"
+                        [stepCount]="store.stepCount"
+                        [teacherName]="store.teacherName()"
+                        [days]="store.slotDays()" />
+                }
+            }
         }
         @case (views.closed) {
             <app-status-message icon="pi pi-lock" [heading]="'studentForm.closed.title' | transloco">

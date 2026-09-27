@@ -1,0 +1,67 @@
+<form class="identify" novalidate (submit)="onSubmit($event)">
+    <app-wizard-step
+        [stepNumber]="stepNumber()"
+        [stepCount]="stepCount()"
+        [heading]="'studentForm.identify.title' | transloco"
+        [intro]="'studentForm.identify.body' | transloco">
+        <div class="identify__field">
+            <label class="identify__label" for="national-id">{{ 'studentForm.identify.label' | transloco }}</label>
+            <input
+                pInputText
+                id="national-id"
+                class="identify__input"
+                type="text"
+                dir="ltr"
+                inputmode="numeric"
+                autocomplete="off"
+                aria-describedby="national-id-hint"
+                [invalid]="isRejected()"
+                (input)="onInput($event)" />
+            <small id="national-id-hint" class="identify__hint">{{ 'studentForm.identify.hint' | transloco }}</small>
+        </div>
+
+        <div class="identify__result" aria-live="polite">
+            @switch (status()) {
+                @case (statuses.checking) {
+                    <p class="identify__checking">
+                        <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+                        {{ 'studentForm.identify.checking' | transloco }}
+                    </p>
+                }
+                @case (statuses.found) {
+                    <p-message severity="success" class="identify__found">
+                        <span>
+                            <strong>{{ 'studentForm.identify.foundTitle' | transloco: { studentName: studentName() } }}</strong>
+                            {{
+                                'studentForm.identify.foundBody'
+                                    | transloco: { weekNumber: weekNumber(), teacherName: teacherName() }
+                            }}
+                        </span>
+                    </p-message>
+                }
+                @case (statuses.notOnRoster) {
+                    <p-message severity="error" class="identify__not-on-roster">
+                        <span>
+                            <strong>{{ 'studentForm.identify.notOnRosterTitle' | transloco }}</strong>
+                            {{ 'studentForm.identify.notOnRosterBody' | transloco }}
+                        </span>
+                    </p-message>
+                }
+                @case (statuses.invalidId) {
+                    <p-message severity="error" class="identify__invalid">
+                        {{ 'studentForm.identify.invalidId' | transloco }}
+                    </p-message>
+                }
+                @case (statuses.failed) {
+                    <p-message severity="warn" class="identify__failed">
+                        {{ 'studentForm.identify.failed' | transloco }}
+                    </p-message>
+                }
+            }
+        </div>
+
+        <div wizardFooter>
+            <p-button type="submit" fluid [label]="'studentForm.continue' | transloco" [disabled]="!canSubmit()" />
+        </div>
+    </app-wizard-step>
+</form>

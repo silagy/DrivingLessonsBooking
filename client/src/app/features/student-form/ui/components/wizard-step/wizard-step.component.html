@@ -1,0 +1,17 @@
+<section class="wizard-step">
+    <div class="wizard-step__body">
+        <p class="wizard-step__counter">
+            {{ 'studentForm.step' | transloco: { current: stepNumber(), total: stepCount() } }}
+        </p>
+        @if (heading()) {
+            <h1 class="wizard-step__heading">{{ heading() }}</h1>
+        }
+        @if (intro()) {
+            <p class="wizard-step__intro">{{ intro() }}</p>
+        }
+        <ng-content />
+    </div>
+    <footer class="wizard-step__footer">
+        <ng-content select="[wizardFooter]" />
+    </footer>
+</section>
