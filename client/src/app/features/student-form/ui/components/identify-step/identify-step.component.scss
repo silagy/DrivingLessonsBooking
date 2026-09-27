@@ -40,6 +40,10 @@
     display: none;
 }
 
+.identify__result .p-message-leave-active {
+    animation: none;
+}
+
 .identify__checking {
     display: flex;
     align-items: center;
