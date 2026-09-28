@@ -1108,6 +1108,58 @@ describe('StudentFormPage', () => {
             expect(page(fixture).querySelector('app-review-step')).toBeNull();
         });
 
+        it('checks the form again in an open window and replaces a list sent from another tab', async () => {
+            //given
+            const roster = { student: COHEN_STUDENT };
+            const createSubmission: SubmitCommand = vi.fn(failingWith(HTTP_CONFLICT));
+            const reviseSubmission = accepting();
+            provideOpenLinkSubmitting(() => of(roster.student), createSubmission, reviseSubmission);
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+            await clickContinue(fixture);
+            roster.student = { ...COHEN_STUDENT, hasSubmission: true };
+
+            //when
+            await press(fixture, '.review__recheck button');
+            const replacesNoticeShown = page(fixture).querySelector('.review__replaces') !== null;
+            await clickContinue(fixture);
+
+            //then
+            expect(replacesNoticeShown).toBe(true);
+            expect(createSubmission).toHaveBeenCalledTimes(1);
+            expect(reviseSubmission).toHaveBeenCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 1,
+                slotRequests: [{ slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null }],
+            });
+        });
+
+        it('checks the form again in an open window and drops a pick whose slot is no longer open', async () => {
+            //given
+            const roster = { student: COHEN_STUDENT };
+            const createSubmission: SubmitCommand = vi
+                .fn(accepting())
+                .mockImplementationOnce(failingWith(HTTP_CONFLICT));
+            provideOpenLinkSubmitting(() => of(roster.student), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+            await clickContinue(fixture);
+            roster.student = studentOf('Teacher Cohen', Transmission.automatic, weekSlots(['monday-evening']));
+
+            //when
+            await press(fixture, '.review__recheck button');
+            const reviewItemCount = page(fixture).querySelectorAll('.review__item').length;
+            await clickContinue(fixture);
+
+            //then
+            expect(reviewItemCount).toBe(1);
+            expect(createSubmission).toHaveBeenLastCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 1,
+                slotRequests: [{ slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null }],
+            });
+        });
+
         it('never submits twice while a submission is in flight', async () => {
             //given
             const createSubmission: SubmitCommand = vi.fn(() => new Subject<void>());

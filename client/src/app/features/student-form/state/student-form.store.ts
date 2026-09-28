@@ -62,7 +62,7 @@ export class StudentFormStore {
     private readonly nationalId = signal<string | null>(null);
     private readonly step = signal(StudentFormStep.identify);
     private readonly target = signal(MIN_TARGET_COUNT);
-    private readonly picks = signal<SlotPick[]>([]);
+    private readonly chosenPicks = signal<SlotPick[]>([]);
     private readonly openSlotId = signal<string | null>(null);
     private readonly submitState = signal(SubmitStatus.idle);
     private readonly submittedThisVisit = signal(false);
@@ -90,6 +90,17 @@ export class StudentFormStore {
 
     private readonly identifyResult = computed<IdentifyResult | null>(() =>
         this.identifyResource.hasValue() ? this.identifyResource.value() : null,
+    );
+
+    private readonly openSlotIds = computed(() => {
+        const result = this.identifyResult();
+        const slots = result?.status === IdentifyStatus.found ? result.student.slots : [];
+
+        return new Set(slots.filter(slot => slot.state === SlotState.open).map(slot => slot.id));
+    });
+
+    private readonly picks = computed(() =>
+        this.chosenPicks().filter(pick => this.openSlotIds().has(pick.slotId)),
     );
 
     readonly view = computed<StudentFormView>(() => {
@@ -273,7 +284,7 @@ export class StudentFormStore {
             return;
         }
 
-        this.picks.update(picks => upsertPick(picks, { slotId, ...choice }));
+        this.chosenPicks.set(upsertPick(this.picks(), { slotId, ...choice }));
         this.openSlotId.set(null);
     }
 
@@ -284,7 +295,7 @@ export class StudentFormStore {
             return;
         }
 
-        this.picks.update(picks => removePick(picks, slotId));
+        this.chosenPicks.set(removePick(this.picks(), slotId));
         this.openSlotId.set(null);
     }
 
@@ -345,6 +356,7 @@ export class StudentFormStore {
     recheck(): void {
         this.submitState.set(SubmitStatus.idle);
         this.publicationResource.reload();
+        this.identifyResource.reload();
     }
 
     goBack(): void {
