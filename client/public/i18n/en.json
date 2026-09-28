@@ -246,6 +246,7 @@
     "step": "Step {{current}} of {{total}}",
     "continue": "Continue",
     "back": "Back",
+    "slotLabel": "{{day}} · {{window}}",
     "window": {
       "opens": "Opens",
       "closes": "Closes",
@@ -306,10 +307,26 @@
       "pickSlots": "Pick slots"
     },
     "slots": {
-      "title": "{{teacherName}}'s week",
-      "body": "These are {{teacherName}}'s slots for this week. Striped slots are unavailable.",
+      "title": "Pick your slots, best first",
+      "body": "Tap a slot to add it — the order is your preference. Tap a picked slot to change or remove it. Striped slots are unavailable.",
       "shortDay": "morning & noon only",
-      "unavailable": "Unavailable"
+      "unavailable": "Unavailable",
+      "pickedRank": "pick {{rank}}",
+      "summary": "Target: {{target}} · Picked: {{picked}}",
+      "backups": "extra picks = backups",
+      "review": "Review my list"
+    },
+    "pick": {
+      "sessionType": "Session type",
+      "single": "Single",
+      "double": "Double",
+      "doubleHint": "(2×)",
+      "constraintLabel": "Constraint for this slot (optional)",
+      "constraintHint": "Free text — e.g. \"only after 16:00\", \"pick me up from work\"",
+      "cancel": "Cancel",
+      "add": "Add as pick #{{rank}}",
+      "save": "Save",
+      "remove": "Remove this pick"
     }
   },
   "general": {

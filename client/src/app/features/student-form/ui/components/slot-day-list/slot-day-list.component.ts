@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { SlotDay } from '../../../domain/slot-day';
 
@@ -11,4 +11,6 @@ import { SlotDay } from '../../../domain/slot-day';
 })
 export class SlotDayListComponent {
     readonly days = input.required<readonly SlotDay[]>();
+
+    readonly chipSelected = output<string>();
 }

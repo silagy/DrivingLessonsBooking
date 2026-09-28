@@ -30,7 +30,7 @@ Precedents: slice 2's `slot-day-list` and `identify-step` (the `p-message` leave
 - The sheet is a **custom dumb component rendered with `@if`**, not a PrimeNG `Drawer` or `DialogService` dialog (README decision 12, "conventions that override the rules"): its open state is wizard state held in the store (roadmap decision 4), its choices are `linkedSignal`s from the `sheet` input (client-state "resettable local choices"), and because it is destroyed the moment the store clears `openSlotId`, no leave animation can keep a previous slot's day, time or constraint on screen (the slice-2 `p-message` `animate.leave` lesson; **Review Focus 10**). PrimeNG supplies `pFocusTrap`, `pTextarea` and `p-button`; Escape and the backdrop cancel.
 - The textarea carries `maxlength="200"` (`SLOT_CONSTRAINT_MAX_LENGTH`) — immediate feedback for the backend's 200-character rule (**Review Focus 7**); the value is trimmed and blank becomes `null` on save (`toSlotConstraint`).
 
-- [ ] **Step 1: Write the failing page-spec cases**
+- [x] **Step 1: Write the failing page-spec cases**
 
 In `ui\pages\student-form\student-form.page.spec.ts`:
 
@@ -280,7 +280,7 @@ What these pin: US-37 (selection order = rank), US-34 (disabled Unavailable chip
 Run (in `client\`): `npm test -- --watch=false`
 Expected: FAIL — chips are list items without `data-slot-id`, there is no `app-pick-sheet`, and the slots footer is empty.
 
-- [ ] **Step 2: Translations and the scrim token (en + he, same commit)**
+- [x] **Step 2: Translations and the scrim token (en + he, same commit)**
 
 In **both** i18n files, inside `"studentForm"`: add `"slotLabel"` directly after `"back"`; **replace** the `"slots"` object; add a `"pick"` object directly after `"slots"`.
 
@@ -356,7 +356,7 @@ In `client\src\styles\_tokens.scss`, add after `--app-shadow-lift: …;`:
 
 (The mockup's overlay tint; tokens live in this one file — client-primeng "no hardcoded colors" in components.)
 
-- [ ] **Step 3: `SlotDayListComponent` — chips become buttons**
+- [x] **Step 3: `SlotDayListComponent` — chips become buttons**
 
 Replace `ui\components\slot-day-list\slot-day-list.component.ts` with:
 
@@ -550,7 +550,7 @@ Replace `ui\components\slot-day-list\slot-day-list.component.scss` with:
 
 The badge sits at the **top inline-end** corner (mockup `insetInlineEnd:-6`), so it mirrors to the top-left in Hebrew without any per-direction CSS; the chip list gains `0.45rem` of top padding so the badge is not clipped. `font: inherit` stops the browser's default button font from overriding the chip typography.
 
-- [ ] **Step 4: `PickSheetComponent` (mockup `SSlotSheet`)**
+- [x] **Step 4: `PickSheetComponent` (mockup `SSlotSheet`)**
 
 `ui\components\pick-sheet\pick-sheet.component.ts`:
 
@@ -883,7 +883,7 @@ Notes for the implementer:
 - `max-width: 30rem` + `margin-inline: auto` matches the student shell column (`student-shell.component.scss`), so on desktop the sheet does not stretch edge to edge.
 - Focus: `afterNextRender` puts focus on the Single option when the sheet opens; `pFocusTrap` keeps Tab inside the sheet; Escape (host listener) and the backdrop cancel. Closing is the store clearing `openSlotId`, which destroys the component — nothing lingers.
 
-- [ ] **Step 5: `SlotsStepComponent` — picking, footer, sheet**
+- [x] **Step 5: `SlotsStepComponent` — picking, footer, sheet**
 
 Replace `ui\components\slots-step\slots-step.component.ts` with:
 
@@ -999,7 +999,7 @@ Replace `ui\components\slots-step\slots-step.component.html` with:
 
 `isTargetCovered` only decides whether the ✓ is drawn (mockup `SSlots`); whether a list is submittable stays the backend's rule, mirrored for feedback on the review step (task 10). The `p` comes before the button in the footer, so `continueButton` (first footer **button**) is still "Review my list".
 
-- [ ] **Step 6: Store — picks and the open sheet**
+- [x] **Step 6: Store — picks and the open sheet**
 
 In `state\student-form.store.ts`:
 
@@ -1077,7 +1077,7 @@ In `state\student-form.store.ts`:
 
 `openPick` refusing a non-Open slot is display integrity (the chip is disabled; a stale or synthetic click still cannot open a sheet) — the rule itself is enforced by the backend (task 2). Picks live only in this per-visit store: never `localStorage`, never the URL (Global Constraints), and a refresh starts over (roadmap decision 4).
 
-- [ ] **Step 7: Wire the page**
+- [x] **Step 7: Wire the page**
 
 In `ui\pages\student-form\student-form.page.html`, replace the `@case (steps.slots) { … }` block with:
 
@@ -1100,14 +1100,14 @@ In `ui\pages\student-form\student-form.page.html`, replace the `@case (steps.slo
 
 `(reviewed)` is wired in task 10 together with the review step it leads to — until then "Review my list" is enabled after the first pick but does nothing.
 
-- [ ] **Step 8: Run the specs to verify they pass**
+- [x] **Step 8: Run the specs to verify they pass**
 
 Run (in `client\`): `npm test -- --watch=false`
 Expected: every spec PASSES — including the ten picking cases.
 
 Then `npm run build` → success, no new warnings.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add client/src/app/features/student-form client/src/styles/_tokens.scss client/public/i18n/en.json client/public/i18n/he.json

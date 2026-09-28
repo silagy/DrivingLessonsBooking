@@ -193,6 +193,56 @@ function textOf(fixture: ComponentFixture<StudentFormPage>, selector: string): s
     return page(fixture).querySelector(selector)?.textContent?.trim();
 }
 
+function chip(fixture: ComponentFixture<StudentFormPage>, slotId: string): HTMLButtonElement {
+    return page(fixture).querySelector(`[data-slot-id="${slotId}"]`) as HTMLButtonElement;
+}
+
+function rankOn(fixture: ComponentFixture<StudentFormPage>, slotId: string): string | undefined {
+    return chip(fixture, slotId).querySelector('.slot-chip__rank')?.textContent?.trim();
+}
+
+function pickSheet(fixture: ComponentFixture<StudentFormPage>): HTMLElement | null {
+    return page(fixture).querySelector('.pick-sheet');
+}
+
+async function tapChip(fixture: ComponentFixture<StudentFormPage>, slotId: string): Promise<void> {
+    chip(fixture, slotId).click();
+    await fixture.whenStable();
+}
+
+async function addPick(fixture: ComponentFixture<StudentFormPage>, slotId: string): Promise<void> {
+    await tapChip(fixture, slotId);
+    await press(fixture, '.pick-sheet__save button');
+}
+
+async function chooseDouble(fixture: ComponentFixture<StudentFormPage>): Promise<void> {
+    await press(fixture, '.pick-sheet__double');
+}
+
+async function typeConstraint(fixture: ComponentFixture<StudentFormPage>, text: string): Promise<void> {
+    const field = page(fixture).querySelector('#pick-constraint') as HTMLTextAreaElement;
+    field.value = text;
+    field.dispatchEvent(new Event('input'));
+    await fixture.whenStable();
+}
+
+function isChecked(fixture: ComponentFixture<StudentFormPage>, selector: string): boolean {
+    return (page(fixture).querySelector(selector) as HTMLInputElement).checked;
+}
+
+function constraintValue(fixture: ComponentFixture<StudentFormPage>): string {
+    return (page(fixture).querySelector('#pick-constraint') as HTMLTextAreaElement).value;
+}
+
+function accessibleNameOf(fixture: ComponentFixture<StudentFormPage>, selector: string): string {
+    const labelIds = page(fixture).querySelector(selector)!.getAttribute('aria-labelledby') ?? '';
+
+    return labelIds
+        .split(' ')
+        .map(id => document.getElementById(id)?.textContent?.trim())
+        .join(' ');
+}
+
 describe('StudentFormPage', () => {
     it.each([
         { view: 'notYetOpen', load: publicationIn(PublicationState.published), windowRows: 2 },
@@ -536,18 +586,285 @@ describe('StudentFormPage', () => {
             //then
             expect(page(fixture).querySelector('app-target-step')).not.toBeNull();
         });
+    });
 
-        it('keeps the week grid read-only until picking arrives', async () => {
+    describe('picking slots', () => {
+        it('numbers picks in the order they are tapped', async () => {
             //given
             provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
             const fixture = await renderPage();
-            await reachTarget(fixture);
+            await reachSlots(fixture);
 
             //when
-            await clickContinue(fixture);
+            await addPick(fixture, 'sunday-afternoon');
+            await addPick(fixture, 'monday-evening');
+            await addPick(fixture, 'wednesday-afternoon');
 
             //then
-            expect(page(fixture).querySelectorAll('.slot-days button, .slot-days input').length).toBe(0);
+            expect(rankOn(fixture, 'sunday-afternoon')).toBe('1');
+            expect(rankOn(fixture, 'monday-evening')).toBe('2');
+            expect(rankOn(fixture, 'wednesday-afternoon')).toBe('3');
+            expect(rankOn(fixture, 'tuesday-morning')).toBeUndefined();
+            expect(chip(fixture, 'monday-evening').classList).toContain('slot-chip--picked');
+            expect(pickSheet(fixture)).toBeNull();
+        });
+
+        it('never opens an unavailable slot', async () => {
+            //given
+            const levi = studentOf('Teacher Levi', Transmission.manual, weekSlots(['sunday-morning']));
+            provideOpenLinkIdentifying(identifyingAs(levi));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+
+            //when
+            await tapChip(fixture, 'sunday-morning');
+
+            //then
+            expect(chip(fixture, 'sunday-morning').disabled).toBe(true);
+            expect(pickSheet(fixture)).toBeNull();
+            expect(chip(fixture, 'sunday-noon').disabled).toBe(false);
+        });
+
+        it('offers a new pick as the next rank, Single, with no constraint', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await addPick(fixture, 'sunday-afternoon');
+
+            //when
+            await tapChip(fixture, 'thursday-evening');
+
+            //then
+            expect(textOf(fixture, '.pick-sheet__rank')).toBe('2');
+            expect(textOf(fixture, '.pick-sheet__time')).toBe('18:00–22:00');
+            expect(isChecked(fixture, '.pick-sheet__single')).toBe(true);
+            expect(constraintValue(fixture)).toBe('');
+            expect(page(fixture).querySelector('.pick-sheet__remove')).toBeNull();
+        });
+
+        it('keeps Double and the constraint on that pick only', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            await chooseDouble(fixture);
+            await typeConstraint(fixture, 'only after 16:00');
+            await press(fixture, '.pick-sheet__save button');
+            await addPick(fixture, 'monday-evening');
+
+            //when
+            await tapChip(fixture, 'sunday-afternoon');
+            const doubleChecked = isChecked(fixture, '.pick-sheet__double');
+            const firstConstraint = constraintValue(fixture);
+            await press(fixture, '.pick-sheet__cancel button');
+            await tapChip(fixture, 'monday-evening');
+
+            //then
+            expect(doubleChecked).toBe(true);
+            expect(firstConstraint).toBe('only after 16:00');
+            expect(isChecked(fixture, '.pick-sheet__single')).toBe(true);
+            expect(constraintValue(fixture)).toBe('');
+        });
+
+        it('removes a pick and moves every later pick up one rank', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await addPick(fixture, 'sunday-afternoon');
+            await addPick(fixture, 'monday-evening');
+            await addPick(fixture, 'wednesday-afternoon');
+
+            //when
+            await tapChip(fixture, 'sunday-afternoon');
+            await press(fixture, '.pick-sheet__remove button');
+
+            //then
+            expect(rankOn(fixture, 'sunday-afternoon')).toBeUndefined();
+            expect(rankOn(fixture, 'monday-evening')).toBe('1');
+            expect(rankOn(fixture, 'wednesday-afternoon')).toBe('2');
+        });
+
+        it('changes a pick in place without moving it', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await addPick(fixture, 'sunday-afternoon');
+            await addPick(fixture, 'monday-evening');
+
+            //when
+            await tapChip(fixture, 'sunday-afternoon');
+            await chooseDouble(fixture);
+            await press(fixture, '.pick-sheet__save button');
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //then
+            expect(textOf(fixture, '.pick-sheet__rank')).toBe('1');
+            expect(isChecked(fixture, '.pick-sheet__double')).toBe(true);
+            expect(rankOn(fixture, 'monday-evening')).toBe('2');
+        });
+
+        it('adds nothing when a new pick is cancelled', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //when
+            await press(fixture, '.pick-sheet__cancel button');
+
+            //then
+            expect(pickSheet(fixture)).toBeNull();
+            expect(rankOn(fixture, 'sunday-afternoon')).toBeUndefined();
+            expect(continueButton(fixture)!.disabled).toBe(true);
+        });
+
+        it('closes on Escape and never shows the previous slot in the next sheet', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-morning');
+            await typeConstraint(fixture, 'typed for Sunday');
+
+            //when
+            page(fixture)
+                .querySelector('app-pick-sheet')!
+                .dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await fixture.whenStable();
+            const closed = pickSheet(fixture) === null;
+            await tapChip(fixture, 'monday-evening');
+
+            //then
+            expect(closed).toBe(true);
+            expect(page(fixture).querySelectorAll('.pick-sheet').length).toBe(1);
+            expect(textOf(fixture, '.pick-sheet__time')).toBe('18:00–22:00');
+            expect(constraintValue(fixture)).toBe('');
+        });
+
+        it('returns focus to the chip that opened the sheet', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            chip(fixture, 'monday-evening').focus();
+            await tapChip(fixture, 'monday-evening');
+            const focusedInSheet = pickSheet(fixture)!.contains(document.activeElement);
+
+            //when
+            await press(fixture, '.pick-sheet__cancel button');
+
+            //then
+            expect(focusedInSheet).toBe(true);
+            expect(document.activeElement).toBe(chip(fixture, 'monday-evening'));
+        });
+
+        it('closes on Escape wherever the focus has gone', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //when
+            document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            await fixture.whenStable();
+
+            //then
+            expect(pickSheet(fixture)).toBeNull();
+        });
+
+        it('lets the sheet itself hold focus so a click on its text keeps focus inside', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //when
+            pickSheet(fixture)!.focus();
+
+            //then
+            expect(document.activeElement).toBe(pickSheet(fixture));
+        });
+
+        it('focuses the chosen session type when a pick is reopened', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            await chooseDouble(fixture);
+            await press(fixture, '.pick-sheet__save button');
+
+            //when
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //then
+            expect(document.activeElement).toBe(page(fixture).querySelector('.pick-sheet__double'));
+        });
+
+        it('names the sheet by the rank, day, window and time of its slot', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+
+            //when
+            await tapChip(fixture, 'thursday-evening');
+
+            //then
+            expect(accessibleNameOf(fixture, '.pick-sheet')).toMatch(
+                /studentForm\.slots\.pickedRank \S*studentForm\.slotLabel 18:00–22:00$/,
+            );
+        });
+
+        it('marks only open chips as opening a dialog', async () => {
+            //given
+            const levi = studentOf('Teacher Levi', Transmission.manual, weekSlots(['sunday-morning']));
+            provideOpenLinkIdentifying(identifyingAs(levi));
+            const fixture = await renderPage();
+
+            //when
+            await reachSlots(fixture);
+
+            //then
+            expect(chip(fixture, 'sunday-noon').getAttribute('aria-haspopup')).toBe('dialog');
+            expect(chip(fixture, 'sunday-morning').hasAttribute('aria-haspopup')).toBe(false);
+        });
+
+        it('caps the constraint at 200 characters', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+
+            //when
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //then
+            expect((page(fixture).querySelector('#pick-constraint') as HTMLTextAreaElement).maxLength).toBe(200);
+        });
+
+        it('keeps Review locked until the first pick, then shows target and picked counts', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            const lockedBeforePicking = continueButton(fixture)!.disabled;
+
+            //when
+            await addPick(fixture, 'sunday-afternoon');
+
+            //then
+            expect(lockedBeforePicking).toBe(true);
+            expect(continueButton(fixture)!.disabled).toBe(false);
+            expect(textOf(fixture, '.slots__summary')).toContain('studentForm.slots.summary');
+            expect(page(fixture).querySelector('.slots__covered')).not.toBeNull();
         });
     });
 });

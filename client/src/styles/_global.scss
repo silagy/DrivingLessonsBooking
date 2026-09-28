@@ -9,6 +9,10 @@ body {
   min-height: 100%;
 }
 
+html:has(app-pick-sheet) {
+  overflow: hidden;
+}
+
 body {
   font-family: var(--app-font-text);
   color: var(--app-ink);

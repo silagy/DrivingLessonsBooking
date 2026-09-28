@@ -66,8 +66,14 @@
                     <app-slots-step
                         [stepNumber]="store.stepNumber()"
                         [stepCount]="store.stepCount"
-                        [teacherName]="store.teacherName()"
                         [days]="store.slotDays()"
+                        [targetCount]="store.targetCount()"
+                        [pickCount]="store.pickCount()"
+                        [pickSheet]="store.pickSheet()"
+                        (chipSelected)="store.openPick($event)"
+                        (pickSaved)="store.savePick($event)"
+                        (pickRemoved)="store.removeOpenPick()"
+                        (pickCancelled)="store.closePick()"
                         (back)="store.goBack()" />
                 }
             }

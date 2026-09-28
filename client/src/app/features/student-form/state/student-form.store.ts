@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { LanguageService } from '../../../core/language.service';
+import { SlotState } from '../../../shared/models/slot-state.enum';
 import { GetPublicationByLinkResponse } from '../data/get-publication-by-link.response';
 import { IdentifyStudentResponse } from '../data/identify-student.response';
 import { SubmissionsApiService } from '../data/submissions-api.service';
@@ -9,7 +10,9 @@ import { IdentifyStatus } from '../domain/identify-status.enum';
 import { formatWindowInstant } from '../domain/jerusalem-time';
 import { nameInitials } from '../domain/name-initials';
 import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-id-input';
+import { PickSheet, pickSheetFor } from '../domain/pick-sheet';
 import { groupSlotsByDay, hasOpenSlot } from '../domain/slot-day';
+import { PickChoice, removePick, SlotPick, upsertPick } from '../domain/slot-pick';
 import { previousStepOf, stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
 import { StudentFormStep } from '../domain/student-form-step.enum';
 import { viewForPublicationState } from '../domain/student-form-view';
@@ -48,6 +51,8 @@ export class StudentFormStore {
     private readonly nationalId = signal<string | null>(null);
     private readonly step = signal(StudentFormStep.identify);
     private readonly target = signal(MIN_TARGET_COUNT);
+    private readonly picks = signal<SlotPick[]>([]);
+    private readonly openSlotId = signal<string | null>(null);
 
     private readonly publicationResource = resource({
         params: () => this.linkToken() ?? undefined,
@@ -138,12 +143,19 @@ export class StudentFormStore {
         const publication = this.publication();
 
         return student && publication
-            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang(), [])
+            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang(), this.picks())
             : [];
     });
 
     readonly targetCount = this.target.asReadonly();
     readonly minTargetCount = MIN_TARGET_COUNT;
+    readonly pickCount = computed(() => this.picks().length);
+    readonly pickSheet = computed<PickSheet | null>(() => {
+        const slotId = this.openSlotId();
+        const slot = this.student()?.slots.find(x => x.id === slotId);
+
+        return slot ? pickSheetFor(slot, this.picks()) : null;
+    });
 
     readonly currentStep = this.step.asReadonly();
     readonly stepNumber = computed(() => stepNumberOf(this.step()));
@@ -208,6 +220,42 @@ export class StudentFormStore {
 
     decreaseTarget(): void {
         this.target.update(count => Math.max(MIN_TARGET_COUNT, count - 1));
+    }
+
+    openPick(slotId: string): void {
+        const slot = this.student()?.slots.find(x => x.id === slotId);
+
+        if (slot?.state !== SlotState.open) {
+            return;
+        }
+
+        this.openSlotId.set(slotId);
+    }
+
+    savePick(choice: PickChoice): void {
+        const slotId = this.openSlotId();
+
+        if (!slotId) {
+            return;
+        }
+
+        this.picks.update(picks => upsertPick(picks, { slotId, ...choice }));
+        this.openSlotId.set(null);
+    }
+
+    removeOpenPick(): void {
+        const slotId = this.openSlotId();
+
+        if (!slotId) {
+            return;
+        }
+
+        this.picks.update(picks => removePick(picks, slotId));
+        this.openSlotId.set(null);
+    }
+
+    closePick(): void {
+        this.openSlotId.set(null);
     }
 
     goBack(): void {
