@@ -74,7 +74,42 @@
                         (pickSaved)="store.savePick($event)"
                         (pickRemoved)="store.removeOpenPick()"
                         (pickCancelled)="store.closePick()"
+                        (reviewed)="store.continueToReview()"
                         (back)="store.goBack()" />
+                }
+                @case (steps.review) {
+                    <app-review-step
+                        [stepNumber]="store.stepNumber()"
+                        [stepCount]="store.stepCount"
+                        [targetCount]="store.targetCount()"
+                        [pickCount]="store.pickCount()"
+                        [items]="store.reviewItems()"
+                        [missingPicks]="store.missingPicks()"
+                        [replacesEarlierSubmission]="store.replacesEarlierSubmission()"
+                        [submitStatus]="store.submitStatus()"
+                        [canSubmit]="store.canSubmit()"
+                        (submitted)="store.submit()"
+                        (addSlots)="store.goBack()"
+                        (changeTarget)="store.changeTarget()"
+                        (recheck)="store.recheck()"
+                        (back)="store.goBack()" />
+                }
+                @case (steps.done) {
+                    <app-status-message
+                        icon="pi pi-check"
+                        tone="success"
+                        [heading]="'studentForm.submitted.title' | transloco">
+                        <p class="student-form__text student-form__submitted">
+                            {{ store.submittedBodyKey() | transloco: store.submittedParams() }}
+                        </p>
+                        <p-button
+                            type="button"
+                            class="student-form__edit"
+                            severity="secondary"
+                            [outlined]="true"
+                            [label]="'studentForm.submitted.edit' | transloco"
+                            (onClick)="store.editSubmission()" />
+                    </app-status-message>
                 }
             }
         }

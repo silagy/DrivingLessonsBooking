@@ -3,6 +3,7 @@ import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { LanguageService } from '../../../core/language.service';
 import { SlotState } from '../../../shared/models/slot-state.enum';
+import { CreateSubmissionRequest } from '../data/create-submission.request';
 import { GetPublicationByLinkResponse } from '../data/get-publication-by-link.response';
 import { IdentifyStudentResponse } from '../data/identify-student.response';
 import { SubmissionsApiService } from '../data/submissions-api.service';
@@ -11,18 +12,28 @@ import { formatWindowInstant } from '../domain/jerusalem-time';
 import { nameInitials } from '../domain/name-initials';
 import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-id-input';
 import { PickSheet, pickSheetFor } from '../domain/pick-sheet';
+import { reviewItemsOf } from '../domain/review-item';
 import { groupSlotsByDay, hasOpenSlot } from '../domain/slot-day';
 import { PickChoice, removePick, SlotPick, upsertPick } from '../domain/slot-pick';
 import { previousStepOf, stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
 import { StudentFormStep } from '../domain/student-form-step.enum';
 import { viewForPublicationState } from '../domain/student-form-view';
 import { StudentFormView } from '../domain/student-form-view.enum';
-import { MIN_TARGET_COUNT } from '../domain/target-count';
+import { SubmitStatus } from '../domain/submit-status.enum';
+import { MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
 import { weekRangeLabel } from '../domain/week-label';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
 const EMPTY_WEEK_PARAMS = { weekNumber: 0, weekRange: '' };
+const SINGLE_PICK = 1;
+const SUBMITTED_BODY_ONE = 'studentForm.submitted.bodyOne';
+const SUBMITTED_BODY_MANY = 'studentForm.submitted.bodyMany';
+const SUBMIT_LOCKING_STATUSES: ReadonlySet<SubmitStatus> = new Set([
+    SubmitStatus.submitting,
+    SubmitStatus.rejected,
+    SubmitStatus.notFound,
+]);
 
 const CAPTION_KEY_BY_STEP: Record<StudentFormStep, string | null> = {
     [StudentFormStep.identify]: null,
@@ -53,6 +64,8 @@ export class StudentFormStore {
     private readonly target = signal(MIN_TARGET_COUNT);
     private readonly picks = signal<SlotPick[]>([]);
     private readonly openSlotId = signal<string | null>(null);
+    private readonly submitState = signal(SubmitStatus.idle);
+    private readonly submittedThisVisit = signal(false);
 
     private readonly publicationResource = resource({
         params: () => this.linkToken() ?? undefined,
@@ -156,6 +169,27 @@ export class StudentFormStore {
 
         return slot ? pickSheetFor(slot, this.picks()) : null;
     });
+    readonly reviewItems = computed(() =>
+        reviewItemsOf(this.picks(), this.student()?.slots ?? [], this.target()),
+    );
+    readonly missingPicks = computed(() => missingPickCount(this.target(), this.pickCount()));
+    readonly submitStatus = this.submitState.asReadonly();
+    readonly replacesEarlierSubmission = computed(
+        () => (this.student()?.hasSubmission ?? false) || this.submittedThisVisit(),
+    );
+    readonly canSubmit = computed(
+        () =>
+            this.pickCount() > 0 && this.missingPicks() === 0 && !SUBMIT_LOCKING_STATUSES.has(this.submitState()),
+    );
+    readonly submittedBodyKey = computed(() =>
+        this.pickCount() === SINGLE_PICK ? SUBMITTED_BODY_ONE : SUBMITTED_BODY_MANY,
+    );
+    readonly submittedParams = computed(() => ({
+        count: this.pickCount(),
+        weekNumber: this.weekParams().weekNumber,
+        teacherName: this.teacherName(),
+        closesAt: this.closesAt(),
+    }));
 
     readonly currentStep = this.step.asReadonly();
     readonly stepNumber = computed(() => stepNumberOf(this.step()));
@@ -258,6 +292,61 @@ export class StudentFormStore {
         this.openSlotId.set(null);
     }
 
+    continueToReview(): void {
+        if (!this.pickCount()) {
+            return;
+        }
+
+        this.submitState.set(SubmitStatus.idle);
+        this.step.set(StudentFormStep.review);
+    }
+
+    changeTarget(): void {
+        this.step.set(StudentFormStep.target);
+    }
+
+    async submit(): Promise<void> {
+        const token = this.linkToken();
+        const nationalId = this.nationalId();
+
+        if (!token || !nationalId || !this.canSubmit()) {
+            return;
+        }
+
+        const request: CreateSubmissionRequest = {
+            nationalId,
+            targetCount: this.target(),
+            slotRequests: this.picks().map(pick => ({
+                slotId: pick.slotId,
+                sessionType: pick.sessionType,
+                constraint: pick.constraint,
+            })),
+        };
+        const command = this.replacesEarlierSubmission()
+            ? this.api.reviseSubmission(token, request)
+            : this.api.createSubmission(token, request);
+
+        this.submitState.set(SubmitStatus.submitting);
+
+        try {
+            await firstValueFrom(command);
+            this.submittedThisVisit.set(true);
+            this.submitState.set(SubmitStatus.idle);
+            this.step.set(StudentFormStep.done);
+        } catch (error) {
+            this.submitState.set(submitFailureOf(error));
+        }
+    }
+
+    editSubmission(): void {
+        this.step.set(StudentFormStep.review);
+    }
+
+    recheck(): void {
+        this.submitState.set(SubmitStatus.idle);
+        this.publicationResource.reload();
+    }
+
     goBack(): void {
         const previous = previousStepOf(this.step());
 
@@ -306,4 +395,16 @@ export class StudentFormStore {
 
 function isStatus(error: unknown, status: number): boolean {
     return error instanceof HttpErrorResponse && error.status === status;
+}
+
+function submitFailureOf(error: unknown): SubmitStatus {
+    if (isStatus(error, HTTP_CONFLICT)) {
+        return SubmitStatus.rejected;
+    }
+
+    if (isStatus(error, HTTP_NOT_FOUND)) {
+        return SubmitStatus.notFound;
+    }
+
+    return SubmitStatus.failed;
 }

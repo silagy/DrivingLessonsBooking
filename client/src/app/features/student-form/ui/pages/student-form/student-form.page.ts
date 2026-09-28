@@ -7,6 +7,7 @@ import { StudentFormView } from '../../../domain/student-form-view.enum';
 import { StudentFormStore } from '../../../state/student-form.store';
 import { DetailsStepComponent } from '../../components/details-step/details-step.component';
 import { IdentifyStepComponent } from '../../components/identify-step/identify-step.component';
+import { ReviewStepComponent } from '../../components/review-step/review-step.component';
 import { SlotsStepComponent } from '../../components/slots-step/slots-step.component';
 import { StatusMessageComponent } from '../../components/status-message/status-message.component';
 import { TargetStepComponent } from '../../components/target-step/target-step.component';
@@ -24,6 +25,7 @@ import { StudentShellComponent } from '../../components/student-shell/student-sh
         DetailsStepComponent,
         TargetStepComponent,
         SlotsStepComponent,
+        ReviewStepComponent,
     ],
     providers: [StudentFormStore],
     templateUrl: './student-form.page.html',

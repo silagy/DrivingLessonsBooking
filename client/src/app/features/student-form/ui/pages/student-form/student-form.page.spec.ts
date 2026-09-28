@@ -8,10 +8,12 @@ import { DayOfWeek } from '../../../../../shared/models/day-of-week.enum';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
 import { SlotState } from '../../../../../shared/models/slot-state.enum';
 import { SlotWindow } from '../../../../../shared/models/slot-window.enum';
+import { CreateSubmissionRequest } from '../../../data/create-submission.request';
 import { GetPublicationByLinkResponse } from '../../../data/get-publication-by-link.response';
 import { IdentifyStudentRequest } from '../../../data/identify-student.request';
 import { IdentifyStudentResponse, SlotForIdentifyStudentResponse } from '../../../data/identify-student.response';
 import { SubmissionsApiService } from '../../../data/submissions-api.service';
+import { SessionType } from '../../../domain/session-type.enum';
 import { Transmission } from '../../../domain/transmission.enum';
 import { StudentFormPage } from './student-form.page';
 
@@ -39,10 +41,13 @@ const FULL_DAYS: readonly DayOfWeek[] = [
 const SHORT_DAY_WINDOWS: readonly SlotWindow[] = [SlotWindow.morning, SlotWindow.noon];
 
 type IdentifyStudent = (token: string, request: IdentifyStudentRequest) => Observable<IdentifyStudentResponse>;
+type SubmitCommand = (token: string, request: CreateSubmissionRequest) => Observable<void>;
 
 interface FakeSubmissionsApi {
     getPublicationByLink: () => Observable<GetPublicationByLinkResponse>;
     identifyStudent: IdentifyStudent;
+    createSubmission: SubmitCommand;
+    reviseSubmission: SubmitCommand;
 }
 
 function weekSlots(unavailable: readonly string[]): SlotForIdentifyStudentResponse[] {
@@ -108,6 +113,10 @@ function answer(lookup: Subject<IdentifyStudentResponse>, student: IdentifyStude
     lookup.complete();
 }
 
+function accepting(): SubmitCommand {
+    return vi.fn(() => of(undefined));
+}
+
 function provideApi(api: FakeSubmissionsApi): void {
     TestBed.configureTestingModule({
         imports: [TranslocoTestingModule.forRoot({ langs: { en: {} } })],
@@ -120,7 +129,20 @@ function provideApi(api: FakeSubmissionsApi): void {
 }
 
 function provideOpenLinkIdentifying(identifyStudent: IdentifyStudent): void {
-    provideApi({ getPublicationByLink: publicationIn(PublicationState.open), identifyStudent });
+    provideOpenLinkSubmitting(identifyStudent, accepting(), accepting());
+}
+
+function provideOpenLinkSubmitting(
+    identifyStudent: IdentifyStudent,
+    createSubmission: SubmitCommand,
+    reviseSubmission: SubmitCommand,
+): void {
+    provideApi({
+        getPublicationByLink: publicationIn(PublicationState.open),
+        identifyStudent,
+        createSubmission,
+        reviseSubmission,
+    });
 }
 
 async function renderPage(): Promise<ComponentFixture<StudentFormPage>> {
@@ -234,6 +256,26 @@ function constraintValue(fixture: ComponentFixture<StudentFormPage>): string {
     return (page(fixture).querySelector('#pick-constraint') as HTMLTextAreaElement).value;
 }
 
+async function reachReview(
+    fixture: ComponentFixture<StudentFormPage>,
+    targetCount: number,
+    slotIds: readonly string[],
+): Promise<void> {
+    await reachTarget(fixture);
+
+    for (let count = 1; count < targetCount; count++) {
+        await press(fixture, '.target__increase');
+    }
+
+    await clickContinue(fixture);
+
+    for (const slotId of slotIds) {
+        await addPick(fixture, slotId);
+    }
+
+    await clickContinue(fixture);
+}
+
 function accessibleNameOf(fixture: ComponentFixture<StudentFormPage>, selector: string): string {
     const labelIds = page(fixture).querySelector(selector)!.getAttribute('aria-labelledby') ?? '';
 
@@ -252,7 +294,12 @@ describe('StudentFormPage', () => {
         { view: 'loadFailed', load: failingWith(HTTP_SERVER_ERROR), windowRows: 0 },
     ])('renders the $view view read-only', async ({ load, windowRows }) => {
         //given
-        provideApi({ getPublicationByLink: load, identifyStudent: identifyingAs(COHEN_STUDENT) });
+        provideApi({
+            getPublicationByLink: load,
+            identifyStudent: identifyingAs(COHEN_STUDENT),
+            createSubmission: accepting(),
+            reviseSubmission: accepting(),
+        });
 
         //when
         const fixture = await renderPage();
@@ -865,6 +912,216 @@ describe('StudentFormPage', () => {
             expect(continueButton(fixture)!.disabled).toBe(false);
             expect(textOf(fixture, '.slots__summary')).toContain('studentForm.slots.summary');
             expect(page(fixture).querySelector('.slots__covered')).not.toBeNull();
+        });
+    });
+
+    describe('review and submit', () => {
+        it('lists the picks in rank order, the ones inside the target as preferred', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 2, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //then
+            expect(page(fixture).querySelector('app-review-step')).not.toBeNull();
+            expect(page(fixture).querySelectorAll('.review__item').length).toBe(3);
+            expect(page(fixture).querySelectorAll('.review__item--preferred').length).toBe(2);
+            expect(page(fixture).querySelector('.review__not-enough')).toBeNull();
+            expect(page(fixture).querySelector('.review__replaces')).toBeNull();
+            expect(continueButton(fixture)!.disabled).toBe(false);
+        });
+
+        it('submits the ranked list with each pick\'s session type and constraint', async () => {
+            //given
+            const createSubmission = accepting();
+            const reviseSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, reviseSubmission);
+            const fixture = await renderPage();
+            await reachTarget(fixture);
+            await press(fixture, '.target__increase');
+            await clickContinue(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            await chooseDouble(fixture);
+            await typeConstraint(fixture, '  only after 16:00 ');
+            await press(fixture, '.pick-sheet__save button');
+            await addPick(fixture, 'monday-evening');
+            await addPick(fixture, 'wednesday-afternoon');
+            await clickContinue(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(createSubmission).toHaveBeenCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 2,
+                slotRequests: [
+                    { slotId: 'sunday-afternoon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+                    { slotId: 'monday-evening', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'wednesday-afternoon', sessionType: SessionType.single, constraint: null },
+                ],
+            });
+            expect(reviseSubmission).not.toHaveBeenCalled();
+        });
+
+        it('blocks a list shorter than the target with a clear message', async () => {
+            //given
+            const createSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 3, ['sunday-afternoon', 'monday-evening']);
+
+            //when
+            continueButton(fixture)!.click();
+            await fixture.whenStable();
+
+            //then
+            expect(page(fixture).querySelector('.review__not-enough')).not.toBeNull();
+            expect(page(fixture).querySelector('.review__unlock')).not.toBeNull();
+            expect(continueButton(fixture)!.disabled).toBe(true);
+            expect(createSubmission).not.toHaveBeenCalled();
+        });
+
+        it('lets the student lower the target from the not-enough message', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 3, ['sunday-afternoon']);
+
+            //when
+            await press(fixture, '.review__change-target button');
+
+            //then
+            expect(page(fixture).querySelector('app-target-step')).not.toBeNull();
+            expect(textOf(fixture, '.target__count')).toBe('3');
+        });
+
+        it('sends the student back to the grid for more slots, keeping the picks', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 3, ['sunday-afternoon']);
+
+            //when
+            await press(fixture, '.review__add-slots button');
+
+            //then
+            expect(page(fixture).querySelector('app-slots-step')).not.toBeNull();
+            expect(rankOn(fixture, 'sunday-afternoon')).toBe('1');
+        });
+
+        it('confirms the submission and explains self-service editing', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.submitted\.title$/);
+            expect(textOf(fixture, '.student-form__submitted')).toContain('studentForm.submitted.bodyMany');
+            expect(page(fixture).querySelector('.student-shell__caption')).toBeNull();
+            expect(page(fixture).querySelector('app-review-step')).toBeNull();
+        });
+
+        it('edits from the confirmation by replacing the submission', async () => {
+            //given
+            const createSubmission = accepting();
+            const reviseSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, reviseSubmission);
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+            await clickContinue(fixture);
+
+            //when
+            await press(fixture, '.student-form__edit button');
+            const replacesNoticeShown = page(fixture).querySelector('.review__replaces') !== null;
+            await clickContinue(fixture);
+
+            //then
+            expect(replacesNoticeShown).toBe(true);
+            expect(createSubmission).toHaveBeenCalledTimes(1);
+            expect(reviseSubmission).toHaveBeenCalledTimes(1);
+        });
+
+        it('replaces the earlier submission of a returning student', async () => {
+            //given
+            const createSubmission = accepting();
+            const reviseSubmission = accepting();
+            const returning = { ...COHEN_STUDENT, hasSubmission: true };
+            provideOpenLinkSubmitting(identifyingAs(returning), createSubmission, reviseSubmission);
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            const replacesNoticeShown = page(fixture).querySelector('.review__replaces') !== null;
+            await clickContinue(fixture);
+
+            //then
+            expect(replacesNoticeShown).toBe(true);
+            expect(reviseSubmission).toHaveBeenCalledTimes(1);
+            expect(createSubmission).not.toHaveBeenCalled();
+        });
+
+        it.each([
+            { status: HTTP_CONFLICT, message: '.review__rejected', canRetry: false },
+            { status: HTTP_NOT_FOUND, message: '.review__not-found', canRetry: false },
+            { status: HTTP_SERVER_ERROR, message: '.review__failed', canRetry: true },
+        ])('keeps the list on screen when the submit answers $status', async ({ status, message, canRetry }) => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), failingWith(status), accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector(message)).not.toBeNull();
+            expect(page(fixture).querySelectorAll('.review__item').length).toBe(1);
+            expect(continueButton(fixture)!.disabled).toBe(!canRetry);
+        });
+
+        it('checks the form again after a rejection and shows the window has closed', async () => {
+            //given
+            const link = { state: PublicationState.open };
+            provideApi({
+                getPublicationByLink: () => publicationIn(link.state)(),
+                identifyStudent: identifyingAs(COHEN_STUDENT),
+                createSubmission: failingWith(HTTP_CONFLICT),
+                reviseSubmission: accepting(),
+            });
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+            await clickContinue(fixture);
+            link.state = PublicationState.closed;
+
+            //when
+            await press(fixture, '.review__recheck button');
+
+            //then
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.closed\.title$/);
+            expect(page(fixture).querySelector('app-review-step')).toBeNull();
+        });
+
+        it('never submits twice while a submission is in flight', async () => {
+            //given
+            const createSubmission: SubmitCommand = vi.fn(() => new Subject<void>());
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            await clickContinue(fixture);
+            await clickContinue(fixture);
+
+            //then
+            expect(createSubmission).toHaveBeenCalledTimes(1);
+            expect(continueButton(fixture)!.disabled).toBe(true);
         });
     });
 });

@@ -327,6 +327,30 @@
       "add": "Add as pick #{{rank}}",
       "save": "Save",
       "remove": "Remove this pick"
+    },
+    "review": {
+      "title": "Your ranked list",
+      "preferredOne": "Rank 1 is your preferred slot; any others are backups.",
+      "preferredMany": "Ranks 1–{{target}} are your preferred slots; the rest are backups.",
+      "notEnoughTitle": "Not enough picks.",
+      "notEnoughBody": "Your target is {{target}}, but you've picked {{picked}}. Add {{missing}} more, or lower your target.",
+      "addSlots": "Add more slots",
+      "changeTarget": "Change my target",
+      "replaces": "You already sent a list for this week. Submitting now replaces it.",
+      "submit": "Submit",
+      "unlockHint": "Submit unlocks once you have {{target}} picks.",
+      "recheck": "Check the form again",
+      "errors": {
+        "rejected": "We couldn't save your list — the submission window may have closed, or this week's slots changed.",
+        "notFound": "We couldn't find your roster details or this week's slots anymore. Please contact your school.",
+        "failed": "We couldn't send your list. Check your connection and try again."
+      }
+    },
+    "submitted": {
+      "title": "Submitted",
+      "bodyOne": "1 pick for week {{weekNumber}} with {{teacherName}}. You can edit it until {{closesAt}} — just reopen this link and enter your national ID.",
+      "bodyMany": "{{count}} picks for week {{weekNumber}} with {{teacherName}}. You can edit them until {{closesAt}} — just reopen this link and enter your national ID.",
+      "edit": "Edit my submission"
     }
   },
   "general": {
