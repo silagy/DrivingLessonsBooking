@@ -5,6 +5,8 @@
 }
 
 .wizard-step {
+    --wizard-step-gutter: 1rem;
+
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -14,7 +16,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.625rem;
-    padding: 1.25rem 1rem 1.5rem;
+    padding: 1.25rem var(--wizard-step-gutter) 1.5rem;
 }
 
 .wizard-step__top {
@@ -26,7 +28,7 @@
 
 .wizard-step__back {
     margin-block: calc(-1 * var(--p-button-padding-y));
-    margin-inline-end: calc(-1 * var(--p-button-padding-x));
+    margin-inline-end: calc(-1 * min(var(--p-button-padding-x), var(--wizard-step-gutter)));
 }
 
 .wizard-step__counter {
