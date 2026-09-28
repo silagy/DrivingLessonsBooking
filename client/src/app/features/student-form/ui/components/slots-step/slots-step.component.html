@@ -2,6 +2,8 @@
     [stepNumber]="stepNumber()"
     [stepCount]="stepCount()"
     [heading]="'studentForm.slots.title' | transloco: { teacherName: teacherName() }"
-    [intro]="'studentForm.slots.body' | transloco: { teacherName: teacherName() }">
+    [intro]="'studentForm.slots.body' | transloco: { teacherName: teacherName() }"
+    [canGoBack]="true"
+    (back)="back.emit()">
     <app-slot-day-list [days]="days()" />
 </app-wizard-step>

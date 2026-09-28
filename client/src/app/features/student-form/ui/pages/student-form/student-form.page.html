@@ -48,15 +48,27 @@
                             [transmission]="student.transmission"
                             [weekLabel]="'studentForm.weekCaption' | transloco: store.weekParams()"
                             [hasAvailability]="store.hasAvailability()"
-                            (continued)="store.continueToSlots()" />
+                            (continued)="store.continueToTarget()" />
                     }
+                }
+                @case (steps.target) {
+                    <app-target-step
+                        [stepNumber]="store.stepNumber()"
+                        [stepCount]="store.stepCount"
+                        [targetCount]="store.targetCount()"
+                        [minTargetCount]="store.minTargetCount"
+                        (increased)="store.increaseTarget()"
+                        (decreased)="store.decreaseTarget()"
+                        (continued)="store.continueToSlots()"
+                        (back)="store.goBack()" />
                 }
                 @case (steps.slots) {
                     <app-slots-step
                         [stepNumber]="store.stepNumber()"
                         [stepCount]="store.stepCount"
                         [teacherName]="store.teacherName()"
-                        [days]="store.slotDays()" />
+                        [days]="store.slotDays()"
+                        (back)="store.goBack()" />
                 }
             }
         }

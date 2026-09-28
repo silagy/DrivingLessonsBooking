@@ -17,6 +17,18 @@
     padding: 1.25rem 1rem 1.5rem;
 }
 
+.wizard-step__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.wizard-step__back {
+    margin-block: calc(-1 * var(--p-button-padding-y));
+    margin-inline-end: calc(-1 * var(--p-button-padding-x));
+}
+
 .wizard-step__counter {
     margin: 0;
     font-family: var(--app-font-display);

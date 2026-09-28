@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { SlotDay } from '../../../domain/slot-day';
 import { SlotDayListComponent } from '../slot-day-list/slot-day-list.component';
@@ -15,4 +15,6 @@ export class SlotsStepComponent {
     readonly stepCount = input.required<number>();
     readonly teacherName = input.required<string>();
     readonly days = input.required<readonly SlotDay[]>();
+
+    readonly back = output<void>();
 }

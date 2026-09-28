@@ -245,6 +245,7 @@
     "weekTeacherCaption": "שבוע {{weekNumber}} · {{weekRange}} · {{teacherName}}",
     "step": "שלב {{current}} מתוך {{total}}",
     "continue": "המשך",
+    "back": "חזרה",
     "window": {
       "opens": "פתיחה",
       "closes": "סגירה",
@@ -294,6 +295,15 @@
       },
       "noAvailabilityTitle": "עדיין אין שעות לשבוע הזה.",
       "noAvailabilityBody": "אין עדיין זמינות שפורסמה אצל {{teacherName}} לשבוע הזה. פנו לבית הספר."
+    },
+    "target": {
+      "title": "כמה שיעורים תרצו השבוע?",
+      "body": "אחר כך תבחרו לפחות אותו מספר של שעות, לפי סדר העדפה.",
+      "unitOne": "שיעור · מינימום {{min}}",
+      "unit": "שיעורים · מינימום {{min}}",
+      "fewer": "פחות שיעורים",
+      "more": "יותר שיעורים",
+      "pickSlots": "לבחירת שעות"
     },
     "slots": {
       "title": "השבוע של {{teacherName}}",

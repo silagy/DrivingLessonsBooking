@@ -9,11 +9,12 @@ import { IdentifyStatus } from '../domain/identify-status.enum';
 import { formatWindowInstant } from '../domain/jerusalem-time';
 import { nameInitials } from '../domain/name-initials';
 import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-id-input';
-import { groupSlotsByDay } from '../domain/slot-day';
-import { stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
+import { groupSlotsByDay, hasOpenSlot } from '../domain/slot-day';
+import { previousStepOf, stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
 import { StudentFormStep } from '../domain/student-form-step.enum';
 import { viewForPublicationState } from '../domain/student-form-view';
 import { StudentFormView } from '../domain/student-form-view.enum';
+import { MIN_TARGET_COUNT } from '../domain/target-count';
 import { weekRangeLabel } from '../domain/week-label';
 
 const HTTP_NOT_FOUND = 404;
@@ -23,7 +24,10 @@ const EMPTY_WEEK_PARAMS = { weekNumber: 0, weekRange: '' };
 const CAPTION_KEY_BY_STEP: Record<StudentFormStep, string | null> = {
     [StudentFormStep.identify]: null,
     [StudentFormStep.details]: 'studentForm.weekCaption',
+    [StudentFormStep.target]: 'studentForm.weekTeacherCaption',
     [StudentFormStep.slots]: 'studentForm.weekTeacherCaption',
+    [StudentFormStep.review]: 'studentForm.weekTeacherCaption',
+    [StudentFormStep.done]: null,
 };
 
 interface IdentifyLookup {
@@ -43,6 +47,7 @@ export class StudentFormStore {
     private readonly linkToken = signal<string | null>(null);
     private readonly nationalId = signal<string | null>(null);
     private readonly step = signal(StudentFormStep.identify);
+    private readonly target = signal(MIN_TARGET_COUNT);
 
     private readonly publicationResource = resource({
         params: () => this.linkToken() ?? undefined,
@@ -127,7 +132,7 @@ export class StudentFormStore {
     readonly studentName = computed(() => this.student()?.studentName ?? '');
     readonly teacherName = computed(() => this.student()?.teacherName ?? '');
     readonly teacherInitials = computed(() => nameInitials(this.teacherName()));
-    readonly hasAvailability = computed(() => (this.student()?.slots.length ?? 0) > 0);
+    readonly hasAvailability = computed(() => hasOpenSlot(this.student()?.slots ?? []));
     readonly slotDays = computed(() => {
         const student = this.student();
         const publication = this.publication();
@@ -136,6 +141,9 @@ export class StudentFormStore {
             ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang(), [])
             : [];
     });
+
+    readonly targetCount = this.target.asReadonly();
+    readonly minTargetCount = MIN_TARGET_COUNT;
 
     readonly currentStep = this.step.asReadonly();
     readonly stepNumber = computed(() => stepNumberOf(this.step()));
@@ -178,12 +186,38 @@ export class StudentFormStore {
         this.step.set(StudentFormStep.details);
     }
 
+    continueToTarget(): void {
+        if (!this.hasAvailability()) {
+            return;
+        }
+
+        this.step.set(StudentFormStep.target);
+    }
+
     continueToSlots(): void {
         if (!this.hasAvailability()) {
             return;
         }
 
         this.step.set(StudentFormStep.slots);
+    }
+
+    increaseTarget(): void {
+        this.target.update(count => count + 1);
+    }
+
+    decreaseTarget(): void {
+        this.target.update(count => Math.max(MIN_TARGET_COUNT, count - 1));
+    }
+
+    goBack(): void {
+        const previous = previousStepOf(this.step());
+
+        if (!previous) {
+            return;
+        }
+
+        this.step.set(previous);
     }
 
     private formatInstant(utcIso: string | undefined): string {

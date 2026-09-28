@@ -1,8 +1,18 @@
 <section class="wizard-step">
     <div class="wizard-step__body">
-        <p class="wizard-step__counter">
-            {{ 'studentForm.step' | transloco: { current: stepNumber(), total: stepCount() } }}
-        </p>
+        <div class="wizard-step__top">
+            <p class="wizard-step__counter">
+                {{ 'studentForm.step' | transloco: { current: stepNumber(), total: stepCount() } }}
+            </p>
+            @if (canGoBack()) {
+                <p-button
+                    type="button"
+                    class="wizard-step__back"
+                    [text]="true"
+                    [label]="'studentForm.back' | transloco"
+                    (onClick)="back.emit()" />
+            }
+        </div>
         @if (heading()) {
             <h1 class="wizard-step__heading">{{ heading() }}</h1>
         }

@@ -245,6 +245,7 @@
     "weekTeacherCaption": "Week {{weekNumber}} · {{weekRange}} · {{teacherName}}",
     "step": "Step {{current}} of {{total}}",
     "continue": "Continue",
+    "back": "Back",
     "window": {
       "opens": "Opens",
       "closes": "Closes",
@@ -294,6 +295,15 @@
       },
       "noAvailabilityTitle": "No lesson slots yet.",
       "noAvailabilityBody": "{{teacherName}} hasn't published availability for this week. Please contact your school."
+    },
+    "target": {
+      "title": "How many lessons do you want this week?",
+      "body": "You'll then pick at least that many slots, ranked by preference.",
+      "unitOne": "lesson · minimum {{min}}",
+      "unit": "lessons · minimum {{min}}",
+      "fewer": "Fewer lessons",
+      "more": "More lessons",
+      "pickSlots": "Pick slots"
     },
     "slots": {
       "title": "{{teacherName}}'s week",

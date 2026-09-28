@@ -173,6 +173,26 @@ async function identifyAndContinue(fixture: ComponentFixture<StudentFormPage>): 
     await clickContinue(fixture);
 }
 
+async function reachTarget(fixture: ComponentFixture<StudentFormPage>): Promise<void> {
+    await identifyAndContinue(fixture);
+    await clickContinue(fixture);
+}
+
+async function reachSlots(fixture: ComponentFixture<StudentFormPage>): Promise<void> {
+    await reachTarget(fixture);
+    await clickContinue(fixture);
+}
+
+async function press(fixture: ComponentFixture<StudentFormPage>, selector: string): Promise<void> {
+    const element = page(fixture).querySelector(selector) as HTMLElement;
+    element.click();
+    await fixture.whenStable();
+}
+
+function textOf(fixture: ComponentFixture<StudentFormPage>, selector: string): string | undefined {
+    return page(fixture).querySelector(selector)?.textContent?.trim();
+}
+
 describe('StudentFormPage', () => {
     it.each([
         { view: 'notYetOpen', load: publicationIn(PublicationState.published), windowRows: 2 },
@@ -383,6 +403,92 @@ describe('StudentFormPage', () => {
         });
     });
 
+    describe('target step', () => {
+        it('asks for a weekly target after the details, starting at one lesson', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await identifyAndContinue(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('app-target-step')).not.toBeNull();
+            expect(textOf(fixture, '.target__count')).toBe('1');
+            expect(page(fixture).querySelector<HTMLButtonElement>('.target__decrease')!.disabled).toBe(true);
+            expect(textOf(fixture, '.student-shell__caption')).toContain('studentForm.weekTeacherCaption');
+        });
+
+        it('raises the target without an upper limit and never lowers it below one', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachTarget(fixture);
+
+            //when
+            for (let count = 1; count <= 30; count++) {
+                await press(fixture, '.target__increase');
+            }
+            const raised = textOf(fixture, '.target__count');
+            for (let count = 1; count <= 40; count++) {
+                await press(fixture, '.target__decrease');
+            }
+
+            //then
+            expect(raised).toBe('31');
+            expect(textOf(fixture, '.target__count')).toBe('1');
+        });
+
+        it('names the unit in the singular for one lesson and in the plural for more', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachTarget(fixture);
+            const single = textOf(fixture, '.target__unit');
+
+            //when
+            await press(fixture, '.target__increase');
+
+            //then
+            expect(single).toMatch(/studentForm\.target\.unitOne$/);
+            expect(textOf(fixture, '.target__unit')).toMatch(/studentForm\.target\.unit$/);
+        });
+
+        it('goes back to the details and keeps the chosen target', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachTarget(fixture);
+            await press(fixture, '.target__increase');
+            await press(fixture, '.target__increase');
+
+            //when
+            await press(fixture, '.wizard-step__back button');
+            const wentBackToDetails = page(fixture).querySelector('app-details-step') !== null;
+            await clickContinue(fixture);
+
+            //then
+            expect(wentBackToDetails).toBe(true);
+            expect(textOf(fixture, '.target__count')).toBe('3');
+        });
+
+        it('stops at the details when every slot of the week is unavailable', async () => {
+            //given
+            const everySlot = weekSlots([]).map(slot => slot.id);
+            const blockedWeek = studentOf('Teacher Levi', Transmission.manual, weekSlots(everySlot));
+            provideOpenLinkIdentifying(identifyingAs(blockedWeek));
+            const fixture = await renderPage();
+
+            //when
+            await identifyAndContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('.details__no-availability')).not.toBeNull();
+            expect(continueButton(fixture)).toBeNull();
+        });
+    });
+
     describe('slots step', () => {
         it.each([
             { teacherName: 'Teacher Cohen', unavailable: [] as string[] },
@@ -392,7 +498,7 @@ describe('StudentFormPage', () => {
             const student = studentOf(teacherName, Transmission.automatic, weekSlots(unavailable));
             provideOpenLinkIdentifying(identifyingAs(student));
             const fixture = await renderPage();
-            await identifyAndContinue(fixture);
+            await reachTarget(fixture);
 
             //when
             await clickContinue(fixture);
@@ -402,9 +508,7 @@ describe('StudentFormPage', () => {
             expect(page(fixture).querySelectorAll('.slot-day').length).toBe(6);
             expect(page(fixture).querySelectorAll('.slot-chip').length).toBe(22);
             expect(page(fixture).querySelectorAll('.slot-chip--unavailable').length).toBe(unavailable.length);
-            expect(page(fixture).querySelector('.student-shell__caption')?.textContent).toContain(
-                'studentForm.weekTeacherCaption',
-            );
+            expect(textOf(fixture, '.student-shell__caption')).toContain('studentForm.weekTeacherCaption');
         });
 
         it('never offers the grid when the teacher has no availability this week', async () => {
@@ -420,17 +524,30 @@ describe('StudentFormPage', () => {
             expect(continueButton(fixture)).toBeNull();
         });
 
-        it('keeps the week grid read-only', async () => {
+        it('goes back from the grid to the target', async () => {
             //given
             provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
             const fixture = await renderPage();
-            await identifyAndContinue(fixture);
+            await reachSlots(fixture);
+
+            //when
+            await press(fixture, '.wizard-step__back button');
+
+            //then
+            expect(page(fixture).querySelector('app-target-step')).not.toBeNull();
+        });
+
+        it('keeps the week grid read-only until picking arrives', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachTarget(fixture);
 
             //when
             await clickContinue(fixture);
 
             //then
-            expect(page(fixture).querySelectorAll('main button, main input').length).toBe(0);
+            expect(page(fixture).querySelectorAll('.slot-days button, .slot-days input').length).toBe(0);
         });
     });
 });

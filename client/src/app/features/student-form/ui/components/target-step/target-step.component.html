@@ -1,0 +1,31 @@
+<app-wizard-step
+    [stepNumber]="stepNumber()"
+    [stepCount]="stepCount()"
+    [heading]="'studentForm.target.title' | transloco"
+    [intro]="'studentForm.target.body' | transloco"
+    [canGoBack]="true"
+    (back)="back.emit()">
+    <div class="target" role="group" [attr.aria-label]="'studentForm.target.title' | transloco">
+        <button
+            type="button"
+            class="target__step target__decrease"
+            [disabled]="isAtMinimum()"
+            [attr.aria-label]="'studentForm.target.fewer' | transloco"
+            (click)="decreased.emit()">
+            <i class="pi pi-minus" aria-hidden="true"></i>
+        </button>
+        <output class="target__count" aria-live="polite">{{ targetCount() }}</output>
+        <button
+            type="button"
+            class="target__step target__increase"
+            [attr.aria-label]="'studentForm.target.more' | transloco"
+            (click)="increased.emit()">
+            <i class="pi pi-plus" aria-hidden="true"></i>
+        </button>
+    </div>
+    <p class="target__unit">{{ unitKey() | transloco: { min: minTargetCount() } }}</p>
+
+    <div wizardFooter>
+        <p-button type="button" fluid [label]="'studentForm.target.pickSlots' | transloco" (onClick)="continued.emit()" />
+    </div>
+</app-wizard-step>

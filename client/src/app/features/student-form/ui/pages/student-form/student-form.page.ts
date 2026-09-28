@@ -9,6 +9,7 @@ import { DetailsStepComponent } from '../../components/details-step/details-step
 import { IdentifyStepComponent } from '../../components/identify-step/identify-step.component';
 import { SlotsStepComponent } from '../../components/slots-step/slots-step.component';
 import { StatusMessageComponent } from '../../components/status-message/status-message.component';
+import { TargetStepComponent } from '../../components/target-step/target-step.component';
 import { StudentShellComponent } from '../../components/student-shell/student-shell.component';
 
 @Component({
@@ -21,6 +22,7 @@ import { StudentShellComponent } from '../../components/student-shell/student-sh
         StudentShellComponent,
         IdentifyStepComponent,
         DetailsStepComponent,
+        TargetStepComponent,
         SlotsStepComponent,
     ],
     providers: [StudentFormStore],
