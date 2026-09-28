@@ -63,7 +63,14 @@ function studentOf(
     transmission: Transmission,
     slots: SlotForIdentifyStudentResponse[],
 ): IdentifyStudentResponse {
-    return { studentName: 'Test Student', teacherName, carName: 'Corolla White', transmission, slots };
+    return {
+        studentName: 'Test Student',
+        teacherName,
+        carName: 'Corolla White',
+        transmission,
+        hasSubmission: false,
+        slots,
+    };
 }
 
 const COHEN_STUDENT = studentOf('Teacher Cohen', Transmission.automatic, weekSlots([]));

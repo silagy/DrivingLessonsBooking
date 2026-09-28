@@ -8,6 +8,7 @@ export interface IdentifyStudentResponse {
     teacherName: string;
     carName: string;
     transmission: Transmission;
+    hasSubmission: boolean;
     slots: SlotForIdentifyStudentResponse[];
 }
 

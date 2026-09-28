@@ -133,7 +133,7 @@ export class StudentFormStore {
         const publication = this.publication();
 
         return student && publication
-            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang())
+            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang(), [])
             : [];
     });
 
