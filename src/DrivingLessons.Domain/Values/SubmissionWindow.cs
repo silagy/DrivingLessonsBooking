@@ -22,4 +22,9 @@ public record SubmissionWindow
 
         return new SubmissionWindow(startUtc, endUtc);
     }
+
+    public bool HasEndedBy(DateTimeOffset instant)
+    {
+        return instant >= EndUtc;
+    }
 }

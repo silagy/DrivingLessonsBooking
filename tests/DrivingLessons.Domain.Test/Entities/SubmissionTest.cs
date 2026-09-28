@@ -146,6 +146,27 @@ public class SubmissionTest
     }
 
     [TestMethod]
+    public void Create__Window_Must_Not_Have_Ended()
+    {
+        //given
+        var scenario = SubmissionFakeBuilder.BuildScenario();
+        var picks = SubmissionFakeBuilder.PicksOf(scenario.WeekSchedule, 1);
+        var submittedAtUtc = scenario.Publication.Window!.EndUtc;
+
+        //when
+        var act = () => Submission.Create(
+            scenario.Publication,
+            scenario.Student,
+            scenario.WeekSchedule,
+            TargetSessionCount.Of(1),
+            picks,
+            submittedAtUtc);
+
+        //then
+        Should.Throw<SubmissionWindowMustBeOpenException>(act);
+    }
+
+    [TestMethod]
     public void Create__Student_Must_Be_Active()
     {
         //given
@@ -344,6 +365,98 @@ public class SubmissionTest
 
         //then
         Should.Throw<SubmissionWindowMustBeOpenException>(act);
+    }
+
+    [TestMethod]
+    public void Revise__Window_Must_Not_Have_Ended()
+    {
+        //given
+        var scenario = SubmissionFakeBuilder.BuildScenario();
+        var submission = SubmissionFakeBuilder.Build(scenario);
+        var picks = SubmissionFakeBuilder.PicksOf(scenario.WeekSchedule, 3);
+        var revisedAtUtc = scenario.Publication.Window!.EndUtc.AddSeconds(1);
+
+        //when
+        var act = () => submission.Revise(
+            scenario.Publication,
+            scenario.Student,
+            scenario.WeekSchedule,
+            TargetSessionCount.Of(3),
+            picks,
+            revisedAtUtc);
+
+        //then
+        Should.Throw<SubmissionWindowMustBeOpenException>(act);
+    }
+
+    [TestMethod]
+    public void Revise__Rejected_Revision_Keeps_The_Previous_Version()
+    {
+        //given
+        var scenario = SubmissionFakeBuilder.BuildScenario();
+        var submission = SubmissionFakeBuilder.Build(scenario);
+        var previousTarget = submission.TargetCount;
+        var previousSlotIds = submission.SlotRequests.Select(x => x.SlotId).ToList();
+        var picks = SubmissionFakeBuilder.PicksOf(scenario.WeekSchedule, 4);
+        var revisedAtUtc = scenario.Publication.Window!.EndUtc;
+
+        //when
+        var act = () => submission.Revise(
+            scenario.Publication,
+            scenario.Student,
+            scenario.WeekSchedule,
+            TargetSessionCount.Of(4),
+            picks,
+            revisedAtUtc);
+
+        //then
+        Should.Throw<SubmissionWindowMustBeOpenException>(act);
+        submission.TargetCount.ShouldBe(previousTarget);
+        submission.SlotRequests.Select(x => x.SlotId).ShouldBe(previousSlotIds);
+        submission.RevisedAtUtc.ShouldBeNull();
+        submission.UncommittedEvents.OfType<SubmissionRevised>().ShouldBeEmpty();
+    }
+
+    [TestMethod]
+    public void Revise__Replaces_Every_Earlier_Version()
+    {
+        //given
+        var scenario = SubmissionFakeBuilder.BuildScenario();
+        var submission = SubmissionFakeBuilder.Build(scenario);
+        var slots = scenario.WeekSchedule.Slots.ToList();
+        var secondPicks = new[] { slots[3], slots[8] }
+                              .Select(slot => SlotPick.Of(slot, SessionType.Single, null))
+                              .ToList();
+        var constraint = SlotConstraint.Of(Faker.FakeString());
+        var thirdPicks = new List<SlotPick> { SlotPick.Of(slots[11], SessionType.Double, constraint) };
+        var secondRevisedAtUtc = Faker.FakeUtcInstant();
+        var thirdRevisedAtUtc = secondRevisedAtUtc.AddMinutes(5);
+        submission.Revise(
+            scenario.Publication,
+            scenario.Student,
+            scenario.WeekSchedule,
+            TargetSessionCount.Of(2),
+            secondPicks,
+            secondRevisedAtUtc);
+
+        //when
+        submission.Revise(
+            scenario.Publication,
+            scenario.Student,
+            scenario.WeekSchedule,
+            TargetSessionCount.Of(1),
+            thirdPicks,
+            thirdRevisedAtUtc);
+
+        //then
+        submission.TargetCount.ShouldBe(TargetSessionCount.Of(1));
+        var slotRequest = submission.SlotRequests.ShouldHaveSingleItem();
+        slotRequest.SlotId.ShouldBe(slots[11].Id);
+        slotRequest.SessionType.ShouldBe(SessionType.Double);
+        slotRequest.Constraint.ShouldBe(constraint);
+        slotRequest.Rank.ShouldBe(Rank.Of(1));
+        submission.RevisedAtUtc.ShouldBe(thirdRevisedAtUtc);
+        submission.UncommittedEvents.OfType<SubmissionRevised>().Count().ShouldBe(2);
     }
 
     [TestMethod]

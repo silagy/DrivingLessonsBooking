@@ -28,6 +28,7 @@ public class ReviseSubmissionInteractorTest
     private Publication publication = null!;
     private WeekSchedule weekSchedule = null!;
     private Submission existing = null!;
+    private TimeProvider timeProvider = null!;
 
     [TestInitialize]
     public void Init()
@@ -37,7 +38,7 @@ public class ReviseSubmissionInteractorTest
         var weekScheduleRepository = A.Fake<IWeekScheduleRepository>();
         submissionRepository = A.Fake<ISubmissionRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        var timeProvider = A.Fake<TimeProvider>();
+        timeProvider = A.Fake<TimeProvider>();
         var contextResolver = new SubmissionContextResolver(
             publicationRepository,
             studentRepository,
@@ -141,6 +142,69 @@ public class ReviseSubmissionInteractorTest
         await Should.ThrowAsync<SubmissionWindowMustBeOpenException>(act);
         A.CallTo(() => unitOfWork.CommitAsync())
             .MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Window_That_Has_Ended_Is_Rejected_And_Keeps_The_Previous_Version()
+    {
+        //given
+        var slots = weekSchedule.Slots.ToList();
+        var request = new ReviseSubmissionRequest(
+            RosterNationalId,
+            2,
+            [
+                new SlotRequestForSubmissionRequest(slots[4].Id.Value, SessionType.Single, null),
+                new SlotRequestForSubmissionRequest(slots[6].Id.Value, SessionType.Double, null)
+            ]);
+
+        A.CallTo(() => timeProvider.GetUtcNow())
+            .Returns(publication.Window!.EndUtc.AddMinutes(1));
+
+        //when
+        var act = () => interactor.ExecuteAsync(publication.LinkToken.Value, request);
+
+        //then
+        await Should.ThrowAsync<SubmissionWindowMustBeOpenException>(act);
+        existing.TargetCount.ShouldBe(TargetSessionCount.Of(1));
+        existing.SlotRequests.Select(x => x.SlotId).ShouldBe([slots[0].Id]);
+        existing.RevisedAtUtc.ShouldBeNull();
+        A.CallTo(() => unitOfWork.CommitAsync())
+            .MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Revises_Any_Number_Of_Times()
+    {
+        //given
+        var slots = weekSchedule.Slots.ToList();
+        var laterNow = Now.AddHours(3);
+        var firstRevision = new ReviseSubmissionRequest(
+            RosterNationalId,
+            2,
+            [
+                new SlotRequestForSubmissionRequest(slots[4].Id.Value, SessionType.Single, null),
+                new SlotRequestForSubmissionRequest(slots[6].Id.Value, SessionType.Single, null)
+            ]);
+        var secondRevision = new ReviseSubmissionRequest(
+            RosterNationalId,
+            1,
+            [new SlotRequestForSubmissionRequest(slots[10].Id.Value, SessionType.Double, "pick me up from work")]);
+
+        await interactor.ExecuteAsync(publication.LinkToken.Value, firstRevision);
+
+        A.CallTo(() => timeProvider.GetUtcNow())
+            .Returns(laterNow);
+
+        //when
+        await interactor.ExecuteAsync(publication.LinkToken.Value, secondRevision);
+
+        //then
+        existing.TargetCount.ShouldBe(TargetSessionCount.Of(1));
+        existing.SlotRequests.ShouldHaveSingleItem().SlotId.ShouldBe(slots[10].Id);
+        existing.RevisedAtUtc.ShouldBe(laterNow);
+        existing.SubmittedAtUtc.ShouldBe(SubmittedAtUtc);
+        A.CallTo(() => unitOfWork.CommitAsync())
+            .MustHaveHappenedTwiceExactly();
     }
 
     [TestMethod]

@@ -49,4 +49,23 @@ public class SubmissionWindowTest
         //then
         Should.Throw<SubmissionWindowEndMustBeAfterStartException>(act);
     }
+
+    [TestMethod]
+    [DataRow(-1, false)]
+    [DataRow(0, true)]
+    [DataRow(1, true)]
+    public void Has_Ended_By(int secondsAfterEnd, bool hasEnded)
+    {
+        //given
+        var startUtc = DateTimeOffset.UtcNow;
+        var endUtc = startUtc.AddDays(3);
+        var window = SubmissionWindow.Of(startUtc, endUtc);
+        var instant = endUtc.AddSeconds(secondsAfterEnd);
+
+        //when
+        var result = window.HasEndedBy(instant);
+
+        //then
+        result.ShouldBe(hasEnded);
+    }
 }
