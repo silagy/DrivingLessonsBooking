@@ -10,8 +10,38 @@ public class IdentifyStudentResponse
     public string TeacherName { get; init; } = string.Empty;
     public string CarName { get; init; } = string.Empty;
     public Transmission Transmission { get; init; }
-    public bool HasSubmission { get; init; }
+    public SubmissionForIdentifyStudentResponse? Submission { get; init; }
     public IReadOnlyCollection<SlotForIdentifyStudentResponse> Slots { get; init; } = [];
+}
+
+public class SubmissionForIdentifyStudentResponse
+{
+    public int TargetCount { get; init; }
+    public DateTimeOffset LastSavedAtUtc { get; init; }
+    public IReadOnlyCollection<SlotRequestForIdentifyStudentResponse> SlotRequests { get; init; } = [];
+
+    public static Expression<Func<Submission, SubmissionForIdentifyStudentResponse>> Selector =>
+        x => new SubmissionForIdentifyStudentResponse
+        {
+            TargetCount = x.TargetCount.Value,
+            LastSavedAtUtc = x.RevisedAtUtc ?? x.SubmittedAtUtc,
+            SlotRequests = x.SlotRequests
+                            .OrderBy(request => request.Rank)
+                            .Select(request => new SlotRequestForIdentifyStudentResponse
+                            {
+                                SlotId = request.SlotId.Value,
+                                SessionType = request.SessionType,
+                                Constraint = request.Constraint == null ? null : request.Constraint.Value
+                            })
+                            .ToList()
+        };
+}
+
+public class SlotRequestForIdentifyStudentResponse
+{
+    public Guid SlotId { get; init; }
+    public SessionType SessionType { get; init; }
+    public string? Constraint { get; init; }
 }
 
 public class SlotForIdentifyStudentResponse

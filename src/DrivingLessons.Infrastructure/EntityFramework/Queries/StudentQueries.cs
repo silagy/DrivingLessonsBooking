@@ -81,9 +81,11 @@ public class StudentQueries : IStudentQueries
                                       on submission.PublicationId equals publication.Id
                                   where submission.StudentId == studentId
                                         && publication.WeekStart == resolvedWeekStart
-                                  select submission.Id;
+                                  select submission;
 
-        var hasSubmission = await submissionsThisWeek.AnyAsync();
+        var savedSubmission = await submissionsThisWeek
+                                        .Select(SubmissionForIdentifyStudentResponse.Selector)
+                                        .FirstOrDefaultAsync();
 
         var slots = await dbContext
                             .WeekSchedules
@@ -100,7 +102,7 @@ public class StudentQueries : IStudentQueries
             TeacherName = identified.TeacherName,
             CarName = identified.CarName,
             Transmission = identified.Transmission,
-            HasSubmission = hasSubmission,
+            Submission = savedSubmission,
             Slots = slots
         };
     }
