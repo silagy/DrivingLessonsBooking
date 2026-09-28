@@ -59,6 +59,7 @@ public class StudentQueries : IStudentQueries
                     where student.NationalId == nationalId && student.IsActive
                     select new
                     {
+                        StudentId = student.Id,
                         TeacherId = teacher.Id,
                         StudentName = student.Name.Value,
                         TeacherName = teacher.Name.Value,
@@ -72,6 +73,17 @@ public class StudentQueries : IStudentQueries
         {
             return null;
         }
+
+        var studentId = identified.StudentId;
+
+        var submissionsThisWeek = from submission in dbContext.Submissions
+                                  join publication in dbContext.Publications
+                                      on submission.PublicationId equals publication.Id
+                                  where submission.StudentId == studentId
+                                        && publication.WeekStart == resolvedWeekStart
+                                  select submission.Id;
+
+        var hasSubmission = await submissionsThisWeek.AnyAsync();
 
         var slots = await dbContext
                             .WeekSchedules
@@ -88,6 +100,7 @@ public class StudentQueries : IStudentQueries
             TeacherName = identified.TeacherName,
             CarName = identified.CarName,
             Transmission = identified.Transmission,
+            HasSubmission = hasSubmission,
             Slots = slots
         };
     }

@@ -1,0 +1,111 @@
+<app-wizard-step
+    [stepNumber]="stepNumber()"
+    [stepCount]="stepCount()"
+    [heading]="'studentForm.review.title' | transloco"
+    [canGoBack]="true"
+    (back)="back.emit()">
+    <div class="review">
+        @if (missingPicks() > 0) {
+            <p-message severity="error" class="review__not-enough">
+                <span>
+                    <strong>{{ 'studentForm.review.notEnoughTitle' | transloco }}</strong>
+                    {{
+                        'studentForm.review.notEnoughBody'
+                            | transloco: { target: targetCount(), picked: pickCount(), missing: missingPicks() }
+                    }}
+                </span>
+            </p-message>
+            <div class="review__fixes">
+                <p-button
+                    type="button"
+                    class="review__add-slots"
+                    severity="secondary"
+                    fluid
+                    [outlined]="true"
+                    [label]="'studentForm.review.addSlots' | transloco"
+                    (onClick)="addSlots.emit()" />
+                <p-button
+                    type="button"
+                    class="review__change-target"
+                    [text]="true"
+                    [label]="'studentForm.review.changeTarget' | transloco"
+                    (onClick)="changeTarget.emit()" />
+            </div>
+        } @else {
+            <p class="review__summary">
+                <strong>{{ 'studentForm.slots.summary' | transloco: { target: targetCount(), picked: pickCount() } }}</strong>
+                {{ preferredKey() | transloco: { target: targetCount() } }}
+            </p>
+        }
+
+        @if (replacesEarlierSubmission()) {
+            <p-message severity="info" class="review__replaces">
+                {{ 'studentForm.review.replaces' | transloco }}
+            </p-message>
+        }
+
+        <ol class="review__list">
+            @for (item of items(); track item.slotId) {
+                @let dayName = 'weekGrid.days.' + item.day | transloco;
+                @let windowName = 'weekGrid.windows.' + item.window | transloco;
+                <li class="review__item" [class.review__item--preferred]="item.isPreferred">
+                    <span class="review__rank" aria-hidden="true">{{ item.rank }}</span>
+                    <div class="review__details">
+                        <p class="review__slot">
+                            {{ 'studentForm.slotLabel' | transloco: { day: dayName, window: windowName } }}
+                            <span class="review__time" dir="ltr">{{ item.timeLabel }}</span>
+                        </p>
+                        <p class="review__meta">
+                            <span
+                                class="review__type"
+                                [class.review__type--double]="item.sessionType === sessionTypes.double">
+                                {{ 'studentForm.pick.' + item.sessionType | transloco }}
+                            </span>
+                            @if (item.constraint) {
+                                <q class="review__constraint">{{ item.constraint }}</q>
+                            }
+                        </p>
+                    </div>
+                </li>
+            }
+        </ol>
+
+        @switch (submitStatus()) {
+            @case (statuses.rejected) {
+                <p-message severity="error" class="review__rejected">
+                    {{ 'studentForm.review.errors.rejected' | transloco }}
+                </p-message>
+                <p-button
+                    type="button"
+                    class="review__recheck"
+                    severity="secondary"
+                    [outlined]="true"
+                    [label]="'studentForm.review.recheck' | transloco"
+                    (onClick)="recheck.emit()" />
+            }
+            @case (statuses.notFound) {
+                <p-message severity="error" class="review__not-found">
+                    {{ 'studentForm.review.errors.notFound' | transloco }}
+                </p-message>
+            }
+            @case (statuses.failed) {
+                <p-message severity="warn" class="review__failed">
+                    {{ 'studentForm.review.errors.failed' | transloco }}
+                </p-message>
+            }
+        }
+    </div>
+
+    <div wizardFooter>
+        <p-button
+            type="button"
+            fluid
+            [label]="'studentForm.review.submit' | transloco"
+            [disabled]="!canSubmit()"
+            [loading]="isSubmitting()"
+            (onClick)="submitted.emit()" />
+        @if (missingPicks() > 0) {
+            <small class="review__unlock">{{ 'studentForm.review.unlockHint' | transloco: { target: targetCount() } }}</small>
+        }
+    </div>
+</app-wizard-step>

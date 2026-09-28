@@ -2,6 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { LanguageService } from '../../../core/language.service';
+import { SlotState } from '../../../shared/models/slot-state.enum';
+import { CreateSubmissionRequest } from '../data/create-submission.request';
 import { GetPublicationByLinkResponse } from '../data/get-publication-by-link.response';
 import { IdentifyStudentResponse } from '../data/identify-student.response';
 import { SubmissionsApiService } from '../data/submissions-api.service';
@@ -9,21 +11,37 @@ import { IdentifyStatus } from '../domain/identify-status.enum';
 import { formatWindowInstant } from '../domain/jerusalem-time';
 import { nameInitials } from '../domain/name-initials';
 import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-id-input';
-import { groupSlotsByDay } from '../domain/slot-day';
-import { stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
+import { PickSheet, pickSheetFor } from '../domain/pick-sheet';
+import { reviewItemsOf } from '../domain/review-item';
+import { groupSlotsByDay, hasOpenSlot } from '../domain/slot-day';
+import { PickChoice, removePick, SlotPick, upsertPick } from '../domain/slot-pick';
+import { previousStepOf, stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
 import { StudentFormStep } from '../domain/student-form-step.enum';
 import { viewForPublicationState } from '../domain/student-form-view';
 import { StudentFormView } from '../domain/student-form-view.enum';
+import { SubmitStatus } from '../domain/submit-status.enum';
+import { MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
 import { weekRangeLabel } from '../domain/week-label';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
 const EMPTY_WEEK_PARAMS = { weekNumber: 0, weekRange: '' };
+const SINGLE_PICK = 1;
+const SUBMITTED_BODY_ONE = 'studentForm.submitted.bodyOne';
+const SUBMITTED_BODY_MANY = 'studentForm.submitted.bodyMany';
+const SUBMIT_LOCKING_STATUSES: ReadonlySet<SubmitStatus> = new Set([
+    SubmitStatus.submitting,
+    SubmitStatus.rejected,
+    SubmitStatus.notFound,
+]);
 
 const CAPTION_KEY_BY_STEP: Record<StudentFormStep, string | null> = {
     [StudentFormStep.identify]: null,
     [StudentFormStep.details]: 'studentForm.weekCaption',
+    [StudentFormStep.target]: 'studentForm.weekTeacherCaption',
     [StudentFormStep.slots]: 'studentForm.weekTeacherCaption',
+    [StudentFormStep.review]: 'studentForm.weekTeacherCaption',
+    [StudentFormStep.done]: null,
 };
 
 interface IdentifyLookup {
@@ -43,6 +61,11 @@ export class StudentFormStore {
     private readonly linkToken = signal<string | null>(null);
     private readonly nationalId = signal<string | null>(null);
     private readonly step = signal(StudentFormStep.identify);
+    private readonly target = signal(MIN_TARGET_COUNT);
+    private readonly chosenPicks = signal<SlotPick[]>([]);
+    private readonly openSlotId = signal<string | null>(null);
+    private readonly submitState = signal(SubmitStatus.idle);
+    private readonly submittedThisVisit = signal(false);
 
     private readonly publicationResource = resource({
         params: () => this.linkToken() ?? undefined,
@@ -67,6 +90,17 @@ export class StudentFormStore {
 
     private readonly identifyResult = computed<IdentifyResult | null>(() =>
         this.identifyResource.hasValue() ? this.identifyResource.value() : null,
+    );
+
+    private readonly openSlotIds = computed(() => {
+        const result = this.identifyResult();
+        const slots = result?.status === IdentifyStatus.found ? result.student.slots : [];
+
+        return new Set(slots.filter(slot => slot.state === SlotState.open).map(slot => slot.id));
+    });
+
+    private readonly picks = computed(() =>
+        this.chosenPicks().filter(pick => this.openSlotIds().has(pick.slotId)),
     );
 
     readonly view = computed<StudentFormView>(() => {
@@ -127,15 +161,46 @@ export class StudentFormStore {
     readonly studentName = computed(() => this.student()?.studentName ?? '');
     readonly teacherName = computed(() => this.student()?.teacherName ?? '');
     readonly teacherInitials = computed(() => nameInitials(this.teacherName()));
-    readonly hasAvailability = computed(() => (this.student()?.slots.length ?? 0) > 0);
+    readonly hasAvailability = computed(() => hasOpenSlot(this.student()?.slots ?? []));
     readonly slotDays = computed(() => {
         const student = this.student();
         const publication = this.publication();
 
         return student && publication
-            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang())
+            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang(), this.picks())
             : [];
     });
+
+    readonly targetCount = this.target.asReadonly();
+    readonly minTargetCount = MIN_TARGET_COUNT;
+    readonly pickCount = computed(() => this.picks().length);
+    readonly pickSheet = computed<PickSheet | null>(() => {
+        const slotId = this.openSlotId();
+        const slot = this.student()?.slots.find(x => x.id === slotId);
+
+        return slot ? pickSheetFor(slot, this.picks()) : null;
+    });
+    readonly reviewItems = computed(() =>
+        reviewItemsOf(this.picks(), this.student()?.slots ?? [], this.target()),
+    );
+    readonly missingPicks = computed(() => missingPickCount(this.target(), this.pickCount()));
+    readonly submitStatus = this.submitState.asReadonly();
+    readonly replacesEarlierSubmission = computed(
+        () => (this.student()?.hasSubmission ?? false) || this.submittedThisVisit(),
+    );
+    readonly canSubmit = computed(
+        () =>
+            this.pickCount() > 0 && this.missingPicks() === 0 && !SUBMIT_LOCKING_STATUSES.has(this.submitState()),
+    );
+    readonly submittedBodyKey = computed(() =>
+        this.pickCount() === SINGLE_PICK ? SUBMITTED_BODY_ONE : SUBMITTED_BODY_MANY,
+    );
+    readonly submittedParams = computed(() => ({
+        count: this.pickCount(),
+        weekNumber: this.weekParams().weekNumber,
+        teacherName: this.teacherName(),
+        closesAt: this.closesAt(),
+    }));
 
     readonly currentStep = this.step.asReadonly();
     readonly stepNumber = computed(() => stepNumberOf(this.step()));
@@ -178,12 +243,130 @@ export class StudentFormStore {
         this.step.set(StudentFormStep.details);
     }
 
+    continueToTarget(): void {
+        if (!this.hasAvailability()) {
+            return;
+        }
+
+        this.step.set(StudentFormStep.target);
+    }
+
     continueToSlots(): void {
         if (!this.hasAvailability()) {
             return;
         }
 
         this.step.set(StudentFormStep.slots);
+    }
+
+    increaseTarget(): void {
+        this.target.update(count => count + 1);
+    }
+
+    decreaseTarget(): void {
+        this.target.update(count => Math.max(MIN_TARGET_COUNT, count - 1));
+    }
+
+    openPick(slotId: string): void {
+        const slot = this.student()?.slots.find(x => x.id === slotId);
+
+        if (slot?.state !== SlotState.open) {
+            return;
+        }
+
+        this.openSlotId.set(slotId);
+    }
+
+    savePick(choice: PickChoice): void {
+        const slotId = this.openSlotId();
+
+        if (!slotId) {
+            return;
+        }
+
+        this.chosenPicks.set(upsertPick(this.picks(), { slotId, ...choice }));
+        this.openSlotId.set(null);
+    }
+
+    removeOpenPick(): void {
+        const slotId = this.openSlotId();
+
+        if (!slotId) {
+            return;
+        }
+
+        this.chosenPicks.set(removePick(this.picks(), slotId));
+        this.openSlotId.set(null);
+    }
+
+    closePick(): void {
+        this.openSlotId.set(null);
+    }
+
+    continueToReview(): void {
+        if (!this.pickCount()) {
+            return;
+        }
+
+        this.submitState.set(SubmitStatus.idle);
+        this.step.set(StudentFormStep.review);
+    }
+
+    changeTarget(): void {
+        this.step.set(StudentFormStep.target);
+    }
+
+    async submit(): Promise<void> {
+        const token = this.linkToken();
+        const nationalId = this.nationalId();
+
+        if (!token || !nationalId || !this.canSubmit()) {
+            return;
+        }
+
+        const request: CreateSubmissionRequest = {
+            nationalId,
+            targetCount: this.target(),
+            slotRequests: this.picks().map(pick => ({
+                slotId: pick.slotId,
+                sessionType: pick.sessionType,
+                constraint: pick.constraint,
+            })),
+        };
+        const command = this.replacesEarlierSubmission()
+            ? this.api.reviseSubmission(token, request)
+            : this.api.createSubmission(token, request);
+
+        this.submitState.set(SubmitStatus.submitting);
+
+        try {
+            await firstValueFrom(command);
+            this.submittedThisVisit.set(true);
+            this.submitState.set(SubmitStatus.idle);
+            this.step.set(StudentFormStep.done);
+        } catch (error) {
+            this.submitState.set(submitFailureOf(error));
+        }
+    }
+
+    editSubmission(): void {
+        this.step.set(StudentFormStep.review);
+    }
+
+    recheck(): void {
+        this.submitState.set(SubmitStatus.idle);
+        this.publicationResource.reload();
+        this.identifyResource.reload();
+    }
+
+    goBack(): void {
+        const previous = previousStepOf(this.step());
+
+        if (!previous) {
+            return;
+        }
+
+        this.step.set(previous);
     }
 
     private formatInstant(utcIso: string | undefined): string {
@@ -224,4 +407,16 @@ export class StudentFormStore {
 
 function isStatus(error: unknown, status: number): boolean {
     return error instanceof HttpErrorResponse && error.status === status;
+}
+
+function submitFailureOf(error: unknown): SubmitStatus {
+    if (isStatus(error, HTTP_CONFLICT)) {
+        return SubmitStatus.rejected;
+    }
+
+    if (isStatus(error, HTTP_NOT_FOUND)) {
+        return SubmitStatus.notFound;
+    }
+
+    return SubmitStatus.failed;
 }

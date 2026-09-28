@@ -170,6 +170,46 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("students", (string)null);
                 });
 
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.Submission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("publication_id");
+
+                    b.Property<DateTimeOffset?>("RevisedAtUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("revised_at_utc");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("student_id");
+
+                    b.Property<DateTimeOffset>("SubmittedAtUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("submitted_at_utc");
+
+                    b.Property<int>("TargetCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("target_count");
+
+                    b.Property<Guid>("WeekScheduleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("week_schedule_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WeekScheduleId");
+
+                    b.HasIndex("PublicationId", "StudentId")
+                        .IsUnique();
+
+                    b.ToTable("submissions", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Domain.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("Id")
@@ -392,6 +432,47 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.Navigation("Entries");
 
                     b.Navigation("Failures");
+                });
+
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.Submission", b =>
+                {
+                    b.OwnsMany("DrivingLessons.Domain.Entities.SlotRequest", "SlotRequests", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("Constraint")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("constraint_text");
+
+                            b1.Property<int>("Rank")
+                                .HasColumnType("integer")
+                                .HasColumnName("rank");
+
+                            b1.Property<int>("SessionType")
+                                .HasColumnType("integer")
+                                .HasColumnName("session_type");
+
+                            b1.Property<Guid>("SlotId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("slot_id");
+
+                            b1.Property<Guid>("submission_id")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("submission_id");
+
+                            b1.ToTable("slot_requests", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("submission_id");
+                        });
+
+                    b.Navigation("SlotRequests");
                 });
 
             modelBuilder.Entity("DrivingLessons.Domain.Entities.WeekSchedule", b =>

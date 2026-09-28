@@ -1,0 +1,30 @@
+:host {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.slots__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--app-text-secondary);
+
+    strong {
+        color: var(--app-ink);
+    }
+}
+
+.slots__covered {
+    font-size: 0.8rem;
+    color: var(--p-green-600);
+}
+
+.slots__backups {
+    margin-inline-start: auto;
+    font-size: 0.72rem;
+    color: var(--app-text-muted);
+}

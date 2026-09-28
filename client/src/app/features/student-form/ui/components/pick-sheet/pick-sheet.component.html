@@ -1,0 +1,97 @@
+@let dayName = 'weekGrid.days.' + sheet().day | transloco;
+@let windowName = 'weekGrid.windows.' + sheet().window | transloco;
+<div class="pick-sheet__backdrop" aria-hidden="true" (click)="cancelled.emit()"></div>
+<section
+    class="pick-sheet"
+    role="dialog"
+    tabindex="-1"
+    aria-modal="true"
+    aria-labelledby="pick-sheet-rank pick-sheet-title pick-sheet-time"
+    pFocusTrap>
+    <span class="pick-sheet__grip" aria-hidden="true"></span>
+
+    <header class="pick-sheet__header">
+        <span class="pick-sheet__rank" aria-hidden="true">{{ sheet().rank }}</span>
+        <span id="pick-sheet-rank" class="p-hidden-accessible">
+            {{ 'studentForm.slots.pickedRank' | transloco: { rank: sheet().rank } }}
+        </span>
+        <h2 id="pick-sheet-title" class="pick-sheet__title">
+            {{ 'studentForm.slotLabel' | transloco: { day: dayName, window: windowName } }}
+        </h2>
+        <span id="pick-sheet-time" class="pick-sheet__time" dir="ltr">{{ sheet().timeLabel }}</span>
+    </header>
+
+    <fieldset class="pick-sheet__types">
+        <legend class="pick-sheet__label">{{ 'studentForm.pick.sessionType' | transloco }}</legend>
+        <div class="pick-sheet__options">
+            <label
+                class="pick-sheet__option"
+                [class.pick-sheet__option--selected]="sessionType() === sessionTypes.single">
+                <input
+                    #singleChoice
+                    type="radio"
+                    name="pick-session-type"
+                    class="p-hidden-accessible pick-sheet__single"
+                    [checked]="sessionType() === sessionTypes.single"
+                    (change)="chooseSessionType(sessionTypes.single)" />
+                {{ 'studentForm.pick.single' | transloco }}
+            </label>
+            <label
+                class="pick-sheet__option"
+                [class.pick-sheet__option--selected]="sessionType() === sessionTypes.double">
+                <input
+                    #doubleChoice
+                    type="radio"
+                    name="pick-session-type"
+                    class="p-hidden-accessible pick-sheet__double"
+                    [checked]="sessionType() === sessionTypes.double"
+                    (change)="chooseSessionType(sessionTypes.double)" />
+                {{ 'studentForm.pick.double' | transloco }}
+                <span class="pick-sheet__double-hint">{{ 'studentForm.pick.doubleHint' | transloco }}</span>
+            </label>
+        </div>
+    </fieldset>
+
+    <div class="pick-sheet__field">
+        <label class="pick-sheet__label" for="pick-constraint">{{ 'studentForm.pick.constraintLabel' | transloco }}</label>
+        <textarea
+            pTextarea
+            id="pick-constraint"
+            class="pick-sheet__constraint"
+            rows="2"
+            aria-describedby="pick-constraint-hint"
+            [attr.maxlength]="maxConstraintLength"
+            [value]="constraintText()"
+            (input)="onConstraintInput($event)"></textarea>
+        <small id="pick-constraint-hint" class="pick-sheet__hint">{{ 'studentForm.pick.constraintHint' | transloco }}</small>
+    </div>
+
+    @if (sheet().isEditing) {
+        <p-button
+            type="button"
+            class="pick-sheet__remove"
+            severity="danger"
+            [text]="true"
+            [label]="'studentForm.pick.remove' | transloco"
+            (onClick)="removed.emit()" />
+    }
+
+    <div class="pick-sheet__actions">
+        <p-button
+            type="button"
+            class="pick-sheet__cancel"
+            [text]="true"
+            [label]="'studentForm.pick.cancel' | transloco"
+            (onClick)="cancelled.emit()" />
+        <p-button
+            type="button"
+            class="pick-sheet__save"
+            fluid
+            [label]="
+                sheet().isEditing
+                    ? ('studentForm.pick.save' | transloco)
+                    : ('studentForm.pick.add' | transloco: { rank: sheet().rank })
+            "
+            (onClick)="save()" />
+    </div>
+</section>

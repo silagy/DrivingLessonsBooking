@@ -1,7 +1,33 @@
 <app-wizard-step
     [stepNumber]="stepNumber()"
     [stepCount]="stepCount()"
-    [heading]="'studentForm.slots.title' | transloco: { teacherName: teacherName() }"
-    [intro]="'studentForm.slots.body' | transloco: { teacherName: teacherName() }">
-    <app-slot-day-list [days]="days()" />
+    [heading]="'studentForm.slots.title' | transloco"
+    [intro]="'studentForm.slots.body' | transloco"
+    [canGoBack]="true"
+    (back)="back.emit()">
+    <app-slot-day-list [days]="days()" (chipSelected)="chipSelected.emit($event)" />
+
+    <div wizardFooter>
+        <p class="slots__summary" aria-live="polite">
+            <strong>{{ 'studentForm.slots.summary' | transloco: { target: targetCount(), picked: pickCount() } }}</strong>
+            @if (isTargetCovered()) {
+                <i class="pi pi-check slots__covered" aria-hidden="true"></i>
+            }
+            <span class="slots__backups">{{ 'studentForm.slots.backups' | transloco }}</span>
+        </p>
+        <p-button
+            type="button"
+            fluid
+            [label]="'studentForm.slots.review' | transloco"
+            [disabled]="!pickCount()"
+            (onClick)="reviewed.emit()" />
+    </div>
 </app-wizard-step>
+
+@if (pickSheet(); as sheet) {
+    <app-pick-sheet
+        [sheet]="sheet"
+        (saved)="pickSaved.emit($event)"
+        (removed)="pickRemoved.emit()"
+        (cancelled)="pickCancelled.emit()" />
+}

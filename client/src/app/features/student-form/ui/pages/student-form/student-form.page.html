@@ -48,15 +48,68 @@
                             [transmission]="student.transmission"
                             [weekLabel]="'studentForm.weekCaption' | transloco: store.weekParams()"
                             [hasAvailability]="store.hasAvailability()"
-                            (continued)="store.continueToSlots()" />
+                            (continued)="store.continueToTarget()" />
                     }
+                }
+                @case (steps.target) {
+                    <app-target-step
+                        [stepNumber]="store.stepNumber()"
+                        [stepCount]="store.stepCount"
+                        [targetCount]="store.targetCount()"
+                        [minTargetCount]="store.minTargetCount"
+                        (increased)="store.increaseTarget()"
+                        (decreased)="store.decreaseTarget()"
+                        (continued)="store.continueToSlots()"
+                        (back)="store.goBack()" />
                 }
                 @case (steps.slots) {
                     <app-slots-step
                         [stepNumber]="store.stepNumber()"
                         [stepCount]="store.stepCount"
-                        [teacherName]="store.teacherName()"
-                        [days]="store.slotDays()" />
+                        [days]="store.slotDays()"
+                        [targetCount]="store.targetCount()"
+                        [pickCount]="store.pickCount()"
+                        [pickSheet]="store.pickSheet()"
+                        (chipSelected)="store.openPick($event)"
+                        (pickSaved)="store.savePick($event)"
+                        (pickRemoved)="store.removeOpenPick()"
+                        (pickCancelled)="store.closePick()"
+                        (reviewed)="store.continueToReview()"
+                        (back)="store.goBack()" />
+                }
+                @case (steps.review) {
+                    <app-review-step
+                        [stepNumber]="store.stepNumber()"
+                        [stepCount]="store.stepCount"
+                        [targetCount]="store.targetCount()"
+                        [pickCount]="store.pickCount()"
+                        [items]="store.reviewItems()"
+                        [missingPicks]="store.missingPicks()"
+                        [replacesEarlierSubmission]="store.replacesEarlierSubmission()"
+                        [submitStatus]="store.submitStatus()"
+                        [canSubmit]="store.canSubmit()"
+                        (submitted)="store.submit()"
+                        (addSlots)="store.goBack()"
+                        (changeTarget)="store.changeTarget()"
+                        (recheck)="store.recheck()"
+                        (back)="store.goBack()" />
+                }
+                @case (steps.done) {
+                    <app-status-message
+                        icon="pi pi-check"
+                        tone="success"
+                        [heading]="'studentForm.submitted.title' | transloco">
+                        <p class="student-form__text student-form__submitted">
+                            {{ store.submittedBodyKey() | transloco: store.submittedParams() }}
+                        </p>
+                        <p-button
+                            type="button"
+                            class="student-form__edit"
+                            severity="secondary"
+                            [outlined]="true"
+                            [label]="'studentForm.submitted.edit' | transloco"
+                            (onClick)="store.editSubmission()" />
+                    </app-status-message>
                 }
             }
         }

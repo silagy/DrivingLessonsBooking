@@ -24,6 +24,8 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public DbSet<RosterImport> RosterImports => Set<RosterImport>();
 
+    public DbSet<Submission> Submissions => Set<Submission>();
+
     public DrivingLessonsDbContext(DbContextOptions<DrivingLessonsDbContext> options, IDomainEventDispatcher dispatcher)
         : base(options)
     {

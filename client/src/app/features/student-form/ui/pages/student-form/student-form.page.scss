@@ -50,3 +50,7 @@
 .student-form__window-row + .student-form__window-row {
     border-block-start: 1px solid var(--app-bg-muted);
 }
+
+.student-form__submitted {
+    max-width: 18rem;
+}

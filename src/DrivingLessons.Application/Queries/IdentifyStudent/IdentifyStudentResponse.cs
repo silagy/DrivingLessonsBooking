@@ -10,6 +10,7 @@ public class IdentifyStudentResponse
     public string TeacherName { get; init; } = string.Empty;
     public string CarName { get; init; } = string.Empty;
     public Transmission Transmission { get; init; }
+    public bool HasSubmission { get; init; }
     public IReadOnlyCollection<SlotForIdentifyStudentResponse> Slots { get; init; } = [];
 }
 

@@ -245,6 +245,8 @@
     "weekTeacherCaption": "Week {{weekNumber}} · {{weekRange}} · {{teacherName}}",
     "step": "Step {{current}} of {{total}}",
     "continue": "Continue",
+    "back": "Back",
+    "slotLabel": "{{day}} · {{window}}",
     "window": {
       "opens": "Opens",
       "closes": "Closes",
@@ -295,11 +297,60 @@
       "noAvailabilityTitle": "No lesson slots yet.",
       "noAvailabilityBody": "{{teacherName}} hasn't published availability for this week. Please contact your school."
     },
+    "target": {
+      "title": "How many lessons do you want this week?",
+      "body": "You'll then pick at least that many slots, ranked by preference.",
+      "unitOne": "lesson · minimum {{min}}",
+      "unit": "lessons · minimum {{min}}",
+      "fewer": "Fewer lessons",
+      "more": "More lessons",
+      "pickSlots": "Pick slots"
+    },
     "slots": {
-      "title": "{{teacherName}}'s week",
-      "body": "These are {{teacherName}}'s slots for this week. Striped slots are unavailable.",
+      "title": "Pick your slots, best first",
+      "body": "Tap a slot to add it — the order is your preference. Tap a picked slot to change or remove it. Striped slots are unavailable.",
       "shortDay": "morning & noon only",
-      "unavailable": "Unavailable"
+      "unavailable": "Unavailable",
+      "pickedRank": "pick {{rank}}",
+      "summary": "Target: {{target}} · Picked: {{picked}}",
+      "backups": "extra picks = backups",
+      "review": "Review my list"
+    },
+    "pick": {
+      "sessionType": "Session type",
+      "single": "Single",
+      "double": "Double",
+      "doubleHint": "(2×)",
+      "constraintLabel": "Constraint for this slot (optional)",
+      "constraintHint": "Free text — e.g. \"only after 16:00\", \"pick me up from work\"",
+      "cancel": "Cancel",
+      "add": "Add as pick #{{rank}}",
+      "save": "Save",
+      "remove": "Remove this pick"
+    },
+    "review": {
+      "title": "Your ranked list",
+      "preferredOne": "Rank 1 is your preferred slot; any others are backups.",
+      "preferredMany": "Ranks 1–{{target}} are your preferred slots; the rest are backups.",
+      "notEnoughTitle": "Not enough picks.",
+      "notEnoughBody": "Your target is {{target}}, but you've picked {{picked}}. Add {{missing}} more, or lower your target.",
+      "addSlots": "Add more slots",
+      "changeTarget": "Change my target",
+      "replaces": "You already sent a list for this week. Submitting now replaces it.",
+      "submit": "Submit",
+      "unlockHint": "Submit unlocks once you have {{target}} picks.",
+      "recheck": "Check the form again",
+      "errors": {
+        "rejected": "We couldn't save your list — the submission window may have closed, or this week's slots changed.",
+        "notFound": "We couldn't find your roster details or this week's slots anymore. Please contact your school.",
+        "failed": "We couldn't send your list. Check your connection and try again."
+      }
+    },
+    "submitted": {
+      "title": "Submitted",
+      "bodyOne": "1 pick for week {{weekNumber}} with {{teacherName}}. You can edit it until {{closesAt}} — just reopen this link and enter your national ID.",
+      "bodyMany": "{{count}} picks for week {{weekNumber}} with {{teacherName}}. You can edit them until {{closesAt}} — just reopen this link and enter your national ID.",
+      "edit": "Edit my submission"
     }
   },
   "general": {

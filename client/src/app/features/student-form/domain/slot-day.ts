@@ -1,6 +1,7 @@
 import { DayOfWeek } from '../../../shared/models/day-of-week.enum';
 import { SlotState } from '../../../shared/models/slot-state.enum';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
+import { rankOf, SlotPick } from './slot-pick';
 import { dateInWeek } from './week-label';
 
 const GRID_DAYS: readonly DayOfWeek[] = [
@@ -35,6 +36,7 @@ export interface SlotChip {
     window: SlotWindow;
     timeLabel: string;
     isUnavailable: boolean;
+    rank: number | null;
 }
 
 export interface SlotDay {
@@ -44,12 +46,17 @@ export interface SlotDay {
     chips: SlotChip[];
 }
 
-export function groupSlotsByDay(slots: readonly StudentSlot[], weekStart: string, locale: string): SlotDay[] {
+export function groupSlotsByDay(
+    slots: readonly StudentSlot[],
+    weekStart: string,
+    locale: string,
+    picks: readonly SlotPick[],
+): SlotDay[] {
     const formatter = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'numeric' });
 
     return GRID_DAYS
         .map((day, dayOffset) => {
-            const chips = chipsFor(slots, day);
+            const chips = chipsFor(slots, day, picks);
 
             return {
                 day,
@@ -61,15 +68,24 @@ export function groupSlotsByDay(slots: readonly StudentSlot[], weekStart: string
         .filter(slotDay => slotDay.chips.length > 0);
 }
 
-function chipsFor(slots: readonly StudentSlot[], day: DayOfWeek): SlotChip[] {
+export function slotTimeLabel(slot: StudentSlot): string {
+    return `${timeLabel(slot.startLocal)}–${timeLabel(slot.endLocal)}`;
+}
+
+export function hasOpenSlot(slots: readonly StudentSlot[]): boolean {
+    return slots.some(slot => slot.state === SlotState.open);
+}
+
+function chipsFor(slots: readonly StudentSlot[], day: DayOfWeek, picks: readonly SlotPick[]): SlotChip[] {
     return slots
         .filter(slot => slot.day === day)
         .sort((first, second) => GRID_WINDOWS.indexOf(first.window) - GRID_WINDOWS.indexOf(second.window))
         .map(slot => ({
             id: slot.id,
             window: slot.window,
-            timeLabel: `${timeLabel(slot.startLocal)}–${timeLabel(slot.endLocal)}`,
+            timeLabel: slotTimeLabel(slot),
             isUnavailable: slot.state === SlotState.unavailable,
+            rank: rankOf(picks, slot.id),
         }));
 }
 

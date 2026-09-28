@@ -4,6 +4,11 @@ namespace DrivingLessons.Application.Common.Exceptions;
 
 public class WeekScheduleNotFoundException : NotFoundException
 {
+    public WeekScheduleNotFoundException()
+        : base("The student's teacher has no week schedule for this week.")
+    {
+    }
+
     public WeekScheduleNotFoundException(WeekScheduleId id)
         : base($"Week schedule {id.Value} was not found.")
     {
