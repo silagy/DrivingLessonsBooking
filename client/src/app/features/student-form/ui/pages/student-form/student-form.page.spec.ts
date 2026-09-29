@@ -11,7 +11,11 @@ import { SlotWindow } from '../../../../../shared/models/slot-window.enum';
 import { CreateSubmissionRequest } from '../../../data/create-submission.request';
 import { GetPublicationByLinkResponse } from '../../../data/get-publication-by-link.response';
 import { IdentifyStudentRequest } from '../../../data/identify-student.request';
-import { IdentifyStudentResponse, SlotForIdentifyStudentResponse } from '../../../data/identify-student.response';
+import {
+    IdentifyStudentResponse,
+    SlotForIdentifyStudentResponse,
+    SubmissionForIdentifyStudentResponse,
+} from '../../../data/identify-student.response';
 import { SubmissionsApiService } from '../../../data/submissions-api.service';
 import { SessionType } from '../../../domain/session-type.enum';
 import { Transmission } from '../../../domain/transmission.enum';
@@ -73,12 +77,24 @@ function studentOf(
         teacherName,
         carName: 'Corolla White',
         transmission,
-        hasSubmission: false,
+        submission: null,
         slots,
     };
 }
 
 const COHEN_STUDENT = studentOf('Teacher Cohen', Transmission.automatic, weekSlots([]));
+
+const SAVED_SUBMISSION: SubmissionForIdentifyStudentResponse = {
+    targetCount: 2,
+    lastSavedAtUtc: '2026-11-12T08:30:00Z',
+    slotRequests: [
+        { slotId: 'monday-noon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+        { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
+        { slotId: 'wednesday-evening', sessionType: SessionType.single, constraint: null },
+    ],
+};
+
+const RETURNING_STUDENT: IdentifyStudentResponse = { ...COHEN_STUDENT, submission: SAVED_SUBMISSION };
 
 function publicationIn(state: PublicationState): () => Observable<GetPublicationByLinkResponse> {
     return () =>
@@ -1052,7 +1068,7 @@ describe('StudentFormPage', () => {
             //given
             const createSubmission = accepting();
             const reviseSubmission = accepting();
-            const returning = { ...COHEN_STUDENT, hasSubmission: true };
+            const returning = RETURNING_STUDENT;
             provideOpenLinkSubmitting(identifyingAs(returning), createSubmission, reviseSubmission);
             const fixture = await renderPage();
             await reachReview(fixture, 1, ['sunday-afternoon']);
@@ -1117,7 +1133,7 @@ describe('StudentFormPage', () => {
             const fixture = await renderPage();
             await reachReview(fixture, 1, ['sunday-afternoon']);
             await clickContinue(fixture);
-            roster.student = { ...COHEN_STUDENT, hasSubmission: true };
+            roster.student = RETURNING_STUDENT;
 
             //when
             await press(fixture, '.review__recheck button');

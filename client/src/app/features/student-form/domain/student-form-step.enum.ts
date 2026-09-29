@@ -5,4 +5,5 @@ export enum StudentFormStep {
     slots = 'slots',
     review = 'review',
     done = 'done',
+    windowClosed = 'windowClosed',
 }

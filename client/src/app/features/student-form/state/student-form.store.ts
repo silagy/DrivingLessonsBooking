@@ -42,6 +42,7 @@ const CAPTION_KEY_BY_STEP: Record<StudentFormStep, string | null> = {
     [StudentFormStep.slots]: 'studentForm.weekTeacherCaption',
     [StudentFormStep.review]: 'studentForm.weekTeacherCaption',
     [StudentFormStep.done]: null,
+    [StudentFormStep.windowClosed]: null,
 };
 
 interface IdentifyLookup {
@@ -186,7 +187,7 @@ export class StudentFormStore {
     readonly missingPicks = computed(() => missingPickCount(this.target(), this.pickCount()));
     readonly submitStatus = this.submitState.asReadonly();
     readonly replacesEarlierSubmission = computed(
-        () => (this.student()?.hasSubmission ?? false) || this.submittedThisVisit(),
+        () => Boolean(this.student()?.submission) || this.submittedThisVisit(),
     );
     readonly canSubmit = computed(
         () =>
