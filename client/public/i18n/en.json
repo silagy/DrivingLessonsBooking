@@ -347,7 +347,7 @@
       "unlockHint": "Submit unlocks once you have {{target}} picks.",
       "recheck": "Check the form again",
       "errors": {
-        "rejected": "We couldn't save your list — the submission window may have closed, or this week's slots changed.",
+        "rejected": "We couldn't save your list — something changed since you opened the form, for example a slot is no longer available.",
         "notFound": "We couldn't find your roster details or this week's slots anymore. Please contact your school.",
         "failed": "We couldn't send your list. Check your connection and try again."
       }
@@ -358,6 +358,12 @@
       "bodyOne": "1 pick for week {{weekNumber}} with {{teacherName}}. You can edit it until {{closesAt}} — just reopen this link and enter your national ID.",
       "bodyMany": "{{count}} picks for week {{weekNumber}} with {{teacherName}}. You can edit them until {{closesAt}} — just reopen this link and enter your national ID.",
       "edit": "Edit my submission"
+    },
+    "closedMidSubmit": {
+      "title": "The window just closed",
+      "bodyNew": "Submissions for week {{weekNumber}} closed while you had this page open. Your list was not saved. If it's urgent, contact {{teacherName}} directly.",
+      "bodyChanges": "Submissions for week {{weekNumber}} closed while you had this page open. Your changes were not saved — the list you sent earlier stays as it was. If it's urgent, contact {{teacherName}} directly.",
+      "hint": "If the school reopens the window, this link will work again."
     }
   },
   "general": {

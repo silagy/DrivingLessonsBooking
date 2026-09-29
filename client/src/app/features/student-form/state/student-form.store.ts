@@ -6,6 +6,7 @@ import { SlotState } from '../../../shared/models/slot-state.enum';
 import { CreateSubmissionRequest } from '../data/create-submission.request';
 import { GetPublicationByLinkResponse } from '../data/get-publication-by-link.response';
 import { IdentifyStudentResponse } from '../data/identify-student.response';
+import { isWindowClosedProblem } from '../data/problem-types';
 import { SubmissionsApiService } from '../data/submissions-api.service';
 import { IdentifyStatus } from '../domain/identify-status.enum';
 import { formatWindowInstant } from '../domain/jerusalem-time';
@@ -33,6 +34,8 @@ const SUBMITTED_BODY_ONE = 'studentForm.submitted.bodyOne';
 const SUBMITTED_BODY_MANY = 'studentForm.submitted.bodyMany';
 const SUBMITTED_TITLE = 'studentForm.submitted.title';
 const REVISED_TITLE = 'studentForm.submitted.revisedTitle';
+const CLOSED_MID_SUBMIT_BODY_NEW = 'studentForm.closedMidSubmit.bodyNew';
+const CLOSED_MID_SUBMIT_BODY_CHANGES = 'studentForm.closedMidSubmit.bodyChanges';
 const SUBMIT_LOCKING_STATUSES: ReadonlySet<SubmitStatus> = new Set([
     SubmitStatus.submitting,
     SubmitStatus.rejected,
@@ -217,6 +220,9 @@ export class StudentFormStore {
         this.pickCount() === SINGLE_PICK ? SUBMITTED_BODY_ONE : SUBMITTED_BODY_MANY,
     );
     readonly submittedTitleKey = computed(() => (this.sentAsRevision() ? REVISED_TITLE : SUBMITTED_TITLE));
+    readonly closedMidSubmitBodyKey = computed(() =>
+        this.sentAsRevision() ? CLOSED_MID_SUBMIT_BODY_CHANGES : CLOSED_MID_SUBMIT_BODY_NEW,
+    );
     readonly submittedParams = computed(() => ({
         count: this.pickCount(),
         weekNumber: this.weekParams().weekNumber,
@@ -376,6 +382,12 @@ export class StudentFormStore {
             this.submitState.set(SubmitStatus.idle);
             this.step.set(StudentFormStep.done);
         } catch (error) {
+            if (isWindowClosedProblem(error)) {
+                this.submitState.set(SubmitStatus.idle);
+                this.step.set(StudentFormStep.windowClosed);
+                return;
+            }
+
             this.submitState.set(submitFailureOf(error));
         }
     }

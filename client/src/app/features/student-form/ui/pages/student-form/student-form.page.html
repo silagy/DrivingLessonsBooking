@@ -113,6 +113,17 @@
                             (onClick)="store.editSubmission()" />
                     </app-status-message>
                 }
+                @case (steps.windowClosed) {
+                    <app-status-message
+                        icon="pi pi-exclamation-circle"
+                        tone="danger"
+                        [heading]="'studentForm.closedMidSubmit.title' | transloco">
+                        <p class="student-form__text student-form__closed-mid-submit">
+                            {{ store.closedMidSubmitBodyKey() | transloco: store.captionParams() }}
+                        </p>
+                        <p class="student-form__hint">{{ 'studentForm.closedMidSubmit.hint' | transloco }}</p>
+                    </app-status-message>
+                }
             }
         }
         @case (views.closed) {

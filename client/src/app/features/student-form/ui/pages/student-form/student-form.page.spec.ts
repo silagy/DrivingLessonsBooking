@@ -16,6 +16,7 @@ import {
     SlotForIdentifyStudentResponse,
     SubmissionForIdentifyStudentResponse,
 } from '../../../data/identify-student.response';
+import { SUBMISSION_WINDOW_CLOSED_PROBLEM } from '../../../data/problem-types';
 import { SubmissionsApiService } from '../../../data/submissions-api.service';
 import { SessionType } from '../../../domain/session-type.enum';
 import { Transmission } from '../../../domain/transmission.enum';
@@ -110,6 +111,22 @@ function publicationIn(state: PublicationState): () => Observable<GetPublication
 
 function failingWith(status: number): () => Observable<never> {
     return () => throwError(() => new HttpErrorResponse({ status }));
+}
+
+function closingWindow(): () => Observable<never> {
+    return () =>
+        throwError(
+            () =>
+                new HttpErrorResponse({
+                    status: HTTP_CONFLICT,
+                    error: {
+                        type: SUBMISSION_WINDOW_CLOSED_PROBLEM,
+                        title: 'Conflict',
+                        status: HTTP_CONFLICT,
+                        detail: "Submissions are accepted only while the week's submission window is open.",
+                    },
+                }),
+        );
 }
 
 function identifyingAs(student: IdentifyStudentResponse): IdentifyStudent {
@@ -1412,6 +1429,76 @@ describe('StudentFormPage', () => {
             //then
             expect(target).toBe('1');
             expect(page(fixture).querySelectorAll('.slot-chip__rank').length).toBe(0);
+        });
+    });
+
+    describe('window closed mid-submit', () => {
+        it('tells a first-time student the window just closed and that their list was not saved', async () => {
+            //given
+            const createSubmission: SubmitCommand = vi.fn(closingWindow());
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(createSubmission).toHaveBeenCalledTimes(1);
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.closedMidSubmit\.title$/);
+            expect(textOf(fixture, '.student-form__closed-mid-submit')).toContain('studentForm.closedMidSubmit.bodyNew');
+            expect(page(fixture).querySelector('app-review-step')).toBeNull();
+            expect(page(fixture).querySelector('.student-shell__caption')).toBeNull();
+            expect(page(fixture).querySelectorAll('app-status-message button').length).toBe(0);
+        });
+
+        it('tells a returning student their changes were not saved and the earlier list stands', async () => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(RETURNING_STUDENT), accepting(), closingWindow());
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await clickContinue(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.closedMidSubmit\.title$/);
+            expect(textOf(fixture, '.student-form__closed-mid-submit')).toContain(
+                'studentForm.closedMidSubmit.bodyChanges',
+            );
+        });
+
+        it('says the edit was not saved when the window closes during an edit from the confirmation', async () => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), accepting(), closingWindow());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+            await clickContinue(fixture);
+            await press(fixture, '.student-form__edit button');
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(textOf(fixture, '.student-form__closed-mid-submit')).toContain(
+                'studentForm.closedMidSubmit.bodyChanges',
+            );
+        });
+
+        it('still offers a recheck for any other rejection', async () => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), failingWith(HTTP_CONFLICT), accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('.review__rejected')).not.toBeNull();
+            expect(page(fixture).querySelector('.review__recheck')).not.toBeNull();
+            expect(page(fixture).querySelector('.student-form__closed-mid-submit')).toBeNull();
         });
     });
 });
