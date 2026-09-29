@@ -71,6 +71,7 @@
                         [targetCount]="store.targetCount()"
                         [pickCount]="store.pickCount()"
                         [pickSheet]="store.pickSheet()"
+                        [droppedPickCount]="store.droppedPickCount()"
                         (chipSelected)="store.openPick($event)"
                         (pickSaved)="store.savePick($event)"
                         (pickRemoved)="store.removeOpenPick()"

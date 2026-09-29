@@ -1331,6 +1331,23 @@ describe('StudentFormPage', () => {
             });
         });
 
+        it('tells the student on the slots step when none of the saved picks is offered any more', async () => {
+            //given
+            const regridded = {
+                ...RETURNING_STUDENT,
+                slots: weekSlots(['monday-noon', 'sunday-afternoon', 'wednesday-evening']),
+            };
+            provideOpenLinkIdentifying(identifyingAs(regridded));
+            const fixture = await renderPage();
+
+            //when
+            await reachSlots(fixture);
+
+            //then
+            expect(page(fixture).querySelectorAll('.slot-chip__rank').length).toBe(0);
+            expect(textOf(fixture, '.slots__dropped')).toContain('studentForm.review.droppedMany');
+        });
+
         it('says nothing about dropped picks when every saved pick is still offered', async () => {
             //given
             provideOpenLinkIdentifying(identifyingAs(RETURNING_STUDENT));
