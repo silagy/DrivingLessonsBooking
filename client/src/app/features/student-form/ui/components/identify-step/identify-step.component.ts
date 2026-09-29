@@ -4,11 +4,13 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { IdentifyStatus } from '../../../domain/identify-status.enum';
+import { WelcomeBack } from '../../../domain/welcome-back';
 import { isNationalIdCandidate, toNationalIdDigits } from '../../../domain/national-id-input';
 import { WizardStepComponent } from '../wizard-step/wizard-step.component';
 
 const RESUBMITTABLE_STATUSES: ReadonlySet<IdentifyStatus> = new Set([IdentifyStatus.found, IdentifyStatus.failed]);
 const REJECTED_STATUSES: ReadonlySet<IdentifyStatus> = new Set([IdentifyStatus.notOnRoster, IdentifyStatus.invalidId]);
+const SINGLE_PICK = 1;
 
 @Component({
     selector: 'app-identify-step',
@@ -24,6 +26,7 @@ export class IdentifyStepComponent {
     readonly studentName = input.required<string>();
     readonly teacherName = input.required<string>();
     readonly weekNumber = input.required<number>();
+    readonly welcomeBack = input.required<WelcomeBack | null>();
 
     readonly nationalIdChanged = output<string>();
     readonly lookupRequested = output<string>();
@@ -33,6 +36,14 @@ export class IdentifyStepComponent {
     protected readonly digits = signal('');
 
     protected readonly isRejected = computed(() => REJECTED_STATUSES.has(this.status()));
+    protected readonly welcomeBackBodyKey = computed(() =>
+        this.welcomeBack()?.pickCount === SINGLE_PICK
+            ? 'studentForm.identify.welcomeBackBodyOne'
+            : 'studentForm.identify.welcomeBackBodyMany',
+    );
+    protected readonly continueKey = computed(() =>
+        this.welcomeBack() ? 'studentForm.identify.editSubmission' : 'studentForm.continue',
+    );
     protected readonly canSubmit = computed(() => {
         const status = this.status();
         const isFreshCandidate = status === IdentifyStatus.idle && isNationalIdCandidate(this.digits());

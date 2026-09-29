@@ -29,15 +29,32 @@
                     </p>
                 }
                 @case (statuses.found) {
-                    <p-message severity="success" class="identify__found">
-                        <span>
-                            <strong>{{ 'studentForm.identify.foundTitle' | transloco: { studentName: studentName() } }}</strong>
-                            {{
-                                'studentForm.identify.foundBody'
-                                    | transloco: { weekNumber: weekNumber(), teacherName: teacherName() }
-                            }}
-                        </span>
-                    </p-message>
+                    @if (welcomeBack(); as returning) {
+                        <p-message severity="success" class="identify__welcome-back">
+                            <span>
+                                <strong>{{ 'studentForm.identify.welcomeBackTitle' | transloco: { studentName: studentName() } }}</strong>
+                                {{
+                                    welcomeBackBodyKey()
+                                        | transloco
+                                            : {
+                                                  pickCount: returning.pickCount,
+                                                  savedAt: returning.savedAt,
+                                                  closesAt: returning.closesAt,
+                                              }
+                                }}
+                            </span>
+                        </p-message>
+                    } @else {
+                        <p-message severity="success" class="identify__found">
+                            <span>
+                                <strong>{{ 'studentForm.identify.foundTitle' | transloco: { studentName: studentName() } }}</strong>
+                                {{
+                                    'studentForm.identify.foundBody'
+                                        | transloco: { weekNumber: weekNumber(), teacherName: teacherName() }
+                                }}
+                            </span>
+                        </p-message>
+                    }
                 }
                 @case (statuses.notOnRoster) {
                     <p-message severity="error" class="identify__not-on-roster">
@@ -61,7 +78,7 @@
         </div>
 
         <div wizardFooter>
-            <p-button type="submit" fluid [label]="'studentForm.continue' | transloco" [disabled]="!canSubmit()" />
+            <p-button type="submit" fluid [label]="continueKey() | transloco" [disabled]="!canSubmit()" />
         </div>
     </app-wizard-step>
 </form>

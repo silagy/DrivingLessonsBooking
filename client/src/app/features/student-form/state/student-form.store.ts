@@ -9,6 +9,7 @@ import { IdentifyStudentResponse } from '../data/identify-student.response';
 import { SubmissionsApiService } from '../data/submissions-api.service';
 import { IdentifyStatus } from '../domain/identify-status.enum';
 import { formatWindowInstant } from '../domain/jerusalem-time';
+import { loadedSubmissionOf } from '../domain/loaded-submission';
 import { nameInitials } from '../domain/name-initials';
 import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-id-input';
 import { PickSheet, pickSheetFor } from '../domain/pick-sheet';
@@ -22,6 +23,7 @@ import { StudentFormView } from '../domain/student-form-view.enum';
 import { SubmitStatus } from '../domain/submit-status.enum';
 import { MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
 import { weekRangeLabel } from '../domain/week-label';
+import { WelcomeBack } from '../domain/welcome-back';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
@@ -29,6 +31,8 @@ const EMPTY_WEEK_PARAMS = { weekNumber: 0, weekRange: '' };
 const SINGLE_PICK = 1;
 const SUBMITTED_BODY_ONE = 'studentForm.submitted.bodyOne';
 const SUBMITTED_BODY_MANY = 'studentForm.submitted.bodyMany';
+const SUBMITTED_TITLE = 'studentForm.submitted.title';
+const REVISED_TITLE = 'studentForm.submitted.revisedTitle';
 const SUBMIT_LOCKING_STATUSES: ReadonlySet<SubmitStatus> = new Set([
     SubmitStatus.submitting,
     SubmitStatus.rejected,
@@ -67,6 +71,8 @@ export class StudentFormStore {
     private readonly openSlotId = signal<string | null>(null);
     private readonly submitState = signal(SubmitStatus.idle);
     private readonly submittedThisVisit = signal(false);
+    private readonly droppedPicks = signal(0);
+    private readonly sentAsRevision = signal(false);
 
     private readonly publicationResource = resource({
         params: () => this.linkToken() ?? undefined,
@@ -163,6 +169,19 @@ export class StudentFormStore {
     readonly teacherName = computed(() => this.student()?.teacherName ?? '');
     readonly teacherInitials = computed(() => nameInitials(this.teacherName()));
     readonly hasAvailability = computed(() => hasOpenSlot(this.student()?.slots ?? []));
+    readonly welcomeBack = computed<WelcomeBack | null>(() => {
+        const saved = this.student()?.submission;
+
+        if (!saved) {
+            return null;
+        }
+
+        return {
+            pickCount: saved.slotRequests.length,
+            savedAt: this.formatInstant(saved.lastSavedAtUtc),
+            closesAt: this.closesAt(),
+        };
+    });
     readonly slotDays = computed(() => {
         const student = this.student();
         const publication = this.publication();
@@ -186,6 +205,7 @@ export class StudentFormStore {
     );
     readonly missingPicks = computed(() => missingPickCount(this.target(), this.pickCount()));
     readonly submitStatus = this.submitState.asReadonly();
+    readonly droppedPickCount = this.droppedPicks.asReadonly();
     readonly replacesEarlierSubmission = computed(
         () => Boolean(this.student()?.submission) || this.submittedThisVisit(),
     );
@@ -196,6 +216,7 @@ export class StudentFormStore {
     readonly submittedBodyKey = computed(() =>
         this.pickCount() === SINGLE_PICK ? SUBMITTED_BODY_ONE : SUBMITTED_BODY_MANY,
     );
+    readonly submittedTitleKey = computed(() => (this.sentAsRevision() ? REVISED_TITLE : SUBMITTED_TITLE));
     readonly submittedParams = computed(() => ({
         count: this.pickCount(),
         weekNumber: this.weekParams().weekNumber,
@@ -237,10 +258,16 @@ export class StudentFormStore {
     }
 
     continueToDetails(): void {
-        if (!this.student()) {
+        const student = this.student();
+
+        if (!student) {
             return;
         }
 
+        const loaded = loadedSubmissionOf(student.submission, student.slots);
+        this.target.set(loaded.targetCount);
+        this.chosenPicks.set(loaded.picks);
+        this.droppedPicks.set(loaded.droppedPickCount);
         this.step.set(StudentFormStep.details);
     }
 
@@ -334,15 +361,18 @@ export class StudentFormStore {
                 constraint: pick.constraint,
             })),
         };
-        const command = this.replacesEarlierSubmission()
+        const isRevision = this.replacesEarlierSubmission();
+        const command = isRevision
             ? this.api.reviseSubmission(token, request)
             : this.api.createSubmission(token, request);
 
+        this.sentAsRevision.set(isRevision);
         this.submitState.set(SubmitStatus.submitting);
 
         try {
             await firstValueFrom(command);
             this.submittedThisVisit.set(true);
+            this.droppedPicks.set(0);
             this.submitState.set(SubmitStatus.idle);
             this.step.set(StudentFormStep.done);
         } catch (error) {
