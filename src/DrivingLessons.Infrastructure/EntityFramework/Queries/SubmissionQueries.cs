@@ -42,6 +42,51 @@ public class SubmissionQueries : ISubmissionQueries
         return new SubmissionStats(studentsSubmitted, totalPicks, lastSubmissionAtUtc);
     }
 
+    public async Task<IReadOnlyList<SlotRequestDetail>> GetSlotRequestDetailsAsync(Guid publicationId, Guid teacherId)
+    {
+        var submissions = TeacherSubmissions(publicationId, teacherId);
+
+        var query = from submission in submissions
+                    join weekSchedule in dbContext.WeekSchedules
+                        on submission.WeekScheduleId equals weekSchedule.Id
+                    join student in dbContext.Students
+                        on submission.StudentId equals student.Id
+                    join car in dbContext.Cars.IgnoreQueryFilters()
+                        on student.CarId equals car.Id
+                    from request in submission.SlotRequests
+                    from slot in weekSchedule.Slots
+                    where slot.Id == request.SlotId
+                    select new
+                    {
+                        slot.Day,
+                        slot.Window,
+                        StudentName = student.Name,
+                        student.NationalId,
+                        student.Phone,
+                        car.Transmission,
+                        request.SessionType,
+                        request.Rank,
+                        submission.TargetCount,
+                        request.Constraint
+                    };
+
+        var rows = await query.ToListAsync();
+
+        return rows
+                   .Select(x => new SlotRequestDetail(
+                       x.Day,
+                       x.Window,
+                       x.StudentName.Value,
+                       x.NationalId.Value,
+                       x.Phone.Value,
+                       x.Transmission,
+                       x.SessionType,
+                       x.Rank.Value,
+                       x.TargetCount.Value,
+                       x.Constraint?.Value))
+                   .ToList();
+    }
+
     private IQueryable<Submission> TeacherSubmissions(Guid publicationId, Guid teacherId)
     {
         var resolvedPublicationId = PublicationId.Of(publicationId);
