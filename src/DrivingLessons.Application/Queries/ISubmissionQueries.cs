@@ -1,3 +1,5 @@
+using DrivingLessons.Domain.Values;
+
 namespace DrivingLessons.Application.Queries;
 
 public interface ISubmissionQueries
@@ -8,3 +10,15 @@ public interface ISubmissionQueries
 }
 
 public record SubmissionStats(int StudentsSubmitted, int TotalPicks, DateTimeOffset? LastSubmissionAtUtc);
+
+public record SlotRequestDetail(
+    DayOfWeek Day,
+    SlotWindowType Window,
+    string StudentName,
+    string NationalId,
+    string Phone,
+    Transmission Transmission,
+    SessionType SessionType,
+    int Rank,
+    int TargetCount,
+    string? Constraint);
