@@ -11,7 +11,7 @@ Slice roadmap for the `module:excel` backlog (3 open issues). Each slice ships a
 | Slice | Content | Issues |
 |-------|---------|--------|
 | 1. Request detail sheet — [plan](us-46-excel-detail-sheet-plan/README.md) | Sheet 2 lists one row per Slot Request with Day, Slot, Student name, National ID, Phone, Transmission, Session type, Rank, Target count, Constraints — sorted by day, slot, rank; Hebrew, right-to-left | [#46](https://github.com/silagy/DrivingLessonsBooking/issues/46) |
-| 2. Summary sheet | Sheet 1 in Hebrew/RTL: slots × Sunday–Friday grid of request counts, Unavailable slots visibly blocked, Friday Afternoon/Evening cells absent | [#45](https://github.com/silagy/DrivingLessonsBooking/issues/45) |
+| 2. Summary sheet — [plan](us-45-excel-summary-sheet-plan/README.md) | Sheet 1 in Hebrew/RTL: slots × Sunday–Friday grid of request counts, Unavailable slots visibly blocked, Friday Afternoon/Evening cells absent | [#45](https://github.com/silagy/DrivingLessonsBooking/issues/45) |
 | 3. Versioned email | A real `IEmailSender` (provider chosen when the slice starts — SES fits the Lightsail hosting, ADR 0002) sending the two-sheet file to each teacher's contact email at every close, subject "Week N Requests - Teacher X - vK" | [#44](https://github.com/silagy/DrivingLessonsBooking/issues/44) |
 
 Slice 1 goes first because the detail sheet is what a teacher books from; slice 3 goes last because it only changes delivery of a file the first two slices finish.
