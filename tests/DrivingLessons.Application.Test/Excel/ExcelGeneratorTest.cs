@@ -71,6 +71,56 @@ public class ExcelGeneratorTest
     }
 
     [TestMethod]
+    public async Task Summary_Sheet_Counts_The_Requests_Of_The_Teacher_And_Publication()
+    {
+        //given
+        var slot = new SlotForGetWeekScheduleResponse
+        {
+            Id = Guid.NewGuid(),
+            Day = DayOfWeek.Sunday,
+            Window = SlotWindowType.Morning,
+            State = SlotState.Open
+        };
+        var schedule = new GetWeekScheduleResponse
+        {
+            Id = Guid.NewGuid(),
+            TeacherId = teacherId.Value,
+            WeekStart = publication.WeekStart.Value,
+            Slots = [slot]
+        };
+        var counts = new Dictionary<Guid, int>
+        {
+            [slot.Id] = 2
+        };
+
+        A.CallTo(() => weekScheduleQueries.GetByTeacherAndWeekAsync(teacherId.Value, publication.WeekStart.Value))
+            .Returns(schedule);
+        A.CallTo(() => submissionQueries.GetSlotRequestCountsAsync(publication.Id.Value, teacherId.Value))
+            .Returns(counts);
+
+        //when
+        var excel = await generator.GenerateAsync(publication.Id, teacherId);
+
+        //then
+        var summary = WorkbookOf(excel).Worksheet(SummarySheet.Name);
+        summary.Cell(1, 2).GetText().ShouldBe("ראשון 4.10");
+        summary.Cell(2, 2).GetValue<int>().ShouldBe(2);
+    }
+
+    [TestMethod]
+    public async Task Summary_Grid_Is_Empty_When_The_Teacher_Has_No_Week_Schedule()
+    {
+        //given
+
+        //when
+        var excel = await generator.GenerateAsync(publication.Id, teacherId);
+
+        //then
+        var summary = WorkbookOf(excel).Worksheet(SummarySheet.Name);
+        summary.Range(2, 2, 5, 7).IsEmpty().ShouldBeTrue();
+    }
+
+    [TestMethod]
     public async Task Workbook_Has_The_Summary_Then_The_Request_Detail_Sheet()
     {
         //given
@@ -81,7 +131,7 @@ public class ExcelGeneratorTest
         //then
         WorkbookOf(excel).Worksheets.Select(x => x.Name).ShouldBe(
             [
-                "Summary",
+                SummarySheet.Name,
                 RequestDetailSheet.Name
             ]);
     }
