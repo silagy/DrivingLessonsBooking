@@ -8,7 +8,7 @@ using DrivingLessons.Domain.Values;
 
 namespace DrivingLessons.Infrastructure.Excel;
 
-public class PlaceholderExcelGenerator : IExcelGenerator
+public class ExcelGenerator : IExcelGenerator
 {
     private const string ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
@@ -34,7 +34,7 @@ public class PlaceholderExcelGenerator : IExcelGenerator
     private readonly IWeekScheduleQueries weekScheduleQueries;
     private readonly ISubmissionQueries submissionQueries;
 
-    public PlaceholderExcelGenerator(
+    public ExcelGenerator(
         IPublicationRepository publicationRepository,
         IWeekScheduleQueries weekScheduleQueries,
         ISubmissionQueries submissionQueries)
@@ -54,11 +54,12 @@ public class PlaceholderExcelGenerator : IExcelGenerator
 
         var schedule = await weekScheduleQueries.GetByTeacherAndWeekAsync(teacherGuid, weekStart);
         var counts = await submissionQueries.GetSlotRequestCountsAsync(publicationId.Value, teacherGuid);
+        var requests = await submissionQueries.GetSlotRequestDetailsAsync(publicationId.Value, teacherGuid);
 
-        var workbook = new XLWorkbook();
+        using var workbook = new XLWorkbook();
 
         BuildSummarySheet(workbook, schedule, counts);
-        BuildDetailSheet(workbook);
+        RequestDetailSheet.AddTo(workbook, requests);
 
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
@@ -112,17 +113,5 @@ public class PlaceholderExcelGenerator : IExcelGenerator
         }
 
         sheet.Columns().AdjustToContents();
-    }
-
-    private static void BuildDetailSheet(XLWorkbook workbook)
-    {
-        var sheet = workbook.Worksheets.Add("Detail");
-
-        sheet.Cell(1, 1).Value = "Student";
-        sheet.Cell(1, 2).Value = "Day";
-        sheet.Cell(1, 3).Value = "Window";
-        sheet.Cell(1, 4).Value = "Session Type";
-        sheet.Cell(1, 5).Value = "Rank";
-        sheet.Cell(1, 6).Value = "Constraint";
     }
 }
