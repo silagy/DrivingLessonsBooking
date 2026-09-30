@@ -282,7 +282,11 @@
       "notOnRosterTitle": "We don't have you on file.",
       "notOnRosterBody": "This ID isn't on the school's roster, so there's nothing to submit. Please contact your school to be added.",
       "invalidId": "This doesn't look like a valid national ID. Check the digits and try again.",
-      "failed": "We couldn't check your ID right now. Check your connection and try again."
+      "failed": "We couldn't check your ID right now. Check your connection and try again.",
+      "welcomeBackTitle": "Welcome back, {{studentName}}.",
+      "welcomeBackBodyOne": "You already sent 1 pick on {{savedAt}}, so we've loaded it. You can edit your submission until the window closes ({{closesAt}}).",
+      "welcomeBackBodyMany": "You already sent {{pickCount}} picks on {{savedAt}}, so we've loaded them. You can edit your submission until the window closes ({{closesAt}}).",
+      "editSubmission": "Edit my submission"
     },
     "details": {
       "lead": "You are submitting availability for",
@@ -337,20 +341,29 @@
       "addSlots": "Add more slots",
       "changeTarget": "Change my target",
       "replaces": "You already sent a list for this week. Submitting now replaces it.",
+      "droppedOne": "1 of your earlier picks is no longer offered this week, so we took it off your list.",
+      "droppedMany": "{{count}} of your earlier picks are no longer offered this week, so we took them off your list.",
       "submit": "Submit",
       "unlockHint": "Submit unlocks once you have {{target}} picks.",
       "recheck": "Check the form again",
       "errors": {
-        "rejected": "We couldn't save your list — the submission window may have closed, or this week's slots changed.",
+        "rejected": "We couldn't save your list — something changed since you opened the form, for example a slot is no longer available.",
         "notFound": "We couldn't find your roster details or this week's slots anymore. Please contact your school.",
         "failed": "We couldn't send your list. Check your connection and try again."
       }
     },
     "submitted": {
       "title": "Submitted",
+      "revisedTitle": "Changes saved",
       "bodyOne": "1 pick for week {{weekNumber}} with {{teacherName}}. You can edit it until {{closesAt}} — just reopen this link and enter your national ID.",
       "bodyMany": "{{count}} picks for week {{weekNumber}} with {{teacherName}}. You can edit them until {{closesAt}} — just reopen this link and enter your national ID.",
       "edit": "Edit my submission"
+    },
+    "closedMidSubmit": {
+      "title": "The window just closed",
+      "bodyNew": "Submissions for week {{weekNumber}} closed while you had this page open. Your list was not saved. If it's urgent, contact {{teacherName}} directly.",
+      "bodyChanges": "Submissions for week {{weekNumber}} closed while you had this page open. Your changes were not saved — the list you sent earlier stays as it was. If it's urgent, contact {{teacherName}} directly.",
+      "hint": "If the school reopens the window, this link will work again."
     }
   },
   "general": {

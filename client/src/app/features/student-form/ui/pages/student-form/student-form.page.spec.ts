@@ -11,7 +11,12 @@ import { SlotWindow } from '../../../../../shared/models/slot-window.enum';
 import { CreateSubmissionRequest } from '../../../data/create-submission.request';
 import { GetPublicationByLinkResponse } from '../../../data/get-publication-by-link.response';
 import { IdentifyStudentRequest } from '../../../data/identify-student.request';
-import { IdentifyStudentResponse, SlotForIdentifyStudentResponse } from '../../../data/identify-student.response';
+import {
+    IdentifyStudentResponse,
+    SlotForIdentifyStudentResponse,
+    SubmissionForIdentifyStudentResponse,
+} from '../../../data/identify-student.response';
+import { SUBMISSION_WINDOW_CLOSED_PROBLEM } from '../../../data/problem-types';
 import { SubmissionsApiService } from '../../../data/submissions-api.service';
 import { SessionType } from '../../../domain/session-type.enum';
 import { Transmission } from '../../../domain/transmission.enum';
@@ -22,6 +27,7 @@ const HTTP_CONFLICT = 409;
 const HTTP_SERVER_ERROR = 500;
 const LINK_TOKEN = 'link-token';
 const ROSTER_NATIONAL_ID = '000000018';
+const FIRST_TIMER_NATIONAL_ID = '000000026';
 
 const WINDOW_TIMES: Record<SlotWindow, [string, string]> = {
     [SlotWindow.morning]: ['07:00:00', '12:00:00'],
@@ -73,12 +79,24 @@ function studentOf(
         teacherName,
         carName: 'Corolla White',
         transmission,
-        hasSubmission: false,
+        submission: null,
         slots,
     };
 }
 
 const COHEN_STUDENT = studentOf('Teacher Cohen', Transmission.automatic, weekSlots([]));
+
+const SAVED_SUBMISSION: SubmissionForIdentifyStudentResponse = {
+    targetCount: 2,
+    lastSavedAtUtc: '2026-11-12T08:30:00Z',
+    slotRequests: [
+        { slotId: 'monday-noon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+        { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
+        { slotId: 'wednesday-evening', sessionType: SessionType.single, constraint: null },
+    ],
+};
+
+const RETURNING_STUDENT: IdentifyStudentResponse = { ...COHEN_STUDENT, submission: SAVED_SUBMISSION };
 
 function publicationIn(state: PublicationState): () => Observable<GetPublicationByLinkResponse> {
     return () =>
@@ -93,6 +111,22 @@ function publicationIn(state: PublicationState): () => Observable<GetPublication
 
 function failingWith(status: number): () => Observable<never> {
     return () => throwError(() => new HttpErrorResponse({ status }));
+}
+
+function closingWindow(): () => Observable<never> {
+    return () =>
+        throwError(
+            () =>
+                new HttpErrorResponse({
+                    status: HTTP_CONFLICT,
+                    error: {
+                        type: SUBMISSION_WINDOW_CLOSED_PROBLEM,
+                        title: 'Conflict',
+                        status: HTTP_CONFLICT,
+                        detail: "Submissions are accepted only while the week's submission window is open.",
+                    },
+                }),
+        );
 }
 
 function identifyingAs(student: IdentifyStudentResponse): IdentifyStudent {
@@ -1048,25 +1082,6 @@ describe('StudentFormPage', () => {
             expect(reviseSubmission).toHaveBeenCalledTimes(1);
         });
 
-        it('replaces the earlier submission of a returning student', async () => {
-            //given
-            const createSubmission = accepting();
-            const reviseSubmission = accepting();
-            const returning = { ...COHEN_STUDENT, hasSubmission: true };
-            provideOpenLinkSubmitting(identifyingAs(returning), createSubmission, reviseSubmission);
-            const fixture = await renderPage();
-            await reachReview(fixture, 1, ['sunday-afternoon']);
-
-            //when
-            const replacesNoticeShown = page(fixture).querySelector('.review__replaces') !== null;
-            await clickContinue(fixture);
-
-            //then
-            expect(replacesNoticeShown).toBe(true);
-            expect(reviseSubmission).toHaveBeenCalledTimes(1);
-            expect(createSubmission).not.toHaveBeenCalled();
-        });
-
         it.each([
             { status: HTTP_CONFLICT, message: '.review__rejected', canRetry: false },
             { status: HTTP_NOT_FOUND, message: '.review__not-found', canRetry: false },
@@ -1117,7 +1132,7 @@ describe('StudentFormPage', () => {
             const fixture = await renderPage();
             await reachReview(fixture, 1, ['sunday-afternoon']);
             await clickContinue(fixture);
-            roster.student = { ...COHEN_STUDENT, hasSubmission: true };
+            roster.student = RETURNING_STUDENT;
 
             //when
             await press(fixture, '.review__recheck button');
@@ -1174,6 +1189,333 @@ describe('StudentFormPage', () => {
             //then
             expect(createSubmission).toHaveBeenCalledTimes(1);
             expect(continueButton(fixture)!.disabled).toBe(true);
+        });
+    });
+
+    describe('returning student', () => {
+        it('welcomes a returning student back and offers to edit the saved submission', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(RETURNING_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await typeNationalId(fixture, ROSTER_NATIONAL_ID);
+
+            //then
+            expect(textOf(fixture, '.identify__welcome-back')).toContain('studentForm.identify.welcomeBackTitle');
+            expect(textOf(fixture, '.identify__welcome-back')).toContain('studentForm.identify.welcomeBackBodyMany');
+            expect(page(fixture).querySelector('.identify__found')).toBeNull();
+            expect(continueButton(fixture)!.textContent).toContain('studentForm.identify.editSubmission');
+        });
+
+        it('greets a first-time student without a welcome back', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await typeNationalId(fixture, ROSTER_NATIONAL_ID);
+
+            //then
+            expect(page(fixture).querySelector('.identify__welcome-back')).toBeNull();
+            expect(page(fixture).querySelector('.identify__found')).not.toBeNull();
+            expect(continueButton(fixture)!.textContent).toContain('studentForm.continue');
+        });
+
+        it('shows the roster details read-only before the saved list', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(RETURNING_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await identifyAndContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('app-details-step')).not.toBeNull();
+            expect(page(fixture).querySelectorAll('app-details-step input, app-details-step select').length).toBe(0);
+        });
+
+        it('starts the target at the saved count', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(RETURNING_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachTarget(fixture);
+
+            //then
+            expect(textOf(fixture, '.target__count')).toBe('2');
+        });
+
+        it('shows the saved picks ranked on the grid with their session type and constraint', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(RETURNING_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+
+            //when
+            await tapChip(fixture, 'monday-noon');
+
+            //then
+            expect(rankOn(fixture, 'monday-noon')).toBe('1');
+            expect(rankOn(fixture, 'sunday-afternoon')).toBe('2');
+            expect(rankOn(fixture, 'wednesday-evening')).toBe('3');
+            expect(isChecked(fixture, '.pick-sheet__double')).toBe(true);
+            expect(constraintValue(fixture)).toBe('only after 16:00');
+        });
+
+        it('replaces the saved submission with the edited list and says the changes are saved', async () => {
+            //given
+            const createSubmission = accepting();
+            const reviseSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(RETURNING_STUDENT), createSubmission, reviseSubmission);
+            const fixture = await renderPage();
+            await reachTarget(fixture);
+            await press(fixture, '.target__increase');
+            await clickContinue(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            await press(fixture, '.pick-sheet__remove button');
+            await addPick(fixture, 'thursday-morning');
+            await addPick(fixture, 'friday-noon');
+            await clickContinue(fixture);
+            const replacesNoticeShown = page(fixture).querySelector('.review__replaces') !== null;
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(replacesNoticeShown).toBe(true);
+            expect(createSubmission).not.toHaveBeenCalled();
+            expect(reviseSubmission).toHaveBeenCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 3,
+                slotRequests: [
+                    { slotId: 'monday-noon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+                    { slotId: 'wednesday-evening', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'thursday-morning', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'friday-noon', sessionType: SessionType.single, constraint: null },
+                ],
+            });
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.submitted\.revisedTitle$/);
+        });
+
+        it('tells the student when saved picks are no longer offered and never sends them back', async () => {
+            //given
+            const reviseSubmission = accepting();
+            const regridded = { ...RETURNING_STUDENT, slots: weekSlots(['monday-noon', 'wednesday-evening']) };
+            provideOpenLinkSubmitting(identifyingAs(regridded), accepting(), reviseSubmission);
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            const survivingRank = rankOn(fixture, 'sunday-afternoon');
+            await clickContinue(fixture);
+            const droppedNotice = textOf(fixture, '.review__dropped');
+            const notEnoughShown = page(fixture).querySelector('.review__not-enough') !== null;
+            await press(fixture, '.review__add-slots button');
+            await addPick(fixture, 'tuesday-evening');
+            await clickContinue(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(survivingRank).toBe('1');
+            expect(droppedNotice).toContain('studentForm.review.droppedMany');
+            expect(notEnoughShown).toBe(true);
+            expect(reviseSubmission).toHaveBeenCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 2,
+                slotRequests: [
+                    { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'tuesday-evening', sessionType: SessionType.single, constraint: null },
+                ],
+            });
+        });
+
+        it('tells the student on the slots step when none of the saved picks is offered any more', async () => {
+            //given
+            const regridded = {
+                ...RETURNING_STUDENT,
+                slots: weekSlots(['monday-noon', 'sunday-afternoon', 'wednesday-evening']),
+            };
+            provideOpenLinkIdentifying(identifyingAs(regridded));
+            const fixture = await renderPage();
+
+            //when
+            await reachSlots(fixture);
+
+            //then
+            expect(page(fixture).querySelectorAll('.slot-chip__rank').length).toBe(0);
+            expect(textOf(fixture, '.slots__dropped')).toContain('studentForm.review.droppedMany');
+        });
+
+        it('says nothing about dropped picks when every saved pick is still offered', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(RETURNING_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelectorAll('.review__item').length).toBe(3);
+            expect(page(fixture).querySelector('.review__dropped')).toBeNull();
+        });
+
+        it('edits again from the confirmation any number of times, always replacing', async () => {
+            //given
+            const createSubmission = accepting();
+            const reviseSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(RETURNING_STUDENT), createSubmission, reviseSubmission);
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await clickContinue(fixture);
+            await clickContinue(fixture);
+
+            //when
+            await press(fixture, '.student-form__edit button');
+            await press(fixture, '.wizard-step__back button');
+            await tapChip(fixture, 'wednesday-evening');
+            await press(fixture, '.pick-sheet__remove button');
+            await clickContinue(fixture);
+            await clickContinue(fixture);
+            await press(fixture, '.student-form__edit button');
+            await clickContinue(fixture);
+
+            //then
+            expect(createSubmission).not.toHaveBeenCalled();
+            expect(reviseSubmission).toHaveBeenCalledTimes(3);
+            expect(reviseSubmission).toHaveBeenLastCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 2,
+                slotRequests: [
+                    { slotId: 'monday-noon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+                    { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
+                ],
+            });
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.submitted\.revisedTitle$/);
+        });
+
+        it('keeps the edits in progress when the form is checked again', async () => {
+            //given
+            const reviseSubmission: SubmitCommand = vi
+                .fn(accepting())
+                .mockImplementationOnce(failingWith(HTTP_CONFLICT));
+            provideOpenLinkSubmitting(identifyingAs(RETURNING_STUDENT), accepting(), reviseSubmission);
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'wednesday-evening');
+            await press(fixture, '.pick-sheet__remove button');
+            await clickContinue(fixture);
+            await clickContinue(fixture);
+
+            //when
+            await press(fixture, '.review__recheck button');
+            const reviewItemCount = page(fixture).querySelectorAll('.review__item').length;
+            await clickContinue(fixture);
+
+            //then
+            expect(reviewItemCount).toBe(2);
+            expect(reviseSubmission).toHaveBeenLastCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 2,
+                slotRequests: [
+                    { slotId: 'monday-noon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+                    { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
+                ],
+            });
+        });
+
+        it('starts fresh when a returning ID is replaced by a first-timer\'s', async () => {
+            //given
+            provideOpenLinkIdentifying(
+                vi.fn((_token: string, request: IdentifyStudentRequest) =>
+                    of(request.nationalId === ROSTER_NATIONAL_ID ? RETURNING_STUDENT : COHEN_STUDENT),
+                ),
+            );
+            const fixture = await renderPage();
+            await typeNationalId(fixture, ROSTER_NATIONAL_ID);
+
+            //when
+            await typeNationalId(fixture, FIRST_TIMER_NATIONAL_ID);
+            await clickContinue(fixture);
+            await clickContinue(fixture);
+            const target = textOf(fixture, '.target__count');
+            await clickContinue(fixture);
+
+            //then
+            expect(target).toBe('1');
+            expect(page(fixture).querySelectorAll('.slot-chip__rank').length).toBe(0);
+        });
+    });
+
+    describe('window closed mid-submit', () => {
+        it('tells a first-time student the window just closed and that their list was not saved', async () => {
+            //given
+            const createSubmission: SubmitCommand = vi.fn(closingWindow());
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(createSubmission).toHaveBeenCalledTimes(1);
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.closedMidSubmit\.title$/);
+            expect(textOf(fixture, '.student-form__closed-mid-submit')).toContain('studentForm.closedMidSubmit.bodyNew');
+            expect(page(fixture).querySelector('app-review-step')).toBeNull();
+            expect(page(fixture).querySelector('.student-shell__caption')).toBeNull();
+            expect(page(fixture).querySelectorAll('app-status-message button').length).toBe(0);
+        });
+
+        it('tells a returning student their changes were not saved and the earlier list stands', async () => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(RETURNING_STUDENT), accepting(), closingWindow());
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await clickContinue(fixture);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(textOf(fixture, '.status__heading')).toMatch(/studentForm\.closedMidSubmit\.title$/);
+            expect(textOf(fixture, '.student-form__closed-mid-submit')).toContain(
+                'studentForm.closedMidSubmit.bodyChanges',
+            );
+        });
+
+        it('says the edit was not saved when the window closes during an edit from the confirmation', async () => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), accepting(), closingWindow());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+            await clickContinue(fixture);
+            await press(fixture, '.student-form__edit button');
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(textOf(fixture, '.student-form__closed-mid-submit')).toContain(
+                'studentForm.closedMidSubmit.bodyChanges',
+            );
+        });
+
+        it('still offers a recheck for any other rejection', async () => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), failingWith(HTTP_CONFLICT), accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('.review__rejected')).not.toBeNull();
+            expect(page(fixture).querySelector('.review__recheck')).not.toBeNull();
+            expect(page(fixture).querySelector('.student-form__closed-mid-submit')).toBeNull();
         });
     });
 });

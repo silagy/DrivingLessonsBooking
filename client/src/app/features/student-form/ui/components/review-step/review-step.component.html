@@ -44,6 +44,12 @@
             </p-message>
         }
 
+        @if (droppedPickCount() > 0) {
+            <p-message severity="warn" class="review__dropped">
+                {{ droppedKey() | transloco: { count: droppedPickCount() } }}
+            </p-message>
+        }
+
         <ol class="review__list">
             @for (item of items(); track item.slotId) {
                 @let dayName = 'weekGrid.days.' + item.day | transloco;

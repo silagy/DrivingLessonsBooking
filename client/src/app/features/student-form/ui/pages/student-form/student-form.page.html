@@ -32,6 +32,7 @@
                         [studentName]="store.studentName()"
                         [teacherName]="store.teacherName()"
                         [weekNumber]="store.weekParams().weekNumber"
+                        [welcomeBack]="store.welcomeBack()"
                         (nationalIdChanged)="store.changeNationalId($event)"
                         (lookupRequested)="store.requestLookup($event)"
                         (continued)="store.continueToDetails()" />
@@ -70,6 +71,7 @@
                         [targetCount]="store.targetCount()"
                         [pickCount]="store.pickCount()"
                         [pickSheet]="store.pickSheet()"
+                        [droppedPickCount]="store.droppedPickCount()"
                         (chipSelected)="store.openPick($event)"
                         (pickSaved)="store.savePick($event)"
                         (pickRemoved)="store.removeOpenPick()"
@@ -86,6 +88,7 @@
                         [items]="store.reviewItems()"
                         [missingPicks]="store.missingPicks()"
                         [replacesEarlierSubmission]="store.replacesEarlierSubmission()"
+                        [droppedPickCount]="store.droppedPickCount()"
                         [submitStatus]="store.submitStatus()"
                         [canSubmit]="store.canSubmit()"
                         (submitted)="store.submit()"
@@ -98,7 +101,7 @@
                     <app-status-message
                         icon="pi pi-check"
                         tone="success"
-                        [heading]="'studentForm.submitted.title' | transloco">
+                        [heading]="store.submittedTitleKey() | transloco">
                         <p class="student-form__text student-form__submitted">
                             {{ store.submittedBodyKey() | transloco: store.submittedParams() }}
                         </p>
@@ -109,6 +112,17 @@
                             [outlined]="true"
                             [label]="'studentForm.submitted.edit' | transloco"
                             (onClick)="store.editSubmission()" />
+                    </app-status-message>
+                }
+                @case (steps.windowClosed) {
+                    <app-status-message
+                        icon="pi pi-exclamation-circle"
+                        tone="danger"
+                        [heading]="'studentForm.closedMidSubmit.title' | transloco">
+                        <p class="student-form__text student-form__closed-mid-submit">
+                            {{ store.closedMidSubmitBodyKey() | transloco: store.captionParams() }}
+                        </p>
+                        <p class="student-form__hint">{{ 'studentForm.closedMidSubmit.hint' | transloco }}</p>
                     </app-status-message>
                 }
             }

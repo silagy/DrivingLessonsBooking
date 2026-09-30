@@ -5,6 +5,12 @@
     [intro]="'studentForm.slots.body' | transloco"
     [canGoBack]="true"
     (back)="back.emit()">
+    @if (droppedPickCount() > 0) {
+        <p-message severity="warn" class="slots__dropped">
+            {{ droppedKey() | transloco: { count: droppedPickCount() } }}
+        </p-message>
+    }
+
     <app-slot-day-list [days]="days()" (chipSelected)="chipSelected.emit($event)" />
 
     <div wizardFooter>

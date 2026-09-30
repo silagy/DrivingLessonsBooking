@@ -107,6 +107,11 @@ public class Publication : AggregateRoot<PublicationId>
         AddEvent(new PublicationReopened(Id, newEndUtc));
     }
 
+    public bool IsOpenAt(DateTimeOffset instant)
+    {
+        return IsOpen && !Window!.HasEndedBy(instant);
+    }
+
     private void MustBeDraft()
     {
         if (!IsDraft)

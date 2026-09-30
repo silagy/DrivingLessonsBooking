@@ -30,6 +30,7 @@ public class CreateSubmissionInteractorTest
     private Publication publication = null!;
     private WeekSchedule weekSchedule = null!;
     private Submission? addedSubmission;
+    private TimeProvider timeProvider = null!;
 
     [TestInitialize]
     public void Init()
@@ -39,7 +40,7 @@ public class CreateSubmissionInteractorTest
         weekScheduleRepository = A.Fake<IWeekScheduleRepository>();
         submissionRepository = A.Fake<ISubmissionRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        var timeProvider = A.Fake<TimeProvider>();
+        timeProvider = A.Fake<TimeProvider>();
         var contextResolver = new SubmissionContextResolver(
             publicationRepository,
             studentRepository,
@@ -266,6 +267,25 @@ public class CreateSubmissionInteractorTest
 
         //then
         await Should.ThrowAsync<SubmissionWindowMustBeOpenException>(act);
+    }
+
+    [TestMethod]
+    public async Task Window_That_Has_Ended_Is_Rejected_Before_The_Close_Job_Runs()
+    {
+        //given
+        A.CallTo(() => timeProvider.GetUtcNow())
+            .Returns(publication.Window!.EndUtc);
+
+        //when
+        var act = () => interactor.ExecuteAsync(publication.LinkToken.Value, RequestWithFirstSlots(1, 1));
+
+        //then
+        await Should.ThrowAsync<SubmissionWindowMustBeOpenException>(act);
+        publication.IsOpen.ShouldBeTrue();
+        A.CallTo(() => submissionRepository.Add(A<Submission>._))
+            .MustNotHaveHappened();
+        A.CallTo(() => unitOfWork.CommitAsync())
+            .MustNotHaveHappened();
     }
 
     [TestMethod]

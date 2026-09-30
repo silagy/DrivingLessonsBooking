@@ -30,10 +30,14 @@ describe('wizard steps', () => {
         expect(previousStepOf(step)).toBe(previous);
     });
 
-    it.each([StudentFormStep.identify, StudentFormStep.details, StudentFormStep.done])(
+    it.each([StudentFormStep.identify, StudentFormStep.details, StudentFormStep.done, StudentFormStep.windowClosed])(
         'offers no way back from %s',
         step => {
             expect(previousStepOf(step)).toBeNull();
         },
     );
+
+    it('keeps the window-closed screen out of the numbered steps', () => {
+        expect(WIZARD_STEPS).not.toContain(StudentFormStep.windowClosed);
+    });
 });

@@ -8,6 +8,7 @@ import { SubmitStatus } from '../../../domain/submit-status.enum';
 import { WizardStepComponent } from '../wizard-step/wizard-step.component';
 
 const SINGLE_PREFERRED_TARGET = 1;
+const SINGLE_DROPPED_PICK = 1;
 
 @Component({
     selector: 'app-review-step',
@@ -24,6 +25,7 @@ export class ReviewStepComponent {
     readonly items = input.required<readonly ReviewItem[]>();
     readonly missingPicks = input.required<number>();
     readonly replacesEarlierSubmission = input.required<boolean>();
+    readonly droppedPickCount = input.required<number>();
     readonly submitStatus = input.required<SubmitStatus>();
     readonly canSubmit = input.required<boolean>();
 
@@ -40,5 +42,8 @@ export class ReviewStepComponent {
         this.targetCount() === SINGLE_PREFERRED_TARGET
             ? 'studentForm.review.preferredOne'
             : 'studentForm.review.preferredMany',
+    );
+    protected readonly droppedKey = computed(() =>
+        this.droppedPickCount() === SINGLE_DROPPED_PICK ? 'studentForm.review.droppedOne' : 'studentForm.review.droppedMany',
     );
 }

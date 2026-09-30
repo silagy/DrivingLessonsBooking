@@ -46,7 +46,7 @@ async function identifiedStore(): Promise<StudentFormStore> {
                             teacherName: 'Teacher Cohen',
                             carName: 'Corolla White',
                             transmission: Transmission.automatic,
-                            hasSubmission: false,
+                            submission: null,
                             slots: SLOTS,
                         }),
                 },

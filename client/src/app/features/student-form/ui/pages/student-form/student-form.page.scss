@@ -51,6 +51,7 @@
     border-block-start: 1px solid var(--app-bg-muted);
 }
 
-.student-form__submitted {
+.student-form__submitted,
+.student-form__closed-mid-submit {
     max-width: 18rem;
 }

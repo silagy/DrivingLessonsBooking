@@ -55,7 +55,7 @@ public class Submission : AggregateRoot<SubmissionId>
         IReadOnlyList<SlotPick> picks,
         DateTimeOffset submittedAtUtc)
     {
-        WindowMustBeOpen(publication);
+        WindowMustBeOpen(publication, submittedAtUtc);
         StudentMustBeActive(student);
         WeekScheduleMustMatchStudentWeek(publication, student, weekSchedule);
         SlotsMustBeOpenInWeekSchedule(weekSchedule, picks);
@@ -84,7 +84,7 @@ public class Submission : AggregateRoot<SubmissionId>
         DateTimeOffset revisedAtUtc)
     {
         MustBeFor(publication, student);
-        WindowMustBeOpen(publication);
+        WindowMustBeOpen(publication, revisedAtUtc);
         StudentMustBeActive(student);
         WeekScheduleMustMatchStudentWeek(publication, student, weekSchedule);
         SlotsMustBeOpenInWeekSchedule(weekSchedule, picks);
@@ -125,9 +125,9 @@ public class Submission : AggregateRoot<SubmissionId>
         }
     }
 
-    private static void WindowMustBeOpen(Publication publication)
+    private static void WindowMustBeOpen(Publication publication, DateTimeOffset instant)
     {
-        if (!publication.IsOpen)
+        if (!publication.IsOpenAt(instant))
         {
             throw new SubmissionWindowMustBeOpenException();
         }

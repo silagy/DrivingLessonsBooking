@@ -317,4 +317,49 @@ public class PublicationTest
         //then
         Should.Throw<PublicationMustBeClosedException>(act);
     }
+
+    [TestMethod]
+    public void Is_Open_At__Before_The_Window_Ends()
+    {
+        //given
+        var publication = PublicationFakeBuilder.BuildOpen();
+        var instant = publication.Window!.EndUtc.AddSeconds(-1);
+
+        //when
+        var result = publication.IsOpenAt(instant);
+
+        //then
+        result.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Is_Open_At__Not_Once_The_Window_Has_Ended()
+    {
+        //given
+        var publication = PublicationFakeBuilder.BuildOpen();
+        var instant = publication.Window!.EndUtc;
+
+        //when
+        var result = publication.IsOpenAt(instant);
+
+        //then
+        result.ShouldBeFalse();
+    }
+
+    [TestMethod]
+    [DataRow(PublicationState.Draft)]
+    [DataRow(PublicationState.Published)]
+    [DataRow(PublicationState.Closed)]
+    public void Is_Open_At__Only_While_Open(PublicationState state)
+    {
+        //given
+        var publication = PublicationFakeBuilder.StateBuilders[state]();
+        var instant = DateTimeOffset.UtcNow;
+
+        //when
+        var result = publication.IsOpenAt(instant);
+
+        //then
+        result.ShouldBeFalse();
+    }
 }
