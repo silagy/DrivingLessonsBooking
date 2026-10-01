@@ -26,3 +26,21 @@ export function rankOf(picks: readonly SlotPick[], slotId: string): number | nul
 
     return index < 0 ? null : index + 1;
 }
+
+export interface PickMove {
+    slotId: string;
+    toIndex: number;
+}
+
+export function movePick(picks: readonly SlotPick[], move: PickMove): SlotPick[] {
+    const fromIndex = picks.findIndex(pick => pick.slotId === move.slotId);
+
+    if (fromIndex < 0) {
+        return [...picks];
+    }
+
+    const toIndex = Math.min(Math.max(move.toIndex, 0), picks.length - 1);
+    const others = picks.filter((_, index) => index !== fromIndex);
+
+    return [...others.slice(0, toIndex), picks[fromIndex], ...others.slice(toIndex)];
+}
