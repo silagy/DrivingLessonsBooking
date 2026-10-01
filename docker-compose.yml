@@ -26,6 +26,13 @@ services:
       Jwt__Audience: DrivingLessons
       Jwt__SigningKey: ${JWT_SIGNING_KEY}
       Jwt__ExpiryHours: "12"
+      Email__Enabled: ${EMAIL_ENABLED:-false}
+      Email__Host: ${EMAIL_HOST:-}
+      Email__Port: ${EMAIL_PORT:-587}
+      Email__Username: ${EMAIL_USERNAME:-}
+      Email__Password: ${EMAIL_PASSWORD:-}
+      Email__FromAddress: ${EMAIL_FROM_ADDRESS:-}
+      Email__FromName: ${EMAIL_FROM_NAME:-}
     depends_on:
       postgres:
         condition: service_healthy

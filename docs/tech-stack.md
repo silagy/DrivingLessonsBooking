@@ -51,7 +51,7 @@ This constraint is why hosting must be **always-on** — spin-down free tiers an
   - `app` — the single .NET image (API + Angular static files)
   - `postgres` — PostgreSQL with a named volume
   - `caddy` — reverse proxy terminating HTTPS with automatic Let's Encrypt certificates
-- **Email**: AWS SES (effectively free at this volume)
+- **Email**: AWS SES over SMTP with MailKit (effectively free at this volume) — see [ADR 0005](decisions/0005-email-over-ses-smtp.md); a local Mailpit container catches it in development
 - **Backups**: nightly `pg_dump` cron on the instance, uploaded to S3
 - **Timezone handling** per requirements §8.3: containers run in UTC; Asia/Jerusalem is presentation-layer only
 

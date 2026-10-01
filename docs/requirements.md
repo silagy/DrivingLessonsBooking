@@ -114,7 +114,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 ### 6.4 Window close and reopen
 - At end time, the link becomes read-only for students and the Excel is **automatically emailed** to the teacher's contact email.
 - The admin may extend the deadline before close, or reopen after close.
-- **Versioning rule:** every window close event fires the email. The email subject carries an incrementing version number (e.g., "Week 25 Requests - Teacher Cohen - v2") so the teacher always knows whether a previously received file is stale.
+- **Versioning rule:** every window close event fires the email. The email subject carries an incrementing version number (e.g., "בקשות לשבוע 25 - משה כהן - גרסה 2"; the email is Hebrew, see decision #22) so the teacher always knows whether a previously received file is stale.
 - The Excel is also available for **on-demand download** from the admin UI at any time, including mid-window.
 ## 7. Student Flow
  
@@ -212,6 +212,7 @@ One row per slot request, sorted by day, then slot, then student rank:
 | 19 | **Unknown ID is rejected** ("contact your school"); new students added by re-uploading the roster | Roster is authoritative; removes self-service onboarding (see ADR 0003) |
 | 20 | ~~No maximum on cars per teacher (was 1–2); minimum one binds as "the last car can never be removed" and a teacher may exist carless until their first car is added~~ **superseded by #21** | Fleet size is the school's business, not a system rule; the minimum only matters once car removal exists |
 | 21 | **Car is its own aggregate — a shared school pool**: one car may be assigned to any number of teachers (many-to-many), a teacher may have zero cars (the last-car rule is dropped), and cars soft-delete like teachers | One physical car is shared between teachers in practice; modeling Car as owned by a single teacher was a modeling error |
+| 22 | **The teacher's Excel email is Hebrew**: subject "בקשות לשבוע N - {teacher} - גרסה K", a right-to-left body, and the attachment named after the subject | Teachers read Hebrew and the workbook is already Hebrew (Excel roadmap decision 1); the version in the attachment's name keeps a saved file identifiable after it leaves the inbox |
  
 ## 12. Explicitly Deferred (v2 candidates)
  
