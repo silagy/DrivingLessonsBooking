@@ -346,6 +346,10 @@
       "submit": "Submit",
       "unlockHint": "Submit unlocks once you have {{target}} picks.",
       "recheck": "Check the form again",
+      "reorderHint": "Use the arrows to move a pick up or down.",
+      "moveUp": "Move pick {{rank}} ({{slot}}) up",
+      "moveDown": "Move pick {{rank}} ({{slot}}) down",
+      "movedTo": "Moved to rank {{rank}}.",
       "errors": {
         "rejected": "We couldn't save your list — something changed since you opened the form, for example a slot is no longer available.",
         "notFound": "We couldn't find your roster details or this week's slots anymore. Please contact your school.",

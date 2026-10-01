@@ -319,6 +319,29 @@ function accessibleNameOf(fixture: ComponentFixture<StudentFormPage>, selector: 
         .join(' ');
 }
 
+type MoveDirection = 'up' | 'down';
+
+function reviewOrder(fixture: ComponentFixture<StudentFormPage>, selector = '.review__item'): string[] {
+    return [...page(fixture).querySelectorAll<HTMLElement>(selector)].map(item => item.dataset['pickId'] ?? '');
+}
+
+function moveButton(
+    fixture: ComponentFixture<StudentFormPage>,
+    slotId: string,
+    direction: MoveDirection,
+): HTMLButtonElement {
+    return page(fixture).querySelector(`[data-pick-id="${slotId}"] .review__move-${direction} button`) as HTMLButtonElement;
+}
+
+async function move(
+    fixture: ComponentFixture<StudentFormPage>,
+    slotId: string,
+    direction: MoveDirection,
+): Promise<void> {
+    moveButton(fixture, slotId, direction).click();
+    await fixture.whenStable();
+}
+
 describe('StudentFormPage', () => {
     it.each([
         { view: 'notYetOpen', load: publicationIn(PublicationState.published), windowRows: 2 },
@@ -1189,6 +1212,246 @@ describe('StudentFormPage', () => {
             //then
             expect(createSubmission).toHaveBeenCalledTimes(1);
             expect(continueButton(fixture)!.disabled).toBe(true);
+        });
+    });
+
+    describe('reordering the ranked list', () => {
+        it('promotes a later pick and submits the new order', async () => {
+            //given
+            const createSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachTarget(fixture);
+            await press(fixture, '.target__increase');
+            await clickContinue(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            await chooseDouble(fixture);
+            await typeConstraint(fixture, 'only after 16:00');
+            await press(fixture, '.pick-sheet__save button');
+            await addPick(fixture, 'monday-evening');
+            await addPick(fixture, 'wednesday-afternoon');
+            await clickContinue(fixture);
+
+            //when
+            await move(fixture, 'wednesday-afternoon', 'up');
+            await move(fixture, 'wednesday-afternoon', 'up');
+            await clickContinue(fixture);
+
+            //then
+            expect(createSubmission).toHaveBeenCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 2,
+                slotRequests: [
+                    { slotId: 'wednesday-afternoon', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'sunday-afternoon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+                    { slotId: 'monday-evening', sessionType: SessionType.single, constraint: null },
+                ],
+            });
+        });
+
+        it('renumbers the ranks to the new order', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 2, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //when
+            await move(fixture, 'wednesday-afternoon', 'up');
+            await move(fixture, 'wednesday-afternoon', 'up');
+
+            //then
+            const ranks = [...page(fixture).querySelectorAll('.review__rank')].map(x => x.textContent?.trim());
+            expect(reviewOrder(fixture)).toEqual(['wednesday-afternoon', 'sunday-afternoon', 'monday-evening']);
+            expect(ranks).toEqual(['1', '2', '3']);
+        });
+
+        it('moves a pick down below the next one', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //when
+            await move(fixture, 'sunday-afternoon', 'down');
+
+            //then
+            expect(reviewOrder(fixture)).toEqual(['monday-evening', 'sunday-afternoon', 'wednesday-afternoon']);
+        });
+
+        it('moves the preferred boundary with the order, so a promoted backup becomes preferred', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 2, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //when
+            await move(fixture, 'wednesday-afternoon', 'up');
+            await move(fixture, 'wednesday-afternoon', 'up');
+
+            //then
+            expect(reviewOrder(fixture, '.review__item--preferred')).toEqual(['wednesday-afternoon', 'sunday-afternoon']);
+        });
+
+        it('never moves the first pick up or the last pick down', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //then
+            expect(moveButton(fixture, 'sunday-afternoon', 'up').disabled).toBe(true);
+            expect(moveButton(fixture, 'sunday-afternoon', 'down').disabled).toBe(false);
+            expect(moveButton(fixture, 'monday-evening', 'up').disabled).toBe(false);
+            expect(moveButton(fixture, 'monday-evening', 'down').disabled).toBe(false);
+            expect(moveButton(fixture, 'wednesday-afternoon', 'up').disabled).toBe(false);
+            expect(moveButton(fixture, 'wednesday-afternoon', 'down').disabled).toBe(true);
+        });
+
+        it('names each move button by its rank and slot', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+
+            //then
+            expect(moveButton(fixture, 'monday-evening', 'up').getAttribute('aria-label')).toMatch(
+                /studentForm\.review\.moveUp$/,
+            );
+            expect(moveButton(fixture, 'sunday-afternoon', 'down').getAttribute('aria-label')).toMatch(
+                /studentForm\.review\.moveDown$/,
+            );
+        });
+
+        it('offers no reordering for a single pick', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //then
+            expect(page(fixture).querySelector('.review__moves')).toBeNull();
+            expect(page(fixture).querySelector('.review__reorder-hint')).toBeNull();
+        });
+
+        it('explains the controls while there is something to reorder', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+
+            //then
+            expect(textOf(fixture, '.review__reorder-hint')).toMatch(/studentForm\.review\.reorderHint$/);
+        });
+
+        it('keeps focus on a pick that reaches the top', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+            moveButton(fixture, 'wednesday-afternoon', 'up').focus();
+
+            //when
+            await move(fixture, 'wednesday-afternoon', 'up');
+            const focusedAfterFirstMove = document.activeElement;
+            await move(fixture, 'wednesday-afternoon', 'up');
+
+            //then
+            expect(focusedAfterFirstMove).toBe(moveButton(fixture, 'wednesday-afternoon', 'up'));
+            expect(document.activeElement).toBe(moveButton(fixture, 'wednesday-afternoon', 'down'));
+        });
+
+        it('announces the new rank of a moved pick, and starts silent on every visit to the review', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+            const before = textOf(fixture, '.review__announcement');
+
+            //when
+            await move(fixture, 'monday-evening', 'up');
+            const afterMove = textOf(fixture, '.review__announcement');
+            await press(fixture, '.wizard-step__back button');
+            await clickContinue(fixture);
+
+            //then
+            expect(before).toBe('');
+            expect(afterMove).toMatch(/studentForm\.review\.movedTo$/);
+            expect(page(fixture).querySelector('.review__announcement')!.getAttribute('aria-live')).toBe('polite');
+            expect(textOf(fixture, '.review__announcement')).toBe('');
+        });
+
+        it('shows the new ranks on the grid and appends a new pick after them', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+            await move(fixture, 'wednesday-afternoon', 'up');
+            await move(fixture, 'wednesday-afternoon', 'up');
+
+            //when
+            await press(fixture, '.wizard-step__back button');
+            const badges = ['wednesday-afternoon', 'sunday-afternoon', 'monday-evening'].map(x => rankOn(fixture, x));
+            await addPick(fixture, 'thursday-evening');
+            await clickContinue(fixture);
+
+            //then
+            expect(badges).toEqual(['1', '2', '3']);
+            expect(reviewOrder(fixture)).toEqual([
+                'wednesday-afternoon',
+                'sunday-afternoon',
+                'monday-evening',
+                'thursday-evening',
+            ]);
+        });
+
+        it('locks reordering while the list is being sent', async () => {
+            //given
+            const createSubmission: SubmitCommand = vi.fn(() => new Subject<void>());
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            expect(moveButton(fixture, 'sunday-afternoon', 'down').disabled).toBe(true);
+            expect(moveButton(fixture, 'monday-evening', 'up').disabled).toBe(true);
+        });
+
+        it('reorders a saved list and replaces it in the new order', async () => {
+            //given
+            const createSubmission = accepting();
+            const reviseSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(RETURNING_STUDENT), createSubmission, reviseSubmission);
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await clickContinue(fixture);
+
+            //when
+            await move(fixture, 'wednesday-evening', 'up');
+            await move(fixture, 'wednesday-evening', 'up');
+            await clickContinue(fixture);
+
+            //then
+            expect(createSubmission).not.toHaveBeenCalled();
+            expect(reviseSubmission).toHaveBeenCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 2,
+                slotRequests: [
+                    { slotId: 'wednesday-evening', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'monday-noon', sessionType: SessionType.double, constraint: 'only after 16:00' },
+                    { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
+                ],
+            });
         });
     });
 
