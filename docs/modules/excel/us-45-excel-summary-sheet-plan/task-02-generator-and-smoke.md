@@ -11,7 +11,7 @@
 - Consumes (task 1): `SummarySheet.AddTo(XLWorkbook, DateOnly, IReadOnlyCollection<SlotForGetWeekScheduleResponse>, IReadOnlyDictionary<Guid, int>)`, `SummarySheet.Name` (`"סיכום"`). (On `main`): `ExcelGenerator(IPublicationRepository, IWeekScheduleQueries, ISubmissionQueries)`; `IWeekScheduleQueries.GetByTeacherAndWeekAsync(Guid teacherId, DateOnly weekStart) : Task<GetWeekScheduleResponse?>`; `ISubmissionQueries.GetSlotRequestCountsAsync(Guid publicationId, Guid teacherId) : Task<IReadOnlyDictionary<Guid, int>>`; `RequestDetailSheet.AddTo` / `RequestDetailSheet.Name` (slice 1).
 - Produces: `ExcelGenerator` whose workbook is `[סיכום, פירוט בקשות]`; constructor, file name and content type unchanged — so `DownloadPublicationExcelInteractor`, `PublicationClosedHandler` and DI need no change. Slice 3 (US-44) attaches this file.
 
-- [ ] **Step 1: Write the failing generator tests**
+- [x] **Step 1: Write the failing generator tests**
 
 In `tests\DrivingLessons.Application.Test\Excel\ExcelGeneratorTest.cs`:
 
@@ -86,12 +86,12 @@ The existing `using`s already cover `SlotForGetWeekScheduleResponse` / `GetWeekS
 
 `Init` answers every other teacher/week with **no** schedule and every other publication/teacher with **no** counts, so `Summary_Sheet_Counts_…` only passes if the generator asks for exactly the teacher, the publication's week and the publication it was given — the scope that keeps another teacher's picks off this file (README Review Focus 3). Its header assertion proves the week's date reaches the sheet. `Summary_Grid_Is_Empty_…` runs on those defaults: a teacher with no week schedule gets an empty grid, not an exception (Review Focus 4).
 
-- [ ] **Step 2: Run the tests to see them fail**
+- [x] **Step 2: Run the tests to see them fail**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~ExcelGeneratorTest"`
 Expected: FAIL — 3 of 5: `Summary_Sheet_Counts_The_Requests_Of_The_Teacher_And_Publication` and `Summary_Grid_Is_Empty_When_The_Teacher_Has_No_Week_Schedule` throw because there is no worksheet named `סיכום`; `Workbook_Has_The_Summary_Then_The_Request_Detail_Sheet` fails because the first sheet is still `Summary`. The other two pass.
 
-- [ ] **Step 3: The generator writes `SummarySheet`**
+- [x] **Step 3: The generator writes `SummarySheet`**
 
 Replace the contents of `src\DrivingLessons.Infrastructure\Excel\ExcelGenerator.cs` with:
 
@@ -155,14 +155,14 @@ What changed: the private `Days` / `Windows` arrays and `BuildSummarySheet` (Eng
 
 Then confirm the English sheet is gone everywhere: `grep -rn '"Summary"' src tests --include=*.cs` → no output.
 
-- [ ] **Step 4: Run the tests to see them pass**
+- [x] **Step 4: Run the tests to see them pass**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~Excel"`
 Expected: PASS — 39 tests (5 generator + 10 summary + 24 detail).
 
 Then: `dotnet build` and `dotnet test` — build clean (no new warnings), every test PASS.
 
-- [ ] **Step 5: Smoke API on a throwaway database — setup**
+- [x] **Step 5: Smoke API on a throwaway database — setup**
 
 1. Create the database (the compose container must be running — `docker ps` shows `drivinglessonsbooking-postgres-1`):
    ```bash
@@ -243,7 +243,7 @@ Then: `dotnet build` and `dotnet test` — build clean (no new warnings), every 
    JS
    ```
 
-- [ ] **Step 6: Smoke — submit, block, read both teachers' files against the dashboard**
+- [x] **Step 6: Smoke — submit, block, read both teachers' files against the dashboard**
 
 Write and run the scenario (two teachers, two cars, four roster students, one open publication):
 
@@ -362,7 +362,7 @@ What step 4 proves:
 
 Keep the API running, the smoke database and `$SMOKE` (`helpers.sh`, `env.sh`, `cohen.xlsx`) — task 3 continues here. `$SMOKE/cohen.xlsx` is the file task 3 hands to your human partner.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/DrivingLessons.Infrastructure/Excel/ExcelGenerator.cs \

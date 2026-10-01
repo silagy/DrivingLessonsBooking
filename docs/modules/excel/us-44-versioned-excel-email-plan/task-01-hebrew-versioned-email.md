@@ -18,7 +18,7 @@
 
 `IEmailSender` stays `LoggingEmailSender` in this task, so the running app still only logs the send (now with the Hebrew subject).
 
-- [ ] **Step 1: Write the failing handler tests**
+- [x] **Step 1: Write the failing handler tests**
 
 Create `tests\DrivingLessons.Application.Test\EventHandlers\PublicationClosedHandlerTest.cs`:
 
@@ -303,12 +303,12 @@ How the fakes are wired:
 - `Closed(…)` walks a real `Publication` through `Publish → Open → Close`, so `TeacherVersions` holds real versions in the order the teachers were passed. 4 October 2026 is a Sunday; its Monday falls in ISO week **41**.
 - `ErrorsLogged()` counts `ILogger.Log` calls at `LogLevel.Error` on the fake logger — `LogError(…)` is an extension method over `Log`.
 
-- [ ] **Step 2: Run the tests to see them fail**
+- [x] **Step 2: Run the tests to see them fail**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~PublicationClosedHandlerTest"`
 Expected: FAIL — the build breaks with `CS1729: 'PublicationClosedHandler' does not contain a constructor that takes 5 arguments`. (The test project already sees `Microsoft.Extensions.Logging` through Infrastructure; Application does not yet.)
 
-- [ ] **Step 3: Give Application the logging abstractions**
+- [x] **Step 3: Give Application the logging abstractions**
 
 ```bash
 dotnet add src/DrivingLessons.Application package Microsoft.Extensions.Logging.Abstractions --version 10.0.9
@@ -323,7 +323,7 @@ dotnet add src/DrivingLessons.Application package Microsoft.Extensions.Logging.A
 
 (10.0.9 matches every other `Microsoft.Extensions.*` package in the solution.)
 
-- [ ] **Step 4: Rewrite the handler**
+- [x] **Step 4: Rewrite the handler**
 
 Replace the contents of `src\DrivingLessons.Application\EventHandlers\PublicationClosedHandler.cs` with:
 
@@ -444,14 +444,14 @@ Why it is shaped this way:
 - **`excel with { FileName = … }`** renames only the attachment; `ExcelGenerator` and the admin download keep `week-{date}-{guid}.xlsx` (README decision 3). The unsafe set is the Windows-forbidden file-name characters — the strictest desktop a teacher is likely to save to.
 - **The body is plain lines joined by `'\n'`**: task 2 turns it into a right-to-left HTML part, one `<p>` per line.
 
-- [ ] **Step 5: Run the tests to see them pass**
+- [x] **Step 5: Run the tests to see them pass**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~PublicationClosedHandlerTest"`
 Expected: PASS — 14 tests (11 methods; `Replaces_Characters_A_File_Name_Cannot_Hold` runs 4 rows).
 
 Then `dotnet build` and `dotnet test` — build clean (no new warnings beyond the existing `NU1903` / `MSTEST0001` / `CS8618`), every test PASSES; the Application suite goes from 97 to 111.
 
-- [ ] **Step 6: Record the Hebrew subject in the requirements**
+- [x] **Step 6: Record the Hebrew subject in the requirements**
 
 In `docs\requirements.md` §6.4, replace
 
@@ -471,7 +471,7 @@ In §11 Decisions Log, add after the row for decision 21:
 | 22 | **The teacher's Excel email is Hebrew**: subject "בקשות לשבוע N - {teacher} - גרסה K", a right-to-left body, and the attachment named after the subject | Teachers read Hebrew and the workbook is already Hebrew (Excel roadmap decision 1); the version in the attachment's name keeps a saved file identifiable after it leaves the inbox |
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/DrivingLessons.Application/DrivingLessons.Application.csproj \

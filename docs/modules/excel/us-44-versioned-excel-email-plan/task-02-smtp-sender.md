@@ -23,7 +23,7 @@
   - `EmailOptions` — `Enabled`, `Host`, `Port`, `Security` (`MailKit.Security.SecureSocketOptions`), `Username`, `Password`, `FromAddress`, `FromName`; validation messages `Email host is required when email is enabled.`, `A valid from address is required when email is enabled.`, `An email password is required with a username.` — task 3 Step 7 expects the first at boot.
   - Configuration keys `Email:*` and compose variables `EMAIL_ENABLED`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USERNAME`, `EMAIL_PASSWORD`, `EMAIL_FROM_ADDRESS`, `EMAIL_FROM_NAME`.
 
-- [ ] **Step 1: Write the failing MIME message tests**
+- [x] **Step 1: Write the failing MIME message tests**
 
 Create `tests\DrivingLessons.Application.Test\Emails\EmailMimeMessageTest.cs`:
 
@@ -162,7 +162,7 @@ public class EmailMimeMessageTest
 
 `TextBody` comes back with CRLF line endings (MIME text is CRLF on the wire), hence `ReplaceLineEndings("\n")`; `HtmlBody` is compared exactly because the right-to-left wrapper is the point. The folder is `Emails`, not `Email` — a `…Test.Email` namespace would shadow the domain `Email` value object in every other test file (README decision 9).
 
-- [ ] **Step 2: Write the failing options tests**
+- [x] **Step 2: Write the failing options tests**
 
 Create `tests\DrivingLessons.Application.Test\Emails\EmailOptionsTest.cs`:
 
@@ -286,12 +286,12 @@ public class EmailOptionsTest
 
 `DataAnnotationValidateOptions<EmailOptions>` is the exact validator `ValidateDataAnnotations()` registers, so these tests prove what `ValidateOnStart()` will do at boot — attributes first (`[Range]` on `Port`), then `IValidatableObject.Validate` when they pass.
 
-- [ ] **Step 3: Run the tests to see them fail**
+- [x] **Step 3: Run the tests to see them fail**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~EmailMimeMessageTest|FullyQualifiedName~EmailOptionsTest"`
 Expected: FAIL — the build breaks with `CS0246: The type or namespace name 'MimeKit' could not be found`, `CS0103: The name 'EmailMimeMessage' does not exist`, and `CS0117: 'EmailOptions' does not contain a definition for 'Host'`.
 
-- [ ] **Step 4: Add MailKit**
+- [x] **Step 4: Add MailKit**
 
 ```bash
 dotnet add src/DrivingLessons.Infrastructure package MailKit --version 4.18.1
@@ -306,7 +306,7 @@ dotnet add src/DrivingLessons.Infrastructure package MailKit --version 4.18.1
 
 MailKit brings MimeKit. The test project sees both through its Infrastructure reference.
 
-- [ ] **Step 5: The SMTP settings and their validation**
+- [x] **Step 5: The SMTP settings and their validation**
 
 Replace the contents of `src\DrivingLessons.Infrastructure\Options\EmailOptions.cs` with:
 
@@ -375,7 +375,7 @@ public sealed class EmailOptions : IValidatableObject
 - `Security` binds from the configuration strings `StartTls` / `None` (the binder parses enum names). `StartTls` is the default so production can never fall back to plaintext by omission; only the Development file says `None`, for Mailpit.
 - Nothing is validated while `Enabled` is false — the default, and every developer machine without Mailpit.
 
-- [ ] **Step 6: The MIME message**
+- [x] **Step 6: The MIME message**
 
 Create `src\DrivingLessons.Infrastructure\Email\EmailMimeMessage.cs`:
 
@@ -429,7 +429,7 @@ public static class EmailMimeMessage
 
 MimeKit encodes the Hebrew subject, display name and attachment file name for the wire (RFC 2047 / 2231), so they arrive intact in any mail client — the smoke in task 3 reads them back from Mailpit.
 
-- [ ] **Step 7: The sender**
+- [x] **Step 7: The sender**
 
 ```bash
 git mv src/DrivingLessons.Infrastructure/Email/LoggingEmailSender.cs src/DrivingLessons.Infrastructure/Email/SmtpEmailSender.cs
@@ -496,7 +496,7 @@ public class SmtpEmailSender : IEmailSender
 - Nothing is caught here: a failure propagates to `PublicationClosedHandler`, which logs it with the teacher and publication ids (task 1).
 - The 30-second timeout bounds each connect / command; MailKit's default is 2 minutes, and the startup reconciliation waits on this call before the app starts listening.
 
-- [ ] **Step 8: Register it**
+- [x] **Step 8: Register it**
 
 In `src\DrivingLessons.Infrastructure\DependencyInjection.cs`, replace
 
@@ -512,14 +512,14 @@ with
 
 Then `grep -rn "LoggingEmailSender" src tests --include=*.cs` → no output.
 
-- [ ] **Step 9: Run the tests to see them pass**
+- [x] **Step 9: Run the tests to see them pass**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~EmailMimeMessageTest|FullyQualifiedName~EmailOptionsTest|FullyQualifiedName~PublicationClosedHandlerTest"`
 Expected: PASS — 29 tests (6 MIME + 9 options + task 1's 14).
 
 Then `dotnet build` and `dotnet test` — build clean (no new warnings), every test PASSES; the Application suite is now 126.
 
-- [ ] **Step 10: Configuration**
+- [x] **Step 10: Configuration**
 
 In `src\DrivingLessons.Presentation.Web\appsettings.json`, replace
 
@@ -595,7 +595,7 @@ EMAIL_FROM_NAME=בית הספר לנהיגה
 
 Check the compose file still renders: `docker compose config | grep Email__` → seven lines, `Email__Enabled: "false"` and `Email__Port: "587"` when your local `.env` sets no `EMAIL_*` (compose's `:-` defaults also cover a variable set to empty).
 
-- [ ] **Step 11: Record the decision and the dev setup**
+- [x] **Step 11: Record the decision and the dev setup**
 
 Create `docs\decisions\0005-email-over-ses-smtp.md`:
 

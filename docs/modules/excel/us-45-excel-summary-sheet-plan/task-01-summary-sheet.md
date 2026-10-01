@@ -14,7 +14,7 @@
 
 `SummarySheet` owns every rule of sheet 1 (README decision 7): the layout, the labels, which cells exist, how a blocked slot looks, the widths. The tests write a workbook, save it to a stream, load it back and read the cells — what a teacher's Excel would read.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests\DrivingLessons.Application.Test\Excel\SummarySheetTest.cs`:
 
@@ -279,12 +279,12 @@ public class SummarySheetTest
 
 Cell coordinates: column B (2) is Sunday … G (7) Friday; row 2 is Morning … 5 Evening. `Grid(…)` builds a full week the way the domain does (`WeekGridDefinition`: 22 slots, Friday Morning and Noon only), with the listed slots Unavailable. `WeekStart` 2026-10-04 is a Sunday, so the headers run 4.10 → 9.10. Colours are compared by ARGB: a reloaded fill is an ARGB colour, not the named `XLColor.LightGray`.
 
-- [ ] **Step 2: Run the tests to see them fail**
+- [x] **Step 2: Run the tests to see them fail**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~SummarySheetTest"`
 Expected: FAIL — the build breaks with `CS0103: The name 'SummarySheet' does not exist in the current context`.
 
-- [ ] **Step 3: The sheet**
+- [x] **Step 3: The sheet**
 
 Create `src\DrivingLessons.Infrastructure\Excel\SummarySheet.cs`:
 
@@ -422,14 +422,14 @@ Why it is shaped this way:
 - The date is `d.M` (`4.10`), what the dashboard's Hebrew locale renders; `HH\\:mm` escapes the colon so the hours never pick up a culture's time separator. `אחה״צ` comes from `HebrewExcelLabels.WindowOf` with its gershayim `״` (U+05F4). The dash between the hours is an en dash `–` (U+2013).
 - Widths are explicit (decision 8): `AdjustToContents` does not widen Hebrew text (slice 1 decision 5).
 
-- [ ] **Step 4: Run the tests to see them pass**
+- [x] **Step 4: Run the tests to see them pass**
 
 Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~SummarySheetTest"`
 Expected: PASS — 10 tests.
 
 Then: `dotnet build` and `dotnet test` — build clean (no new warnings beyond the existing `NU1903` / `MSTEST0001` / `CS8618`), every test PASS. `SummarySheet` is not called yet — `ExcelGenerator` still writes its English `Summary` sheet until task 2 — so nothing else changes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/DrivingLessons.Infrastructure/Excel/SummarySheet.cs \
