@@ -18,6 +18,7 @@ How to run the driving-lessons app locally. Two setups: **Docker Compose** (inte
 | OpenAPI explorer (Scalar, dev only) | http://localhost:5080/scalar/v1 |
 | PostgreSQL | localhost:5432 |
 | Dev admin login | `admin@local.dev` / `DevAdmin#2026` |
+| Mailpit inbox (optional, local email) | http://localhost:8025 (SMTP on 1025) |
 
 The client always calls relative `/api/...` URLs. In dev, `client/proxy.conf.json` proxies `/api` → `http://localhost:5080`.
 
@@ -66,6 +67,21 @@ When the API runs from source (Option B), an interactive OpenAPI explorer is ser
 It's enabled in the **Development** environment only — the Docker Compose stack (Option A) runs in Production and does **not** expose it. Reach it on the API host (`:5080`) directly, not through the Angular dev server (`:4200`), which only proxies `/api`.
 
 To call secured endpoints: `POST /api/auth/login` with the dev admin credentials, copy the returned `accessToken`, click **Authorize** in Scalar and paste it. Requests then send `Authorization: Bearer <token>`.
+
+## Email locally (Mailpit)
+
+At every window close the API emails each teacher their Excel file over SMTP ([ADR 0005](../decisions/0005-email-over-ses-smtp.md)). In Development it points at a local Mailpit on port 1025 but sends nothing until you turn it on — with `Email:Enabled` false (the default) it logs `Email disabled. Skipped send…` instead.
+
+```bash
+# (once) the local inbox — SMTP on 1025, web UI on 8025
+docker run -d --name dl-mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit
+# (already created it before? just: docker start dl-mailpit)
+
+# API with email on
+dotnet run --project src/DrivingLessons.Presentation.Web -- --Email:Enabled=true
+```
+
+Publish a week with a short window; when it closes, each teacher's email (Hebrew subject, the `.xlsx` attached) appears at http://localhost:8025. In Docker Compose / production, set the `EMAIL_*` variables in `.env` (see `.env.example`).
 
 ## Build & test
 
