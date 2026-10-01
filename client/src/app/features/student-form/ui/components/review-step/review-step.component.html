@@ -54,15 +54,28 @@
             <p class="review__reorder-hint">{{ 'studentForm.review.reorderHint' | transloco }}</p>
         }
 
-        <ol class="review__list">
+        <ol
+            class="review__list"
+            cdkDropList
+            cdkDropListLockAxis="y"
+            [cdkDropListData]="items()"
+            [cdkDropListDisabled]="!canReorder() || isSubmitting()"
+            (cdkDropListDropped)="onDropped($event)">
             @for (item of items(); track item.slotId; let first = $first, last = $last) {
                 @let dayName = 'weekGrid.days.' + item.day | transloco;
                 @let windowName = 'weekGrid.windows.' + item.window | transloco;
                 @let slotName = 'studentForm.slotLabel' | transloco: { day: dayName, window: windowName };
                 <li
                     class="review__item"
+                    cdkDrag
+                    cdkDragPreviewContainer="parent"
                     [class.review__item--preferred]="item.isPreferred"
                     [attr.data-pick-id]="item.slotId">
+                    @if (canReorder()) {
+                        <span class="review__grip" cdkDragHandle aria-hidden="true">
+                            <i class="pi pi-bars"></i>
+                        </span>
+                    }
                     <span class="review__rank" aria-hidden="true">{{ item.rank }}</span>
                     <div class="review__details">
                         <p class="review__slot">

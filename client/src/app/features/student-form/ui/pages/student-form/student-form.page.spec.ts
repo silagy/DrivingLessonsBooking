@@ -1,6 +1,8 @@
+import { CdkDropList } from '@angular/cdk/drag-drop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { LanguageService } from '../../../../../core/language.service';
@@ -339,6 +341,21 @@ async function move(
     direction: MoveDirection,
 ): Promise<void> {
     moveButton(fixture, slotId, direction).click();
+    await fixture.whenStable();
+}
+
+function dropList(fixture: ComponentFixture<StudentFormPage>): CdkDropList {
+    return fixture.debugElement.query(By.directive(CdkDropList)).injector.get(CdkDropList);
+}
+
+async function drop(
+    fixture: ComponentFixture<StudentFormPage>,
+    previousIndex: number,
+    currentIndex: number,
+): Promise<void> {
+    fixture.debugElement
+        .query(By.directive(CdkDropList))
+        .triggerEventHandler('cdkDropListDropped', { previousIndex, currentIndex });
     await fixture.whenStable();
 }
 
@@ -1452,6 +1469,94 @@ describe('StudentFormPage', () => {
                     { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
                 ],
             });
+        });
+    });
+
+    describe('dragging the ranked list', () => {
+        it('reorders a pick dropped at a new rank and submits the new order', async () => {
+            //given
+            const createSubmission = accepting();
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 2, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //when
+            await drop(fixture, 2, 0);
+            const order = reviewOrder(fixture);
+            const announcement = textOf(fixture, '.review__announcement');
+            await clickContinue(fixture);
+
+            //then
+            expect(order).toEqual(['wednesday-afternoon', 'sunday-afternoon', 'monday-evening']);
+            expect(announcement).toMatch(/studentForm\.review\.movedTo$/);
+            expect(createSubmission).toHaveBeenCalledWith(LINK_TOKEN, {
+                nationalId: ROSTER_NATIONAL_ID,
+                targetCount: 2,
+                slotRequests: [
+                    { slotId: 'wednesday-afternoon', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'sunday-afternoon', sessionType: SessionType.single, constraint: null },
+                    { slotId: 'monday-evening', sessionType: SessionType.single, constraint: null },
+                ],
+            });
+        });
+
+        it('changes nothing when a pick is dropped where it started', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //when
+            await drop(fixture, 1, 1);
+
+            //then
+            expect(reviewOrder(fixture)).toEqual(['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+            expect(textOf(fixture, '.review__announcement')).toBe('');
+        });
+
+        it('offers a drag handle on every pick when there is more than one', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //then
+            const grips = [...page(fixture).querySelectorAll('.review__item .review__grip')];
+            expect(grips.length).toBe(3);
+            expect(grips.every(grip => grip.getAttribute('aria-hidden') === 'true')).toBe(true);
+            expect(dropList(fixture).disabled).toBe(false);
+            expect(dropList(fixture).lockAxis).toBe('y');
+        });
+
+        it('offers no drag handle for a single pick', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //then
+            expect(page(fixture).querySelector('.review__grip')).toBeNull();
+            expect(dropList(fixture).disabled).toBe(true);
+        });
+
+        it('locks dragging while the list is being sent', async () => {
+            //given
+            const createSubmission: SubmitCommand = vi.fn(() => new Subject<void>());
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), createSubmission, accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+
+            //when
+            await clickContinue(fixture);
+            await drop(fixture, 1, 0);
+
+            //then
+            expect(dropList(fixture).disabled).toBe(true);
+            expect(reviewOrder(fixture)).toEqual(['sunday-afternoon', 'monday-evening']);
         });
     });
 

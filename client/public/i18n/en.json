@@ -346,7 +346,7 @@
       "submit": "Submit",
       "unlockHint": "Submit unlocks once you have {{target}} picks.",
       "recheck": "Check the form again",
-      "reorderHint": "Use the arrows to move a pick up or down.",
+      "reorderHint": "Drag a pick by its handle, or use the arrows, to change its rank.",
       "moveUp": "Move pick {{rank}} ({{slot}}) up",
       "moveDown": "Move pick {{rank}} ({{slot}}) down",
       "movedTo": "Moved to rank {{rank}}.",

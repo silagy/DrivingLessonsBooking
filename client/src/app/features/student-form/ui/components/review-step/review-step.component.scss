@@ -62,6 +62,41 @@
     border-color: var(--p-sky-500);
 }
 
+.review__item.cdk-drag-preview {
+    border-color: var(--p-sky-500);
+    box-shadow: var(--app-shadow-lift);
+}
+
+.review__item.cdk-drag-placeholder {
+    opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .review__item.cdk-drag-animating,
+    .review__list.cdk-drop-list-dragging .review__item:not(.cdk-drag-placeholder) {
+        transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+.review__grip {
+    display: flex;
+    flex: none;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-block: -0.4rem;
+    margin-inline: -0.5rem -0.25rem;
+    color: var(--app-text-muted);
+    cursor: grab;
+    touch-action: none;
+}
+
+.review__grip:active {
+    cursor: grabbing;
+}
+
 .review__rank {
     display: flex;
     flex: none;

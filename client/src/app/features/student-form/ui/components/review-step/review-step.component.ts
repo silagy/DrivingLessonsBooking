@@ -1,3 +1,4 @@
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 import {
     afterNextRender,
     ChangeDetectionStrategy,
@@ -25,7 +26,7 @@ const MOVE_DOWN_BUTTON = '.review__move-down button';
 
 @Component({
     selector: 'app-review-step',
-    imports: [TranslocoPipe, ButtonModule, MessageModule, WizardStepComponent],
+    imports: [TranslocoPipe, ButtonModule, MessageModule, WizardStepComponent, CdkDropList, CdkDrag, CdkDragHandle],
     templateUrl: './review-step.component.html',
     styleUrl: './review-step.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,6 +66,16 @@ export class ReviewStepComponent {
     protected readonly droppedKey = computed(() =>
         this.droppedPickCount() === SINGLE_DROPPED_PICK ? 'studentForm.review.droppedOne' : 'studentForm.review.droppedMany',
     );
+
+    protected onDropped(drop: CdkDragDrop<readonly ReviewItem[]>): void {
+        const item = this.items()[drop.previousIndex];
+
+        if (!item || drop.previousIndex === drop.currentIndex) {
+            return;
+        }
+
+        this.moved.emit({ slotId: item.slotId, toIndex: drop.currentIndex });
+    }
 
     protected moveUp(item: ReviewItem): void {
         this.move(item.slotId, positionOf(item) - 1, [MOVE_UP_BUTTON, MOVE_DOWN_BUTTON]);
