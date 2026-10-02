@@ -12,6 +12,7 @@
     <PackageReference Include="Shouldly" Version="4.3.0" />
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\DrivingLessons.Application\DrivingLessons.Application.csproj" />
     <ProjectReference Include="..\..\src\DrivingLessons.Infrastructure\DrivingLessons.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\DrivingLessons.Presentation.Web\DrivingLessons.Presentation.Web.csproj" />
   </ItemGroup>
 
 </Project>
