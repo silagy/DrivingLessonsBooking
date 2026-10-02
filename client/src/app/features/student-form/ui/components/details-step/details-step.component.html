@@ -28,7 +28,7 @@
         <p-message severity="warn" class="details__no-availability">
             <span>
                 <strong>{{ 'studentForm.details.noAvailabilityTitle' | transloco }}</strong>
-                {{ 'studentForm.details.noAvailabilityBody' | transloco: { teacherName: teacherName() } }}
+                {{ 'studentForm.details.noAvailabilityBody' | transloco: { teacherName: (teacherName() | isolateDirection) } }}
             </span>
         </p-message>
     }

@@ -32,7 +32,7 @@
                     @if (welcomeBack(); as returning) {
                         <p-message severity="success" class="identify__welcome-back">
                             <span>
-                                <strong>{{ 'studentForm.identify.welcomeBackTitle' | transloco: { studentName: studentName() } }}</strong>
+                                <strong>{{ 'studentForm.identify.welcomeBackTitle' | transloco: { studentName: (studentName() | isolateDirection) } }}</strong>
                                 {{
                                     welcomeBackBodyKey()
                                         | transloco
@@ -47,10 +47,10 @@
                     } @else {
                         <p-message severity="success" class="identify__found">
                             <span>
-                                <strong>{{ 'studentForm.identify.foundTitle' | transloco: { studentName: studentName() } }}</strong>
+                                <strong>{{ 'studentForm.identify.foundTitle' | transloco: { studentName: (studentName() | isolateDirection) } }}</strong>
                                 {{
                                     'studentForm.identify.foundBody'
-                                        | transloco: { weekNumber: weekNumber(), teacherName: teacherName() }
+                                        | transloco: { weekNumber: weekNumber(), teacherName: (teacherName() | isolateDirection) }
                                 }}
                             </span>
                         </p-message>

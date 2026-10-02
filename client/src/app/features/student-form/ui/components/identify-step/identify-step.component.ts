@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { IsolateDirectionPipe } from '../../../../../shared/pipes/isolate-direction.pipe';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,7 +15,7 @@ const SINGLE_PICK = 1;
 
 @Component({
     selector: 'app-identify-step',
-    imports: [TranslocoPipe, ButtonModule, InputTextModule, MessageModule, WizardStepComponent],
+    imports: [TranslocoPipe, ButtonModule, InputTextModule, MessageModule, WizardStepComponent, IsolateDirectionPipe],
     templateUrl: './identify-step.component.html',
     styleUrl: './identify-step.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
