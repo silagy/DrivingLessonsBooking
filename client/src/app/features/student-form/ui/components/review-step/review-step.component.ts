@@ -43,7 +43,7 @@ export class ReviewStepComponent {
     readonly submitStatus = input.required<SubmitStatus>();
     readonly canSubmit = input.required<boolean>();
     readonly canReorder = input.required<boolean>();
-    readonly movedPickRank = input.required<number | null>();
+    readonly movedPickId = input.required<string | null>();
 
     readonly submitted = output<void>();
     readonly addSlots = output<void>();
@@ -58,6 +58,9 @@ export class ReviewStepComponent {
     protected readonly statuses = SubmitStatus;
     protected readonly sessionTypes = SessionType;
     protected readonly isSubmitting = computed(() => this.submitStatus() === SubmitStatus.submitting);
+    protected readonly movedItem = computed(
+        () => this.items().find(item => item.slotId === this.movedPickId()) ?? null,
+    );
     protected readonly preferredKey = computed(() =>
         this.targetCount() === SINGLE_PREFERRED_TARGET
             ? 'studentForm.review.preferredOne'

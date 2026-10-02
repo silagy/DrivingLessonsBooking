@@ -122,8 +122,11 @@
         </ol>
 
         <p class="review__announcement" aria-live="polite">
-            @if (movedPickRank(); as rank) {
-                {{ 'studentForm.review.movedTo' | transloco: { rank } }}
+            @if (movedItem(); as moved) {
+                @let movedDayName = 'weekGrid.days.' + moved.day | transloco;
+                @let movedWindowName = 'weekGrid.windows.' + moved.window | transloco;
+                @let movedSlotName = 'studentForm.slotLabel' | transloco: { day: movedDayName, window: movedWindowName };
+                {{ 'studentForm.review.movedTo' | transloco: { rank: moved.rank, slot: movedSlotName } }}
             }
         </p>
 

@@ -16,7 +16,7 @@ import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-
 import { PickSheet, pickSheetFor } from '../domain/pick-sheet';
 import { reviewItemsOf } from '../domain/review-item';
 import { groupSlotsByDay, hasOpenSlot } from '../domain/slot-day';
-import { movePick, PickChoice, PickMove, rankOf, removePick, SlotPick, upsertPick } from '../domain/slot-pick';
+import { movePick, PickChoice, PickMove, removePick, SlotPick, upsertPick } from '../domain/slot-pick';
 import { previousStepOf, stepNumberOf, WIZARD_STEPS } from '../domain/student-form-step';
 import { StudentFormStep } from '../domain/student-form-step.enum';
 import { viewForPublicationState } from '../domain/student-form-view';
@@ -199,11 +199,7 @@ export class StudentFormStore {
     readonly minTargetCount = MIN_TARGET_COUNT;
     readonly pickCount = computed(() => this.picks().length);
     readonly canReorder = computed(() => this.pickCount() > SINGLE_PICK);
-    readonly movedPickRank = computed(() => {
-        const slotId = this.movedSlotId();
-
-        return slotId ? rankOf(this.picks(), slotId) : null;
-    });
+    readonly movedPickId = this.movedSlotId.asReadonly();
     readonly pickSheet = computed<PickSheet | null>(() => {
         const slotId = this.openSlotId();
         const slot = this.student()?.slots.find(x => x.id === slotId);
@@ -416,6 +412,7 @@ export class StudentFormStore {
 
     recheck(): void {
         this.submitState.set(SubmitStatus.idle);
+        this.movedSlotId.set(null);
         this.publicationResource.reload();
         this.identifyResource.reload();
     }

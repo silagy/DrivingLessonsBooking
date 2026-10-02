@@ -3,8 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { TranslocoTestingModule } from '@jsverse/transloco';
-import { Observable, of, Subject, throwError } from 'rxjs';
+import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco';
+import { firstValueFrom, Observable, of, Subject, throwError } from 'rxjs';
 import { LanguageService } from '../../../../../core/language.service';
 import { DayOfWeek } from '../../../../../shared/models/day-of-week.enum';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
@@ -155,7 +155,12 @@ function accepting(): SubmitCommand {
 
 function provideApi(api: FakeSubmissionsApi): void {
     TestBed.configureTestingModule({
-        imports: [TranslocoTestingModule.forRoot({ langs: { en: {} } })],
+        imports: [
+            TranslocoTestingModule.forRoot({
+                langs: { en: {} },
+                translocoConfig: { availableLangs: ['en'], defaultLang: 'en' },
+            }),
+        ],
         providers: [
             provideZonelessChangeDetection(),
             { provide: SubmissionsApiService, useValue: api },
@@ -187,6 +192,13 @@ async function renderPage(): Promise<ComponentFixture<StudentFormPage>> {
     await fixture.whenStable();
 
     return fixture;
+}
+
+async function translateMoveAnnouncements(): Promise<void> {
+    const transloco = TestBed.inject(TranslocoService);
+    await firstValueFrom(transloco.load('en'));
+    transloco.setTranslationKey('studentForm.slotLabel', '{{day}} · {{window}}', { lang: 'en' });
+    transloco.setTranslationKey('studentForm.review.movedTo', '{{slot}} moved to rank {{rank}}.', { lang: 'en' });
 }
 
 function page(fixture: ComponentFixture<StudentFormPage>): HTMLElement {
@@ -1403,6 +1415,40 @@ describe('StudentFormPage', () => {
             expect(afterMove).toMatch(/studentForm\.review\.movedTo$/);
             expect(page(fixture).querySelector('.review__announcement')!.getAttribute('aria-live')).toBe('polite');
             expect(textOf(fixture, '.review__announcement')).toBe('');
+        });
+
+        it('starts silent again when the form is checked again after a rejection', async () => {
+            //given
+            provideOpenLinkSubmitting(identifyingAs(COHEN_STUDENT), failingWith(HTTP_CONFLICT), accepting());
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening']);
+            await move(fixture, 'monday-evening', 'up');
+            await clickContinue(fixture);
+
+            //when
+            await press(fixture, '.review__recheck button');
+
+            //then
+            expect(reviewOrder(fixture)).toEqual(['monday-evening', 'sunday-afternoon']);
+            expect(textOf(fixture, '.review__announcement')).toBe('');
+        });
+
+        it('names the moved pick, so a second pick moved to the same rank is announced too', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await translateMoveAnnouncements();
+            await reachReview(fixture, 1, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+            await move(fixture, 'wednesday-afternoon', 'up');
+            const afterFirstMove = textOf(fixture, '.review__announcement');
+
+            //when
+            await move(fixture, 'sunday-afternoon', 'down');
+
+            //then
+            const afterSecondMove = textOf(fixture, '.review__announcement');
+            expect(afterFirstMove).toMatch(/weekGrid\.days\.wednesday.* moved to rank 2\.$/);
+            expect(afterSecondMove).toMatch(/weekGrid\.days\.sunday.* moved to rank 2\.$/);
         });
 
         it('shows the new ranks on the grid and appends a new pick after them', async () => {
