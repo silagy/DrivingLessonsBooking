@@ -50,15 +50,36 @@
             </p-message>
         }
 
-        <ol class="review__list">
-            @for (item of items(); track item.slotId) {
+        @if (canReorder()) {
+            <p class="review__reorder-hint">{{ 'studentForm.review.reorderHint' | transloco }}</p>
+        }
+
+        <ol
+            class="review__list"
+            cdkDropList
+            cdkDropListLockAxis="y"
+            [cdkDropListData]="items()"
+            [cdkDropListDisabled]="!canReorder() || isSubmitting()"
+            (cdkDropListDropped)="onDropped($event)">
+            @for (item of items(); track item.slotId; let first = $first, last = $last) {
                 @let dayName = 'weekGrid.days.' + item.day | transloco;
                 @let windowName = 'weekGrid.windows.' + item.window | transloco;
-                <li class="review__item" [class.review__item--preferred]="item.isPreferred">
+                @let slotName = 'studentForm.slotLabel' | transloco: { day: dayName, window: windowName };
+                <li
+                    class="review__item"
+                    cdkDrag
+                    cdkDragPreviewContainer="parent"
+                    [class.review__item--preferred]="item.isPreferred"
+                    [attr.data-pick-id]="item.slotId">
+                    @if (canReorder()) {
+                        <span class="review__grip" cdkDragHandle aria-hidden="true">
+                            <i class="pi pi-bars"></i>
+                        </span>
+                    }
                     <span class="review__rank" aria-hidden="true">{{ item.rank }}</span>
                     <div class="review__details">
                         <p class="review__slot">
-                            {{ 'studentForm.slotLabel' | transloco: { day: dayName, window: windowName } }}
+                            {{ slotName }}
                             <span class="review__time" dir="ltr">{{ item.timeLabel }}</span>
                         </p>
                         <p class="review__meta">
@@ -72,9 +93,42 @@
                             }
                         </p>
                     </div>
+                    @if (canReorder()) {
+                        <div class="review__moves">
+                            <p-button
+                                type="button"
+                                class="review__move-up"
+                                icon="pi pi-arrow-up"
+                                severity="secondary"
+                                [text]="true"
+                                [rounded]="true"
+                                [disabled]="first || isSubmitting()"
+                                [ariaLabel]="'studentForm.review.moveUp' | transloco: { rank: item.rank, slot: slotName }"
+                                (onClick)="moveUp(item)" />
+                            <p-button
+                                type="button"
+                                class="review__move-down"
+                                icon="pi pi-arrow-down"
+                                severity="secondary"
+                                [text]="true"
+                                [rounded]="true"
+                                [disabled]="last || isSubmitting()"
+                                [ariaLabel]="'studentForm.review.moveDown' | transloco: { rank: item.rank, slot: slotName }"
+                                (onClick)="moveDown(item)" />
+                        </div>
+                    }
                 </li>
             }
         </ol>
+
+        <p class="review__announcement" aria-live="polite">
+            @if (movedItem(); as moved) {
+                @let movedDayName = 'weekGrid.days.' + moved.day | transloco;
+                @let movedWindowName = 'weekGrid.windows.' + moved.window | transloco;
+                @let movedSlotName = 'studentForm.slotLabel' | transloco: { day: movedDayName, window: movedWindowName };
+                {{ 'studentForm.review.movedTo' | transloco: { rank: moved.rank, slot: movedSlotName } }}
+            }
+        </p>
 
         @switch (submitStatus()) {
             @case (statuses.rejected) {
