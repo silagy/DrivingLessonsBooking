@@ -75,10 +75,10 @@ public class SummarySheetTest
             .Select(row => sheet.Cell(row, 1).GetText())
             .ShouldBe(
                 [
-                    "בוקר 07:00–12:00",
-                    "צהריים 12:00–15:00",
-                    "אחה״צ 15:00–18:00",
-                    "ערב 18:00–22:00"
+                    "בוקר 07:00-12:00",
+                    "צהריים 12:00-15:00",
+                    "אחה״צ 15:00-18:00",
+                    "ערב 18:00-22:00"
                 ]);
         sheet.Cell(MorningRow, 1).Style.Font.Bold.ShouldBeTrue();
     }
@@ -203,7 +203,7 @@ public class SummarySheetTest
         var sheet = Reloaded(workbook);
         sheet.Range(MorningRow, FirstDayColumn, EveningRow, FridayColumn).IsEmpty().ShouldBeTrue();
         sheet.Cell(1, FirstDayColumn).GetText().ShouldBe("ראשון 4.10");
-        sheet.Cell(MorningRow, 1).GetText().ShouldBe("בוקר 07:00–12:00");
+        sheet.Cell(MorningRow, 1).GetText().ShouldBe("בוקר 07:00-12:00");
     }
 
     private static void ShouldBeOutsideTheGrid(IXLCell cell)

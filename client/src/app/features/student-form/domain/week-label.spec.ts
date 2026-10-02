@@ -28,4 +28,15 @@ describe('weekRangeLabel', () => {
         expect(label).toContain('14');
         expect(label).toContain('19');
     });
+
+    it('joins the two days with a plain hyphen', () => {
+        //given
+        const weekStart = '2026-06-14';
+
+        //when
+        const label = weekRangeLabel(weekStart, 'en-IL');
+
+        //then
+        expect(label).toBe('14-19 Jun');
+    });
 });

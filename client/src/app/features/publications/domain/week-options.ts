@@ -34,7 +34,7 @@ export function weekRangeLabel(weekStart: Date, locale: string): string {
     const startLabel = weekStart.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
     const endLabel = weekEnd.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 
-    return `${startLabel} – ${endLabel}`;
+    return `${startLabel} - ${endLabel}`;
 }
 
 function addDays(date: Date, days: number): Date {

@@ -69,7 +69,7 @@ export function groupSlotsByDay(
 }
 
 export function slotTimeLabel(slot: StudentSlot): string {
-    return `${timeLabel(slot.startLocal)}–${timeLabel(slot.endLocal)}`;
+    return `${timeLabel(slot.startLocal)}-${timeLabel(slot.endLocal)}`;
 }
 
 export function hasOpenSlot(slots: readonly StudentSlot[]): boolean {

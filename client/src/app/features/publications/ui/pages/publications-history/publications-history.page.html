@@ -31,7 +31,7 @@
                             @if (row.windowStartUtc && row.windowEndUtc) {
                                 <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
                             } @else {
-                                <span class="history__dash">—</span>
+                                <span class="history__dash">-</span>
                             }
                         </td>
                         <td><app-publication-state-tag [state]="row.state" /></td>
@@ -39,7 +39,7 @@
                             @if (row.latestExcelVersion !== null) {
                                 <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
                             } @else {
-                                <span class="history__dash">—</span>
+                                <span class="history__dash">-</span>
                             }
                         </td>
                         <td class="history__action">

@@ -28,7 +28,7 @@
   },
   "teachers": {
     "title": "Cars & teachers",
-    "subtitle": "Cars are a shared pool — manage them once, then assign each to one or more teachers.",
+    "subtitle": "Cars are a shared pool - manage them once, then assign each to one or more teachers.",
     "carsSection": "Cars",
     "teachersSection": "Teachers",
     "addTeacher": "Add teacher",
@@ -124,7 +124,7 @@
   },
   "weekSchedules": {
     "title": "Prepare a week",
-    "subtitle": "All slots start Open — click a slot to mark it Unavailable.",
+    "subtitle": "All slots start Open - click a slot to mark it Unavailable.",
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
@@ -181,7 +181,7 @@
       "copy": "Copy link",
       "copied": "Link copied.",
       "copyFailed": "Could not copy the link.",
-      "hint": "One link for all teachers — generated on publish. Share it yourself, e.g. in the students' WhatsApp group."
+      "hint": "One link for all teachers - generated on publish. Share it yourself, e.g. in the students' WhatsApp group."
     },
     "windowStart": "Opens",
     "windowEnd": "Closes",
@@ -199,7 +199,7 @@
     "excelDownloaded": "Excel downloaded",
     "loadFailed": "Failed to load the publication.",
     "publishDialog": {
-      "subtitle": "One window for the whole school — publish {{week}} and share a single link.",
+      "subtitle": "One window for the whole school - publish {{week}} and share a single link.",
       "opensAt": "Submissions open",
       "closesAt": "Submissions close"
     },
@@ -219,7 +219,7 @@
     },
     "history": {
       "title": "Publications history",
-      "subtitle": "Every published week, per teacher — with the last emailed Excel version.",
+      "subtitle": "Every published week, per teacher - with the last emailed Excel version.",
       "week": "Week",
       "teacher": "Teacher",
       "window": "Submission window",
@@ -229,7 +229,7 @@
       "viewDashboard": "View dashboard",
       "empty": "No publications yet.",
       "loadFailed": "Failed to load history.",
-      "windowRange": "{{start}} – {{end}}"
+      "windowRange": "{{start}} - {{end}}"
     },
     "dialogs": {
       "publishTitle": "Publish week",
@@ -256,7 +256,7 @@
     "notYetOpen": {
       "title": "Submissions aren't open yet",
       "body": "The form for week {{weekNumber}} ({{weekRange}}) isn't open yet.",
-      "hint": "Come back through the same link — no need for a new one."
+      "hint": "Come back through the same link - no need for a new one."
     },
     "closed": {
       "title": "Submissions are closed",
@@ -274,11 +274,11 @@
     },
     "identify": {
       "title": "Enter your national ID",
-      "body": "We match it to the school roster to load your details — no password needed.",
+      "body": "We match it to the school roster to load your details - no password needed.",
       "label": "National ID",
       "hint": "9 digits, as registered with the school",
       "checking": "Checking the roster…",
-      "foundTitle": "Found you — {{studentName}}.",
+      "foundTitle": "Found you - {{studentName}}.",
       "foundBody": "Let's collect your availability for week {{weekNumber}} with {{teacherName}}.",
       "notOnRosterTitle": "We don't have you on file.",
       "notOnRosterBody": "This ID isn't on the school's roster, so there's nothing to submit. Please contact your school to be added.",
@@ -313,7 +313,7 @@
     },
     "slots": {
       "title": "Pick your slots, best first",
-      "body": "Tap a slot to add it — the order is your preference. Tap a picked slot to change or remove it. Striped slots are unavailable.",
+      "body": "Tap a slot to add it - the order is your preference. Tap a picked slot to change or remove it. Striped slots are unavailable.",
       "shortDay": "morning & noon only",
       "unavailable": "Unavailable",
       "pickedRank": "pick {{rank}}",
@@ -327,7 +327,7 @@
       "double": "Double",
       "doubleHint": "(2×)",
       "constraintLabel": "Constraint for this slot (optional)",
-      "constraintHint": "Free text — e.g. \"only after 16:00\", \"pick me up from work\"",
+      "constraintHint": "Free text - e.g. \"only after 16:00\", \"pick me up from work\"",
       "cancel": "Cancel",
       "add": "Add as pick #{{rank}}",
       "save": "Save",
@@ -336,7 +336,7 @@
     "review": {
       "title": "Your ranked list",
       "preferredOne": "Rank 1 is your preferred slot; any others are backups.",
-      "preferredMany": "Ranks 1–{{target}} are your preferred slots; the rest are backups.",
+      "preferredMany": "Ranks 1-{{target}} are your preferred slots; the rest are backups.",
       "notEnoughTitle": "Not enough picks.",
       "notEnoughBody": "Your target is {{target}}, but you've picked {{picked}}. Add {{missing}} more, or lower your target.",
       "addSlots": "Add more slots",
@@ -352,7 +352,7 @@
       "moveDown": "Move pick {{rank}} ({{slot}}) down",
       "movedTo": "{{slot}} moved to rank {{rank}}.",
       "errors": {
-        "rejected": "We couldn't save your list — something changed since you opened the form, for example a slot is no longer available.",
+        "rejected": "We couldn't save your list - something changed since you opened the form, for example a slot is no longer available.",
         "notFound": "We couldn't find your roster details or this week's slots anymore. Please contact your school.",
         "failed": "We couldn't send your list. Check your connection and try again."
       }
@@ -360,14 +360,14 @@
     "submitted": {
       "title": "Submitted",
       "revisedTitle": "Changes saved",
-      "bodyOne": "1 pick for week {{weekNumber}} with {{teacherName}}. You can edit it until {{closesAt}} — just reopen this link and enter your national ID.",
-      "bodyMany": "{{count}} picks for week {{weekNumber}} with {{teacherName}}. You can edit them until {{closesAt}} — just reopen this link and enter your national ID.",
+      "bodyOne": "1 pick for week {{weekNumber}} with {{teacherName}}. You can edit it until {{closesAt}} - just reopen this link and enter your national ID.",
+      "bodyMany": "{{count}} picks for week {{weekNumber}} with {{teacherName}}. You can edit them until {{closesAt}} - just reopen this link and enter your national ID.",
       "edit": "Edit my submission"
     },
     "closedMidSubmit": {
       "title": "The window just closed",
       "bodyNew": "Submissions for week {{weekNumber}} closed while you had this page open. Your list was not saved. If it's urgent, contact {{teacherName}} directly.",
-      "bodyChanges": "Submissions for week {{weekNumber}} closed while you had this page open. Your changes were not saved — the list you sent earlier stays as it was. If it's urgent, contact {{teacherName}} directly.",
+      "bodyChanges": "Submissions for week {{weekNumber}} closed while you had this page open. Your changes were not saved - the list you sent earlier stays as it was. If it's urgent, contact {{teacherName}} directly.",
       "hint": "If the school reopens the window, this link will work again."
     }
   },

@@ -62,7 +62,7 @@
                         [value]="'' + (store.dashboard()?.totalPicks ?? 0)"
                         [label]="'publications.dashboard.totalPicks' | transloco" />
                     <app-publication-stat-chip
-                        [value]="store.dashboard()?.lastSubmissionAtUtc ? formatInstant(store.dashboard()!.lastSubmissionAtUtc!) : '—'"
+                        [value]="store.dashboard()?.lastSubmissionAtUtc ? formatInstant(store.dashboard()!.lastSubmissionAtUtc!) : '-'"
                         [label]="'publications.dashboard.lastSubmission' | transloco" />
                     <span class="dashboard__stamp">
                         {{ 'publications.dataAsOf' | transloco: { time: store.dataAsOf() } }}

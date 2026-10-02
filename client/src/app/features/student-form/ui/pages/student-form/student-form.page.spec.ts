@@ -785,7 +785,7 @@ describe('StudentFormPage', () => {
 
             //then
             expect(textOf(fixture, '.pick-sheet__rank')).toBe('2');
-            expect(textOf(fixture, '.pick-sheet__time')).toBe('18:00–22:00');
+            expect(textOf(fixture, '.pick-sheet__time')).toBe('18:00-22:00');
             expect(isChecked(fixture, '.pick-sheet__single')).toBe(true);
             expect(constraintValue(fixture)).toBe('');
             expect(page(fixture).querySelector('.pick-sheet__remove')).toBeNull();
@@ -890,7 +890,7 @@ describe('StudentFormPage', () => {
             //then
             expect(closed).toBe(true);
             expect(page(fixture).querySelectorAll('.pick-sheet').length).toBe(1);
-            expect(textOf(fixture, '.pick-sheet__time')).toBe('18:00–22:00');
+            expect(textOf(fixture, '.pick-sheet__time')).toBe('18:00-22:00');
             expect(constraintValue(fixture)).toBe('');
         });
 
@@ -967,7 +967,7 @@ describe('StudentFormPage', () => {
 
             //then
             expect(accessibleNameOf(fixture, '.pick-sheet')).toMatch(
-                /studentForm\.slots\.pickedRank \S*studentForm\.slotLabel 18:00–22:00$/,
+                /studentForm\.slots\.pickedRank \S*studentForm\.slotLabel 18:00-22:00$/,
             );
         });
 

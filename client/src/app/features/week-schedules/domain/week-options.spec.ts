@@ -9,7 +9,7 @@ describe('buildWeekOptions', () => {
         const [first, second] = buildWeekOptions('en-IL', wednesday);
 
         //then
-        expect(first).toEqual({ weekStart: '2026-10-04', label: '4 Oct – 9 Oct 2026' });
+        expect(first).toEqual({ weekStart: '2026-10-04', label: '4 Oct - 9 Oct 2026' });
         expect(second.weekStart).toBe('2026-10-11');
     });
 });
