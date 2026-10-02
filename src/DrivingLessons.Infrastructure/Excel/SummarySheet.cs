@@ -74,7 +74,7 @@ public static class SummarySheet
             var end = SlotWindowTimes.EndOf(window);
 
             sheet.Cell(index + FirstSlotRow, LabelColumn).Value =
-                $"{HebrewExcelLabels.WindowOf(window)} {start:HH\\:mm}–{end:HH\\:mm}";
+                $"{HebrewExcelLabels.WindowOf(window)} {start:HH\\:mm}-{end:HH\\:mm}";
         }
     }
 

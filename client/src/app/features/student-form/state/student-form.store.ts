@@ -25,6 +25,7 @@ import { SubmitStatus } from '../domain/submit-status.enum';
 import { MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
 import { weekRangeLabel } from '../domain/week-label';
 import { WelcomeBack } from '../domain/welcome-back';
+import { isolateDirection } from '../../../shared/text/isolate-direction';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
@@ -229,7 +230,7 @@ export class StudentFormStore {
     readonly submittedParams = computed(() => ({
         count: this.pickCount(),
         weekNumber: this.weekParams().weekNumber,
-        teacherName: this.teacherName(),
+        teacherName: isolateDirection(this.teacherName()),
         closesAt: this.closesAt(),
     }));
 
@@ -238,7 +239,10 @@ export class StudentFormStore {
     readonly stepCount = WIZARD_STEPS.length;
 
     readonly captionKey = computed(() => (this.isOpen() ? CAPTION_KEY_BY_STEP[this.step()] : null));
-    readonly captionParams = computed(() => ({ ...this.weekParams(), teacherName: this.teacherName() }));
+    readonly captionParams = computed(() => ({
+        ...this.weekParams(),
+        teacherName: isolateDirection(this.teacherName()),
+    }));
 
     open(token: string): void {
         this.linkToken.set(token);

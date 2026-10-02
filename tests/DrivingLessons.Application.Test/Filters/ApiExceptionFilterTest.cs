@@ -73,6 +73,49 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Missing_Roster_Columns_Are_Named_In_Params()
+    {
+        //given
+        var missingColumns = new[] { "טלפון", "מורה" };
+        var context = ContextFor(new RosterFileMustContainRequiredColumnsException(missingColumns));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["columns"] = "טלפון, מורה" });
+    }
+
+    [TestMethod]
+    public void Constraint_Length_Limit_Is_Named_In_Params()
+    {
+        //given
+        var maxLength = 200;
+        var context = ContextFor(new SlotConstraintMustNotExceedMaxLengthException(maxLength));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["maxLength"] = "200" });
+    }
+
+    [TestMethod]
+    public void Rule_Without_Values_Carries_No_Params()
+    {
+        //given
+        var context = ContextFor(new CarNameMustNotBeEmptyException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        ProblemOf(context).Extensions.ShouldNotContainKey("params");
+    }
+
+    [TestMethod]
     public void Failed_Sign_In_Carries_No_Code()
     {
         //given

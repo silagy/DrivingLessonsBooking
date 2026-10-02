@@ -1,3 +1,5 @@
+import { parseIsoDate } from '../../../shared/dates/parse-iso-date';
+
 export interface WeekOption {
     weekStart: string;
     label: string;
@@ -15,7 +17,7 @@ export function currentWeekStart(today: Date = new Date()): string {
 }
 
 export function buildWeekOptions(locale: string, today: Date = new Date()): WeekOption[] {
-    const firstSunday = new Date(currentWeekStart(today));
+    const firstSunday = parseIsoDate(currentWeekStart(today));
 
     return Array.from({ length: WEEK_OPTION_COUNT }, (_, index) => {
         const weekStart = addDays(firstSunday, index * DAYS_PER_WEEK);
@@ -32,7 +34,7 @@ export function weekRangeLabel(weekStart: Date, locale: string): string {
     const startLabel = weekStart.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
     const endLabel = weekEnd.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 
-    return `${startLabel} – ${endLabel}`;
+    return `${startLabel} - ${endLabel}`;
 }
 
 function addDays(date: Date, days: number): Date {

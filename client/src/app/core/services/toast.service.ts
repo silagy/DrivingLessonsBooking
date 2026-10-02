@@ -33,7 +33,7 @@ export class ToastService {
         const ruleKey = problem?.code ? `errors.${problem.code}` : undefined;
 
         if (ruleKey && this.hasTranslation(ruleKey)) {
-            return this.transloco.translate(ruleKey);
+            return this.transloco.translate(ruleKey, problem?.params);
         }
 
         return this.transloco.translate(GENERIC_ERROR_KEYS[error.status] ?? UNEXPECTED_ERROR_KEY);

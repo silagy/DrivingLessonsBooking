@@ -49,7 +49,7 @@ describe('groupSlotsByDay', () => {
         expect(sunday.chips[0]).toEqual({
             id: 'sunday-morning',
             window: SlotWindow.morning,
-            timeLabel: '07:00–12:00',
+            timeLabel: '07:00-12:00',
             isUnavailable: true,
             rank: null,
         });

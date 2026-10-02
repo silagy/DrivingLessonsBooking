@@ -4,9 +4,12 @@ namespace DrivingLessons.Domain.Exceptions;
 
 public class RosterFileMustContainRequiredColumnsException : DomainException
 {
+    public IReadOnlyCollection<string> MissingColumns { get; }
+
     public RosterFileMustContainRequiredColumnsException(IReadOnlyCollection<string> missingColumns)
         : base(BuildMessage(missingColumns))
     {
+        MissingColumns = missingColumns;
     }
 
     private static string BuildMessage(IReadOnlyCollection<string> missingColumns)

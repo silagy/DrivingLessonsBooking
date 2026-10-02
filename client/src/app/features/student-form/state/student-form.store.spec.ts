@@ -86,6 +86,19 @@ describe('StudentFormStore', () => {
         });
     });
 
+    describe('captionParams', () => {
+        it('keeps the teacher\'s name in its own reading direction', async () => {
+            //given
+            const store = await identifiedStore();
+
+            //when
+            const params = store.captionParams();
+
+            //then
+            expect(params.teacherName).toBe('⁨Teacher Cohen⁩');
+        });
+    });
+
     describe('slotDays', () => {
         it('dates each day day-first in Israeli English', async () => {
             //given

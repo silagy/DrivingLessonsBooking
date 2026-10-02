@@ -12,6 +12,7 @@ import { CarCardComponent } from '../../components/car-card/car-card.component';
 import { TeacherCardComponent } from '../../components/teacher-card/teacher-card.component';
 import { CarFormDialog, CarFormResult } from '../../dialogs/car-form/car-form.dialog';
 import { TeacherFormDialog, TeacherFormResult } from '../../dialogs/teacher-form/teacher-form.dialog';
+import { isolateDirection } from '../../../../../shared/text/isolate-direction';
 
 const noCars: Car[] = [];
 
@@ -71,7 +72,7 @@ export class CarsAndTeachersPage {
     protected onDeleteTeacher(teacher: Teacher): void {
         const data: ConfirmDialogData = {
             messageKey: 'teachers.confirmDeleteTeacher',
-            messageParams: { name: teacher.name },
+            messageParams: { name: isolateDirection(teacher.name) },
         };
 
         this.openConfirm('teachers.deleteTeacher', data, async () => {
@@ -114,7 +115,7 @@ export class CarsAndTeachersPage {
     protected onDeleteCar(car: Car): void {
         const data: ConfirmDialogData = {
             messageKey: 'teachers.confirmDeleteCar',
-            messageParams: { name: car.name },
+            messageParams: { name: isolateDirection(car.name) },
         };
 
         this.openConfirm('teachers.deleteCar', data, () => void this.carsStore.delete(car.id));

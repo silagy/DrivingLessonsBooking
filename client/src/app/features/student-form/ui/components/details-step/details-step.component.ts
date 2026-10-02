@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { IsolateDirectionPipe } from '../../../../../shared/pipes/isolate-direction.pipe';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -7,7 +8,7 @@ import { WizardStepComponent } from '../wizard-step/wizard-step.component';
 
 @Component({
     selector: 'app-details-step',
-    imports: [TranslocoPipe, ButtonModule, MessageModule, WizardStepComponent],
+    imports: [TranslocoPipe, ButtonModule, MessageModule, WizardStepComponent, IsolateDirectionPipe],
     templateUrl: './details-step.component.html',
     styleUrl: './details-step.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,

@@ -7,7 +7,7 @@
         @for (failure of failures(); track failure.rowNumber) {
             <li class="failed-panel__row">
                 <span class="failed-panel__label">
-                    {{ 'roster.failedRows.row' | transloco: { number: failure.rowNumber, name: failure.studentName } }}
+                    {{ 'roster.failedRows.row' | transloco: { number: failure.rowNumber, name: (failure.studentName | isolateDirection) } }}
                 </span>
                 <span class="failed-panel__reason">{{ 'roster.failureReasons.' + failure.reason | transloco }}</span>
             </li>

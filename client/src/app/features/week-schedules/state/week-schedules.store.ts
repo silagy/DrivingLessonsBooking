@@ -74,7 +74,7 @@ export class WeekSchedulesStore {
         const times: Partial<Record<SlotWindow, string>> = {};
 
         for (const slot of this.slots()) {
-            times[slot.window] ??= `${formatTime(slot.startLocal)}–${formatTime(slot.endLocal)}`;
+            times[slot.window] ??= `${formatTime(slot.startLocal)}-${formatTime(slot.endLocal)}`;
         }
 
         return times;

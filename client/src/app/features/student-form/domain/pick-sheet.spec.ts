@@ -25,7 +25,7 @@ describe('pickSheetFor', () => {
             slotId: 'thursday-evening',
             day: DayOfWeek.thursday,
             window: SlotWindow.evening,
-            timeLabel: '18:00–22:00',
+            timeLabel: '18:00-22:00',
             rank: 3,
             choice: { sessionType: SessionType.single, constraint: null },
             isEditing: false,

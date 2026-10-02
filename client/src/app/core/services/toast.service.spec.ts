@@ -14,6 +14,7 @@ const EN = {
         carNameMustNotBeEmpty: 'Enter the car\'s name.',
         conflict: 'This change conflicts with the latest data. Refresh the page and try again.',
         notFound: 'This item no longer exists. Refresh the page.',
+        rosterFileMustContainRequiredColumns: 'The file is missing required columns: {{columns}}.',
     },
     general: {
         unexpectedError: 'Something went wrong. Please try again.',
@@ -61,6 +62,24 @@ describe('ToastService', () => {
 
             //then
             expect(shownSummary(add)).toBe('Enter the car\'s name.');
+        });
+
+        it('fills the rule\'s values into its message', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                detail: 'Roster file must contain required columns: Phone.',
+                code: 'rosterFileMustContainRequiredColumns',
+                params: { columns: 'Phone, Teacher' },
+            });
+
+            //when
+            toast.apiError(error);
+
+            //then
+            expect(shownSummary(add)).toBe('The file is missing required columns: Phone, Teacher.');
         });
 
         it('falls back to the generic message for a rule it has no key for', () => {

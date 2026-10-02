@@ -194,6 +194,7 @@ Every 404 and 409 body carries a machine-readable `code` extension: the exceptio
 - `code` is the contract the client translates; `detail` stays English, developer-facing, and is **never shown to a user**
 - The code is derived from the class name, so **renaming an exception renames its code**
 - **Every new `{Entity}{Rule}Exception` or `{Entity}NotFoundException` needs an `errors.{code}` key in both `client\public\i18n\en.json` and `he.json` in the same PR** — without one the user gets the generic `errors.conflict` / `errors.notFound` message instead of the rule
+- A rule whose message needs values exposes them as read-only properties on its exception, and the filter maps them into a `params` extension of strings (`"params": { "columns": "טלפון, מורה" }`); the client interpolates them into `errors.{code}` (`"The file is missing required columns: {{columns}}."`). Today: `RosterFileMustContainRequiredColumnsException` → `columns`, `SlotConstraintMustNotExceedMaxLengthException` → `maxLength`
 
 ## Auth Slice Exception (US-01)
 
