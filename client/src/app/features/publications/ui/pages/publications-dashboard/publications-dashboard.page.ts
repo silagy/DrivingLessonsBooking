@@ -9,7 +9,7 @@ import { WeekGridComponent } from '../../../../../shared/components/week-grid/we
 import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
 import { PublicationStateTagComponent } from '../../../../../shared/components/publication-state-tag/publication-state-tag.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
-import { formatInstantInJerusalem } from '../../../domain/jerusalem-time';
+import { formatInstantInJerusalem, formatWeekdayInstantInJerusalem } from '../../../domain/jerusalem-time';
 import { LanguageService } from '../../../../../core/language.service';
 import { PublicationsStore } from '../../../state/publications.store';
 import { SlotCountCellComponent } from '../../components/slot-count-cell/slot-count-cell.component';
@@ -22,6 +22,11 @@ import { ReopenWindowDialog } from '../../dialogs/reopen-window/reopen-window.di
 const PUBLISH_FLAG = '1';
 const DIALOG_WIDTH = '35rem';
 const NARROW_DIALOG_WIDTH = '28rem';
+
+interface WindowStatus {
+    key: string;
+    moment: string;
+}
 
 @Component({
     selector: 'app-publications-dashboard-page',
@@ -59,6 +64,36 @@ export class PublicationsDashboardPage {
         const dashboard = this.store.dashboard();
 
         return dashboard?.windowEndUtc ? this.formatInstant(dashboard.windowEndUtc) : '';
+    });
+
+    protected readonly windowStatus = computed<WindowStatus | undefined>(() => {
+        const publication = this.store.publication();
+
+        if (!publication?.windowStartUtc || !publication.windowEndUtc) {
+            return undefined;
+        }
+
+        const locale = this.language.locale();
+
+        switch (publication.state) {
+            case PublicationState.published:
+                return {
+                    key: 'publications.dashboard.opensAt',
+                    moment: formatWeekdayInstantInJerusalem(publication.windowStartUtc, locale),
+                };
+            case PublicationState.open:
+                return {
+                    key: 'publications.dashboard.closesAt',
+                    moment: formatWeekdayInstantInJerusalem(publication.windowEndUtc, locale),
+                };
+            case PublicationState.closed:
+                return {
+                    key: 'publications.dashboard.closedAt',
+                    moment: formatWeekdayInstantInJerusalem(publication.windowEndUtc, locale),
+                };
+            default:
+                return undefined;
+        }
     });
 
     constructor() {

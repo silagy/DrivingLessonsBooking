@@ -5,20 +5,56 @@
     gap: 24px;
 }
 
-.dashboard__eyebrow {
-    font-family: var(--app-font-display);
-    font-weight: 800;
-    font-size: 0.66rem;
-    letter-spacing: calc(0.1em * var(--app-caps-tracking));
-    text-transform: uppercase;
-    color: var(--app-text-muted);
-    margin-block-end: 6px;
-}
-
 .dashboard__title-row {
     display: flex;
     align-items: center;
     gap: 14px;
+}
+
+.dashboard__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font: inherit;
+}
+
+.dashboard__week-title,
+:host ::ng-deep .dashboard__teacher-select .p-select-label {
+    font-family: var(--app-font-display);
+    font-weight: 500;
+    font-size: 1.625rem;
+    letter-spacing: -0.01em;
+    color: var(--app-ink);
+}
+
+:host ::ng-deep .dashboard__teacher-select {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+
+    .p-select-label {
+        padding-inline: 0;
+    }
+
+    .p-select-dropdown {
+        width: auto;
+        padding-inline-start: 6px;
+        color: var(--app-text-secondary);
+    }
+}
+
+.dashboard__subtitle {
+    display: flex;
+    flex-wrap: wrap;
+    margin-block-start: 4px;
+    font-size: 0.85rem;
+    color: var(--app-text-secondary);
+}
+
+.dashboard__subtitle-part::before {
+    content: '·';
+    padding-inline: 6px;
 }
 
 .dashboard__actions {
