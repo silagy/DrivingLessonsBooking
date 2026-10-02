@@ -2,13 +2,13 @@
     <p class="details__lead">{{ 'studentForm.details.lead' | transloco }}</p>
     <div class="details__teacher">
         <span class="details__avatar" aria-hidden="true">{{ teacherInitials() }}</span>
-        <h1 class="details__teacher-name">{{ teacherName() }}</h1>
+        <h1 class="details__teacher-name" dir="auto">{{ teacherName() }}</h1>
     </div>
 
     <dl class="details__card">
         <div class="details__row">
             <dt>{{ 'studentForm.details.student' | transloco }}</dt>
-            <dd class="details__student">{{ studentName() }}</dd>
+            <dd class="details__student" dir="auto">{{ studentName() }}</dd>
         </div>
         <div class="details__row">
             <dt>{{ 'studentForm.details.transmission' | transloco }}</dt>
@@ -16,7 +16,7 @@
         </div>
         <div class="details__row">
             <dt>{{ 'studentForm.details.car' | transloco }}</dt>
-            <dd class="details__car">{{ carName() }}</dd>
+            <dd class="details__car" dir="auto">{{ carName() }}</dd>
         </div>
         <div class="details__row">
             <dt>{{ 'studentForm.details.week' | transloco }}</dt>

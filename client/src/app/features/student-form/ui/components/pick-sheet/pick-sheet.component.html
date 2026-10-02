@@ -58,7 +58,7 @@
             pTextarea
             id="pick-constraint"
             class="pick-sheet__constraint"
-            dir="auto"
+            [attr.dir]="constraintDirection()"
             rows="2"
             aria-describedby="pick-constraint-hint"
             [attr.maxlength]="maxConstraintLength"
