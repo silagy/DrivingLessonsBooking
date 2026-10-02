@@ -85,7 +85,7 @@ export class PublicationsStore {
             .sort((a, b) => a.name.localeCompare(b.name));
     });
 
-    readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.lang()));
+    readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
 
     readonly weekLabel = computed<string>(() => {
         const weekStart = this.selectedWeekStartState();
@@ -106,7 +106,7 @@ export class PublicationsStore {
     readonly dataAsOf = computed<string>(() => {
         const loadedAt = this.loadedAtState();
 
-        return loadedAt ? formatInstantInJerusalem(loadedAt, this.language.lang()) : '';
+        return loadedAt ? formatInstantInJerusalem(loadedAt, this.language.locale()) : '';
     });
 
     readonly dashboard = computed<GetPublicationDashboardResponse | undefined>(() => this.dashboardResource.value());

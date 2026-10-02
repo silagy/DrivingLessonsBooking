@@ -28,7 +28,7 @@ async function identifiedStore(): Promise<StudentFormStore> {
         providers: [
             provideZonelessChangeDetection(),
             StudentFormStore,
-            { provide: LanguageService, useValue: { lang: signal('en') } },
+            { provide: LanguageService, useValue: { lang: signal('en'), locale: signal('en-IL') } },
             {
                 provide: SubmissionsApiService,
                 useValue: {
@@ -83,6 +83,19 @@ describe('StudentFormStore', () => {
 
             //then
             expect(store.pickSheet()).toBeNull();
+        });
+    });
+
+    describe('slotDays', () => {
+        it('dates each day day-first in Israeli English', async () => {
+            //given
+            const store = await identifiedStore();
+
+            //when
+            const [sunday] = store.slotDays();
+
+            //then
+            expect(sunday.dateLabel).toBe('15/11');
         });
     });
 });

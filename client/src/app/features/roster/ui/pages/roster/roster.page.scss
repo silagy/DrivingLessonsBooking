@@ -74,6 +74,10 @@
     font-variant-numeric: tabular-nums;
 }
 
+:host-context([dir='rtl']) .roster__ltr-cell {
+    text-align: end;
+}
+
 .roster__row--inactive td {
     color: var(--app-text-muted);
 }

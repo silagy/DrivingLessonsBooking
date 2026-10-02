@@ -88,7 +88,7 @@ export class PublicationsDashboardPage {
             return '';
         }
 
-        return formatInstantInJerusalem(utcIso, this.language.lang());
+        return formatInstantInJerusalem(utcIso, this.language.locale());
     }
 
     protected onPublish(): void {

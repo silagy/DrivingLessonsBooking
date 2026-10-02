@@ -164,7 +164,7 @@ function provideApi(api: FakeSubmissionsApi): void {
         providers: [
             provideZonelessChangeDetection(),
             { provide: SubmissionsApiService, useValue: api },
-            { provide: LanguageService, useValue: { lang: signal('en') } },
+            { provide: LanguageService, useValue: { lang: signal('en'), locale: signal('en-IL') } },
         ],
     });
 }

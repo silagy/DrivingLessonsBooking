@@ -26,7 +26,7 @@ describe('student-form routes', () => {
                     withComponentInputBinding(),
                 ),
                 { provide: SubmissionsApiService, useValue: { getPublicationByLink: () => NEVER } },
-                { provide: LanguageService, useValue: { lang: signal('en') } },
+                { provide: LanguageService, useValue: { lang: signal('en'), locale: signal('en-IL') } },
             ],
         });
     });

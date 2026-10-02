@@ -65,7 +65,7 @@
                         [value]="store.dashboard()?.lastSubmissionAtUtc ? formatInstant(store.dashboard()!.lastSubmissionAtUtc!) : '—'"
                         [label]="'publications.dashboard.lastSubmission' | transloco" />
                     <span class="dashboard__stamp">
-                        {{ 'publications.dashboard.dataAsOf' | transloco }} <bdi>{{ store.dataAsOf() }}</bdi>
+                        {{ 'publications.dataAsOf' | transloco: { time: store.dataAsOf() } }}
                     </span>
                 </div>
                 <section class="dashboard__card">

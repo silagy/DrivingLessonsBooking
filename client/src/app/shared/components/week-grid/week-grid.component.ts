@@ -62,8 +62,8 @@ export class WeekGridComponent<T extends WeekGridCell> {
         if (!weekStart) {
             return undefined;
         }
-        const date = new Date(weekStart);
-        date.setDate(date.getDate() + this.days.indexOf(day));
-        return date.toLocaleDateString(this.language.lang(), { day: 'numeric', month: 'numeric' });
+        const [year, month, dayOfMonth] = weekStart.split('-').map(Number);
+        const date = new Date(year, month - 1, dayOfMonth + this.days.indexOf(day));
+        return date.toLocaleDateString(this.language.locale(), { day: 'numeric', month: 'numeric' });
     }
 }

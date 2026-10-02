@@ -1,7 +1,7 @@
-<button type="button" class="assign__trigger" (click)="open($event)">
+<button #trigger type="button" class="assign__trigger" (click)="open($event)">
   {{ 'teachers.assign' | transloco }}
 </button>
-<p-popover>
+<p-popover (onShow)="anchorToTrigger()">
   <div class="assign__panel">
     <span class="assign__title">{{ 'teachers.assignToTeachers' | transloco }}</span>
     @for (row of rows(); track row.id) {

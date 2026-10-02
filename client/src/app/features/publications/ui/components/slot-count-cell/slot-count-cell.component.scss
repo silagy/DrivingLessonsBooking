@@ -31,7 +31,7 @@
 
 .slot-count__caption {
     font-size: 0.6rem;
-    letter-spacing: 0.04em;
+    letter-spacing: calc(0.04em * var(--app-caps-tracking));
     text-transform: uppercase;
     color: var(--app-text-muted);
 }

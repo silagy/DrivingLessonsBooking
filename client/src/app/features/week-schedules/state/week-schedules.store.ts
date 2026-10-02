@@ -64,7 +64,7 @@ export class WeekSchedulesStore {
             .sort((a, b) => a.name.localeCompare(b.name));
     });
 
-    readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.lang()));
+    readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
 
     readonly weekSchedule = computed<WeekSchedule | undefined>(() => this.scheduleResource.value());
 

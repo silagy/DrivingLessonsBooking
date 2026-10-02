@@ -51,6 +51,10 @@
     white-space: nowrap;
 }
 
+:host-context([dir='rtl']) .card__email {
+    text-align: end;
+}
+
 .card__cars {
     display: flex;
     flex-wrap: wrap;
@@ -72,7 +76,7 @@
 .card__chip-tag {
     font-size: 0.625rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: calc(0.04em * var(--app-caps-tracking));
     text-transform: uppercase;
     color: var(--app-text-secondary);
 }
