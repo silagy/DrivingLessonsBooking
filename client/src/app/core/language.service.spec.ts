@@ -61,6 +61,18 @@ describe('LanguageService', () => {
         expect([document.documentElement.lang, document.documentElement.dir]).toEqual(['he', 'rtl']);
     });
 
+    it('starts in Hebrew when the saved language is not one it supports', () => {
+        //given
+        withSavedLanguage('fr');
+
+        //when
+        const language = startService();
+
+        //then
+        expect([language.lang(), language.locale(), document.documentElement.dir]).toEqual(['he', 'he-IL', 'rtl']);
+        expect(primeNgLabels().aria?.close).toBe('סגירה');
+    });
+
     it('starts in the saved language', () => {
         //given
         withSavedLanguage('en');

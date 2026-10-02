@@ -28,9 +28,7 @@ export class LanguageService {
   private readonly primeng = inject(PrimeNG);
   private readonly title = inject(Title);
 
-  readonly lang = signal<AppLanguage>(
-    (localStorage.getItem(STORAGE_KEY) as AppLanguage) ?? 'he',
-  );
+  readonly lang = signal<AppLanguage>(localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'he');
 
   readonly locale = computed<AppLocale>(() => LOCALES[this.lang()]);
 
