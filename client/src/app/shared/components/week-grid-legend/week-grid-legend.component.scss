@@ -1,0 +1,32 @@
+.week-grid-legend {
+  display: flex;
+  gap: 22px;
+}
+
+.week-grid-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.75rem;
+  color: var(--p-surface-600);
+}
+
+.week-grid-legend__swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--app-border);
+
+  &--open {
+    background: var(--app-bg-card);
+  }
+
+  &--unavailable {
+    background: var(--app-slot-unavailable);
+  }
+
+  &--void {
+    background: var(--app-bg-muted);
+    border: none;
+  }
+}

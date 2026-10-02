@@ -68,11 +68,7 @@
       </app-week-grid>
 
       <footer class="weekly-prep__footer">
-        <div class="weekly-prep__legend">
-          <span class="legend-item"><span class="legend-swatch legend-swatch--open"></span>{{ 'weekGrid.legend.open' | transloco }}</span>
-          <span class="legend-item"><span class="legend-swatch legend-swatch--unavailable"></span>{{ 'weekGrid.legend.unavailable' | transloco }}</span>
-          <span class="legend-item"><span class="legend-swatch legend-swatch--void"></span>{{ 'weekGrid.legend.outsideGrid' | transloco }}</span>
-        </div>
+        <app-week-grid-legend />
         <span class="weekly-prep__count">
           {{ 'weekSchedules.unavailableCount' | transloco: { count: store.unavailableCount() } }}
         </span>

@@ -6,6 +6,7 @@ import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { DialogService } from 'primeng/dynamicdialog';
 import { WeekGridComponent } from '../../../../../shared/components/week-grid/week-grid.component';
+import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
 import { PublicationStateTagComponent } from '../../../../../shared/components/publication-state-tag/publication-state-tag.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
 import { formatInstantInJerusalem } from '../../../domain/jerusalem-time';
@@ -31,6 +32,7 @@ const NARROW_DIALOG_WIDTH = '28rem';
         SelectModule,
         ProgressSpinnerModule,
         WeekGridComponent,
+        WeekGridLegendComponent,
         PublicationStateTagComponent,
         SlotCountCellComponent,
         PublicationStatChipComponent,

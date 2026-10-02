@@ -23,7 +23,7 @@
                 }
                 @case (PublicationState.open) {
                     <p-button [label]="'publications.extendWindow' | transloco" severity="secondary" text size="small" (onClick)="onExtend()" />
-                    <p-button [label]="'general.refresh' | transloco" severity="secondary" size="small" (onClick)="store.refresh()" />
+                    <p-button [label]="'general.refresh' | transloco" severity="secondary" outlined size="small" (onClick)="store.refresh()" />
                     <p-button [label]="'publications.downloadExcel' | transloco" size="small" (onClick)="store.downloadExcel()" />
                 }
                 @case (PublicationState.closed) {
@@ -69,11 +69,15 @@
                     </span>
                 </div>
                 <section class="dashboard__card">
-                    <app-week-grid [cells]="store.slotCounts()" [weekStart]="store.selectedWeekStart()">
+                    <app-week-grid
+                        [cells]="store.slotCounts()"
+                        [weekStart]="store.selectedWeekStart()"
+                        [windowTimes]="store.windowTimes()">
                         <ng-template let-cell>
                             <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" />
                         </ng-template>
                     </app-week-grid>
+                    <app-week-grid-legend class="dashboard__legend" />
                 </section>
             }
             @case (PublicationState.closed) {
@@ -81,11 +85,15 @@
                     {{ 'publications.dashboard.closedNotice' | transloco: { closedAt: windowLabel(), version: store.dashboard()?.latestExcelVersion ?? 1 } }}
                 </section>
                 <section class="dashboard__card">
-                    <app-week-grid [cells]="store.slotCounts()" [weekStart]="store.selectedWeekStart()">
+                    <app-week-grid
+                        [cells]="store.slotCounts()"
+                        [weekStart]="store.selectedWeekStart()"
+                        [windowTimes]="store.windowTimes()">
                         <ng-template let-cell>
                             <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" />
                         </ng-template>
                     </app-week-grid>
+                    <app-week-grid-legend class="dashboard__legend" />
                 </section>
             }
         }

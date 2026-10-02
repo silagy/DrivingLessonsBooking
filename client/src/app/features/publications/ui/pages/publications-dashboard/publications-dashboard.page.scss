@@ -49,6 +49,11 @@
     margin-block-start: 14px;
 }
 
+.dashboard__legend {
+    display: block;
+    margin-block-start: 18px;
+}
+
 .dashboard__notice {
     color: var(--app-text-secondary);
     line-height: 1.55;

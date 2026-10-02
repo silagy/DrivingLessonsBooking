@@ -4,6 +4,8 @@ import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AppRoutes } from '../../../shared/config/app-routes';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
+import { SlotWindow } from '../../../shared/models/slot-window.enum';
+import { windowTimesOf } from '../../../shared/dates/window-times';
 import { LanguageService } from '../../../core/language.service';
 import { formatInstantInJerusalem } from '../domain/jerusalem-time';
 import { ClipboardService } from '../../../core/services/clipboard.service';
@@ -114,6 +116,8 @@ export class PublicationsStore {
     readonly slotCounts = computed<SlotCountForGetPublicationDashboardResponse[]>(
         () => this.dashboard()?.slotCounts ?? [],
     );
+
+    readonly windowTimes = computed<Partial<Record<SlotWindow, string>>>(() => windowTimesOf(this.slotCounts()));
 
     readonly hasPublication = computed(() => this.publication() !== undefined);
 
