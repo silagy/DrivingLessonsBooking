@@ -28,7 +28,7 @@
 .fleet__section {
     font-size: 0.6875rem;
     font-weight: 700;
-    letter-spacing: 0.09em;
+    letter-spacing: calc(0.09em * var(--app-caps-tracking));
     text-transform: uppercase;
     color: var(--app-text-secondary);
     margin-block: 1.5rem 0.625rem;

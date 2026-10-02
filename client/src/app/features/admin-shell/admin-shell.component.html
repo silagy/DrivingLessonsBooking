@@ -49,7 +49,7 @@
       <div class="shell__user">
         <span class="shell__avatar" aria-hidden="true">{{ initials() }}</span>
         @if (auth.email(); as email) {
-          <span class="shell__email">{{ email }}</span>
+          <bdi class="shell__email">{{ email }}</bdi>
         }
       </div>
 

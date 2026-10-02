@@ -30,4 +30,10 @@
   --app-shadow-card: 0 1px 2px rgba(18, 20, 24, 0.06), 0 2px 8px rgba(18, 20, 24, 0.06);
   --app-shadow-lift: 0 4px 16px rgba(18, 20, 24, 0.1), 0 1px 3px rgba(18, 20, 24, 0.06);
   --app-scrim: rgba(18, 20, 24, 0.4);
+
+  --app-caps-tracking: 1;
+}
+
+:root[lang='he'] {
+  --app-caps-tracking: 0;
 }

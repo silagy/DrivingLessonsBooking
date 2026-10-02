@@ -36,7 +36,7 @@
     font-family: var(--app-font-display);
     font-weight: 800;
     font-size: 0.66rem;
-    letter-spacing: 0.1em;
+    letter-spacing: calc(0.1em * var(--app-caps-tracking));
     text-transform: uppercase;
     color: var(--app-text-muted);
 }
