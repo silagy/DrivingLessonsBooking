@@ -9,6 +9,7 @@ import { PublicationStateTagComponent } from '../../../../../shared/components/p
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
 import { formatInstantInJerusalem } from '../../../domain/jerusalem-time';
 import { weekRangeLabel } from '../../../domain/week-options';
+import { parseIsoDate } from '../../../../../shared/dates/parse-iso-date';
 import { LanguageService } from '../../../../../core/language.service';
 import { PublicationsStore } from '../../../state/publications.store';
 import { ItemForFindPublicationHistoryResponse } from '../../../data/item-for-find-publication-history.response';
@@ -34,8 +35,7 @@ export class PublicationsHistoryPage {
     protected readonly PublicationState = PublicationState;
 
     protected weekLabel(row: ItemForFindPublicationHistoryResponse): string {
-        const [year, month, day] = row.weekStart.split('-').map(Number);
-        const weekStart = new Date(year, month - 1, day);
+        const weekStart = parseIsoDate(row.weekStart);
 
         return weekRangeLabel(weekStart, this.language.locale());
     }

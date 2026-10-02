@@ -5,6 +5,7 @@ import { LanguageService } from '../../../core/language.service';
 import { DayOfWeek } from '../../models/day-of-week.enum';
 import { SlotWindow } from '../../models/slot-window.enum';
 import { WeekGridCell } from '../../models/week-grid-cell';
+import { parseIsoDate } from '../../dates/parse-iso-date';
 
 export interface WeekGridCellContext<T extends WeekGridCell> {
     $implicit: T;
@@ -62,8 +63,8 @@ export class WeekGridComponent<T extends WeekGridCell> {
         if (!weekStart) {
             return undefined;
         }
-        const [year, month, dayOfMonth] = weekStart.split('-').map(Number);
-        const date = new Date(year, month - 1, dayOfMonth + this.days.indexOf(day));
+        const date = parseIsoDate(weekStart);
+        date.setDate(date.getDate() + this.days.indexOf(day));
         return date.toLocaleDateString(this.language.locale(), { day: 'numeric', month: 'numeric' });
     }
 }

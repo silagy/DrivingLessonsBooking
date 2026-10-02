@@ -1,3 +1,5 @@
+import { parseIsoDate } from '../../../shared/dates/parse-iso-date';
+
 const GRID_LAST_DAY_OFFSET = 5;
 
 export interface WeekDates {
@@ -6,9 +8,10 @@ export interface WeekDates {
 }
 
 export function dateInWeek(weekStart: string, dayOffset: number): Date {
-    const [year, month, day] = weekStart.split('-').map(Number);
+    const date = parseIsoDate(weekStart);
+    date.setDate(date.getDate() + dayOffset);
 
-    return new Date(year, month - 1, day + dayOffset);
+    return date;
 }
 
 export function weekDates(weekStart: string): WeekDates {
