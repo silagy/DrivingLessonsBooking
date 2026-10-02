@@ -22,4 +22,6 @@ public class SlotCountForGetPublicationDashboardResponse
     public SlotWindowType Window { get; init; }
     public SlotState State { get; init; }
     public int RequestCount { get; init; }
+    public TimeOnly StartLocal => SlotWindowTimes.StartOf(Window);
+    public TimeOnly EndLocal => SlotWindowTimes.EndOf(Window);
 }

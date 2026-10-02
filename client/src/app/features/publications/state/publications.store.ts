@@ -4,6 +4,8 @@ import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AppRoutes } from '../../../shared/config/app-routes';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
+import { SlotWindow } from '../../../shared/models/slot-window.enum';
+import { windowTimesOf } from '../../../shared/dates/window-times';
 import { LanguageService } from '../../../core/language.service';
 import { formatInstantInJerusalem } from '../domain/jerusalem-time';
 import { ClipboardService } from '../../../core/services/clipboard.service';
@@ -19,7 +21,8 @@ import { ReopenPublicationRequest } from '../data/reopen-publication.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { SlotCountForGetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
 import { TeacherOption } from '../domain/teacher-option.model';
-import { buildWeekOptions, WeekOption } from '../domain/week-options';
+import { buildWeekOptions, WeekOption, weekRangeLabel } from '../domain/week-options';
+import { parseIsoDate } from '../../../shared/dates/parse-iso-date';
 
 const HTTP_NOT_FOUND = 404;
 
@@ -88,12 +91,14 @@ export class PublicationsStore {
     readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
 
     readonly weekLabel = computed<string>(() => {
-        const weekStart = this.selectedWeekStartState();
+        const weekStart = parseIsoDate(this.selectedWeekStartState());
 
-        return this.weekOptions().find((option) => option.weekStart === weekStart)?.label ?? '';
+        return weekRangeLabel(weekStart, this.language.locale());
     });
 
     readonly publication = computed<GetPublicationResponse | undefined>(() => this.publicationResource.value());
+
+    readonly weekNumber = computed<number | undefined>(() => this.publication()?.weekNumber);
 
     readonly state = computed<PublicationState | undefined>(() => this.publication()?.state);
 
@@ -114,6 +119,8 @@ export class PublicationsStore {
     readonly slotCounts = computed<SlotCountForGetPublicationDashboardResponse[]>(
         () => this.dashboard()?.slotCounts ?? [],
     );
+
+    readonly windowTimes = computed<Partial<Record<SlotWindow, string>>>(() => windowTimesOf(this.slotCounts()));
 
     readonly hasPublication = computed(() => this.publication() !== undefined);
 

@@ -212,6 +212,42 @@ public class ImportRosterInteractorTest
     }
 
     [TestMethod]
+    [DataRow("06/09/2026")]
+    [DataRow("6/9/2026")]
+    [DataRow("2026-09-06")]
+    public async Task Start_Date_Is_Parsed(string startDate)
+    {
+        //given
+        RowsAre(RowWithStartDate(startDate));
+
+        //when
+        await interactor.ExecuteAsync(Request());
+
+        //then
+        var expected = LessonsStartDate.Of(new DateOnly(2026, 9, 6));
+        A.CallTo(() => studentRepository.Add(A<Student>.That.Matches(x => x.StartDate == expected)))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [TestMethod]
+    [DataRow("2026/09/06")]
+    [DataRow("09-06-2026")]
+    [DataRow("not a date")]
+    public async Task Invalid_Start_Date_Is_Recorded_As_Failed_Row(string startDate)
+    {
+        //given
+        RowsAre(RowWithStartDate(startDate));
+
+        //when
+        var response = await interactor.ExecuteAsync(Request());
+
+        //then
+        response.Failed.ShouldBe(1);
+        persistedImport!.Failures.ShouldContain(x =>
+            x.RowNumber == 2 && x.Reason == RosterRowFailureReason.InvalidStartDate);
+    }
+
+    [TestMethod]
     public async Task Duplicate_National_Id_In_File_Keeps_First_Row()
     {
         //given
@@ -287,6 +323,20 @@ public class ImportRosterInteractorTest
             Phone = "0501234567",
             TeacherName = teacher.Name.Value,
             CarName = car.Name.Value
+        };
+    }
+
+    private RosterCsvRow RowWithStartDate(string startDate)
+    {
+        return new RosterCsvRow
+        {
+            RowNumber = 2,
+            FullName = "דנה כהן",
+            NationalId = "123456782",
+            Phone = "0501234567",
+            TeacherName = teacher.Name.Value,
+            CarName = car.Name.Value,
+            StartDate = startDate
         };
     }
 

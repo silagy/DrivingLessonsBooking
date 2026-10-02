@@ -8,6 +8,7 @@ public class GetPublicationResponse
 {
     public Guid Id { get; init; }
     public DateOnly WeekStart { get; init; }
+    public int WeekNumber { get; init; }
     public PublicationState State { get; init; }
     public string LinkToken { get; init; } = string.Empty;
     public DateTimeOffset? WindowStartUtc { get; init; }
@@ -18,6 +19,7 @@ public class GetPublicationResponse
         {
             Id = x.Id.Value,
             WeekStart = x.WeekStart.Value,
+            WeekNumber = x.WeekStart.WeekNumber,
             State = x.State,
             LinkToken = x.LinkToken.Value,
             WindowStartUtc = x.Window == null

@@ -215,7 +215,11 @@
       "lastSubmission": "הגשה אחרונה",
       "draftPrompt": "השבוע הוכן אך טרם פורסם. פרסמו אותו כדי לפתוח את חלון ההגשות וליצור את הקישור.",
       "publishedNotice": "ההגשות ייפתחו אוטומטית ב־{{opensAt}}.",
-      "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה."
+      "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה.",
+      "weekTitle": "- שבוע {{weekNumber}}",
+      "opensAt": "ההגשה נפתחת {{moment}}",
+      "closesAt": "ההגשה נסגרת {{moment}}",
+      "closedAt": "ההגשה נסגרה {{moment}}"
     },
     "history": {
       "title": "היסטוריית פרסומים",

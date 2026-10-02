@@ -215,7 +215,11 @@
       "lastSubmission": "last submission",
       "draftPrompt": "This week is prepared but not published. Publish it to open the submission window and generate the link.",
       "publishedNotice": "Submissions open automatically at {{opensAt}}.",
-      "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher."
+      "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher.",
+      "weekTitle": "- Week {{weekNumber}}",
+      "opensAt": "Submissions open {{moment}}",
+      "closesAt": "Submissions close {{moment}}",
+      "closedAt": "Submissions closed {{moment}}"
     },
     "history": {
       "title": "Publications history",

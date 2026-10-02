@@ -24,6 +24,20 @@ export function formatInstantInJerusalem(utcIso: string, locale: string): string
     return formatter.format(new Date(utcIso));
 }
 
+export function formatWeekdayInstantInJerusalem(utcIso: string, locale: string): string {
+    const formatter = new Intl.DateTimeFormat(locale, {
+        timeZone: 'Asia/Jerusalem',
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+    });
+
+    return formatter.format(new Date(utcIso));
+}
+
 function jerusalemOffsetMinutes(instant: Date): number {
     const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: 'Asia/Jerusalem',

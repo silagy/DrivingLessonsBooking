@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { ToastService } from '../../../core/services/toast.service';
 import { LanguageService } from '../../../core/language.service';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
+import { windowTimesOf } from '../../../shared/dates/window-times';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { WeekSchedulesApiService } from '../data/week-schedules-api.service';
 import { GetWeekScheduleResponse } from '../data/get-week-schedule.response';
@@ -17,7 +18,6 @@ import { buildWeekOptions, WeekOption } from '../domain/week-options';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
-const TIME_LABEL_LENGTH = 5;
 
 @Injectable({ providedIn: 'root' })
 export class WeekSchedulesStore {
@@ -70,15 +70,7 @@ export class WeekSchedulesStore {
 
     readonly slots = computed<Slot[]>(() => this.weekSchedule()?.slots ?? []);
 
-    readonly windowTimes = computed<Partial<Record<SlotWindow, string>>>(() => {
-        const times: Partial<Record<SlotWindow, string>> = {};
-
-        for (const slot of this.slots()) {
-            times[slot.window] ??= `${formatTime(slot.startLocal)}-${formatTime(slot.endLocal)}`;
-        }
-
-        return times;
-    });
+    readonly windowTimes = computed<Partial<Record<SlotWindow, string>>>(() => windowTimesOf(this.slots()));
 
     readonly unavailableCount = computed(
         () => this.slots().filter((slot) => slot.state === SlotState.unavailable).length,
@@ -171,8 +163,4 @@ function defaultWeekStart(): string {
 
 function isStatus(error: unknown, status: number): boolean {
     return error instanceof HttpErrorResponse && error.status === status;
-}
-
-function formatTime(time: string): string {
-    return time.slice(0, TIME_LABEL_LENGTH);
 }

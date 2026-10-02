@@ -21,4 +21,6 @@ export interface SlotCountForGetPublicationDashboardResponse {
     window: SlotWindow;
     state: SlotState;
     requestCount: number;
+    startLocal: string;
+    endLocal: string;
 }
