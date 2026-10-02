@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Domain.Common;
@@ -10,6 +11,8 @@ namespace DrivingLessons.Presentation.Web.Filters;
 public sealed class ApiExceptionFilter : IExceptionFilter
 {
     private const string CodeExtension = "code";
+    private const string ParamsExtension = "params";
+    private const string ColumnSeparator = ", ";
 
     public void OnException(ExceptionContext context)
     {
@@ -43,8 +46,31 @@ public sealed class ApiExceptionFilter : IExceptionFilter
             problemDetails.Extensions[CodeExtension] = problemCode;
         }
 
+        var parameters = ParamsOf(context.Exception);
+
+        if (parameters is not null)
+        {
+            problemDetails.Extensions[ParamsExtension] = parameters;
+        }
+
         context.Result = new ObjectResult(problemDetails) { StatusCode = statusCode };
         context.ExceptionHandled = true;
+    }
+
+    private static IReadOnlyDictionary<string, string>? ParamsOf(Exception exception)
+    {
+        return exception switch
+        {
+            RosterFileMustContainRequiredColumnsException missing => new Dictionary<string, string>
+            {
+                ["columns"] = string.Join(ColumnSeparator, missing.MissingColumns)
+            },
+            SlotConstraintMustNotExceedMaxLengthException tooLong => new Dictionary<string, string>
+            {
+                ["maxLength"] = tooLong.MaxLength.ToString(CultureInfo.InvariantCulture)
+            },
+            _ => null
+        };
     }
 
     private static string CodeOf(Exception exception)

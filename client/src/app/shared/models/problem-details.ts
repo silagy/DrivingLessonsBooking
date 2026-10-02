@@ -3,4 +3,5 @@ export interface ProblemDetails {
     title: string;
     detail?: string;
     code?: string;
+    params?: Record<string, string>;
 }

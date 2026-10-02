@@ -193,10 +193,11 @@ export interface ProblemDetails {
     title: string;
     detail?: string;
     code?: string;
+    params?: Record<string, string>;
 }
 ```
 
-`ToastService.apiError` shows `errors.{code}` when that key exists, otherwise `errors.notFound` (404) / `errors.conflict` (409), otherwise `general.unexpectedError`. It **never** shows `detail` — that is English, developer-facing text (see `api-guidelines.md` "Rule Codes").
+`ToastService.apiError` shows `errors.{code}` (interpolating `params`) when that key exists, otherwise `errors.notFound` (404) / `errors.conflict` (409), otherwise `general.unexpectedError`. It **never** shows `detail` — that is English, developer-facing text (see `api-guidelines.md` "Rule Codes").
 
 409 means the user's view was stale (e.g., publishing an already-published Publication) — surface a translated message and refresh the affected state. There is **no ETag/If-Match handling** — the backend deliberately omits optimistic locking.
 
