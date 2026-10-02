@@ -1,3 +1,4 @@
+using System.Globalization;
 using DrivingLessons.Application.Abstractions;
 using DrivingLessons.Application.Common;
 using DrivingLessons.Domain.Common;
@@ -9,8 +10,12 @@ namespace DrivingLessons.Application.Commands.ImportRoster;
 
 public class ImportRosterInteractor
 {
-    private const string PrimaryStartDateFormat = "dd/MM/yyyy";
-    private const string ShortStartDateFormat = "d/M/yyyy";
+    private static readonly string[] StartDateFormats =
+    [
+        "dd/MM/yyyy",
+        "d/M/yyyy",
+        "yyyy-MM-dd"
+    ];
 
     private readonly IRosterCsvParser parser;
     private readonly IStudentRepository studentRepository;
@@ -216,11 +221,11 @@ public class ImportRosterInteractor
 
     private static bool TryParseStartDate(string value, out DateOnly result)
     {
-        if (DateOnly.TryParseExact(value, PrimaryStartDateFormat, out result))
-        {
-            return true;
-        }
-
-        return DateOnly.TryParseExact(value, ShortStartDateFormat, out result);
+        return DateOnly.TryParseExact(
+            value,
+            StartDateFormats,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out result);
     }
 }
