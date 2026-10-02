@@ -89,7 +89,7 @@ export class PublicationsStore {
 | Derived state | `computed()` in the store — selectors live with the state, not in pages |
 | Reads (queries) | `resource()` keyed on a params signal; `reload()` after a successful command |
 | Writes (commands) | `async` method → `firstValueFrom(api...)` → toast → reload affected resource |
-| Errors | error signals hold **i18n keys**, never raw text; 409 ProblemDetails titles surface via `toast.apiError` |
+| Errors | error signals hold **i18n keys**, never raw text; 404/409 rule codes surface translated via `toast.apiError` (`errors.{code}`) |
 | Loading | `resource().isLoading` for reads; one `isMutating` signal for writes |
 | Scope | `providedIn: 'root'` by default; provide on the feature route only when state must reset per visit |
 | Naming | state = nouns (`publications`, `isLoading`), methods = verbs (`publish`, `selectTeacher`), derived = selector-like (`openPublications`, `isEmpty`) |

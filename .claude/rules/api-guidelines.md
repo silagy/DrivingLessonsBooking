@@ -183,6 +183,18 @@ public class ApiExceptionFilter : IExceptionFilter
 
 Register once in `AddControllers(options => options.Filters.Add<ApiExceptionFilter>())`.
 
+### Rule Codes
+
+Every 404 and 409 body carries a machine-readable `code` extension: the exception's type name without the `Exception` suffix, camelCased with `JsonNamingPolicy.CamelCase` (`WindowExtensionMustBeLaterException` → `"windowExtensionMustBeLater"`, `TeacherNotFoundException` → `"teacherNotFound"`). The 401 body carries none — sign-in failure stays detail-free.
+
+```json
+{ "title": "Conflict", "status": 409, "detail": "Publication 3f2a… window extension … must be later than the current end.", "code": "windowExtensionMustBeLater" }
+```
+
+- `code` is the contract the client translates; `detail` stays English, developer-facing, and is **never shown to a user**
+- The code is derived from the class name, so **renaming an exception renames its code**
+- **Every new `{Entity}{Rule}Exception` or `{Entity}NotFoundException` needs an `errors.{code}` key in both `client\public\i18n\en.json` and `he.json` in the same PR** — without one the user gets the generic `errors.conflict` / `errors.notFound` message instead of the rule
+
 ## Auth Slice Exception (US-01)
 
 The admin sign-in slice (`docs/modules/auth/us-01-admin-sign-in-plan.md`) is deliberately **pre-aggregate infrastructure** — no domain aggregate, and its code style deviates from these rules in places (constructor injection, `Handle(...)` naming). That deviation is accepted **for that slice only**. Every aggregate endpoint (Teacher, WeekSchedule, Publication, Student, Submission) follows these rules: `ExecuteAsync`, `[FromServices]` injection, CQRS controller split, no comments.
