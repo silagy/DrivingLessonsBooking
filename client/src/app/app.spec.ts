@@ -1,7 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
 import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { App } from './app';
 
@@ -36,5 +38,30 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
     expect(compiled.querySelector('p-toast')).toBeTruthy();
+  });
+
+  it('puts toasts in the top-left corner in Hebrew', async () => {
+    //given
+    const fixture = TestBed.createComponent(App);
+
+    //when
+    await fixture.whenStable();
+
+    //then
+    const toast = fixture.debugElement.query(By.directive(Toast)).componentInstance as Toast;
+    expect(toast.position).toBe('top-left');
+  });
+
+  it('puts toasts in the top-right corner in English', async () => {
+    //given
+    localStorage.setItem('app_lang', 'en');
+    const fixture = TestBed.createComponent(App);
+
+    //when
+    await fixture.whenStable();
+
+    //then
+    const toast = fixture.debugElement.query(By.directive(Toast)).componentInstance as Toast;
+    expect(toast.position).toBe('top-right');
   });
 });
