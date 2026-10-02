@@ -1,7 +1,7 @@
 import en from '../../../public/i18n/en.json';
 import he from '../../../public/i18n/he.json';
 
-const TYPOGRAPHIC_PUNCTUATION = /[–—…]/;
+const TYPOGRAPHIC_PUNCTUATION = /[\u2013\u2014\u2026]/;
 
 type TranslationTree = { [key: string]: string | TranslationTree };
 
