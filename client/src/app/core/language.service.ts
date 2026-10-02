@@ -1,62 +1,61 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Title } from '@angular/platform-browser';
 import { PrimeNG } from 'primeng/config';
 import { Translation } from 'primeng/api';
 import { TranslocoService } from '@jsverse/transloco';
+import { PRIMENG_EN, PRIMENG_HE } from './primeng-translations';
 
 export type AppLanguage = 'he' | 'en';
-const STORAGE_KEY = 'app_lang';
+export type AppLocale = 'he-IL' | 'en-IL';
 
-export const PRIMENG_HE: Partial<Translation> = {
-  firstDayOfWeek: 0,
-  dayNames: ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'],
-  dayNamesShort: ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'],
-  dayNamesMin: ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'],
-  monthNames: [
-    'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
-    'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר',
-  ],
-  monthNamesShort: [
-    'ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יונ',
-    'יול', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ',
-  ],
-  today: 'היום',
-  clear: 'נקה',
+const STORAGE_KEY = 'app_lang';
+const DOCUMENT_TITLE_KEY = 'shell.title';
+
+const LOCALES: Record<AppLanguage, AppLocale> = {
+  he: 'he-IL',
+  en: 'en-IL',
 };
 
-export const PRIMENG_EN: Partial<Translation> = {
-  firstDayOfWeek: 0,
-  dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-  dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-  dayNamesMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-  monthNames: [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ],
-  monthNamesShort: [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ],
-  today: 'Today',
-  clear: 'Clear',
+const PRIMENG_TRANSLATIONS: Record<AppLanguage, Partial<Translation>> = {
+  he: PRIMENG_HE,
+  en: PRIMENG_EN,
 };
 
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private readonly transloco = inject(TranslocoService);
   private readonly primeng = inject(PrimeNG);
+  private readonly title = inject(Title);
 
   readonly lang = signal<AppLanguage>(
     (localStorage.getItem(STORAGE_KEY) as AppLanguage) ?? 'he',
   );
+
+  readonly locale = computed<AppLocale>(() => LOCALES[this.lang()]);
+
+  readonly isRtl = computed(() => this.lang() === 'he');
+
+  private readonly documentTitle = toSignal(this.transloco.selectTranslate(DOCUMENT_TITLE_KEY), {
+    initialValue: '',
+  });
 
   constructor() {
     effect(() => {
       const lang = this.lang();
       localStorage.setItem(STORAGE_KEY, lang);
       this.transloco.setActiveLang(lang);
-      this.primeng.setTranslation(lang === 'he' ? PRIMENG_HE : PRIMENG_EN);
+      this.applyPrimeNgTranslation(PRIMENG_TRANSLATIONS[lang]);
       document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+      document.documentElement.dir = this.isRtl() ? 'rtl' : 'ltr';
+    });
+
+    effect(() => {
+      const title = this.documentTitle();
+
+      if (title) {
+        this.title.setTitle(title);
+      }
     });
   }
 
@@ -66,5 +65,12 @@ export class LanguageService {
 
   use(lang: AppLanguage): void {
     this.lang.set(lang);
+  }
+
+  private applyPrimeNgTranslation(translation: Partial<Translation>): void {
+    this.primeng.setTranslation({
+      ...translation,
+      aria: { ...this.primeng.translation.aria, ...translation.aria },
+    });
   }
 }

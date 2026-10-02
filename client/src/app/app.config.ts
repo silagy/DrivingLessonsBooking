@@ -9,7 +9,7 @@ import { routes } from './app.routes';
 import { AppPreset } from './theme/app-preset';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { authInterceptor } from './core/auth.interceptor';
-import { PRIMENG_HE } from './core/language.service';
+import { PRIMENG_HE } from './core/primeng-translations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
