@@ -7,20 +7,23 @@
 - Local only, never staged: `.claude\launch.json` (an `api-smoke` entry added in Step 1, removed in Step 11)
 
 **Interfaces:**
-- Consumes: the client from tasks 1–3, the unchanged API (`GET api/submissions/by-link/{token}`, `POST …/identify`, `POST`/`PUT api/submissions/by-link/{token}`, admin `POST api/publications/{id}/publish`, `POST api/publications/{id}/extend-window`).
+- Consumes: the client from tasks 1–3, the unchanged API (`GET api/submissions/by-link/{token}`, `POST …/identify`, `POST`/`PUT api/submissions/by-link/{token}`, admin `POST api/week-schedules`, `GET api/publications/by-week`, `POST api/publications/{id}/publish`).
 - Produces: a verified slice and a PR closing #23.
 
 Verify with `javascript_tool`, `get_page_text`, `read_page`, `find` and `read_network_requests`. Project memory: `screenshot` can hang or come back half-rendered or tiled on this PrimeNG app, so `await document.fonts.ready` (plus ~1.5s) first and trust the measurements over the picture.
 
-**The audit helper.** Paste once per page load into `javascript_tool`. It is the acceptance criterion in code: no sideways page scroll, nothing visible past either viewport edge, no clipped horizontal overflow, every control at least 40×40px, and no input under 16px (iOS zooms on focus below that). It only looks inside the student shell, so the admin-only toast container is ignored (README decision 6).
+**The audit helper.** Paste once per page load into `javascript_tool`. It is the acceptance criterion in code: no sideways page scroll, nothing visible past either viewport edge, no clipped horizontal overflow, every control at least 40×40px, and no input under 16px (iOS zooms on focus below that). It only looks inside the student shell, so the admin-only toast container is ignored (README decision 6), and it skips visually hidden screen-reader text (`.p-hidden-accessible` and the review's `clip-path: inset(50%)` live region), which is clipped on purpose.
+
+**Driving the pane.** When the browser pane is not drawn on screen, `computer` clicks and typing do not reach the page. Drive the flow with DOM events instead (`input.focus(); input.value = …; input.dispatchEvent(new Event('input', { bubbles: true }))`, `button.click()`). The audit measures layout, which does not depend on how the event was raised. Physical touch is Step 7's job. The ID step looks the ID up as soon as nine digits are typed, so the found / welcome-back message appears without pressing `המשך`.
 
 ```js
+const visuallyHidden = el => el.closest('.p-hidden-accessible') || getComputedStyle(el).clipPath === 'inset(50%)';
 window.audit = () => {
     const width = window.innerWidth;
     const label = el => el.tagName.toLowerCase() + [...el.classList].map(name => '.' + name).join('');
     const shown = [...document.querySelectorAll('app-student-shell *')].filter(el => {
         const box = el.getBoundingClientRect();
-        return box.width > 0 && box.height > 0 && !el.closest('.p-hidden-accessible');
+        return box.width > 0 && box.height > 0 && !visuallyHidden(el);
     });
     const outside = shown
         .filter(el => { const box = el.getBoundingClientRect(); return box.left < -0.5 || box.right > width + 0.5; })
@@ -103,7 +106,7 @@ echo "WEEK=$WEEK LINK=$LINK PUB_ID=$PUB_ID"
 docker exec drivinglessonsbooking-postgres-1 psql -U app -d drivinglessons_us22_smoke -c "select name from teachers;"
 ```
 
-Expected: `car: 201`, `week schedule: 201`, `import: 201` with `"added":2,…,"failed":0`, `publish: 204`, `link state: open` (if it still says `published`, wait a few seconds for Quartz to fire the past-due open job), the `WEEK=… LINK=… PUB_ID=…` line, and the teacher name in Hebrew, **not** `?????`. If the import reports `"failed":2` with `unknownTeacher`, the teacher name was mangled: check `teacher.json` and the `select`. **Write down `LINK` and `PUB_ID`.** Keep this shell open: Step 8 uses `API`, `AUTH`, `json` and `PUB_ID` again.
+Expected: `car: 201`, `week schedule: 201`, `import: 201` with `"added":2,…,"failed":0`, `publish: 204`, `link state: open` (if it still says `published`, wait a few seconds for Quartz to fire the past-due open job), the `WEEK=… LINK=… PUB_ID=…` line, and the teacher name in Hebrew, **not** `?????`. If the import reports `"failed":2` with `unknownTeacher`, the teacher name was mangled: check `teacher.json` and the `select`. **Write down `LINK` and `PUB_ID`.** Keep this shell open: Step 8 uses `API`, `AUTH`, `json` and `WEEK` again.
 
 - [ ] **Step 2: Client, viewport meta, audit helper**
 
@@ -191,13 +194,21 @@ Ask your human partner whether a phone is available. If not, write "real-device 
 1. **Invalid link:** `/s/not-a-real-token` → `הקישור אינו תקין` → audit (HE, EN).
 2. **Not on the roster:** `/s/{LINK}`, type `000000034` (synthetic, valid check digit, not in the roster) → `המשך` → `אינכם מופיעים אצלנו.` → audit (HE, EN).
 3. **Invalid ID:** clear the field, type `123456789` → `המשך` → `זה לא נראה כמו מספר תעודת זהות תקין. בדקו את הספרות ונסו שוב.` → audit (HE, EN).
-4. **Window closed mid-submit:** reload, identify **A** → `עריכת ההגשה` → walk to the review and **stop**. In the Step-1 shell, end the window in three minutes:
+4. **Window closed mid-submit:** a window can only be extended, never shortened (`extend-window` to an earlier end returns 409 `WindowExtensionMustBeLaterException`), so publish the following week with a four-minute window and let the close job end it. In the Step-1 shell:
    ```bash
-   curl -s -o /dev/null -w "extend: %{http_code}\n" -X POST $API/api/publications/$PUB_ID/extend-window -H "$AUTH" \
-     -H "Content-Type: application/json" -d "{\"newEndUtc\":\"$(date -u -d '+3 minutes' +%Y-%m-%dT%H:%M:%SZ)\"}"
+   TEACHER_ID=$(docker exec drivinglessonsbooking-postgres-1 psql -U app -d drivinglessons_us22_smoke -t -A -c "select id from teachers limit 1;")
+   WEEK2=$(date -u -d "$WEEK +7 days" +%F)
+   curl -s -o /dev/null -w "week2 schedule: %{http_code}\n" -X POST $API/api/week-schedules -H "$AUTH" \
+     -H "Content-Type: application/json" -d "{\"teacherId\":\"$TEACHER_ID\",\"weekStart\":\"$WEEK2\"}"
+   PUB2=$(curl -s "$API/api/publications/by-week?week=$WEEK2" -H "$AUTH")
+   PUB2_ID=$(json id <<< "$PUB2"); LINK2=$(json linkToken <<< "$PUB2")
+   curl -s -o /dev/null -w "publish week2: %{http_code}\n" -X POST $API/api/publications/$PUB2_ID/publish -H "$AUTH" \
+     -H "Content-Type: application/json" \
+     -d "{\"startUtc\":\"$(date -u -d '-5 minutes' +%Y-%m-%dT%H:%M:%SZ)\",\"endUtc\":\"$(date -u -d '+4 minutes' +%Y-%m-%dT%H:%M:%SZ)\"}"
+   echo "LINK2=$LINK2"
    ```
-   → `extend: 204`. Wait until `curl -s $API/api/submissions/by-link/$LINK | json state` → `closed`. In the pane press `שליחה` → `PUT` **409** → `החלון נסגר ממש עכשיו` → audit (HE, EN).
-5. **Closed:** reload → `ההגשה נסגרה` → audit (HE, EN).
+   → `week2 schedule: 201`, `publish week2: 204`. Right away, in the pane open `/s/{LINK2}`, identify **A**, walk to the slots, add one pick, open the review and **stop**. Wait until `curl -s $API/api/submissions/by-link/$LINK2 | json state` → `closed`. Then press `שליחה` → `POST` **409** → `החלון נסגר ממש עכשיו` → audit (HE, EN).
+5. **Closed:** reload `/s/{LINK2}` → `ההגשה נסגרה` → audit (HE, EN).
 
 - [ ] **Step 9: PII**
 
