@@ -172,3 +172,16 @@ client\src\app\
     └── week-schedules\state\week-schedules.store.ts                 locale
 docs\modules\i18n\README.md                                          new roadmap, slice row links this plan (committed with the plan)
 ```
+
+## Execution Notes (2 October 2026) — what shipped differently from the tasks
+
+The tasks above are the plan as written. These deviations were ruled during execution; the code on the branch follows the notes, not the task text.
+
+| Task | Plan said | Shipped | Why |
+|------|-----------|---------|-----|
+| 1 | No new package | `Microsoft.EntityFrameworkCore.Relational` 10.0.9 pinned in `DrivingLessons.Application.Test` | Referencing Presentation.Web raised MSB3277 (EF Core 10.0.4 transitive vs the 10.0.9 the Web app already runs through EF Design). The pin matches production. |
+| 4 | `new Date(row.weekStart)` in the history page | Local parse (`split('-')`), also in `week-grid.component.ts` | `new Date('YYYY-MM-DD')` is UTC midnight; west of UTC the grid showed the previous day. The week pickers' `buildWeekOptions` still has this pattern (follow-up). |
+| 6 | `insetInlineEnd`, measured against `clientWidth` | `insetInlineStart` (field and style), measured against `document.documentElement.getBoundingClientRect().right` (`containerRight`) | In RTL `inset-inline-end` is the **left** edge. An absolute panel is placed against the document's edge, which differs from `clientWidth` when the page is scrolled sideways. |
+| 7 / decision 11 | `text-align: match-parent` | `:host-context([dir='rtl']) .card__email` / `.roster__ltr-cell { text-align: end; }` | Chrome computes `match-parent` to `start` and resolves it against the element's own LTR direction, so the value stayed left. |
+| 8 (found) | `<p-toast [position]>` bound to the direction | One `<p-toast>` re-created per corner (`@for … track`) | PrimeNG patched the inline style with `right: false`, so switching English → Hebrew at runtime kept the toast on the right. |
+| Final review | — | An unsupported saved `app_lang` falls back to Hebrew | Any other value crashed the language effect. |
