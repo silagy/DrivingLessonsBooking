@@ -12,6 +12,10 @@
 - Consumes: everything from tasks 1–7; the runbook `docs/operations/runbook.md` (section numbers below refer to it).
 - Produces: v1 live at `https://<domain>`; a results document; #74 and #1 closed.
 
+- [ ] **Step 0: An AWS account that is safe to use (human)**
+
+Follow [docs/operations/aws-account-setup.md](../../../operations/aws-account-setup.md): the account, root MFA, the `monthly-limit` budget, your everyday admin user with MFA, region Frankfurt. Every later step signs in as that admin user, never as root.
+
 - [ ] **Step 1: Long-lead items (human — ideally already started on day one)**
 
 Runbook §1.1 (register the domain) and §1.4 steps 1–3 (SES identity with custom MAIL FROM, DMARC record, production-access request). Record in the results file: domain registered at `<time>`, SES identity verified at `<time>`, production access granted at `<time>` (or "still sandboxed" — then Step 8 uses a verified recipient address).
