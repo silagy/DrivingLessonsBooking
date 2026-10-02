@@ -3,6 +3,7 @@ import {
     afterNextRender,
     ChangeDetectionStrategy,
     Component,
+    computed,
     DestroyRef,
     ElementRef,
     inject,
@@ -19,6 +20,8 @@ import { PickSheet } from '../../../domain/pick-sheet';
 import { SessionType } from '../../../domain/session-type.enum';
 import { SLOT_CONSTRAINT_MAX_LENGTH, toSlotConstraint } from '../../../domain/slot-constraint';
 import { PickChoice } from '../../../domain/slot-pick';
+
+const TYPED_TEXT_DIRECTION = 'auto';
 
 @Component({
     selector: 'app-pick-sheet',
@@ -39,6 +42,7 @@ export class PickSheetComponent {
     protected readonly maxConstraintLength = SLOT_CONSTRAINT_MAX_LENGTH;
     protected readonly sessionType = linkedSignal(() => this.sheet().choice.sessionType);
     protected readonly constraintText = linkedSignal(() => this.sheet().choice.constraint ?? '');
+    protected readonly constraintDirection = computed(() => (this.constraintText() ? TYPED_TEXT_DIRECTION : null));
 
     private readonly singleChoice = viewChild.required<ElementRef<HTMLInputElement>>('singleChoice');
     private readonly doubleChoice = viewChild.required<ElementRef<HTMLInputElement>>('doubleChoice');

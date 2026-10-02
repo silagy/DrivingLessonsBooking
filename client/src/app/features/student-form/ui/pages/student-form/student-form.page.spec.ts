@@ -584,6 +584,21 @@ describe('StudentFormPage', () => {
             expect(page(fixture).querySelector('.details__teacher-name')?.textContent?.trim()).toBe('Teacher Levi');
             expect(page(fixture).querySelector('.details__no-availability')).not.toBeNull();
         });
+
+        it('shows each roster name in its own reading direction', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await identifyAndContinue(fixture);
+
+            //then
+            const directions = ['.details__teacher-name', '.details__student', '.details__car'].map(selector =>
+                page(fixture).querySelector(selector)!.getAttribute('dir'),
+            );
+            expect(directions).toEqual(['auto', 'auto', 'auto']);
+        });
     });
 
     describe('target step', () => {
@@ -983,6 +998,37 @@ describe('StudentFormPage', () => {
             expect((page(fixture).querySelector('#pick-constraint') as HTMLTextAreaElement).maxLength).toBe(200);
         });
 
+        it('lets the constraint follow the direction it is typed in', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //when
+            await typeConstraint(fixture, 'only after 16:00');
+
+            //then
+            expect(page(fixture).querySelector('#pick-constraint')!.getAttribute('dir')).toBe('auto');
+        });
+
+        it('keeps an empty constraint in the page direction', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            const directionWhenOpened = page(fixture).querySelector('#pick-constraint')!.getAttribute('dir');
+            await typeConstraint(fixture, 'only after 16:00');
+
+            //when
+            await typeConstraint(fixture, '');
+
+            //then
+            expect(directionWhenOpened).toBeNull();
+            expect(page(fixture).querySelector('#pick-constraint')!.hasAttribute('dir')).toBe(false);
+        });
+
         it('keeps Review locked until the first pick, then shows target and picked counts', async () => {
             //given
             provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
@@ -1050,6 +1096,24 @@ describe('StudentFormPage', () => {
                 ],
             });
             expect(reviseSubmission).not.toHaveBeenCalled();
+        });
+
+        it('keeps a typed constraint in its own reading direction on the review', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            await typeConstraint(fixture, 'only after 16:00');
+            await press(fixture, '.pick-sheet__save button');
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            const constraint = page(fixture).querySelector('.review__constraint')!;
+            expect(constraint.textContent?.trim()).toBe('only after 16:00');
+            expect(constraint.getAttribute('dir')).toBe('auto');
         });
 
         it('blocks a list shorter than the target with a clear message', async () => {
