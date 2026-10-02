@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Popover, PopoverModule } from 'primeng/popover';
+import { LanguageService } from '../../../../../core/language.service';
 import { Teacher } from '../../../domain/teacher.model';
+import { rtlPopoverPlacement } from './rtl-popover-placement';
 
 interface AssignRow {
     id: string;
@@ -21,12 +23,15 @@ interface AssignRow {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssignTeachersPopoverComponent {
+    private readonly language = inject(LanguageService);
+
     readonly teachers = input.required<Teacher[]>();
     readonly assignedIds = input.required<string[]>();
 
     readonly applied = output<string[]>();
 
     private readonly popover = viewChild.required(Popover);
+    private readonly trigger = viewChild.required<ElementRef<HTMLButtonElement>>('trigger');
     private readonly selectedIds = signal<string[]>([]);
 
     protected readonly rows = computed<AssignRow[]>(() => {
@@ -44,6 +49,23 @@ export class AssignTeachersPopoverComponent {
     protected open(event: Event): void {
         this.selectedIds.set([...this.assignedIds()]);
         this.popover().toggle(event);
+    }
+
+    protected anchorToTrigger(): void {
+        const panel = this.popover().container;
+
+        if (!this.language.isRtl() || !panel) {
+            return;
+        }
+
+        const placement = rtlPopoverPlacement(
+            this.trigger().nativeElement.getBoundingClientRect().right,
+            panel.offsetWidth,
+            document.documentElement.getBoundingClientRect().right,
+        );
+        panel.style.insetInlineEnd = '';
+        panel.style.insetInlineStart = `${placement.insetInlineStart}px`;
+        panel.style.setProperty('--p-popover-arrow-left', `${placement.arrowInset}px`);
     }
 
     protected setSelected(teacherId: string, checked: boolean): void {

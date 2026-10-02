@@ -40,3 +40,19 @@ body {
 .p-datepicker-next-button:dir(rtl) svg {
   transform: scaleX(-1);
 }
+
+.p-popover::before,
+.p-popover::after {
+  left: auto;
+  inset-inline-start: calc(var(--p-popover-arrow-offset) + var(--p-popover-arrow-left));
+}
+
+.p-popover::before {
+  margin-left: 0;
+  margin-inline-start: calc(-1 * var(--p-popover-gutter));
+}
+
+.p-popover::after {
+  margin-left: 0;
+  margin-inline-start: calc(-1 * (var(--p-popover-gutter) - 2px));
+}
