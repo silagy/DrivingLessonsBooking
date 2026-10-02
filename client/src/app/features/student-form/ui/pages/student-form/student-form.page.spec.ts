@@ -983,6 +983,19 @@ describe('StudentFormPage', () => {
             expect((page(fixture).querySelector('#pick-constraint') as HTMLTextAreaElement).maxLength).toBe(200);
         });
 
+        it('lets the constraint follow the direction it is typed in', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+
+            //when
+            await tapChip(fixture, 'sunday-afternoon');
+
+            //then
+            expect(page(fixture).querySelector('#pick-constraint')!.getAttribute('dir')).toBe('auto');
+        });
+
         it('keeps Review locked until the first pick, then shows target and picked counts', async () => {
             //given
             provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
@@ -1050,6 +1063,24 @@ describe('StudentFormPage', () => {
                 ],
             });
             expect(reviseSubmission).not.toHaveBeenCalled();
+        });
+
+        it('keeps a typed constraint in its own reading direction on the review', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachSlots(fixture);
+            await tapChip(fixture, 'sunday-afternoon');
+            await typeConstraint(fixture, 'only after 16:00');
+            await press(fixture, '.pick-sheet__save button');
+
+            //when
+            await clickContinue(fixture);
+
+            //then
+            const constraint = page(fixture).querySelector('.review__constraint')!;
+            expect(constraint.textContent?.trim()).toBe('only after 16:00');
+            expect(constraint.getAttribute('dir')).toBe('auto');
         });
 
         it('blocks a list shorter than the target with a clear message', async () => {
