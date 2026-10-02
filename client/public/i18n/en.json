@@ -131,7 +131,7 @@
     "selectTeacherPrompt": "Select a teacher and week to prepare the grid.",
     "cellOpen": "Open",
     "cellUnavailable": "Unavailable",
-    "publishWeek": "Publish week…",
+    "publishWeek": "Publish week...",
     "unavailableCount": "{{count}} slots marked unavailable",
     "loadFailed": "Failed to load the week schedule."
   },
@@ -168,10 +168,10 @@
       "open": "Open",
       "closed": "Closed"
     },
-    "publish": "Publish week…",
+    "publish": "Publish week...",
     "extendWindow": "Extend deadline",
     "reopen": "Reopen window",
-    "reopenWindow": "Reopen window…",
+    "reopenWindow": "Reopen window...",
     "copyLink": "Copy link",
     "downloadExcel": "Download Excel",
     "refresh": "Refresh",
@@ -241,7 +241,7 @@
     }
   },
   "studentForm": {
-    "loading": "Loading the form…",
+    "loading": "Loading the form...",
     "weekCaption": "Week {{weekNumber}} · {{weekRange}}",
     "weekTeacherCaption": "Week {{weekNumber}} · {{weekRange}} · {{teacherName}}",
     "step": "Step {{current}} of {{total}}",
@@ -277,7 +277,7 @@
       "body": "We match it to the school roster to load your details - no password needed.",
       "label": "National ID",
       "hint": "9 digits, as registered with the school",
-      "checking": "Checking the roster…",
+      "checking": "Checking the roster...",
       "foundTitle": "Found you - {{studentName}}.",
       "foundBody": "Let's collect your availability for week {{weekNumber}} with {{teacherName}}.",
       "notOnRosterTitle": "We don't have you on file.",

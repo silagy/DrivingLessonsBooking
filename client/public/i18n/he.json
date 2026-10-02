@@ -131,7 +131,7 @@
     "selectTeacherPrompt": "בחרו מורה ושבוע כדי להכין את הרשת.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
-    "publishWeek": "פרסום שבוע…",
+    "publishWeek": "פרסום שבוע...",
     "unavailableCount": "{{count}} משבצות סומנו כלא זמינות",
     "loadFailed": "טעינת שבוע העבודה נכשלה."
   },
@@ -168,10 +168,10 @@
       "open": "פתוח",
       "closed": "סגור"
     },
-    "publish": "פרסום שבוע…",
+    "publish": "פרסום שבוע...",
     "extendWindow": "הארכת מועד",
     "reopen": "פתיחה מחדש",
-    "reopenWindow": "פתיחה מחדש…",
+    "reopenWindow": "פתיחה מחדש...",
     "copyLink": "העתקת קישור",
     "downloadExcel": "הורדת אקסל",
     "refresh": "רענון",
@@ -241,7 +241,7 @@
     }
   },
   "studentForm": {
-    "loading": "טוען את הטופס…",
+    "loading": "טוען את הטופס...",
     "weekCaption": "שבוע {{weekNumber}} · {{weekRange}}",
     "weekTeacherCaption": "שבוע {{weekNumber}} · {{weekRange}} · {{teacherName}}",
     "step": "שלב {{current}} מתוך {{total}}",
@@ -277,7 +277,7 @@
       "body": "נאתר אתכם ברשימת התלמידים של בית הספר כדי לטעון את הפרטים שלכם - בלי סיסמה.",
       "label": "תעודת זהות",
       "hint": "9 ספרות, כפי שרשום בבית הספר",
-      "checking": "בודקים ברשימת התלמידים…",
+      "checking": "בודקים ברשימת התלמידים...",
       "foundTitle": "מצאנו אתכם - {{studentName}}.",
       "foundBody": "בואו נאסוף את הזמינות שלכם לשבוע {{weekNumber}} אצל {{teacherName}}.",
       "notOnRosterTitle": "אינכם מופיעים אצלנו.",
