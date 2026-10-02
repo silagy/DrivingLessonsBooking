@@ -213,7 +213,6 @@
       "studentsSubmitted": "תלמידים הגישו",
       "totalPicks": "סה״כ בחירות",
       "lastSubmission": "הגשה אחרונה",
-      "dataAsOf": "נתונים נכון ל־",
       "draftPrompt": "השבוע הוכן אך טרם פורסם. פרסמו אותו כדי לפתוח את חלון ההגשות וליצור את הקישור.",
       "publishedNotice": "ההגשות ייפתחו אוטומטית ב־{{opensAt}}.",
       "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה."
@@ -229,7 +228,8 @@
       "redownload": "הורדה חוזרת",
       "viewDashboard": "צפייה בלוח",
       "empty": "אין פרסומים עדיין.",
-      "loadFailed": "טעינת ההיסטוריה נכשלה."
+      "loadFailed": "טעינת ההיסטוריה נכשלה.",
+      "windowRange": "{{start}} – {{end}}"
     },
     "dialogs": {
       "publishTitle": "פרסום השבוע",

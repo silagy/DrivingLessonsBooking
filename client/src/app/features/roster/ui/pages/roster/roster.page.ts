@@ -58,7 +58,7 @@ export class RosterPage {
     protected readonly importedAtLabel = computed(() => {
         const latest = this.store.latestImport();
 
-        return latest ? formatInstantInJerusalem(latest.importedAtUtc, this.language.lang()) : '';
+        return latest ? formatInstantInJerusalem(latest.importedAtUtc, this.language.locale()) : '';
     });
 
     protected onFilterChange(value: string): void {

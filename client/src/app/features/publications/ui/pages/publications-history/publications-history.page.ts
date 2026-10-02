@@ -8,6 +8,7 @@ import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { PublicationStateTagComponent } from '../../../../../shared/components/publication-state-tag/publication-state-tag.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
 import { formatInstantInJerusalem } from '../../../domain/jerusalem-time';
+import { weekRangeLabel } from '../../../domain/week-options';
 import { LanguageService } from '../../../../../core/language.service';
 import { PublicationsStore } from '../../../state/publications.store';
 import { ItemForFindPublicationHistoryResponse } from '../../../data/item-for-find-publication-history.response';
@@ -32,12 +33,11 @@ export class PublicationsHistoryPage {
 
     protected readonly PublicationState = PublicationState;
 
-    protected windowLabel(row: ItemForFindPublicationHistoryResponse): string {
-        if (!row.windowStartUtc || !row.windowEndUtc) {
-            return '—';
-        }
+    protected weekLabel(row: ItemForFindPublicationHistoryResponse): string {
+        const [year, month, day] = row.weekStart.split('-').map(Number);
+        const weekStart = new Date(year, month - 1, day);
 
-        return `${this.formatInstant(row.windowStartUtc)} → ${this.formatInstant(row.windowEndUtc)}`;
+        return weekRangeLabel(weekStart, this.language.locale());
     }
 
     protected canRedownload(row: ItemForFindPublicationHistoryResponse): boolean {
@@ -54,7 +54,7 @@ export class PublicationsHistoryPage {
         });
     }
 
-    private formatInstant(utcIso: string): string {
-        return formatInstantInJerusalem(utcIso, this.language.lang());
+    protected formatInstant(utcIso: string): string {
+        return formatInstantInJerusalem(utcIso, this.language.locale());
     }
 }

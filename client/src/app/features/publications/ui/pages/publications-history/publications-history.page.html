@@ -25,9 +25,15 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-row>
                     <tr>
-                        <td><bdi>{{ row.weekStart }}</bdi></td>
+                        <td><bdi>{{ weekLabel(row) }}</bdi></td>
                         <td>{{ row.teacherName }}</td>
-                        <td class="history__window"><bdi>{{ windowLabel(row) }}</bdi></td>
+                        <td class="history__window">
+                            @if (row.windowStartUtc && row.windowEndUtc) {
+                                <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
+                            } @else {
+                                <span class="history__dash">—</span>
+                            }
+                        </td>
                         <td><app-publication-state-tag [state]="row.state" /></td>
                         <td>
                             @if (row.latestExcelVersion !== null) {

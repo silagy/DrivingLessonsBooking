@@ -139,7 +139,7 @@ export class StudentFormStore {
 
         return {
             weekNumber: publication.weekNumber,
-            weekRange: weekRangeLabel(publication.weekStart, this.language.lang()),
+            weekRange: weekRangeLabel(publication.weekStart, this.language.locale()),
         };
     });
 
@@ -191,7 +191,7 @@ export class StudentFormStore {
         const publication = this.publication();
 
         return student && publication
-            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.lang(), this.picks())
+            ? groupSlotsByDay(student.slots, publication.weekStart, this.language.locale(), this.picks())
             : [];
     });
 
@@ -428,7 +428,7 @@ export class StudentFormStore {
     }
 
     private formatInstant(utcIso: string | undefined): string {
-        return utcIso ? formatWindowInstant(utcIso, this.language.lang()) : '';
+        return utcIso ? formatWindowInstant(utcIso, this.language.locale()) : '';
     }
 
     private async loadByLink(token: string): Promise<GetPublicationByLinkResponse | null> {

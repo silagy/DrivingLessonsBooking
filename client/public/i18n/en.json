@@ -213,7 +213,6 @@
       "studentsSubmitted": "students submitted",
       "totalPicks": "total picks",
       "lastSubmission": "last submission",
-      "dataAsOf": "Data as of",
       "draftPrompt": "This week is prepared but not published. Publish it to open the submission window and generate the link.",
       "publishedNotice": "Submissions open automatically at {{opensAt}}.",
       "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher."
@@ -229,7 +228,8 @@
       "redownload": "Re-download",
       "viewDashboard": "View dashboard",
       "empty": "No publications yet.",
-      "loadFailed": "Failed to load history."
+      "loadFailed": "Failed to load history.",
+      "windowRange": "{{start}} – {{end}}"
     },
     "dialogs": {
       "publishTitle": "Publish week",
