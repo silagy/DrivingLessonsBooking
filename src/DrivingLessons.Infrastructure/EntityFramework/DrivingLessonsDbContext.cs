@@ -12,6 +12,8 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
 
+    public DbSet<User> Users => Set<User>();
+
     public DbSet<Teacher> Teachers => Set<Teacher>();
 
     public DbSet<Car> Cars => Set<Car>();
