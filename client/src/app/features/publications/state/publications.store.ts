@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { computed, inject, Injectable, resource, signal } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal, resource, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AppRoutes } from '../../../shared/config/app-routes';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
@@ -36,7 +36,6 @@ export class PublicationsStore {
     private readonly fileDownload = inject(FileDownloadService);
     private readonly document = inject(DOCUMENT);
 
-    private readonly selectedTeacherIdState = signal<string | null>(null);
     private readonly selectedWeekStartState = signal<string>(defaultWeekStart());
     private readonly mutating = signal(false);
     private readonly loadedAtState = signal<string | null>(null);
@@ -71,7 +70,6 @@ export class PublicationsStore {
         loader: () => firstValueFrom(this.api.findHistory()),
     });
 
-    readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
     readonly selectedWeekStart = this.selectedWeekStartState.asReadonly();
     readonly isMutating = this.mutating.asReadonly();
 
@@ -87,6 +85,13 @@ export class PublicationsStore {
             .map((item) => ({ id: item.id, name: item.name }))
             .sort((a, b) => a.name.localeCompare(b.name));
     });
+
+    private readonly selectedTeacherIdState = linkedSignal<TeacherOption[], string | null>({
+        source: this.teachers,
+        computation: (teachers, previous) => previous?.value ?? teachers[0]?.id ?? null,
+    });
+
+    readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
 
     readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
 
