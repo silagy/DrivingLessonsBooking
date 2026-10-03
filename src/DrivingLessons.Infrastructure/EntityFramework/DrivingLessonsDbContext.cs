@@ -1,7 +1,6 @@
 using DrivingLessons.Application.Common;
 using DrivingLessons.Domain.Common;
 using DrivingLessons.Domain.Entities;
-using DrivingLessons.Infrastructure.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingLessons.Infrastructure.EntityFramework;
@@ -10,7 +9,7 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 {
     private readonly IDomainEventDispatcher dispatcher;
 
-    public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<User> Users => Set<User>();
 
     public DbSet<Teacher> Teachers => Set<Teacher>();
 

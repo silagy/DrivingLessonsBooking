@@ -19,6 +19,7 @@ using DrivingLessons.Application.Commands.OpenPublication;
 using DrivingLessons.Application.Commands.PublishPublication;
 using DrivingLessons.Application.Commands.ReopenPublication;
 using DrivingLessons.Application.Commands.ReviseSubmission;
+using DrivingLessons.Application.Commands.SeedFirstAdministrator;
 using DrivingLessons.Application.Commands.UnassignCarFromTeacher;
 using DrivingLessons.Application.EventHandlers;
 using DrivingLessons.Application.Queries.DownloadPublicationExcel;
@@ -44,6 +45,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<LoginInteractor>();
+        services.AddScoped<SeedFirstAdministratorInteractor>();
         services.AddScoped<CreateTeacherInteractor>();
         services.AddScoped<CreateCarInteractor>();
         services.AddScoped<ChangeTeacherDetailsInteractor>();

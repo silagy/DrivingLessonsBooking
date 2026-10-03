@@ -51,7 +51,7 @@ Your local `.env` is for your machine only. The strong production passwords go i
 
 ## Setup A: Docker Compose (integrated)
 
-Runs the single deployable (Kestrel serving the Angular build) plus PostgreSQL, the same way production does. Migrations apply and the admin user is seeded automatically on startup.
+Runs the single deployable (Kestrel serving the Angular build) plus PostgreSQL, the same way production does. Migrations apply on startup. On an empty database, the first Administrator is created from `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Once any User exists, changing those values does nothing: the stored email and password stay as they are.
 
 1. Build and start everything:
    ```bash
@@ -98,7 +98,7 @@ Pick one:
   ```
 - **Rider / Visual Studio:** open `DrivingLessons.sln`, select the `DrivingLessons.Presentation.Web` project with the **`http`** launch profile, and press Run or Debug. Use this when you want breakpoints. Rider's and Visual Studio's hot reload apply most code edits, and you restart for the rest.
 
-Both run in the `Development` environment, use `appsettings.Development.json`, apply migrations and seed the dev admin on startup. Wait for `Now listening on: http://localhost:5080`.
+Both run in the `Development` environment, use `appsettings.Development.json`, apply migrations on startup and, on an empty database, create the dev Administrator from `appsettings.Development.json`. Wait for `Now listening on: http://localhost:5080`.
 
 ### Step 3: Run the Angular client (port 4200)
 
@@ -207,6 +207,7 @@ npm test
 | Docker shows old behavior after a code change | The image wasn't rebuilt | `docker compose up -d --build` |
 | `'ng' is not recognized` on `npm start` | `client\node_modules` is missing or only partly installed | Run `npm ci` in `client\`, then `npm start` |
 | `npm ci` fails with `EPERM ... esbuild.exe` | A running `ng serve` (or an old one left over) is holding the file | Stop every `ng serve` (`Ctrl+C`, or end the `node` / `esbuild` processes in Task Manager), then run `npm ci` again |
+| Can't sign in as the Administrator, or changed `ADMIN_PASSWORD` / `Admin:Password` and nothing happened | Configuration only creates the first Administrator on an empty database; it never changes an existing password | [Reset the Administrator from configuration](#reset-the-administrator-from-configuration) (below) |
 
 To make the database password match the current `POSTGRES_PASSWORD` in `.env` without losing data, run this from **bash** (Git Bash or WSL). PowerShell breaks the quoting:
 
@@ -216,3 +217,16 @@ docker compose exec -T postgres sh -c 'echo "ALTER USER app PASSWORD :'"'"'pw'"'
 ```
 
 The first line makes sure the container has the current `.env` value. Inside the container, local connections don't need a password, so this works even while the old password is unknown.
+
+### Reset the Administrator from configuration
+
+Until Users can change or reset passwords in the app, this is the way to recover a forgotten Administrator password or apply a new one from configuration. It deletes every User, so the next start re-creates the Administrator from `ADMIN_EMAIL` / `ADMIN_PASSWORD` (Setup A) or `Admin:Email` / `Admin:Password` in `appsettings.Development.json` (Setup B). Nothing else references Users yet, so no other data is touched. Once Teacher-role Users exist, they would have to be re-created.
+
+1. Set the email and password you want in `.env` (Setup A) or `appsettings.Development.json` (Setup B).
+2. Delete the Users:
+   ```bash
+   docker compose exec -T postgres psql -U app -d drivinglessons -c "DELETE FROM users;"
+   ```
+3. Restart the app so it reads the new values: in Setup A, `docker compose up -d --force-recreate app` (a plain `restart` keeps the old `.env` values); in Setup B, restart the API. Then sign in with the configured values.
+
+On a server, take a backup first, from bash (`docker compose exec -T postgres pg_dump -U app -d drivinglessons -Fc > before-reset.dump`).

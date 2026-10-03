@@ -3,6 +3,7 @@ using System;
 using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
 {
     [DbContext(typeof(DrivingLessonsDbContext))]
-    partial class DrivingLessonsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261003063653_AddUsers")]
+    partial class AddUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -302,6 +305,29 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                         .IsUnique();
 
                     b.ToTable("week_schedules", (string)null);
+                });
+
+            modelBuilder.Entity("DrivingLessons.Infrastructure.Auth.AdminUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("admin_users", (string)null);
                 });
 
             modelBuilder.Entity("DrivingLessons.Domain.Entities.Car", b =>
