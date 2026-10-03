@@ -18,12 +18,12 @@ export class CarsStore {
     });
 
     readonly cars = computed<Car[]>(() => {
-        const cars = this.carsResource.value() ?? [];
+        const cars = this.carsResource.hasValue() ? this.carsResource.value() : [];
 
         return [...cars].sort((a, b) => a.name.localeCompare(b.name));
     });
 
-    readonly isLoading = computed(() => this.carsResource.isLoading() && !this.carsResource.value());
+    readonly isLoading = computed(() => this.carsResource.isLoading() && !this.carsResource.hasValue());
     readonly loadError = computed(() => (this.carsResource.error() ? 'teachers.carsLoadFailed' : null));
     readonly isEmpty = computed(() => !this.isLoading() && !this.cars().length);
     readonly isMutating = this.mutating.asReadonly();

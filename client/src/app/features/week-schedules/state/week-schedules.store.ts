@@ -49,7 +49,9 @@ export class WeekSchedulesStore {
         loader: ({ params: week }) => this.loadPublicationState(week),
     });
 
-    readonly publicationState = computed<PublicationState | undefined>(() => this.publicationResource.value());
+    readonly publicationState = computed<PublicationState | undefined>(() =>
+        this.publicationResource.hasValue() ? this.publicationResource.value() : undefined,
+    );
     readonly canPublish = computed(() => this.publicationState() === PublicationState.draft);
 
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
@@ -57,7 +59,7 @@ export class WeekSchedulesStore {
     readonly isMutating = this.mutating.asReadonly();
 
     readonly teachers = computed<TeacherOption[]>(() => {
-        const items = this.teachersResource.value() ?? [];
+        const items = this.teachersResource.hasValue() ? this.teachersResource.value() : [];
 
         return items
             .map((item) => ({ id: item.id, name: item.name }))
@@ -66,7 +68,9 @@ export class WeekSchedulesStore {
 
     readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
 
-    readonly weekSchedule = computed<WeekSchedule | undefined>(() => this.scheduleResource.value());
+    readonly weekSchedule = computed<WeekSchedule | undefined>(() =>
+        this.scheduleResource.hasValue() ? this.scheduleResource.value() : undefined,
+    );
 
     readonly slots = computed<Slot[]>(() => this.weekSchedule()?.slots ?? []);
 

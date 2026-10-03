@@ -30,10 +30,12 @@ export class RosterStore {
     readonly uploading = this.uploadingState.asReadonly();
 
     readonly latestImport = computed<GetLatestRosterImportResponse | undefined>(() =>
-        this.latestImportResource.value(),
+        this.latestImportResource.hasValue() ? this.latestImportResource.value() : undefined,
     );
 
-    readonly students = computed<ItemForFindStudentsResponse[]>(() => this.studentsResource.value() ?? []);
+    readonly students = computed<ItemForFindStudentsResponse[]>(() =>
+        this.studentsResource.hasValue() ? this.studentsResource.value() : [],
+    );
 
     readonly filteredStudents = computed<ItemForFindStudentsResponse[]>(() => {
         const teacherId = this.selectedTeacherIdState();
