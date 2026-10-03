@@ -134,7 +134,10 @@ export class PublicationsStore {
     readonly hasPublication = computed(() => this.publication() !== undefined);
 
     readonly isLoading = computed(
-        () => this.publicationResource.isLoading() || this.dashboardResource.isLoading(),
+        () =>
+            this.publicationResource.isLoading() ||
+            this.teachersResource.isLoading() ||
+            this.dashboardResource.isLoading(),
     );
 
     readonly loadError = computed(() => {
