@@ -227,6 +227,6 @@ Until Users can change or reset passwords in the app, this is the way to recover
    ```bash
    docker compose exec -T postgres psql -U app -d drivinglessons -c "DELETE FROM users;"
    ```
-3. Restart the app (`docker compose restart app`, or restart the API in Setup B) and sign in with the configured values.
+3. Restart the app so it reads the new values: in Setup A, `docker compose up -d --force-recreate app` (a plain `restart` keeps the old `.env` values); in Setup B, restart the API. Then sign in with the configured values.
 
-On a server, take a backup first (`docker compose exec -T postgres pg_dump -U app -d drivinglessons -Fc > before-reset.dump`).
+On a server, take a backup first, from bash (`docker compose exec -T postgres pg_dump -U app -d drivinglessons -Fc > before-reset.dump`).
