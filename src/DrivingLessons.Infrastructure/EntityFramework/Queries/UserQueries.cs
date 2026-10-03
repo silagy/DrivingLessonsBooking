@@ -21,7 +21,7 @@ public class UserQueries : IUserQueries
                     join teacher in dbContext.Teachers.IgnoreQueryFilters()
                         on user.TeacherId equals teacher.Id into linkedTeachers
                     from linkedTeacher in linkedTeachers.DefaultIfEmpty()
-                    orderby user.IsDeleted, user.Name
+                    orderby user.IsDeleted, user.Name, user.SignInEmail
                     select new ItemForFindUsersResponse
                     {
                         Id = user.Id.Value,

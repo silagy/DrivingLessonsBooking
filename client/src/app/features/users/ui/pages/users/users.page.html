@@ -7,7 +7,7 @@
     <p-button
       [label]="'users.addUser' | transloco"
       icon="pi pi-user-plus"
-      [disabled]="store.isMutating()"
+      [disabled]="store.isMutating() || !!store.loadError()"
       (onClick)="onAddUser()" />
   </header>
 

@@ -90,6 +90,21 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Undefined_Role_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserRoleMustBeDefinedException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userRoleMustBeDefined");
+    }
+
+    [TestMethod]
     public void Missing_User_Is_Not_Found_With_Its_Rule_As_Code()
     {
         //given

@@ -49,7 +49,6 @@ public class DeleteTeacherInteractorTest
     public async Task Deletes_A_Teacher_Whose_Linked_User_Is_Deleted()
     {
         //given
-        A.CallTo(() => userQueries.ExistsLinkedToTeacherAsync(teacher.Id)).Returns(true);
         A.CallTo(() => userQueries.ActiveExistsLinkedToTeacherAsync(teacher.Id)).Returns(false);
 
         //when

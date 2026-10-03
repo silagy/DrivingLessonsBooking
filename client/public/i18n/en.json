@@ -481,6 +481,7 @@
     "temporaryPasswordMustNotBeEmpty": "Enter a temporary password.",
     "userNameMustNotBeEmpty": "Enter the User's name.",
     "userNotFound": "This User no longer exists. Refresh the page.",
+    "userRoleMustBeDefined": "Choose a Role: Administrator or Teacher.",
     "userSignInEmailAlreadyInUse": "Another User already signs in with this email.",
     "userWithTeacherRoleMustHaveLinkedTeacher": "A Teacher-role User must be linked to a teacher.",
     "weekScheduleAlreadyExists": "This teacher's week is already prepared. Refresh the page.",

@@ -481,6 +481,7 @@
     "temporaryPasswordMustNotBeEmpty": "הזינו סיסמה זמנית.",
     "userNameMustNotBeEmpty": "הזינו את שם המשתמש.",
     "userNotFound": "המשתמש הזה כבר לא קיים. רעננו את הדף.",
+    "userRoleMustBeDefined": "בחרו תפקיד: מנהל או מורה.",
     "userSignInEmailAlreadyInUse": "משתמש אחר כבר מתחבר עם האימייל הזה.",
     "userWithTeacherRoleMustHaveLinkedTeacher": "משתמש בתפקיד מורה חייב להיות מקושר למורה.",
     "weekScheduleAlreadyExists": "השבוע של המורה הזה כבר הוכן. רעננו את הדף.",
