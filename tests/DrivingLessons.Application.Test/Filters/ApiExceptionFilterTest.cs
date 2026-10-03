@@ -90,6 +90,21 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Missing_User_Is_Not_Found_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserNotFoundException(UserId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status404NotFound);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userNotFound");
+    }
+
+    [TestMethod]
     public void Closed_Window_Keeps_Its_Problem_Type_And_Carries_Its_Rule_As_Code()
     {
         //given
