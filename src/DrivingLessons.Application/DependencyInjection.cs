@@ -8,6 +8,7 @@ using DrivingLessons.Application.Commands.Common;
 using DrivingLessons.Application.Commands.CreateCar;
 using DrivingLessons.Application.Commands.CreateSubmission;
 using DrivingLessons.Application.Commands.CreateTeacher;
+using DrivingLessons.Application.Commands.CreateUser;
 using DrivingLessons.Application.Commands.CreateWeekSchedule;
 using DrivingLessons.Application.Commands.DeleteCar;
 using DrivingLessons.Application.Commands.DeleteTeacher;
@@ -46,6 +47,7 @@ public static class DependencyInjection
     {
         services.AddScoped<LoginInteractor>();
         services.AddScoped<SeedFirstAdministratorInteractor>();
+        services.AddScoped<CreateUserInteractor>();
         services.AddScoped<CreateTeacherInteractor>();
         services.AddScoped<CreateCarInteractor>();
         services.AddScoped<ChangeTeacherDetailsInteractor>();

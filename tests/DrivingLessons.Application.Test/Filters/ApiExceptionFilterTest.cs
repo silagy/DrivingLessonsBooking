@@ -45,6 +45,51 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Sign_In_Email_In_Use_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserSignInEmailAlreadyInUseException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userSignInEmailAlreadyInUse");
+    }
+
+    [TestMethod]
+    public void Teacher_Already_Linked_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new TeacherAlreadyLinkedToUserException(TeacherId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "teacherAlreadyLinkedToUser");
+    }
+
+    [TestMethod]
+    public void Blank_Temporary_Password_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new TemporaryPasswordMustNotBeEmptyException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "temporaryPasswordMustNotBeEmpty");
+    }
+
+    [TestMethod]
     public void Closed_Window_Keeps_Its_Problem_Type_And_Carries_Its_Rule_As_Code()
     {
         //given

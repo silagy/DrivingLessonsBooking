@@ -47,6 +47,7 @@ public static class DependencyInjection
             .ValidateOnStart();
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserQueries, UserQueries>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<ITeacherQueries, TeacherQueries>();
         services.AddScoped<ICarRepository, CarRepository>();
