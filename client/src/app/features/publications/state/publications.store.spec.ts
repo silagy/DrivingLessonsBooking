@@ -14,6 +14,7 @@ import { TeacherOption } from '../domain/teacher-option.model';
 import { PublicationsStore } from './publications.store';
 
 const HTTP_NOT_FOUND = 404;
+const HTTP_INTERNAL_SERVER_ERROR = 500;
 
 const TEACHERS: TeacherOption[] = [
     { id: 'teacher-levi', name: 'Teacher Levi' },
@@ -122,5 +123,23 @@ describe('PublicationsStore', () => {
 
         //then
         expect(fileDownload.download).toHaveBeenCalledWith(expect.any(Blob), 'week-2026-10-04.xlsx');
+    });
+
+    it('reports the load error instead of throwing when the week fails to load', async () => {
+        //given
+        const store = createStore(
+            of(TEACHERS),
+            throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR })),
+        );
+
+        //when
+        await TestBed.inject(ApplicationRef).whenStable();
+
+        //then
+        expect(store.publication()).toBeUndefined();
+        expect(store.state()).toBeUndefined();
+        expect(store.weekNumber()).toBeUndefined();
+        expect(store.dashboard()).toBeUndefined();
+        expect(store.loadError()).toBe('publications.loadFailed');
     });
 });

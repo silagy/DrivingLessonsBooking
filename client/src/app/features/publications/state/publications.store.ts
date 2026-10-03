@@ -51,7 +51,7 @@ export class PublicationsStore {
 
     private readonly dashboardResource = resource({
         params: () => {
-            const publication = this.publicationResource.value();
+            const publication = this.publication();
             const teacherId = this.selectedTeacherIdState();
 
             return publication && teacherId ? { publicationId: publication.id, teacherId } : undefined;
@@ -73,13 +73,15 @@ export class PublicationsStore {
     readonly selectedWeekStart = this.selectedWeekStartState.asReadonly();
     readonly isMutating = this.mutating.asReadonly();
 
-    readonly history = computed<ItemForFindPublicationHistoryResponse[]>(() => this.historyResource.value() ?? []);
+    readonly history = computed<ItemForFindPublicationHistoryResponse[]>(() =>
+        this.historyResource.hasValue() ? this.historyResource.value() : [],
+    );
     readonly historyIsLoading = this.historyResource.isLoading;
     readonly historyError = computed(() => (this.historyResource.error() ? 'publications.history.loadFailed' : null));
     readonly historyIsEmpty = computed(() => !this.historyIsLoading() && this.history().length === 0);
 
     readonly teachers = computed<TeacherOption[]>(() => {
-        const items = this.teachersResource.value() ?? [];
+        const items = this.teachersResource.hasValue() ? this.teachersResource.value() : [];
 
         return items
             .map((item) => ({ id: item.id, name: item.name }))
@@ -105,7 +107,9 @@ export class PublicationsStore {
         return weekRangeLabel(weekStart, this.language.locale());
     });
 
-    readonly publication = computed<GetPublicationResponse | undefined>(() => this.publicationResource.value());
+    readonly publication = computed<GetPublicationResponse | undefined>(() =>
+        this.publicationResource.hasValue() ? this.publicationResource.value() : undefined,
+    );
 
     readonly weekNumber = computed<number | undefined>(() => this.publication()?.weekNumber);
 
@@ -123,7 +127,9 @@ export class PublicationsStore {
         return loadedAt ? formatInstantInJerusalem(loadedAt, this.language.locale()) : '';
     });
 
-    readonly dashboard = computed<GetPublicationDashboardResponse | undefined>(() => this.dashboardResource.value());
+    readonly dashboard = computed<GetPublicationDashboardResponse | undefined>(() =>
+        this.dashboardResource.hasValue() ? this.dashboardResource.value() : undefined,
+    );
 
     readonly slotCounts = computed<SlotCountForGetPublicationDashboardResponse[]>(
         () => this.dashboard()?.slotCounts ?? [],
