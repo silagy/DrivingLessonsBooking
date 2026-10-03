@@ -11,7 +11,7 @@ import { User } from '../domain/user.model';
 
 const SINGLE_USER_COUNT = 1;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class UsersStore {
     private readonly api = inject(UsersApiService);
     private readonly teacherOptionsApi = inject(TeacherOptionsApiService);

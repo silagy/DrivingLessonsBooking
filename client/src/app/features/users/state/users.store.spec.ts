@@ -55,8 +55,9 @@ function createStore(
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
+            UsersStore,
             { provide: UsersApiService, useValue: { findUsers: vi.fn(findUsers), createUser: vi.fn(createUser) } },
-            { provide: TeacherOptionsApiService, useValue: { findTeachers: () => of(TEACHERS) } },
+            { provide: TeacherOptionsApiService, useValue: { findTeachers: vi.fn(() => of(TEACHERS)) } },
             { provide: ToastService, useValue: { success: vi.fn(), apiError: vi.fn() } },
         ],
     });
@@ -137,6 +138,20 @@ describe('UsersStore', () => {
         expect(toast.success).toHaveBeenCalledWith('users.created');
         await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
         expect(store.isMutating()).toBe(false);
+    });
+
+    it('loads the Teachers again for a new store instance', async () => {
+        //given
+        createStore(() => of([ADMINISTRATOR]), () => NEVER);
+        await stable();
+        const teacherOptionsApi = TestBed.inject(TeacherOptionsApiService);
+
+        //when
+        TestBed.runInInjectionContext(() => new UsersStore());
+        await stable();
+
+        //then
+        expect(teacherOptionsApi.findTeachers).toHaveBeenCalledTimes(2);
     });
 
     it('shows the refusal and keeps the list when the server rejects the User', async () => {
