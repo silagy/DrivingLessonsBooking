@@ -77,6 +77,11 @@
     font-variant-numeric: tabular-nums;
 }
 
+.dashboard__share {
+    display: block;
+    margin-block-start: 14px;
+}
+
 .dashboard__card {
     background: var(--app-bg-card);
     border: 1px solid var(--app-border);

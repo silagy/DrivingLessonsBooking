@@ -80,6 +80,10 @@
                         {{ 'publications.dataAsOf' | transloco: { time: store.dataAsOf() } }}
                     </span>
                 </div>
+                <app-share-link-box
+                    class="dashboard__share"
+                    [link]="store.shareLink()"
+                    (copyClicked)="store.copyLink()" />
                 <section class="dashboard__card">
                     <app-week-grid
                         [cells]="store.slotCounts()"
