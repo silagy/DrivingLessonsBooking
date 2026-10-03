@@ -17,9 +17,11 @@ export class TeachersStore {
         loader: () => firstValueFrom(this.api.findTeachers()),
     });
 
-    readonly teachers = computed<Teacher[]>(() => this.teachersResource.value() ?? []);
+    readonly teachers = computed<Teacher[]>(() =>
+        this.teachersResource.hasValue() ? this.teachersResource.value() : [],
+    );
 
-    readonly isLoading = computed(() => this.teachersResource.isLoading() && !this.teachersResource.value());
+    readonly isLoading = computed(() => this.teachersResource.isLoading() && !this.teachersResource.hasValue());
     readonly loadError = computed(() => (this.teachersResource.error() ? 'teachers.loadFailed' : null));
     readonly isEmpty = computed(() => !this.isLoading() && !this.teachers().length);
     readonly isMutating = this.mutating.asReadonly();
