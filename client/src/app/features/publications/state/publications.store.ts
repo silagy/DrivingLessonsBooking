@@ -205,9 +205,10 @@ export class PublicationsStore {
         this.toast.apiError(undefined);
     }
 
-    async downloadExcel(publicationId?: string, teacherId?: string): Promise<void> {
+    async downloadExcel(publicationId?: string, teacherId?: string, weekStart?: string): Promise<void> {
         const id = publicationId ?? this.publication()?.id;
         const teacher = teacherId ?? this.selectedTeacherIdState();
+        const week = weekStart ?? this.selectedWeekStartState();
 
         if (!id || !teacher) {
             return;
@@ -217,7 +218,7 @@ export class PublicationsStore {
 
         try {
             const blob = await firstValueFrom(this.api.downloadExcel(id, teacher));
-            this.fileDownload.download(blob, `week-${this.selectedWeekStartState()}.xlsx`);
+            this.fileDownload.download(blob, `week-${week}.xlsx`);
         } catch (error) {
             this.toast.apiError(error);
         } finally {

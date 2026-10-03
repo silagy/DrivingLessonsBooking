@@ -45,7 +45,7 @@ export class PublicationsHistoryPage {
     }
 
     protected onRedownload(row: ItemForFindPublicationHistoryResponse): void {
-        void this.store.downloadExcel(row.publicationId, row.teacherId);
+        void this.store.downloadExcel(row.publicationId, row.teacherId, row.weekStart);
     }
 
     protected onViewDashboard(row: ItemForFindPublicationHistoryResponse): void {

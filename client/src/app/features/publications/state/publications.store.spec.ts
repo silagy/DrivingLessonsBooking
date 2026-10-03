@@ -45,11 +45,12 @@ function createStore(
                     getByWeek: () => publication,
                     getDashboard: () => NEVER,
                     findHistory: () => of([]),
+                    downloadExcel: () => of(new Blob()),
                 },
             },
             { provide: ToastService, useValue: { success: () => undefined, apiError: () => undefined } },
             { provide: ClipboardService, useValue: { copy: async () => true } },
-            { provide: FileDownloadService, useValue: { download: () => undefined } },
+            { provide: FileDownloadService, useValue: { download: vi.fn() } },
         ],
     });
 
@@ -95,5 +96,31 @@ describe('PublicationsStore', () => {
 
         //then
         expect(store.isLoading()).toBe(true);
+    });
+
+    it('names a history download after the row week, not the week selected on the dashboard', async () => {
+        //given
+        const store = await loadedStore();
+        const fileDownload = TestBed.inject(FileDownloadService);
+        store.selectWeek('2026-10-04');
+
+        //when
+        await store.downloadExcel('publication-week-38', 'teacher-levi', '2026-09-13');
+
+        //then
+        expect(fileDownload.download).toHaveBeenCalledWith(expect.any(Blob), 'week-2026-09-13.xlsx');
+    });
+
+    it('names a dashboard download after the selected week', async () => {
+        //given
+        const store = await loadedStore();
+        const fileDownload = TestBed.inject(FileDownloadService);
+        store.selectWeek('2026-10-04');
+
+        //when
+        await store.downloadExcel('publication-1');
+
+        //then
+        expect(fileDownload.download).toHaveBeenCalledWith(expect.any(Blob), 'week-2026-10-04.xlsx');
     });
 });
