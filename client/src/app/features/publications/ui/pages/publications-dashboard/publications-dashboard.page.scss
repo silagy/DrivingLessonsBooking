@@ -122,6 +122,16 @@
     line-height: 1.55;
 }
 
+.dashboard__loading {
+    display: flex;
+    justify-content: center;
+
+    p-progressspinner {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
+
 .dashboard__empty {
     display: flex;
     align-items: center;

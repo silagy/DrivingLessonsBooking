@@ -54,7 +54,7 @@
     </header>
 
     @if (store.isLoading()) {
-        <div class="dashboard__state"><p-progressSpinner /></div>
+        <section class="dashboard__card dashboard__loading"><p-progressSpinner /></section>
     } @else if (store.loadError(); as errorKey) {
         <div class="dashboard__state">{{ errorKey | transloco }}</div>
     } @else if (!store.hasPublication()) {

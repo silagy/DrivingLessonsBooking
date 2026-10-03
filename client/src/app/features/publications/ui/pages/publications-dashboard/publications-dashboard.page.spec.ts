@@ -157,6 +157,22 @@ describe('PublicationsDashboardPage', () => {
         expect(page.querySelector('p-progressspinner')).not.toBeNull();
     });
 
+    it('shows the spinner in the same card the empty state uses', async () => {
+        //given
+        const store = fakeStore({
+            state: signal(undefined),
+            publication: signal(undefined),
+            hasPublication: signal(false),
+            isLoading: signal(true),
+        });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.dashboard__card p-progressspinner')).not.toBeNull();
+    });
+
     it('moves to the picked week through the URL and drops a pending publish request', async () => {
         //given
         const store = fakeStore({});
