@@ -109,6 +109,7 @@ Domain.Test       → Domain
 
 Core aggregates (full model in `docs/requirements.md` §5):
 
+- **User** — a person who can sign in; exactly one Role (`Administrator` | `Teacher`); a Teacher-Role User is linked to exactly one Teacher; sign-in email unique case-insensitively; soft-deleted; replaces the infrastructure admin record (#84)
 - **Teacher** — no longer owns cars (decision #21); scheduling is per teacher, not per car
 - **Car** — shared pool aggregate; assigned to any number of teachers (many-to-many via TeacherAssignment); soft-deleted; transmission per car
 - **WeekSchedule** — per teacher per week; grid of Slots (`Open`/`Unavailable`), Sunday–Friday, short Friday

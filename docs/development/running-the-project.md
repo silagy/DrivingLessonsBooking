@@ -51,7 +51,7 @@ Your local `.env` is for your machine only. The strong production passwords go i
 
 ## Setup A: Docker Compose (integrated)
 
-Runs the single deployable (Kestrel serving the Angular build) plus PostgreSQL, the same way production does. Migrations apply and the admin user is seeded automatically on startup.
+Runs the single deployable (Kestrel serving the Angular build) plus PostgreSQL, the same way production does. Migrations apply on startup. On an empty database, the first Administrator is created from `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Once any User exists, changing those values does nothing: the stored email and password stay as they are.
 
 1. Build and start everything:
    ```bash
@@ -98,7 +98,7 @@ Pick one:
   ```
 - **Rider / Visual Studio:** open `DrivingLessons.sln`, select the `DrivingLessons.Presentation.Web` project with the **`http`** launch profile, and press Run or Debug. Use this when you want breakpoints. Rider's and Visual Studio's hot reload apply most code edits, and you restart for the rest.
 
-Both run in the `Development` environment, use `appsettings.Development.json`, apply migrations and seed the dev admin on startup. Wait for `Now listening on: http://localhost:5080`.
+Both run in the `Development` environment, use `appsettings.Development.json`, apply migrations on startup and, on an empty database, create the dev Administrator from `appsettings.Development.json`. Wait for `Now listening on: http://localhost:5080`.
 
 ### Step 3: Run the Angular client (port 4200)
 
