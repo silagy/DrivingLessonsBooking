@@ -38,7 +38,9 @@ export class PublicationsStore {
                 : Promise.resolve([]),
     });
 
-    readonly publications = computed(() => this.publicationsResource.value() ?? []);
+    readonly publications = computed(() =>
+        this.publicationsResource.hasValue() ? this.publicationsResource.value() : []
+    );
     readonly isLoading = this.publicationsResource.isLoading;
     readonly loadError = computed(() => (this.publicationsResource.error() ? 'Publications.loadFailed' : null));
     readonly isMutating = this.mutating.asReadonly();
@@ -88,6 +90,7 @@ export class PublicationsStore {
 | Public state | `readonly name = this.name.asReadonly()` or a `computed()` |
 | Derived state | `computed()` in the store — selectors live with the state, not in pages |
 | Reads (queries) | `resource()` keyed on a params signal; `reload()` after a successful command |
+| Resource values | always `resource.hasValue() ? resource.value() : fallback` — `value()` throws while the resource is in the error state, which crashes every computed and template that reads it; never `value() ?? fallback` or `!value()` |
 | Writes (commands) | `async` method → `firstValueFrom(api...)` → toast → reload affected resource |
 | Errors | error signals hold **i18n keys**, never raw text; 404/409 rule codes surface translated via `toast.apiError` (`errors.{code}`) |
 | Loading | `resource().isLoading` for reads; one `isMutating` signal for writes |
@@ -113,7 +116,9 @@ export class StudentFormStore {
                 : Promise.resolve(null),
     });
 
-    readonly publication = computed(() => this.publicationResource.value() ?? null);
+    readonly publication = computed(() =>
+        this.publicationResource.hasValue() ? this.publicationResource.value() : null
+    );
     readonly windowIsOpen = computed(() => this.publication()?.state === PublicationState.open);
 
     open(token: string): void {
