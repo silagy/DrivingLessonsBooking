@@ -1,6 +1,8 @@
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgModel } from '@angular/forms';
+import { By } from '@angular/platform-browser';
+import { provideRouter, Router } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { providePrimeNG } from 'primeng/config';
 import { LanguageService } from '../../../../../core/language.service';
@@ -48,6 +50,14 @@ function fakeStore(overrides: Record<string, unknown>) {
 }
 
 async function render(store: ReturnType<typeof fakeStore>): Promise<HTMLElement> {
+    const fixture = await renderFixture(store);
+
+    return fixture.nativeElement as HTMLElement;
+}
+
+async function renderFixture(
+    store: ReturnType<typeof fakeStore>,
+): Promise<ComponentFixture<PublicationsDashboardPage>> {
     TestBed.configureTestingModule({
         imports: [
             PublicationsDashboardPage,
@@ -68,7 +78,15 @@ async function render(store: ReturnType<typeof fakeStore>): Promise<HTMLElement>
     const fixture = TestBed.createComponent(PublicationsDashboardPage);
     await fixture.whenStable();
 
-    return fixture.nativeElement as HTMLElement;
+    return fixture;
+}
+
+function weekPickerModel(fixture: ComponentFixture<PublicationsDashboardPage>): NgModel {
+    const weekPicker = fixture.debugElement
+        .queryAll(By.directive(NgModel))
+        .find((element) => (element.nativeElement as HTMLElement).matches('.dashboard__week-select'));
+
+    return weekPicker!.injector.get(NgModel);
 }
 
 describe('PublicationsDashboardPage', () => {
@@ -103,5 +121,24 @@ describe('PublicationsDashboardPage', () => {
 
         //then
         expect(page.querySelector('.dashboard__week-select .p-select-label')?.textContent?.trim()).toBe(WEEK_LABEL);
+    });
+
+    it('moves to the picked week through the URL and drops a pending publish request', async () => {
+        //given
+        const store = fakeStore({});
+        const fixture = await renderFixture(store);
+        const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+
+        //when
+        weekPickerModel(fixture).viewToModelUpdate('2026-10-11');
+
+        //then
+        expect(navigate).toHaveBeenCalledWith(
+            [],
+            expect.objectContaining({
+                queryParams: { week: '2026-10-11', publish: null },
+                queryParamsHandling: 'merge',
+            }),
+        );
     });
 });

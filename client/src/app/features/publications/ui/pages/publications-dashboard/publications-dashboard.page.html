@@ -27,7 +27,7 @@
                     optionLabel="label"
                     optionValue="weekStart"
                     [ngModel]="store.selectedWeekStart()"
-                    (ngModelChange)="store.selectWeek($event)"
+                    (ngModelChange)="onWeekPicked($event)"
                     [ariaLabel]="'publications.week' | transloco" />
                 @if (windowStatus(); as status) {
                     <span class="dashboard__subtitle-part">{{ status.key | transloco: { moment: status.moment } }}</span>
