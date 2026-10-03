@@ -29,6 +29,16 @@ export function buildWeekOptions(locale: string, today: Date = new Date()): Week
     });
 }
 
+export function withWeekOption(options: readonly WeekOption[], weekStart: string, locale: string): WeekOption[] {
+    if (options.some((option) => option.weekStart === weekStart)) {
+        return [...options];
+    }
+
+    const selected = { weekStart, label: weekRangeLabel(parseIsoDate(weekStart), locale) };
+
+    return [...options, selected].sort((first, second) => first.weekStart.localeCompare(second.weekStart));
+}
+
 export function weekRangeLabel(weekStart: Date, locale: string): string {
     const weekEnd = addDays(weekStart, GRID_LAST_DAY_OFFSET);
     const startLabel = weekStart.toLocaleDateString(locale, { day: 'numeric', month: 'short' });

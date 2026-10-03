@@ -47,9 +47,31 @@
 .dashboard__subtitle {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     margin-block-start: 4px;
+}
+
+.dashboard__subtitle-part {
     font-size: 0.85rem;
     color: var(--app-text-secondary);
+}
+
+:host ::ng-deep .dashboard__week-select {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+
+    .p-select-label {
+        padding: 0;
+        font-size: 0.85rem;
+        color: var(--app-text-secondary);
+    }
+
+    .p-select-dropdown {
+        width: auto;
+        padding-inline-start: 4px;
+        color: var(--app-text-secondary);
+    }
 }
 
 .dashboard__subtitle-part::before {
@@ -77,6 +99,11 @@
     font-variant-numeric: tabular-nums;
 }
 
+.dashboard__share {
+    display: block;
+    margin-block-start: 14px;
+}
+
 .dashboard__card {
     background: var(--app-bg-card);
     border: 1px solid var(--app-border);
@@ -93,6 +120,27 @@
 .dashboard__notice {
     color: var(--app-text-secondary);
     line-height: 1.55;
+}
+
+.dashboard__loading {
+    display: flex;
+    justify-content: center;
+
+    p-progressspinner {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
+
+.dashboard__empty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    .dashboard__notice {
+        margin: 0;
+    }
 }
 
 .dashboard__state {

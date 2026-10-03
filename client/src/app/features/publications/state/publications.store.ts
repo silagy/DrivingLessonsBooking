@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { computed, inject, Injectable, resource, signal } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal, resource, signal } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AppRoutes } from '../../../shared/config/app-routes';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
@@ -21,7 +21,7 @@ import { ReopenPublicationRequest } from '../data/reopen-publication.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { SlotCountForGetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
 import { TeacherOption } from '../domain/teacher-option.model';
-import { buildWeekOptions, WeekOption, weekRangeLabel } from '../domain/week-options';
+import { buildWeekOptions, WeekOption, weekRangeLabel, withWeekOption } from '../domain/week-options';
 import { parseIsoDate } from '../../../shared/dates/parse-iso-date';
 
 const HTTP_NOT_FOUND = 404;
@@ -36,7 +36,6 @@ export class PublicationsStore {
     private readonly fileDownload = inject(FileDownloadService);
     private readonly document = inject(DOCUMENT);
 
-    private readonly selectedTeacherIdState = signal<string | null>(null);
     private readonly selectedWeekStartState = signal<string>(defaultWeekStart());
     private readonly mutating = signal(false);
     private readonly loadedAtState = signal<string | null>(null);
@@ -52,7 +51,7 @@ export class PublicationsStore {
 
     private readonly dashboardResource = resource({
         params: () => {
-            const publication = this.publicationResource.value();
+            const publication = this.publication();
             const teacherId = this.selectedTeacherIdState();
 
             return publication && teacherId ? { publicationId: publication.id, teacherId } : undefined;
@@ -71,24 +70,36 @@ export class PublicationsStore {
         loader: () => firstValueFrom(this.api.findHistory()),
     });
 
-    readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
     readonly selectedWeekStart = this.selectedWeekStartState.asReadonly();
     readonly isMutating = this.mutating.asReadonly();
 
-    readonly history = computed<ItemForFindPublicationHistoryResponse[]>(() => this.historyResource.value() ?? []);
+    readonly history = computed<ItemForFindPublicationHistoryResponse[]>(() =>
+        this.historyResource.hasValue() ? this.historyResource.value() : [],
+    );
     readonly historyIsLoading = this.historyResource.isLoading;
     readonly historyError = computed(() => (this.historyResource.error() ? 'publications.history.loadFailed' : null));
     readonly historyIsEmpty = computed(() => !this.historyIsLoading() && this.history().length === 0);
 
     readonly teachers = computed<TeacherOption[]>(() => {
-        const items = this.teachersResource.value() ?? [];
+        const items = this.teachersResource.hasValue() ? this.teachersResource.value() : [];
 
         return items
             .map((item) => ({ id: item.id, name: item.name }))
             .sort((a, b) => a.name.localeCompare(b.name));
     });
 
+    private readonly selectedTeacherIdState = linkedSignal<TeacherOption[], string | null>({
+        source: this.teachers,
+        computation: (teachers, previous) => previous?.value ?? teachers[0]?.id ?? null,
+    });
+
+    readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
+
     readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
+
+    readonly weekChoices = computed<WeekOption[]>(() =>
+        withWeekOption(this.weekOptions(), this.selectedWeekStartState(), this.language.locale()),
+    );
 
     readonly weekLabel = computed<string>(() => {
         const weekStart = parseIsoDate(this.selectedWeekStartState());
@@ -96,7 +107,9 @@ export class PublicationsStore {
         return weekRangeLabel(weekStart, this.language.locale());
     });
 
-    readonly publication = computed<GetPublicationResponse | undefined>(() => this.publicationResource.value());
+    readonly publication = computed<GetPublicationResponse | undefined>(() =>
+        this.publicationResource.hasValue() ? this.publicationResource.value() : undefined,
+    );
 
     readonly weekNumber = computed<number | undefined>(() => this.publication()?.weekNumber);
 
@@ -114,7 +127,9 @@ export class PublicationsStore {
         return loadedAt ? formatInstantInJerusalem(loadedAt, this.language.locale()) : '';
     });
 
-    readonly dashboard = computed<GetPublicationDashboardResponse | undefined>(() => this.dashboardResource.value());
+    readonly dashboard = computed<GetPublicationDashboardResponse | undefined>(() =>
+        this.dashboardResource.hasValue() ? this.dashboardResource.value() : undefined,
+    );
 
     readonly slotCounts = computed<SlotCountForGetPublicationDashboardResponse[]>(
         () => this.dashboard()?.slotCounts ?? [],
@@ -125,7 +140,10 @@ export class PublicationsStore {
     readonly hasPublication = computed(() => this.publication() !== undefined);
 
     readonly isLoading = computed(
-        () => this.publicationResource.isLoading() || this.dashboardResource.isLoading(),
+        () =>
+            this.publicationResource.isLoading() ||
+            this.teachersResource.isLoading() ||
+            this.dashboardResource.isLoading(),
     );
 
     readonly loadError = computed(() => {
@@ -193,9 +211,10 @@ export class PublicationsStore {
         this.toast.apiError(undefined);
     }
 
-    async downloadExcel(publicationId?: string, teacherId?: string): Promise<void> {
+    async downloadExcel(publicationId?: string, teacherId?: string, weekStart?: string): Promise<void> {
         const id = publicationId ?? this.publication()?.id;
         const teacher = teacherId ?? this.selectedTeacherIdState();
+        const week = weekStart ?? this.selectedWeekStartState();
 
         if (!id || !teacher) {
             return;
@@ -205,7 +224,7 @@ export class PublicationsStore {
 
         try {
             const blob = await firstValueFrom(this.api.downloadExcel(id, teacher));
-            this.fileDownload.download(blob, `week-${this.selectedWeekStartState()}.xlsx`);
+            this.fileDownload.download(blob, `week-${week}.xlsx`);
         } catch (error) {
             this.toast.apiError(error);
         } finally {

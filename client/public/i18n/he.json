@@ -219,7 +219,8 @@
       "weekTitle": "- שבוע {{weekNumber}}",
       "opensAt": "ההגשה נפתחת {{moment}}",
       "closesAt": "ההגשה נסגרת {{moment}}",
-      "closedAt": "ההגשה נסגרה {{moment}}"
+      "closedAt": "ההגשה נסגרה {{moment}}",
+      "prepareWeek": "להכנת השבוע"
     },
     "history": {
       "title": "היסטוריית פרסומים",

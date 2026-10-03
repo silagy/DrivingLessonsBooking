@@ -21,7 +21,14 @@
                 }
             </div>
             <div class="dashboard__subtitle">
-                <span><bdi>{{ store.weekLabel() }}</bdi></span>
+                <p-select
+                    styleClass="dashboard__week-select"
+                    [options]="store.weekChoices()"
+                    optionLabel="label"
+                    optionValue="weekStart"
+                    [ngModel]="store.selectedWeekStart()"
+                    (ngModelChange)="onWeekPicked($event)"
+                    [ariaLabel]="'publications.week' | transloco" />
                 @if (windowStatus(); as status) {
                     <span class="dashboard__subtitle-part">{{ status.key | transloco: { moment: status.moment } }}</span>
                 }
@@ -47,9 +54,17 @@
     </header>
 
     @if (store.isLoading()) {
-        <div class="dashboard__state"><p-progressSpinner /></div>
+        <section class="dashboard__card dashboard__loading"><p-progressSpinner /></section>
     } @else if (store.loadError(); as errorKey) {
         <div class="dashboard__state">{{ errorKey | transloco }}</div>
+    } @else if (!store.hasPublication()) {
+        <section class="dashboard__card dashboard__empty">
+            <p class="dashboard__notice">{{ 'publications.noPublication' | transloco }}</p>
+            <a
+                pButton
+                [label]="'publications.dashboard.prepareWeek' | transloco"
+                [routerLink]="['/', appRoutes.weekSchedules]"></a>
+        </section>
     } @else {
         @switch (store.state()) {
             @case (PublicationState.draft) {
@@ -80,6 +95,10 @@
                         {{ 'publications.dataAsOf' | transloco: { time: store.dataAsOf() } }}
                     </span>
                 </div>
+                <app-share-link-box
+                    class="dashboard__share"
+                    [link]="store.shareLink()"
+                    (copyClicked)="store.copyLink()" />
                 <section class="dashboard__card">
                     <app-week-grid
                         [cells]="store.slotCounts()"
