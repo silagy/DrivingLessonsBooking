@@ -25,6 +25,10 @@ export const ADMIN_ROUTES: Routes = [
         path: AppRoutes.publications,
         loadChildren: () => import('../publications/publications.routes'),
       },
+      {
+        path: AppRoutes.users,
+        loadChildren: () => import('../users/users.routes'),
+      },
     ],
   },
 ];

@@ -23,7 +23,8 @@
       "roster": "Roster",
       "weeklyPrep": "Weekly prep",
       "publications": "Publications",
-      "history": "History"
+      "history": "History",
+      "users": "Users"
     }
   },
   "teachers": {
@@ -245,6 +246,42 @@
       "newEnd": "New closing time"
     }
   },
+  "users": {
+    "title": "Users",
+    "subtitle": "Users are the people who can sign in.",
+    "addUser": "Add User",
+    "table": {
+      "name": "Name",
+      "signInEmail": "Sign-in email",
+      "role": "Role",
+      "teacher": "Linked teacher",
+      "status": "Status"
+    },
+    "roles": {
+      "administrator": "Administrator",
+      "teacher": "Teacher"
+    },
+    "status": {
+      "active": "Active",
+      "deleted": "Deleted"
+    },
+    "noTeacher": "None",
+    "name": "Name",
+    "signInEmail": "Sign-in email",
+    "role": "Role",
+    "teacher": "Linked teacher",
+    "chooseTeacher": "Choose a teacher",
+    "alreadyHasUser": "Already has a User",
+    "teacherHintRequired": "Required for the Teacher Role.",
+    "teacherHintOptional": "Optional. Link a teacher if this Administrator also teaches.",
+    "teacherLinkFixed": "The linked teacher can't be changed after the User is created.",
+    "teacherRequired": "Choose the teacher this User signs in for.",
+    "temporaryPassword": "Temporary password",
+    "temporaryPasswordHint": "No email is sent. Give the password to the person yourself.",
+    "created": "User added",
+    "loadFailed": "Loading users failed",
+    "onlyOneUserHint": "Only you can sign in so far. Add a User for each teacher who should sign in."
+  },
   "studentForm": {
     "loading": "Loading the form...",
     "weekCaption": "Week {{weekNumber}} · {{weekRange}}",
@@ -436,10 +473,16 @@
     "targetSessionCountMustBePositive": "Ask for at least one lesson.",
     "teacherAlreadyAssignedToCar": "This teacher is already assigned to the car. Refresh the page.",
     "teacherAlreadyDeleted": "This teacher was already deleted. Refresh the page.",
+    "teacherAlreadyLinkedToUser": "This teacher already has a User. Refresh the page.",
     "teacherMustNotHaveActiveUser": "This teacher still has an active User, so they can't be deleted.",
     "teacherNameMustNotBeEmpty": "Enter the teacher's name.",
     "teacherNotAssignedToCar": "This teacher isn't assigned to the car. Refresh the page.",
     "teacherNotFound": "This teacher no longer exists. Refresh the page.",
+    "temporaryPasswordMustNotBeEmpty": "Enter a temporary password.",
+    "userNameMustNotBeEmpty": "Enter the User's name.",
+    "userNotFound": "This User no longer exists. Refresh the page.",
+    "userSignInEmailAlreadyInUse": "Another User already signs in with this email.",
+    "userWithTeacherRoleMustHaveLinkedTeacher": "A Teacher-role User must be linked to a teacher.",
     "weekScheduleAlreadyExists": "This teacher's week is already prepared. Refresh the page.",
     "weekScheduleNotFound": "This teacher's week isn't prepared yet.",
     "weekStartMustBeSunday": "A week starts on Sunday.",

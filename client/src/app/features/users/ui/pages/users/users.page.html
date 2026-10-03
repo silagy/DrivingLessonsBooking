@@ -1,0 +1,60 @@
+<div class="users">
+  <header class="users__header">
+    <div>
+      <h2 class="users__title">{{ 'users.title' | transloco }}</h2>
+      <p class="users__subtitle">{{ 'users.subtitle' | transloco }}</p>
+    </div>
+    <p-button
+      [label]="'users.addUser' | transloco"
+      icon="pi pi-user-plus"
+      [disabled]="store.isMutating()"
+      (onClick)="onAddUser()" />
+  </header>
+
+  @if (store.isLoading()) {
+    <div class="users__state"><p-progressSpinner /></div>
+  } @else if (store.loadError(); as errorKey) {
+    <p class="users__error">{{ errorKey | transloco }}</p>
+  } @else {
+    <section class="users__table-card">
+      <p-table [value]="store.users()" dataKey="id">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'users.table.name' | transloco }}</th>
+            <th>{{ 'users.table.signInEmail' | transloco }}</th>
+            <th>{{ 'users.table.role' | transloco }}</th>
+            <th>{{ 'users.table.teacher' | transloco }}</th>
+            <th>{{ 'users.table.status' | transloco }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user>
+          <tr [class.users__row--deleted]="user.isDeleted">
+            <td>{{ user.name }}</td>
+            <td><bdi dir="ltr">{{ user.signInEmail }}</bdi></td>
+            <td>
+              <p-tag [value]="('users.roles.' + user.role) | transloco" [severity]="roleTagSeverity[user.role]" />
+            </td>
+            <td>
+              @if (user.teacherName; as teacherName) {
+                {{ teacherName }}
+              } @else {
+                <span class="users__muted">{{ 'users.noTeacher' | transloco }}</span>
+              }
+            </td>
+            <td>
+              @if (user.isDeleted) {
+                <p-tag severity="secondary" [value]="'users.status.deleted' | transloco" />
+              } @else {
+                <p-tag severity="success" [value]="'users.status.active' | transloco" />
+              }
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    @if (store.hasOnlyOneUser()) {
+      <p class="users__hint">{{ 'users.onlyOneUserHint' | transloco }}</p>
+    }
+  }
+</div>

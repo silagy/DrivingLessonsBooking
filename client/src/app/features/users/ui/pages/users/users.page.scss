@@ -1,0 +1,56 @@
+.users__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.users__title {
+    margin: 0;
+    font-family: var(--app-font-display);
+    font-weight: 500;
+    font-size: 1.625rem;
+    color: var(--app-ink);
+    letter-spacing: -0.01em;
+}
+
+.users__subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.84rem;
+    color: var(--app-text-secondary);
+}
+
+.users__table-card {
+    margin-block-start: 1.125rem;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-shadow-card);
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+}
+
+.users__row--deleted td {
+    color: var(--app-text-muted);
+}
+
+.users__muted {
+    color: var(--app-text-muted);
+}
+
+.users__state {
+    display: flex;
+    justify-content: center;
+    padding-block: 3rem;
+}
+
+.users__error {
+    color: var(--p-red-500);
+    margin-block-start: 1.5rem;
+}
+
+.users__hint {
+    margin-block-start: 0.875rem;
+    font-size: 0.85rem;
+    color: var(--app-text-secondary);
+}
