@@ -21,7 +21,7 @@ import { ReopenPublicationRequest } from '../data/reopen-publication.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { SlotCountForGetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
 import { TeacherOption } from '../domain/teacher-option.model';
-import { buildWeekOptions, WeekOption, weekRangeLabel } from '../domain/week-options';
+import { buildWeekOptions, WeekOption, weekRangeLabel, withWeekOption } from '../domain/week-options';
 import { parseIsoDate } from '../../../shared/dates/parse-iso-date';
 
 const HTTP_NOT_FOUND = 404;
@@ -89,6 +89,10 @@ export class PublicationsStore {
     });
 
     readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
+
+    readonly weekChoices = computed<WeekOption[]>(() =>
+        withWeekOption(this.weekOptions(), this.selectedWeekStartState(), this.language.locale()),
+    );
 
     readonly weekLabel = computed<string>(() => {
         const weekStart = parseIsoDate(this.selectedWeekStartState());

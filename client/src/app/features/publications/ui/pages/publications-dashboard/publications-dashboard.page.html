@@ -21,7 +21,14 @@
                 }
             </div>
             <div class="dashboard__subtitle">
-                <span><bdi>{{ store.weekLabel() }}</bdi></span>
+                <p-select
+                    styleClass="dashboard__week-select"
+                    [options]="store.weekChoices()"
+                    optionLabel="label"
+                    optionValue="weekStart"
+                    [ngModel]="store.selectedWeekStart()"
+                    (ngModelChange)="store.selectWeek($event)"
+                    [ariaLabel]="'publications.week' | transloco" />
                 @if (windowStatus(); as status) {
                     <span class="dashboard__subtitle-part">{{ status.key | transloco: { moment: status.moment } }}</span>
                 }

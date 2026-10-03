@@ -47,9 +47,31 @@
 .dashboard__subtitle {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     margin-block-start: 4px;
+}
+
+.dashboard__subtitle-part {
     font-size: 0.85rem;
     color: var(--app-text-secondary);
+}
+
+:host ::ng-deep .dashboard__week-select {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+
+    .p-select-label {
+        padding: 0;
+        font-size: 0.85rem;
+        color: var(--app-text-secondary);
+    }
+
+    .p-select-dropdown {
+        width: auto;
+        padding-inline-start: 4px;
+        color: var(--app-text-secondary);
+    }
 }
 
 .dashboard__subtitle-part::before {

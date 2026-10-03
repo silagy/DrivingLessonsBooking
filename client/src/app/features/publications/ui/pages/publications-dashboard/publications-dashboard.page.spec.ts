@@ -93,4 +93,15 @@ describe('PublicationsDashboardPage', () => {
         //then
         expect(page.querySelector('app-share-link-box')).toBeNull();
     });
+
+    it('shows the selected week in the week picker', async () => {
+        //given
+        const store = fakeStore({});
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.dashboard__week-select .p-select-label')?.textContent?.trim()).toBe(WEEK_LABEL);
+    });
 });
