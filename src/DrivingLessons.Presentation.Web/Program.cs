@@ -4,8 +4,8 @@ using System.Text.Json.Serialization;
 using DrivingLessons.Presentation.Web.Filters;
 using DrivingLessons.Presentation.Web.OpenApi;
 using DrivingLessons.Application;
+using DrivingLessons.Application.Commands.SeedFirstAdministrator;
 using DrivingLessons.Infrastructure;
-using DrivingLessons.Infrastructure.Auth;
 using DrivingLessons.Infrastructure.Options;
 using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -56,7 +56,9 @@ await using (var scope = app.Services.CreateAsyncScope())
     var db = scope.ServiceProvider.GetRequiredService<DrivingLessonsDbContext>();
     await db.Database.MigrateAsync();
     var adminOptions = scope.ServiceProvider.GetRequiredService<IOptions<AdminOptions>>().Value;
-    await AdminSeeder.SeedAsync(db, adminOptions);
+    var seedFirstAdministrator = scope.ServiceProvider.GetRequiredService<SeedFirstAdministratorInteractor>();
+    var seedRequest = new SeedFirstAdministratorRequest(adminOptions.Name, adminOptions.Email, adminOptions.Password);
+    await seedFirstAdministrator.ExecuteAsync(seedRequest);
 }
 
 if (app.Environment.IsDevelopment())

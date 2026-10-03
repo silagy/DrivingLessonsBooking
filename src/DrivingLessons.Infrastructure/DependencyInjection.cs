@@ -46,7 +46,6 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddScoped<IAdminAccountGateway, AdminAccountGateway>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<ITeacherQueries, TeacherQueries>();
