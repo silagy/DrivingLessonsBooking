@@ -1,4 +1,5 @@
 using DrivingLessons.Application.Auth;
+using DrivingLessons.Domain.Values;
 using DrivingLessons.Infrastructure.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,13 @@ public sealed class AdminAccountGateway(DrivingLessonsDbContext dbContext) : IAd
                         .AsNoTracking()
                         .FirstOrDefaultAsync(a => a.Email == normalizedEmail, cancellationToken);
 
-        return admin is null ? null : new AdminAccount(admin.Id, admin.Email, admin.PasswordHash);
+        if (admin is null)
+        {
+            return null;
+        }
+
+        var passwordHash = PasswordHash.Of(admin.PasswordHash);
+
+        return new AdminAccount(admin.Id, admin.Email, passwordHash);
     }
 }

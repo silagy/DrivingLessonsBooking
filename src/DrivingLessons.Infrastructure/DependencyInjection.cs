@@ -65,7 +65,7 @@ public static class DependencyInjection
         services.AddScoped<IRosterCsvParser, RosterCsvParser>();
         services.AddScoped<IExcelGenerator, ExcelGenerator>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();
-        services.AddSingleton<IPasswordVerifier, PasswordVerifier>();
+        services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddSingleton(TimeProvider.System);

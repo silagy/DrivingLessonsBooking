@@ -4,7 +4,7 @@ namespace DrivingLessons.Application.Auth;
 
 public sealed class LoginInteractor(
     IAdminAccountGateway accounts,
-    IPasswordVerifier passwords,
+    IPasswordHasher passwords,
     IJwtTokenGenerator tokens)
 {
     public async Task<LoginResult> Handle(LoginCommand command, CancellationToken cancellationToken)
