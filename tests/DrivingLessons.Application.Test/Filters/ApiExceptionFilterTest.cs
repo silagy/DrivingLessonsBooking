@@ -105,6 +105,21 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Teacher_With_An_Active_User_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new TeacherMustNotHaveActiveUserException(TeacherId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "teacherMustNotHaveActiveUser");
+    }
+
+    [TestMethod]
     public void Closed_Window_Keeps_Its_Problem_Type_And_Carries_Its_Rule_As_Code()
     {
         //given

@@ -436,6 +436,7 @@
     "targetSessionCountMustBePositive": "בקשו לפחות שיעור אחד.",
     "teacherAlreadyAssignedToCar": "המורה כבר משויך לרכב הזה. רעננו את הדף.",
     "teacherAlreadyDeleted": "המורה הזה כבר נמחק. רעננו את הדף.",
+    "teacherMustNotHaveActiveUser": "למורה הזה יש משתמש פעיל, ולכן אי אפשר למחוק אותו.",
     "teacherNameMustNotBeEmpty": "הזינו את שם המורה.",
     "teacherNotAssignedToCar": "המורה לא משויך לרכב הזה. רעננו את הדף.",
     "teacherNotFound": "המורה הזה כבר לא קיים. רעננו את הדף.",

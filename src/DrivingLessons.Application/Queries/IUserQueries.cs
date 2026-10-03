@@ -13,4 +13,6 @@ public interface IUserQueries
     Task<bool> ExistsWithSignInEmailAsync(Email signInEmail);
 
     Task<bool> ExistsLinkedToTeacherAsync(TeacherId teacherId);
+
+    Task<bool> ActiveExistsLinkedToTeacherAsync(TeacherId teacherId);
 }

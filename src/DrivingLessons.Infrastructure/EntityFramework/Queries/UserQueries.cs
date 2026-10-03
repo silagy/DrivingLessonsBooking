@@ -80,4 +80,11 @@ public class UserQueries : IUserQueries
                          .Users
                          .AnyAsync(x => x.TeacherId == teacherId);
     }
+
+    public async Task<bool> ActiveExistsLinkedToTeacherAsync(TeacherId teacherId)
+    {
+        return await dbContext
+                         .Users
+                         .AnyAsync(x => x.TeacherId == teacherId && !x.IsDeleted);
+    }
 }

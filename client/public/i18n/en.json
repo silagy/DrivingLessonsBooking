@@ -436,6 +436,7 @@
     "targetSessionCountMustBePositive": "Ask for at least one lesson.",
     "teacherAlreadyAssignedToCar": "This teacher is already assigned to the car. Refresh the page.",
     "teacherAlreadyDeleted": "This teacher was already deleted. Refresh the page.",
+    "teacherMustNotHaveActiveUser": "This teacher still has an active User, so they can't be deleted.",
     "teacherNameMustNotBeEmpty": "Enter the teacher's name.",
     "teacherNotAssignedToCar": "This teacher isn't assigned to the car. Refresh the page.",
     "teacherNotFound": "This teacher no longer exists. Refresh the page.",
