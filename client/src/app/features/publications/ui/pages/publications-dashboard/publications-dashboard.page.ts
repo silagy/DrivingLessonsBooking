@@ -4,7 +4,8 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { DialogService } from 'primeng/dynamicdialog';
 import { WeekGridComponent } from '../../../../../shared/components/week-grid/week-grid.component';
 import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
@@ -33,6 +34,7 @@ interface WindowStatus {
     selector: 'app-publications-dashboard-page',
     imports: [
         FormsModule,
+        RouterLink,
         TranslocoPipe,
         ButtonModule,
         SelectModule,
@@ -58,6 +60,7 @@ export class PublicationsDashboardPage {
     private readonly route = inject(ActivatedRoute);
 
     protected readonly PublicationState = PublicationState;
+    protected readonly appRoutes = AppRoutes;
 
     readonly teacherId = input<string>();
     readonly week = input<string>();

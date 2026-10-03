@@ -123,6 +123,40 @@ describe('PublicationsDashboardPage', () => {
         expect(page.querySelector('.dashboard__week-select .p-select-label')?.textContent?.trim()).toBe(WEEK_LABEL);
     });
 
+    it('explains that the week is not prepared and links to weekly prep', async () => {
+        //given
+        const store = fakeStore({
+            state: signal(undefined),
+            publication: signal(undefined),
+            hasPublication: signal(false),
+            weekNumber: signal(undefined),
+        });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.dashboard__empty')).not.toBeNull();
+        expect(page.querySelector('.dashboard__empty a')?.getAttribute('href')).toBe('/week-schedules');
+    });
+
+    it('shows the spinner rather than the empty state while loading', async () => {
+        //given
+        const store = fakeStore({
+            state: signal(undefined),
+            publication: signal(undefined),
+            hasPublication: signal(false),
+            isLoading: signal(true),
+        });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.dashboard__empty')).toBeNull();
+        expect(page.querySelector('p-progressspinner')).not.toBeNull();
+    });
+
     it('moves to the picked week through the URL and drops a pending publish request', async () => {
         //given
         const store = fakeStore({});

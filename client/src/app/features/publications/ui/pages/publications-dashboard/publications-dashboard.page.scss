@@ -122,6 +122,17 @@
     line-height: 1.55;
 }
 
+.dashboard__empty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    .dashboard__notice {
+        margin: 0;
+    }
+}
+
 .dashboard__state {
     display: flex;
     justify-content: center;

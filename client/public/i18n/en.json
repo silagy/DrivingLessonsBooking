@@ -219,7 +219,8 @@
       "weekTitle": "- Week {{weekNumber}}",
       "opensAt": "Submissions open {{moment}}",
       "closesAt": "Submissions close {{moment}}",
-      "closedAt": "Submissions closed {{moment}}"
+      "closedAt": "Submissions closed {{moment}}",
+      "prepareWeek": "Prepare this week"
     },
     "history": {
       "title": "Publications history",
