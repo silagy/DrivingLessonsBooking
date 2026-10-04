@@ -14,13 +14,14 @@
       dir="ltr"
       autocomplete="off" />
     @if (form.controls.signInEmail.dirty && form.controls.signInEmail.invalid) {
-      <small class="field__error">{{ 'formErrors.emailInvalid' | transloco }}</small>
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ 'formErrors.emailInvalid' | transloco }}</small>
     }
   </div>
 
   <div class="field">
     <label id="user-role-label">{{ 'users.role' | transloco }}</label>
     <p-selectbutton
+      class="role-switch"
       formControlName="role"
       [options]="roleOptions"
       optionLabel="label"
@@ -30,7 +31,12 @@
   </div>
 
   <div class="field">
-    <label for="user-teacher">{{ 'users.teacher' | transloco }}</label>
+    <label for="user-teacher">
+      {{ 'users.teacher' | transloco }}
+      @if (!teacherLinkRequired()) {
+        <span class="field__optional">{{ 'users.optional' | transloco }}</span>
+      }
+    </label>
     <p-select
       inputId="user-teacher"
       formControlName="teacherId"
@@ -53,10 +59,9 @@
     </p-select>
     <small class="field__hint">
       {{ (teacherLinkRequired() ? 'users.teacherHintRequired' : 'users.teacherHintOptional') | transloco }}
-      {{ 'users.teacherLinkFixed' | transloco }}
     </small>
     @if (form.hasError(teacherLinkMissing) && form.controls.teacherId.touched) {
-      <small class="field__error">{{ 'users.teacherRequired' | transloco }}</small>
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ 'users.teacherRequired' | transloco }}</small>
     }
   </div>
 

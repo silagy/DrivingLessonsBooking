@@ -5,33 +5,27 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { Role } from '../../../domain/role.enum';
 import { UsersStore } from '../../../state/users.store';
 import { AddUserDialog, AddUserDialogData, AddUserResult } from '../../dialogs/add-user/add-user.dialog';
 
-type RoleTagSeverity = 'info' | 'secondary';
-
-const ROLE_TAG_SEVERITY: Record<string, RoleTagSeverity> = {
-    [Role.administrator]: 'info',
-    [Role.teacher]: 'secondary',
-};
-
 @Component({
     selector: 'app-users-page',
-    imports: [TranslocoPipe, ButtonModule, ProgressSpinnerModule, TableModule, TagModule],
+    imports: [TranslocoPipe, InitialsPipe, ButtonModule, ProgressSpinnerModule, TableModule, TagModule],
     templateUrl: './users.page.html',
     styleUrl: './users.page.scss',
     providers: [UsersStore, DialogService],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersPage {
-    private static readonly dialogWidth = '30rem';
+    private static readonly dialogWidth = '33.75rem';
 
     protected readonly store = inject(UsersStore);
     private readonly dialogs = inject(DialogService);
     private readonly transloco = inject(TranslocoService);
 
-    protected readonly roleTagSeverity = ROLE_TAG_SEVERITY;
+    protected readonly roles = Role;
 
     protected onAddUser(): void {
         const data: AddUserDialogData = { teachers: this.store.linkableTeachers() };

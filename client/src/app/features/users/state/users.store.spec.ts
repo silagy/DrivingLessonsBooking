@@ -98,6 +98,19 @@ describe('UsersStore', () => {
         expect(store.loadError()).toBe('users.loadFailed');
     });
 
+    it('loads the Users again when asked to retry', async () => {
+        //given
+        const store = createStore(() => of([ADMINISTRATOR]), () => NEVER);
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+
+        //when
+        store.reload();
+
+        //then
+        await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
+    });
+
     it('marks the Teachers that already have a User, ordered by name', async () => {
         //given
         const store = createStore(() => of([ADMINISTRATOR, TEACHER_USER]), () => NEVER);

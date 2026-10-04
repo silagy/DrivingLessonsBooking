@@ -1,20 +1,19 @@
 .dialog-form {
   display: flex;
   flex-direction: column;
-  gap: 1.125rem;
+  gap: 1rem;
   padding-block-start: 0.25rem;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.375rem;
 
   label {
-    font-family: var(--app-font-display);
-    font-weight: 700;
-    font-size: 0.8rem;
-    color: var(--app-ink);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--p-surface-500);
   }
 
   input {
@@ -22,15 +21,23 @@
   }
 }
 
-.field__hint {
-  font-size: 0.72rem;
-  line-height: 1.4;
+.field__optional {
+  font-weight: 400;
   color: var(--app-text-muted);
 }
 
+.field__hint {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--app-text-secondary);
+}
+
 .field__error {
-  color: var(--p-red-500);
-  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--p-red-600);
+  font-size: 0.78rem;
 }
 
 .dialog-form__actions {

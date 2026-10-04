@@ -40,6 +40,10 @@ export class UsersStore {
     readonly hasOnlyOneUser = computed(() => this.users().length === SINGLE_USER_COUNT);
     readonly isMutating = this.mutating.asReadonly();
 
+    reload(): void {
+        this.usersResource.reload();
+    }
+
     async create(request: CreateUserRequest): Promise<void> {
         this.mutating.set(true);
 
