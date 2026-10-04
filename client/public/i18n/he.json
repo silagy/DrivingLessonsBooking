@@ -15,6 +15,8 @@
   "shell": {
     "title": "מערכת תכנון שיעורי נהיגה",
     "logout": "התנתקות",
+    "userMenu": "תפריט משתמש",
+    "changeMyPassword": "שינוי הסיסמה שלי",
     "languageToggle": "English",
     "language": "שפה",
     "nav": {
@@ -312,6 +314,16 @@
     "detailsChanged": "הפרטים נשמרו",
     "roleChanged": "התפקיד שונה",
     "temporaryPasswordSet": "הסיסמה הזמנית הוגדרה"
+  },
+  "myPassword": {
+    "title": "שינוי הסיסמה שלי",
+    "current": "סיסמה נוכחית",
+    "new": "סיסמה חדשה",
+    "confirm": "אימות הסיסמה החדשה",
+    "save": "שינוי סיסמה",
+    "mismatch": "הסיסמאות לא תואמות.",
+    "changed": "הסיסמה שונתה",
+    "changedDetail": "נשארת מחובר/ת."
   },
   "studentForm": {
     "loading": "טוען את הטופס...",

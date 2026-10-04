@@ -52,19 +52,36 @@
     <div class="shell__actions">
       <app-language-toggle />
 
-      <div class="shell__user">
+      <p-button
+        [styleClass]="isUserMenuOpen() ? 'shell__user shell__user--open' : 'shell__user'"
+        [ariaLabel]="'shell.userMenu' | transloco"
+        severity="secondary"
+        text
+        (onClick)="onUserMenu($event)">
         <span class="shell__avatar" aria-hidden="true">{{ initials() }}</span>
         @if (auth.email(); as email) {
-          <bdi class="shell__email">{{ email }}</bdi>
+          <bdi class="shell__email" dir="ltr">{{ email }}</bdi>
         }
-      </div>
+        <i class="pi pi-chevron-down shell__chevron" [class.shell__chevron--open]="isUserMenuOpen()" aria-hidden="true"></i>
+      </p-button>
 
-      <p-button
-        [label]="'shell.logout' | transloco"
-        (onClick)="auth.logout()"
-        severity="secondary"
-        size="small"
-        text />
+      <p-menu
+        #userMenu
+        [model]="userMenuItems()"
+        [popup]="true"
+        appendTo="body"
+        styleClass="shell-user-menu"
+        (onShow)="isUserMenuOpen.set(true)"
+        (onHide)="isUserMenuOpen.set(false)">
+        <ng-template #start>
+          <div class="shell-user-menu__header">
+            <span class="shell__avatar shell__avatar--large" aria-hidden="true">{{ initials() }}</span>
+            @if (auth.email(); as email) {
+              <bdi class="shell-user-menu__email" dir="ltr">{{ email }}</bdi>
+            }
+          </div>
+        </ng-template>
+      </p-menu>
     </div>
   </header>
 
