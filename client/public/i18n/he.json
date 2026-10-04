@@ -296,7 +296,21 @@
     "deleted": "המשתמש נמחק",
     "restored": "המשתמש שוחזר",
     "restoredDetail": "{{name}} יכול/ה להיכנס שוב.",
-    "refusedTitle": "הפעולה לא בוצעה"
+    "refusedTitle": "הפעולה לא בוצעה",
+    "editDetails": "עריכת פרטים",
+    "changeRole": "שינוי תפקיד",
+    "setTemporaryPassword": "הגדרת סיסמה זמנית",
+    "linkLocked": "אי אפשר לשנות",
+    "newRole": "תפקיד חדש",
+    "currentRole": "(נוכחי)",
+    "promoteNote": "הקישור למורה {{teacher}} נשמר. מעכשיו תהיה גישה לכל המסכים.",
+    "demoteNote": "מעכשיו תהיה גישה רק למערכת השבועית ולפרסומים של {{teacher}}.",
+    "roleEffect": "השינוי ייכנס לתוקף בפעולה הבאה שלהם. ייתכן שהם יוצאו מהמערכת.",
+    "temporaryPasswordNote": "כל החיבורים הפעילים שלהם יסתיימו מיד. מסרו להם את הסיסמה החדשה בעצמכם.",
+    "setPassword": "הגדרת סיסמה",
+    "detailsChanged": "הפרטים נשמרו",
+    "roleChanged": "התפקיד שונה",
+    "temporaryPasswordSet": "הסיסמה הזמנית הוגדרה"
   },
   "studentForm": {
     "loading": "טוען את הטופס...",

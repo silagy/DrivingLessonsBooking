@@ -1,0 +1,12 @@
+<div class="who-card">
+  <span class="who-card__avatar" aria-hidden="true">{{ user().name | initials }}</span>
+  <span class="who-card__identity">
+    <span class="who-card__name">{{ user().name }}</span>
+    <bdi dir="ltr" class="who-card__email">{{ user().signInEmail }}</bdi>
+  </span>
+  <p-tag
+    class="who-card__role"
+    [class.who-card__role--administrator]="user().role === roles.administrator"
+    [class.who-card__role--teacher]="user().role === roles.teacher"
+    [value]="('users.roles.' + user().role) | transloco" />
+</div>

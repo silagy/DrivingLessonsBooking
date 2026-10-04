@@ -10,34 +10,3 @@
   font-size: 0.75rem;
   color: var(--app-text-muted);
 }
-
-:host ::ng-deep .role-switch.p-selectbutton {
-  display: flex;
-  gap: 2px;
-  padding: 3px;
-  background: var(--app-bg-muted);
-  border: 1px solid var(--app-border);
-  border-radius: 999px;
-
-  .p-togglebutton {
-    flex: 1;
-    justify-content: center;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--app-text-secondary);
-  }
-
-  .p-togglebutton-content {
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .p-togglebutton-checked {
-    background: var(--app-bg-card);
-    border-color: var(--app-border);
-    color: var(--app-ink);
-    font-weight: 600;
-    box-shadow: var(--app-shadow-card);
-  }
-}

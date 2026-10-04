@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Type, inject, signal, viewChild } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -13,7 +13,16 @@ import { Role } from '../../../domain/role.enum';
 import { User } from '../../../domain/user.model';
 import { UsersStore } from '../../../state/users.store';
 import { AddUserDialog, AddUserDialogData, AddUserResult } from '../../dialogs/add-user/add-user.dialog';
+import {
+    ChangeUserRoleDialog,
+    ChangeUserRoleDialogData,
+} from '../../dialogs/change-user-role/change-user-role.dialog';
 import { DeleteUserDialog, DeleteUserDialogData } from '../../dialogs/delete-user/delete-user.dialog';
+import { EditUserDialog, EditUserDialogData } from '../../dialogs/edit-user/edit-user.dialog';
+import {
+    SetTemporaryPasswordDialog,
+    SetTemporaryPasswordDialogData,
+} from '../../dialogs/set-temporary-password/set-temporary-password.dialog';
 
 @Component({
     selector: 'app-users-page',
@@ -25,6 +34,7 @@ import { DeleteUserDialog, DeleteUserDialogData } from '../../dialogs/delete-use
 })
 export class UsersPage {
     private static readonly dialogWidth = '33.75rem';
+    private static readonly userDialogWidth = '32.5rem';
     private static readonly deleteDialogWidth = '31.25rem';
 
     protected readonly store = inject(UsersStore);
@@ -56,6 +66,22 @@ export class UsersPage {
     protected onRowActions(event: Event, user: User): void {
         this.rowActions.set([
             {
+                label: this.transloco.translate('users.editDetails'),
+                icon: 'pi pi-pencil',
+                command: () => this.onEditUser(user),
+            },
+            {
+                label: this.transloco.translate('users.changeRole'),
+                icon: 'pi pi-shield',
+                command: () => this.onChangeRole(user),
+            },
+            {
+                label: this.transloco.translate('users.setTemporaryPassword'),
+                icon: 'pi pi-key',
+                command: () => this.onSetTemporaryPassword(user),
+            },
+            { separator: true },
+            {
                 label: this.transloco.translate('users.delete'),
                 icon: 'pi pi-trash',
                 styleClass: 'users-menu__item--danger',
@@ -69,9 +95,55 @@ export class UsersPage {
         void this.store.restore(user);
     }
 
-    private onDeleteUser(user: User): void {
-        this.store.clearRefusal();
+    private onEditUser(user: User): void {
+        const data: EditUserDialogData = {
+            user,
+            refusal: this.store.refusal,
+            isSaving: this.store.isMutating,
+            confirm: (request) => this.store.changeDetails(user.id, request),
+        };
 
+        this.openUserDialog(
+            EditUserDialog,
+            this.transloco.translate('users.editDetails'),
+            UsersPage.userDialogWidth,
+            data,
+        );
+    }
+
+    private onChangeRole(user: User): void {
+        const data: ChangeUserRoleDialogData = {
+            user,
+            refusal: this.store.refusal,
+            isSaving: this.store.isMutating,
+            confirm: (request) => this.store.changeRole(user.id, request),
+        };
+
+        this.openUserDialog(
+            ChangeUserRoleDialog,
+            this.transloco.translate('users.changeRole'),
+            UsersPage.userDialogWidth,
+            data,
+        );
+    }
+
+    private onSetTemporaryPassword(user: User): void {
+        const data: SetTemporaryPasswordDialogData = {
+            user,
+            refusal: this.store.refusal,
+            isSaving: this.store.isMutating,
+            confirm: (request) => this.store.setTemporaryPassword(user.id, request),
+        };
+
+        this.openUserDialog(
+            SetTemporaryPasswordDialog,
+            this.transloco.translate('users.setTemporaryPassword'),
+            UsersPage.userDialogWidth,
+            data,
+        );
+    }
+
+    private onDeleteUser(user: User): void {
         const data: DeleteUserDialogData = {
             user,
             refusal: this.store.refusal,
@@ -79,9 +151,20 @@ export class UsersPage {
             confirm: () => this.store.delete(user.id),
         };
 
-        this.dialogs.open(DeleteUserDialog, {
-            header: this.transloco.translate('users.deleteTitle', { name: isolateDirection(user.name) }),
-            width: UsersPage.deleteDialogWidth,
+        this.openUserDialog(
+            DeleteUserDialog,
+            this.transloco.translate('users.deleteTitle', { name: isolateDirection(user.name) }),
+            UsersPage.deleteDialogWidth,
+            data,
+        );
+    }
+
+    private openUserDialog(component: Type<unknown>, header: string, width: string, data: unknown): void {
+        this.store.clearRefusal();
+
+        this.dialogs.open(component, {
+            header,
+            width,
             modal: true,
             dismissableMask: true,
             data,

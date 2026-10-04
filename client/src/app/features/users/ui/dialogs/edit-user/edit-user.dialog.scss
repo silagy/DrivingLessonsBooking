@@ -1,0 +1,31 @@
+.field__label {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--p-surface-500);
+}
+
+.locked-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  block-size: 42px;
+  padding-inline: 0.75rem;
+  border-radius: 6px;
+  background: var(--app-bg-muted);
+  border: 1px dashed var(--app-border);
+}
+
+.locked-field__icon {
+  font-size: 0.9rem;
+  color: var(--app-text-secondary);
+}
+
+.locked-field__value {
+  font-size: 0.9rem;
+  color: var(--app-ink);
+}
+
+.locked-field__note {
+  font-size: 0.78rem;
+  color: var(--app-text-muted);
+}

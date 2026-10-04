@@ -296,7 +296,21 @@
     "deleted": "User deleted",
     "restored": "User restored",
     "restoredDetail": "{{name}} can sign in again.",
-    "refusedTitle": "That didn't go through"
+    "refusedTitle": "That didn't go through",
+    "editDetails": "Edit details",
+    "changeRole": "Change Role",
+    "setTemporaryPassword": "Set Temporary Password",
+    "linkLocked": "can't be changed",
+    "newRole": "New Role",
+    "currentRole": "(current)",
+    "promoteNote": "The link to {{teacher}} is kept. They get access to every screen.",
+    "demoteNote": "From now on they only see {{teacher}}'s Week Schedules and Publications.",
+    "roleEffect": "The change takes effect on their next action. They may be signed out.",
+    "temporaryPasswordNote": "Their current sessions end immediately. Tell them the new password yourself.",
+    "setPassword": "Set password",
+    "detailsChanged": "Details saved",
+    "roleChanged": "Role changed",
+    "temporaryPasswordSet": "Temporary Password set"
   },
   "studentForm": {
     "loading": "Loading the form...",

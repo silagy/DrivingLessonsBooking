@@ -1,0 +1,45 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+  @if (refusal(); as message) {
+    <p-message severity="error">
+      <span class="dialog-form__refusal-text">
+        <strong>{{ 'users.refusedTitle' | transloco }}</strong>
+        <span>{{ message }}</span>
+      </span>
+    </p-message>
+  }
+
+  <div class="field">
+    <label for="edit-user-name">{{ 'users.name' | transloco }}</label>
+    <input pInputText id="edit-user-name" formControlName="name" />
+  </div>
+
+  <div class="field">
+    <label for="edit-user-sign-in-email">{{ 'users.signInEmail' | transloco }}</label>
+    <input
+      pInputText
+      id="edit-user-sign-in-email"
+      formControlName="signInEmail"
+      type="email"
+      dir="ltr"
+      autocomplete="off" />
+    @if (form.controls.signInEmail.dirty && form.controls.signInEmail.invalid) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ 'formErrors.emailInvalid' | transloco }}</small>
+    }
+  </div>
+
+  @if (user.teacherName; as teacherName) {
+    <div class="field">
+      <span class="field__label">{{ 'users.teacher' | transloco }}</span>
+      <div class="locked-field">
+        <i class="pi pi-lock locked-field__icon" aria-hidden="true"></i>
+        <span class="locked-field__value">{{ teacherName }}</span>
+        <span class="locked-field__note">· {{ 'users.linkLocked' | transloco }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="dialog-form__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+    <p-button [label]="'general.save' | transloco" type="submit" [disabled]="form.invalid || isSaving()" />
+  </div>
+</form>

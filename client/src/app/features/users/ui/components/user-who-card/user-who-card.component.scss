@@ -1,0 +1,62 @@
+.who-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: 10px;
+    background: var(--app-bg-page);
+    border: 1px solid var(--app-border);
+}
+
+.who-card__avatar {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 34px;
+    block-size: 34px;
+    border-radius: 999px;
+    background: var(--app-steel-light);
+    color: var(--app-whale);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.who-card__identity {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+}
+
+.who-card__name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--app-ink);
+}
+
+.who-card__email {
+    font-size: 0.8rem;
+    color: var(--app-text-secondary);
+}
+
+.who-card__role {
+    margin-inline-start: auto;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.who-card__role--administrator {
+    background: var(--p-sky-50);
+    color: var(--p-sky-700);
+    border-color: var(--p-sky-100);
+}
+
+.who-card__role--teacher {
+    background: var(--p-ocean-50);
+    color: var(--p-ocean-700);
+    border-color: var(--p-ocean-100);
+}
