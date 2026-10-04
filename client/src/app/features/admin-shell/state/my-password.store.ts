@@ -18,6 +18,10 @@ export class MyPasswordStore {
     readonly refusal = this.refusalMessage.asReadonly();
 
     async change(request: ChangeMyPasswordRequest): Promise<boolean> {
+        if (this.saving()) {
+            return false;
+        }
+
         this.saving.set(true);
         this.refusalMessage.set(null);
 

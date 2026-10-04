@@ -45,7 +45,7 @@ export class ChangeMyPasswordDialog {
     );
 
     protected async submit(): Promise<void> {
-        if (this.form.invalid) {
+        if (this.form.invalid || this.isSaving()) {
             return;
         }
 

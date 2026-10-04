@@ -91,6 +91,20 @@ describe('MyPasswordStore', () => {
         expect(store.isSaving()).toBe(true);
     });
 
+    it('ignores a second change while one is in flight', async () => {
+        //given
+        const store = createStore(() => NEVER);
+        const api = TestBed.inject(MeApiService);
+        void store.change(REQUEST);
+
+        //when
+        const second = await store.change(REQUEST);
+
+        //then
+        expect(second).toBe(false);
+        expect(api.changeMyPassword).toHaveBeenCalledTimes(1);
+    });
+
     it('starts a new change without the previous refusal', async () => {
         //given
         let calls = 0;
