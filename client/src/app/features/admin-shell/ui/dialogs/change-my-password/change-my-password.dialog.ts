@@ -7,7 +7,7 @@ import { PasswordModule } from 'primeng/password';
 import { ChangeMyPasswordRequest } from '../../../data/change-my-password.request';
 import { passwordsMatch } from '../../../domain/passwords-match';
 import { MyPasswordStore } from '../../../state/my-password.store';
-import { DialogRefusalComponent } from '../../components/dialog-refusal/dialog-refusal.component';
+import { DialogRefusalComponent } from '../../../../../shared/components/dialog-refusal/dialog-refusal.component';
 
 const PASSWORDS_MISMATCH = 'passwordsMismatch';
 
@@ -22,7 +22,7 @@ function matchingPasswords(group: AbstractControl): ValidationErrors | null {
     selector: 'app-change-my-password-dialog',
     imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, PasswordModule, DialogRefusalComponent],
     templateUrl: './change-my-password.dialog.html',
-    styleUrl: '../dialog-form.scss',
+    styleUrl: '../../../../../shared/dialogs/dialog-form.scss',
     providers: [MyPasswordStore],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

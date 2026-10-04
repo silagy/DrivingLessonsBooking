@@ -44,7 +44,7 @@ Task 5 spells out the layout and copy, so it can be built without the `claude_de
 | Precedent | `SetUserTemporaryPasswordInteractor` (value object → hash → domain → commit) and its test | `Application\Commands\SetUserTemporaryPassword\`, `tests\DrivingLessons.Application.Test\Commands\` |
 | Client auth | `AuthService`: `token` signal, `email` / `userId` from the token, `login()` stores the token in `localStorage['auth_token']`, `logout()` | `client\src\app\core\auth.service.ts` |
 | Admin shell | Top bar: logo, nav, language toggle, avatar initials + email, a text "Sign out" button. No user menu, no `DialogService`. | `client\src\app\features\admin-shell\admin-shell.component.*` |
-| Dialog building blocks | `dialog-form.scss` (`.dialog-form`, `.field`, `.field__error`, `.dialog-form__actions`), `DialogRefusalComponent` (error `p-message` titled `users.refusedTitle`), dialogs built with `DynamicDialog` + reactive forms + `p-password` | `client\src\app\features\users\ui\` |
+| Dialog building blocks | `dialog-form.scss` (`.dialog-form`, `.field`, `.field__error`, `.dialog-form__actions`), `DialogRefusalComponent` (error `p-message` titled `general.refusedTitle`), dialogs built with `DynamicDialog` + reactive forms + `p-password` | `client\src\app\shared\components\dialog-refusal\` and `client\src\app\shared\dialogs\dialog-form.scss` (moved here from `features\users`) |
 
 ## Decisions (made while planning, challenge on review)
 
@@ -56,7 +56,7 @@ Task 5 spells out the layout and copy, so it can be built without the `claude_de
 | 4 | **A new `Password` value object for the new password** (`Password.Of`: non-blank, kept verbatim with spaces, `PasswordMustNotBeEmptyException`). `TemporaryPassword` is a different concept and its error copy says "temporary". No length or complexity rule: the spec gives none, and `TemporaryPassword` has none. |
 | 5 | **Interactor order:** load the signed-in User (missing → `UserNotFoundException`) → `Password.Of(newPassword)` → verify the current password (a `null` current password counts as empty, so it's wrong) → hash → `user.ChangePassword` → commit → issue the token. Validating the new password first keeps a blank form from reaching the hasher. |
 | 6 | **Route:** `PUT api/me/password` on a new `MeCommandController` (`Controllers\Me\`), tag "Me". It returns `200` with `ChangeMyPasswordResponse { accessToken, expiresAtUtc }`, the same shape as `LoginResult`. There is no class-level policy, so the fallback (authenticated User) lets Teacher-role Users in (AC 2). |
-| 7 | **The client lives in the `users` feature**, so the dialog reuses `dialog-form.scss` and `DialogRefusalComponent` without moving them: `data\me-api.service.ts` (one service per controller pair: Me), `state\my-password.store.ts`, `ui\dialogs\change-my-password\`. The admin shell imports the dialog. |
+| 7 | **The client lives in the `admin-shell` feature**, because the dialog opens from the shell's user menu and one feature must not import another. The dialog building blocks it shares with the `users` dialogs moved to `shared\`: `DialogRefusalComponent` to `shared\components\dialog-refusal\` and `dialog-form.scss` to `shared\dialogs\`, with the title key renamed to `general.refusedTitle` so `shared\` stays feature-agnostic. The slice: `data\me-api.service.ts` (one service per controller pair: Me), `state\my-password.store.ts`, `ui\dialogs\change-my-password\`. The admin shell imports the dialog. |
 | 8 | **The dialog provides its own `MyPasswordStore`** (`providers: [MyPasswordStore]`). Each opening gets a fresh store, so a reopened dialog never shows the previous refusal. The shell has no store and passes no data. |
 | 9 | **The confirmation check is client-side only** (design 9b, "Mismatch (client-side)"). The pure `passwordsMatch` lives in `domain\`, and the request carries only `currentPassword` and `newPassword`. It is UX feedback, not a business rule (CLAUDE.md rule 12). |
 | 10 | **User menu scope.** The menu header shows the avatar initials and the sign-in email (dir="ltr"). Name, Role tag and linked Teacher (design 2c) aren't in the token and belong to slice (2), "Roles, policies and Teacher scoping". "Sign out" keeps the existing `shell.logout` key and copy instead of the mock's "Log out". |
@@ -125,11 +125,13 @@ Before anything touches the database, switch to the compose Postgres instead of 
 | `tests\DrivingLessons.Application.Test\Filters\ApiExceptionFilterTest.cs` | Two cases | 2 |
 | `client\public\i18n\en.json`, `he.json` | `errors.*` (2); `myPassword.*`, `shell.*` (5) | 2, 5 |
 | `src\DrivingLessons.Presentation.Web\Controllers\Me\MeCommandController.cs` | **New** | 3 |
-| `client\src\app\core\auth.service.ts`, `.spec.ts` | `useToken` | 4 |
-| `client\src\app\features\users\data\change-my-password.request.ts`, `change-my-password.response.ts`, `me-api.service.ts` | **New** | 4 |
-| `client\src\app\features\users\domain\passwords-match.ts`, `.spec.ts` | **New** | 4 |
-| `client\src\app\features\users\state\my-password.store.ts`, `.spec.ts` | **New** | 4 |
-| `client\src\app\features\users\ui\dialogs\change-my-password\*` | **New** | 5 |
+| `client\src\app\core\auth.service.ts`, `.spec.ts` | `useToken`, `storedToken` | 4 |
+| `client\src\app\core\auth.interceptor.ts`, `.spec.ts` | A 401 adopts a newer stored token instead of signing out | final review |
+| `client\src\app\features\admin-shell\data\change-my-password.request.ts`, `change-my-password.response.ts`, `me-api.service.ts` | **New** | 4 |
+| `client\src\app\features\admin-shell\domain\passwords-match.ts`, `.spec.ts` | **New** | 4 |
+| `client\src\app\features\admin-shell\state\my-password.store.ts`, `.spec.ts` | **New** | 4 |
+| `client\src\app\features\admin-shell\ui\dialogs\change-my-password\*` | **New** | 5 |
+| `client\src\app\shared\components\dialog-refusal\*`, `client\src\app\shared\dialogs\dialog-form.scss` | Moved from `features\users`, shared by both features; title key is `general.refusedTitle` | final review |
 | `client\src\app\features\admin-shell\admin-shell.component.ts`, `.html`, `.scss` | User menu, opens the dialog | 5 |
 | `docs\modules\auth\users-and-roles-design.md` | Slice (4) links this plan | plan commit |
 

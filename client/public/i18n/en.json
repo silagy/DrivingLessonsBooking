@@ -298,7 +298,6 @@
     "deleted": "User deleted",
     "restored": "User restored",
     "restoredDetail": "{{name}} can sign in again.",
-    "refusedTitle": "That didn't go through",
     "editDetails": "Edit details",
     "changeRole": "Change Role",
     "setTemporaryPassword": "Set Temporary Password",
@@ -457,6 +456,7 @@
     }
   },
   "general": {
+    "refusedTitle": "That didn't go through",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",

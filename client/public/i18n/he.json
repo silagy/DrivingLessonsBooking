@@ -298,7 +298,6 @@
     "deleted": "המשתמש נמחק",
     "restored": "המשתמש שוחזר",
     "restoredDetail": "{{name}} יכול/ה להיכנס שוב.",
-    "refusedTitle": "הפעולה לא בוצעה",
     "editDetails": "עריכת פרטים",
     "changeRole": "שינוי תפקיד",
     "setTemporaryPassword": "הגדרת סיסמה זמנית",
@@ -457,6 +456,7 @@
     }
   },
   "general": {
+    "refusedTitle": "הפעולה לא בוצעה",
     "save": "שמירה",
     "cancel": "ביטול",
     "delete": "מחיקה",

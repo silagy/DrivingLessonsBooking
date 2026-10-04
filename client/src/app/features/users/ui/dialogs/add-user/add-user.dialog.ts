@@ -53,7 +53,7 @@ const teacherLinkValidator: ValidatorFn = (group: AbstractControl): ValidationEr
         SelectButtonModule,
     ],
     templateUrl: './add-user.dialog.html',
-    styleUrls: ['../dialog-form.scss', './add-user.dialog.scss'],
+    styleUrls: ['../../../../../shared/dialogs/dialog-form.scss', './add-user.dialog.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddUserDialog {

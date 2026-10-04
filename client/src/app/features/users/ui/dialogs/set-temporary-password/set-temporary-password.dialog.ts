@@ -6,7 +6,7 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { SetUserTemporaryPasswordRequest } from '../../../data/set-user-temporary-password.request';
-import { DialogRefusalComponent } from '../../components/dialog-refusal/dialog-refusal.component';
+import { DialogRefusalComponent } from '../../../../../shared/components/dialog-refusal/dialog-refusal.component';
 import { UserWhoCardComponent } from '../../components/user-who-card/user-who-card.component';
 import { UserDialogData } from '../user-dialog-data';
 
@@ -18,7 +18,7 @@ export interface SetTemporaryPasswordDialogData extends UserDialogData<SetUserTe
     selector: 'app-set-temporary-password-dialog',
     imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, MessageModule, PasswordModule, DialogRefusalComponent, UserWhoCardComponent],
     templateUrl: './set-temporary-password.dialog.html',
-    styleUrl: '../dialog-form.scss',
+    styleUrl: '../../../../../shared/dialogs/dialog-form.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SetTemporaryPasswordDialog {

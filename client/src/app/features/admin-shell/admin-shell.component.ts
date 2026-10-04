@@ -9,7 +9,7 @@ import { AuthService } from '../../core/auth.service';
 import { AppRoutes } from '../../shared/config/app-routes';
 import { BrandLogoComponent } from '../../shared/brand-logo/brand-logo.component';
 import { LanguageToggleComponent } from '../../shared/language-toggle/language-toggle.component';
-import { ChangeMyPasswordDialog } from '../users/ui/dialogs/change-my-password/change-my-password.dialog';
+import { ChangeMyPasswordDialog } from './ui/dialogs/change-my-password/change-my-password.dialog';
 
 @Component({
   selector: 'app-admin-shell',
