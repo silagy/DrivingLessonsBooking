@@ -2,6 +2,7 @@ import { Injectable, computed, inject, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { isolateDirection } from '../../../shared/text/isolate-direction';
 import { CreateUserRequest } from '../data/create-user.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { UsersApiService } from '../data/users-api.service';
@@ -89,7 +90,7 @@ export class UsersStore {
 
         try {
             await firstValueFrom(this.api.restoreUser(user.id));
-            this.toast.success('users.restored', { key: 'users.restoredDetail', params: { name: user.name } });
+            this.toast.success('users.restored', { key: 'users.restoredDetail', params: { name: isolateDirection(user.name) } });
             this.usersResource.reload();
         } catch (error) {
             this.toast.apiError(error);

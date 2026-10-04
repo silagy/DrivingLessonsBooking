@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { NEVER, Observable, of, throwError } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { isolateDirection } from '../../../shared/text/isolate-direction';
 import { CreateUserRequest } from '../data/create-user.request';
 import { CreateUserResponse } from '../data/create-user.response';
 import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
@@ -299,7 +300,7 @@ describe('UsersStore', () => {
         expect(api.restoreUser).toHaveBeenCalledWith('user-nahum');
         expect(toast.success).toHaveBeenCalledWith('users.restored', {
             key: 'users.restoredDetail',
-            params: { name: 'Gil Nahum' },
+            params: { name: isolateDirection('Gil Nahum') },
         });
         await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
         expect(store.isMutating()).toBe(false);
