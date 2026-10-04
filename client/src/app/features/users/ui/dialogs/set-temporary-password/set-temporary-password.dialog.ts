@@ -10,6 +10,10 @@ import { DialogRefusalComponent } from '../../components/dialog-refusal/dialog-r
 import { UserWhoCardComponent } from '../../components/user-who-card/user-who-card.component';
 import { UserDialogData } from '../user-dialog-data';
 
+export interface SetTemporaryPasswordDialogData extends UserDialogData<SetUserTemporaryPasswordRequest> {
+    isSelf: boolean;
+}
+
 @Component({
     selector: 'app-set-temporary-password-dialog',
     imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, MessageModule, PasswordModule, DialogRefusalComponent, UserWhoCardComponent],
@@ -20,11 +24,12 @@ import { UserDialogData } from '../user-dialog-data';
 export class SetTemporaryPasswordDialog {
     private readonly fb = inject(FormBuilder);
     private readonly ref = inject(DynamicDialogRef);
-    private readonly data = inject(DynamicDialogConfig<UserDialogData<SetUserTemporaryPasswordRequest>>).data as UserDialogData<SetUserTemporaryPasswordRequest>;
+    private readonly data = inject(DynamicDialogConfig<SetTemporaryPasswordDialogData>).data as SetTemporaryPasswordDialogData;
 
     protected readonly user = this.data.user;
     protected readonly refusal = this.data.refusal;
     protected readonly isSaving = this.data.isSaving;
+    protected readonly isSelf = this.data.isSelf;
 
     protected readonly form = this.fb.nonNullable.group({
         temporaryPassword: ['', Validators.required],

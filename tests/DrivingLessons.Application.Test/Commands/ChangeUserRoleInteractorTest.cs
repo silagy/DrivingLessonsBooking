@@ -130,6 +130,21 @@ public class ChangeUserRoleInteractorTest
     }
 
     [TestMethod]
+    public async Task Linked_Administrator_Gets_The_Teacher_Role_When_Another_Administrator_Remains()
+    {
+        //given
+        A.CallTo(() => queries.CountActiveAdministratorsAsync()).Returns(2);
+        var request = new ChangeUserRoleRequest(Role.Teacher);
+
+        //when
+        await interactor.ExecuteAsync(linkedAdministrator.Id.Value, request);
+
+        //then
+        linkedAdministrator.Role.ShouldBe(Role.Teacher);
+        A.CallTo(() => unitOfWork.CommitAsync()).MustHaveHappenedOnceExactly();
+    }
+
+    [TestMethod]
     public async Task Same_Role_Is_Rejected_Without_Counting_Administrators()
     {
         //given

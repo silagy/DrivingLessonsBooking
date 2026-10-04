@@ -123,7 +123,7 @@ Switch the language to English, then check:
 - `dir` is `ltr`, and the kebab sits at the right end.
 - The menu reads "Edit details", "Change Role", "Set Temporary Password", then "Delete".
 - Edit details shows "Linked Teacher", the lock icon and "· can't be changed".
-- Change Role shows "New Role", "Teacher (current)" (or "Administrator (current)"), the promote or demote note with the Hebrew name isolated, "The change takes effect on their next action. They may be signed out." and the buttons "Cancel" and "Change Role".
+- Change Role shows "New Role", "Teacher (current)" (or "Administrator (current)"), the promote or demote note with the Hebrew name isolated, "The change takes effect on their next action, and they'll need to sign in again." and the buttons "Cancel" and "Change Role".
 - Set Temporary Password shows "Their current sessions end immediately. Tell them the new password yourself." and "Set password".
 - The toasts read "Details saved", "Role changed" and "Temporary Password set".
 

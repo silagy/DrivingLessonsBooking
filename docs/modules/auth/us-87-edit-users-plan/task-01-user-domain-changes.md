@@ -423,7 +423,7 @@ In `src\DrivingLessons.Domain\Entities\User.cs`, add these public methods after 
         MustNotBeDeleted();
         MustHaveDefinedRole(role);
         MustNotHaveRole(role);
-        MustBeLinkedToTeacherForTeacherRole(role);
+        MustHaveLinkedTeacherToTakeTeacherRole(role);
 
         Role = role;
         SecurityStamp = SecurityStamp.New();
@@ -453,7 +453,7 @@ Then add these private guards after `MustHaveLinkedTeacherForTeacherRole`:
         }
     }
 
-    private void MustBeLinkedToTeacherForTeacherRole(Role role)
+    private void MustHaveLinkedTeacherToTakeTeacherRole(Role role)
     {
         if (role is Role.Teacher
             && TeacherId is null)

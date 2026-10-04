@@ -120,7 +120,7 @@ Before anything touches the database, switch to the compose Postgres instead of 
 
 | File | Change | Task |
 |------|--------|------|
-| `src\DrivingLessons.Domain\Entities\User.cs` | `ChangeDetails`, `ChangeRole`, `SetTemporaryPassword`, `MustNotHaveRole`, `MustBeLinkedToTeacherForTeacherRole` | 1 |
+| `src\DrivingLessons.Domain\Entities\User.cs` | `ChangeDetails`, `ChangeRole`, `SetTemporaryPassword`, `MustNotHaveRole`, `MustHaveLinkedTeacherToTakeTeacherRole` | 1 |
 | `src\DrivingLessons.Domain\Events\UserDetailsChanged.cs`, `UserRoleChanged.cs`, `UserTemporaryPasswordSet.cs` | **New** | 1 |
 | `src\DrivingLessons.Domain\Exceptions\UserAlreadyHasRoleException.cs` | **New** | 1 |
 | `tests\DrivingLessons.Domain.Test\Entities\UserTest.cs` | New tests | 1 |

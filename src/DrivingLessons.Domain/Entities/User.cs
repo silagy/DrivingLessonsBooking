@@ -95,7 +95,7 @@ public class User : AggregateRoot<UserId>
         MustNotBeDeleted();
         MustHaveDefinedRole(role);
         MustNotHaveRole(role);
-        MustBeLinkedToTeacherForTeacherRole(role);
+        MustHaveLinkedTeacherToTakeTeacherRole(role);
 
         Role = role;
         SecurityStamp = SecurityStamp.New();
@@ -138,7 +138,7 @@ public class User : AggregateRoot<UserId>
         }
     }
 
-    private void MustBeLinkedToTeacherForTeacherRole(Role role)
+    private void MustHaveLinkedTeacherToTakeTeacherRole(Role role)
     {
         if (role is Role.Teacher
             && TeacherId is null)

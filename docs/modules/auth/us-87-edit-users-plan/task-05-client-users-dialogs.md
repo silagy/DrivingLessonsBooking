@@ -23,7 +23,7 @@
   - `otherRole(role: Role): Role` and `roleChangeNoteKey(newRole: Role, teacherName: string | null): string | null`
   - `<app-user-who-card [user]="user" />`
   - The three dialogs. Each one's data is `{ user: User; refusal: Signal<string | null>; isSaving: Signal<boolean>; confirm: (request) => Promise<boolean> }`, and it closes only when `confirm` resolves to `true`.
-  - Translation keys `users.editDetails`, `users.changeRole`, `users.setTemporaryPassword`, `users.linkLocked`, `users.newRole`, `users.currentRole`, `users.promoteNote`, `users.demoteNote`, `users.roleEffect`, `users.temporaryPasswordNote`, `users.setPassword`, `users.detailsChanged`, `users.roleChanged`, `users.temporaryPasswordSet`.
+  - Translation keys `users.editDetails`, `users.changeRole`, `users.setTemporaryPassword`, `users.linkLocked`, `users.newRole`, `users.currentRole`, `users.promoteNote`, `users.demoteNote`, `users.roleEffect`, `users.temporaryPasswordNote`, `users.temporaryPasswordSelfNote`, `users.setPassword`, `users.detailsChanged`, `users.roleChanged`, `users.temporaryPasswordSet`.
 
 **Why:**
 - #87 AC 7: the Users screen gets Edit, Change Role and Set Temporary Password actions, and 409 violations appear translated.
@@ -39,7 +39,7 @@
   - An optional error message comes first, then the who-card (avatar, name, LTR email, Role tag).
   - The "New Role" pill switch has the current Role disabled and labelled "(current)".
   - Then comes an info message: the promote note when the new Role is Administrator, or the demote note when it's Teacher and the User is linked.
-  - Last comes a muted line with an info icon: "The change takes effect on their next action. They may be signed out."
+  - Last comes a muted line with an info icon: "The change takes effect on their next action, and they'll need to sign in again."
   - The footer has Cancel and Change Role. The notes are hidden while a refusal shows.
 - **7a, Set Temporary Password:** the who-card, then the "Temporary Password" password field (shown in the frame) and the info message "Their current sessions end immediately. Tell them the new password yourself." The footer has Cancel and Set password.
 - Copy comes from the design's copy deck: `act.*`, `edit.*`, `role.*` and `temp.*`.
@@ -773,8 +773,9 @@ In `client\public\i18n\he.json`, inside `"users"`, add after `"refusedTitle"` (p
     "currentRole": "(נוכחי)",
     "promoteNote": "הקישור למורה {{teacher}} נשמר. מעכשיו תהיה גישה לכל המסכים.",
     "demoteNote": "מעכשיו תהיה גישה רק למערכת השבועית ולפרסומים של {{teacher}}.",
-    "roleEffect": "השינוי ייכנס לתוקף בפעולה הבאה שלהם. ייתכן שהם יוצאו מהמערכת.",
+    "roleEffect": "השינוי ייכנס לתוקף בפעולה הבאה שלהם, והם יצטרכו להיכנס שוב.",
     "temporaryPasswordNote": "כל החיבורים הפעילים שלהם יסתיימו מיד. מסרו להם את הסיסמה החדשה בעצמכם.",
+    "temporaryPasswordSelfNote": "זו הסיסמה שלך. מיד אחרי השמירה תצאו מהמערכת - היכנסו שוב עם הסיסמה החדשה.",
     "setPassword": "הגדרת סיסמה",
     "detailsChanged": "הפרטים נשמרו",
     "roleChanged": "התפקיד שונה",
@@ -792,8 +793,9 @@ In `client\public\i18n\en.json`, at the same place:
     "currentRole": "(current)",
     "promoteNote": "The link to {{teacher}} is kept. They get access to every screen.",
     "demoteNote": "From now on they only see {{teacher}}'s Week Schedules and Publications.",
-    "roleEffect": "The change takes effect on their next action. They may be signed out.",
+    "roleEffect": "The change takes effect on their next action, and they'll need to sign in again.",
     "temporaryPasswordNote": "Their current sessions end immediately. Tell them the new password yourself.",
+    "temporaryPasswordSelfNote": "This is your own password. You're signed out right after saving - sign in again with the new password.",
     "setPassword": "Set password",
     "detailsChanged": "Details saved",
     "roleChanged": "Role changed",

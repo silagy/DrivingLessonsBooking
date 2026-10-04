@@ -11,7 +11,6 @@ import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { isolateDirection } from '../../../../../shared/text/isolate-direction';
 import { ChangeUserDetailsRequest } from '../../../data/change-user-details.request';
 import { ChangeUserRoleRequest } from '../../../data/change-user-role.request';
-import { SetUserTemporaryPasswordRequest } from '../../../data/set-user-temporary-password.request';
 import { Role } from '../../../domain/role.enum';
 import { User } from '../../../domain/user.model';
 import { UsersStore } from '../../../state/users.store';
@@ -19,7 +18,7 @@ import { AddUserDialog, AddUserDialogData, AddUserResult } from '../../dialogs/a
 import { ChangeUserRoleDialog } from '../../dialogs/change-user-role/change-user-role.dialog';
 import { DeleteUserDialog, DeleteUserDialogData } from '../../dialogs/delete-user/delete-user.dialog';
 import { EditUserDialog } from '../../dialogs/edit-user/edit-user.dialog';
-import { SetTemporaryPasswordDialog } from '../../dialogs/set-temporary-password/set-temporary-password.dialog';
+import { SetTemporaryPasswordDialog, SetTemporaryPasswordDialogData } from '../../dialogs/set-temporary-password/set-temporary-password.dialog';
 import { UserDialogData } from '../../dialogs/user-dialog-data';
 
 @Component({
@@ -126,8 +125,9 @@ export class UsersPage {
     }
 
     private onSetTemporaryPassword(user: User): void {
-        const data: UserDialogData<SetUserTemporaryPasswordRequest> = {
+        const data: SetTemporaryPasswordDialogData = {
             user,
+            isSelf: user.id === this.store.currentUserId(),
             refusal: this.store.refusal,
             isSaving: this.store.isMutating,
             confirm: (request) => this.store.setTemporaryPassword(user.id, request),
