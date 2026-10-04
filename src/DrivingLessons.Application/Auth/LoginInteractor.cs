@@ -1,23 +1,42 @@
 using DrivingLessons.Application.Common.Exceptions;
+using DrivingLessons.Domain.Exceptions;
+using DrivingLessons.Domain.Repositories;
+using DrivingLessons.Domain.Values;
 
 namespace DrivingLessons.Application.Auth;
 
 public sealed class LoginInteractor(
-    IAdminAccountGateway accounts,
-    IPasswordVerifier passwords,
+    IUserRepository users,
+    IPasswordHasher passwords,
     IJwtTokenGenerator tokens)
 {
-    public async Task<LoginResult> Handle(LoginCommand command, CancellationToken cancellationToken)
+    public async Task<LoginResult> ExecuteAsync(LoginCommand command)
     {
-        var normalizedEmail = command.Email?.Trim().ToLowerInvariant() ?? string.Empty;
-        var account = await accounts.FindByEmailAsync(normalizedEmail, cancellationToken);
+        var signInEmail = SignInEmailOf(command.Email) ?? throw new AuthenticationFailedException();
+        var user = await users.GetByEmailAsync(signInEmail);
+        var password = command.Password ?? string.Empty;
 
-        if (account is null || !passwords.Verify(account.PasswordHash, command.Password ?? string.Empty))
+        if (user is null
+            || user.IsDeleted
+            || !passwords.Verify(user.PasswordHash, password))
         {
             throw new AuthenticationFailedException();
         }
 
-        var issued = tokens.Generate(account.Id, account.Email);
+        var issued = tokens.Generate(user);
+
         return new LoginResult(issued.AccessToken, issued.ExpiresAtUtc);
+    }
+
+    private static Email? SignInEmailOf(string? rawEmail)
+    {
+        try
+        {
+            return Email.Of(rawEmail ?? string.Empty);
+        }
+        catch (EmailMustBeValidException)
+        {
+            return null;
+        }
     }
 }

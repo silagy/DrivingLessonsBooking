@@ -1,0 +1,85 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+  <div class="field">
+    <label for="user-name">{{ 'users.name' | transloco }}</label>
+    <input pInputText id="user-name" formControlName="name" />
+  </div>
+
+  <div class="field">
+    <label for="user-sign-in-email">{{ 'users.signInEmail' | transloco }}</label>
+    <input
+      pInputText
+      id="user-sign-in-email"
+      formControlName="signInEmail"
+      type="email"
+      dir="ltr"
+      autocomplete="off" />
+    @if (form.controls.signInEmail.dirty && form.controls.signInEmail.invalid) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ 'formErrors.emailInvalid' | transloco }}</small>
+    }
+  </div>
+
+  <div class="field">
+    <label id="user-role-label">{{ 'users.role' | transloco }}</label>
+    <p-selectbutton
+      class="role-switch"
+      formControlName="role"
+      [options]="roleOptions"
+      optionLabel="label"
+      optionValue="value"
+      [allowEmpty]="false"
+      ariaLabelledBy="user-role-label" />
+  </div>
+
+  <div class="field">
+    <label for="user-teacher">
+      {{ 'users.teacher' | transloco }}
+      @if (!teacherLinkRequired()) {
+        <span class="field__optional">{{ 'users.optional' | transloco }}</span>
+      }
+    </label>
+    <p-select
+      inputId="user-teacher"
+      formControlName="teacherId"
+      [options]="teachers"
+      optionLabel="name"
+      optionValue="id"
+      optionDisabled="alreadyLinked"
+      [placeholder]="'users.chooseTeacher' | transloco"
+      [showClear]="!teacherLinkRequired()"
+      appendTo="body"
+      fluid>
+      <ng-template pTemplate="item" let-teacher>
+        <span class="teacher-option">
+          <span>{{ teacher.name }}</span>
+          @if (teacher.alreadyLinked) {
+            <small class="teacher-option__note">{{ 'users.alreadyHasUser' | transloco }}</small>
+          }
+        </span>
+      </ng-template>
+    </p-select>
+    <small class="field__hint">
+      {{ (teacherLinkRequired() ? 'users.teacherHintRequired' : 'users.teacherHintOptional') | transloco }}
+    </small>
+    @if (form.hasError(teacherLinkMissing) && form.controls.teacherId.touched) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ 'users.teacherRequired' | transloco }}</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="user-temporary-password">{{ 'users.temporaryPassword' | transloco }}</label>
+    <p-password
+      inputId="user-temporary-password"
+      formControlName="temporaryPassword"
+      [feedback]="false"
+      [toggleMask]="true"
+      autocomplete="new-password"
+      dir="ltr"
+      fluid />
+    <small class="field__hint">{{ 'users.temporaryPasswordHint' | transloco }}</small>
+  </div>
+
+  <div class="dialog-form__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+    <p-button [label]="'general.save' | transloco" type="submit" [disabled]="form.invalid" />
+  </div>
+</form>

@@ -46,7 +46,8 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddScoped<IAdminAccountGateway, AdminAccountGateway>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserQueries, UserQueries>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
         services.AddScoped<ITeacherQueries, TeacherQueries>();
         services.AddScoped<ICarRepository, CarRepository>();
@@ -64,7 +65,7 @@ public static class DependencyInjection
         services.AddScoped<IRosterCsvParser, RosterCsvParser>();
         services.AddScoped<IExcelGenerator, ExcelGenerator>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();
-        services.AddSingleton<IPasswordVerifier, PasswordVerifier>();
+        services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddSingleton(TimeProvider.System);

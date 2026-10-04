@@ -1,6 +1,6 @@
 # ADR 0004: No Admin Domain Aggregate
 
-**Status:** Accepted
+**Status:** Superseded by issue [#84](https://github.com/silagy/DrivingLessonsBooking/issues/84): sign-in now uses the `User` aggregate. The replacement ADR comes with the docs slice of spec [#82](https://github.com/silagy/DrivingLessonsBooking/issues/82).
 **Date:** 14 June 2026
 
 ## Context

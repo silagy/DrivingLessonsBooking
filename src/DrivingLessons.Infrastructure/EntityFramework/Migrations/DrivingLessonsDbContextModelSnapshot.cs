@@ -235,6 +235,53 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("teachers", (string)null);
                 });
 
+            modelBuilder.Entity("DrivingLessons.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer")
+                        .HasColumnName("role");
+
+                    b.Property<string>("SecurityStamp")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("security_stamp");
+
+                    b.Property<string>("SignInEmail")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)")
+                        .HasColumnName("email");
+
+                    b.Property<Guid?>("TeacherId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("teacher_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SignInEmail")
+                        .IsUnique();
+
+                    b.ToTable("users", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Domain.Entities.WeekSchedule", b =>
                 {
                     b.Property<Guid>("Id")
@@ -255,29 +302,6 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                         .IsUnique();
 
                     b.ToTable("week_schedules", (string)null);
-                });
-
-            modelBuilder.Entity("DrivingLessons.Infrastructure.Auth.AdminUser", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(320)
-                        .HasColumnType("character varying(320)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("admin_users", (string)null);
                 });
 
             modelBuilder.Entity("DrivingLessons.Domain.Entities.Car", b =>

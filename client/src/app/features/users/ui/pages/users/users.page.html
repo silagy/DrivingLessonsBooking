@@ -1,0 +1,90 @@
+<div class="users">
+  <header class="users__header">
+    <div>
+      <h2 class="users__title">{{ 'users.title' | transloco }}</h2>
+      <p class="users__subtitle">{{ 'users.subtitle' | transloco }}</p>
+    </div>
+    <p-button
+      [label]="'users.addUser' | transloco"
+      [disabled]="store.isMutating() || !!store.loadError()"
+      (onClick)="onAddUser()" />
+  </header>
+
+  <section class="users__card">
+    @if (store.isLoading()) {
+      <div class="users__state">
+        <p-progressSpinner />
+        <span class="users__state-text">{{ 'users.loading' | transloco }}</span>
+      </div>
+    } @else if (store.loadError(); as errorKey) {
+      <div class="users__state">
+        <span class="users__error">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          {{ errorKey | transloco }}
+        </span>
+        <p-button [label]="'users.retry' | transloco" text size="small" (onClick)="store.reload()" />
+      </div>
+    } @else {
+      <p-table [value]="store.users()" dataKey="id">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'users.table.name' | transloco }}</th>
+            <th>{{ 'users.table.signInEmail' | transloco }}</th>
+            <th>{{ 'users.table.role' | transloco }}</th>
+            <th>{{ 'users.table.teacher' | transloco }}</th>
+            <th>{{ 'users.table.status' | transloco }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user>
+          <tr [class.users__row--deleted]="user.isDeleted">
+            <td>
+              <span class="users__name">
+                <span class="users__avatar" aria-hidden="true">{{ user.name | initials }}</span>
+                <span class="users__name-text">{{ user.name }}</span>
+              </span>
+            </td>
+            <td class="users__email"><bdi dir="ltr">{{ user.signInEmail }}</bdi></td>
+            <td>
+              <p-tag
+                class="users__tag"
+                [class.users__tag--administrator]="!user.isDeleted && user.role === roles.administrator"
+                [class.users__tag--teacher]="!user.isDeleted && user.role === roles.teacher"
+                [class.users__tag--muted]="user.isDeleted"
+                [value]="('users.roles.' + user.role) | transloco" />
+            </td>
+            <td>
+              @if (user.teacherName; as teacherName) {
+                {{ teacherName }}
+              } @else {
+                <span class="users__muted">{{ 'users.noTeacher' | transloco }}</span>
+              }
+            </td>
+            <td>
+              @if (user.isDeleted) {
+                <p-tag class="users__tag" severity="secondary" [value]="'users.status.deleted' | transloco" />
+              } @else {
+                <p-tag class="users__tag" severity="success" [value]="'users.status.active' | transloco" />
+              }
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      @if (store.hasOnlyOneUser()) {
+        <div class="users__empty">
+          <span class="users__empty-icon" aria-hidden="true"><i class="pi pi-user"></i></span>
+          <p class="users__empty-title">{{ 'users.emptyTitle' | transloco }}</p>
+          <p class="users__empty-hint">{{ 'users.emptyHint' | transloco }}</p>
+          <p-button
+            class="users__empty-action"
+            [label]="'users.addUser' | transloco"
+            size="small"
+            [disabled]="store.isMutating()"
+            (onClick)="onAddUser()" />
+        </div>
+      } @else {
+        <p class="users__footer">{{ 'users.footer' | transloco: { count: store.users().length } }}</p>
+      }
+    }
+  </section>
+</div>

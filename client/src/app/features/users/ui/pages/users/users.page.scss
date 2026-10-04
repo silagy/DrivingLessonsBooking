@@ -1,0 +1,196 @@
+.users__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.users__title {
+    margin: 0;
+    font-family: var(--app-font-display);
+    font-weight: 600;
+    font-size: 1.625rem;
+    color: var(--app-ink);
+    letter-spacing: -0.01em;
+}
+
+.users__subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--app-text-secondary);
+}
+
+.users__card {
+    margin-block-start: 1.375rem;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-shadow-card);
+    overflow: hidden;
+}
+
+:host ::ng-deep .users__card .p-datatable {
+    overflow-x: auto;
+
+    .p-datatable-thead > tr > th {
+        padding: 0.75rem 1rem;
+        background: var(--app-bg-page);
+        border-block-end: 1px solid var(--app-border);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--app-text-secondary);
+        text-align: start;
+        white-space: nowrap;
+    }
+
+    .p-datatable-tbody > tr > td {
+        padding: 0.75rem 1rem;
+        border-block-end: 1px solid var(--app-bg-muted);
+        font-size: 0.875rem;
+        color: var(--app-ink);
+        vertical-align: middle;
+    }
+
+    .p-datatable-tbody > tr.users__row--deleted {
+        background: var(--app-bg-page);
+    }
+
+    .p-datatable-tbody > tr.users__row--deleted > td {
+        color: var(--app-text-muted);
+    }
+}
+
+.users__name {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.users__name-text {
+    font-weight: 600;
+}
+
+.users__avatar {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 30px;
+    block-size: 30px;
+    border-radius: 999px;
+    background: var(--app-steel-light);
+    color: var(--app-whale);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.users__row--deleted .users__avatar {
+    background: var(--app-bg-muted);
+    color: var(--app-text-muted);
+}
+
+.users__email {
+    color: var(--app-text-secondary);
+}
+
+.users__tag {
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.users__tag--administrator {
+    background: var(--p-sky-50);
+    color: var(--p-sky-700);
+    border-color: var(--p-sky-100);
+}
+
+.users__tag--teacher {
+    background: var(--p-ocean-50);
+    color: var(--p-ocean-700);
+    border-color: var(--p-ocean-100);
+}
+
+.users__tag--muted {
+    background: var(--app-bg-muted);
+    color: var(--app-text-muted);
+    border-color: var(--app-border);
+}
+
+.users__muted {
+    color: var(--app-text-muted);
+}
+
+.users__state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-block-size: 300px;
+}
+
+.users__state-text {
+    font-size: 0.85rem;
+    color: var(--app-text-secondary);
+}
+
+.users__error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--p-red-600);
+}
+
+.users__footer {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.78rem;
+    color: var(--app-text-muted);
+}
+
+.users__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2.375rem 1.5rem 2.625rem;
+    text-align: center;
+}
+
+.users__empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 44px;
+    block-size: 44px;
+    border-radius: 999px;
+    background: var(--app-bg-muted);
+    border: 1px solid var(--app-border);
+    color: var(--p-sky-500);
+    font-size: 1.25rem;
+}
+
+.users__empty-title {
+    margin: 0.25rem 0 0;
+    font-size: 1.06rem;
+    font-weight: 600;
+    color: var(--app-ink);
+}
+
+.users__empty-hint {
+    margin: 0;
+    max-inline-size: 460px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--app-text-secondary);
+}
+
+.users__empty-action {
+    margin-block-start: 0.625rem;
+}

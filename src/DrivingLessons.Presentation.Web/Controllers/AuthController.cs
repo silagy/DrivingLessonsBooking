@@ -10,6 +10,6 @@ public sealed class AuthController(LoginInteractor login) : ControllerBase
 {
     [HttpPost("login")]
     [AllowAnonymous]
-    public Task<LoginResult> Login([FromBody] LoginCommand command, CancellationToken cancellationToken) =>
-        login.Handle(command, cancellationToken);
+    public Task<LoginResult> Login([FromBody] LoginCommand command) =>
+        login.ExecuteAsync(command);
 }
