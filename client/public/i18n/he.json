@@ -15,6 +15,8 @@
   "shell": {
     "title": "מערכת תכנון שיעורי נהיגה",
     "logout": "התנתקות",
+    "userMenu": "תפריט משתמש",
+    "changeMyPassword": "שינוי הסיסמה שלי",
     "languageToggle": "English",
     "language": "שפה",
     "nav": {
@@ -296,7 +298,6 @@
     "deleted": "המשתמש נמחק",
     "restored": "המשתמש שוחזר",
     "restoredDetail": "{{name}} יכול/ה להיכנס שוב.",
-    "refusedTitle": "הפעולה לא בוצעה",
     "editDetails": "עריכת פרטים",
     "changeRole": "שינוי תפקיד",
     "setTemporaryPassword": "הגדרת סיסמה זמנית",
@@ -312,6 +313,16 @@
     "detailsChanged": "הפרטים נשמרו",
     "roleChanged": "התפקיד שונה",
     "temporaryPasswordSet": "הסיסמה הזמנית הוגדרה"
+  },
+  "myPassword": {
+    "title": "שינוי הסיסמה שלי",
+    "current": "סיסמה נוכחית",
+    "new": "סיסמה חדשה",
+    "confirm": "אימות הסיסמה החדשה",
+    "save": "שינוי סיסמה",
+    "mismatch": "הסיסמאות לא תואמות.",
+    "changed": "הסיסמה שונתה",
+    "changedDetail": "נשארת מחובר/ת."
   },
   "studentForm": {
     "loading": "טוען את הטופס...",
@@ -445,6 +456,7 @@
     }
   },
   "general": {
+    "refusedTitle": "הפעולה לא בוצעה",
     "save": "שמירה",
     "cancel": "ביטול",
     "delete": "מחיקה",
@@ -510,6 +522,7 @@
     "teacherNotAssignedToCar": "המורה לא משויך לרכב הזה. רעננו את הדף.",
     "teacherNotFound": "המורה הזה כבר לא קיים. רעננו את הדף.",
     "temporaryPasswordMustNotBeEmpty": "הזינו סיסמה זמנית.",
+    "passwordMustNotBeEmpty": "הזינו סיסמה חדשה.",
     "userNameMustNotBeEmpty": "הזינו את שם המשתמש.",
     "userNotFound": "המשתמש הזה כבר לא קיים. רעננו את הדף.",
     "userAlreadyDeleted": "המשתמש הזה כבר נמחק. רעננו את הדף.",
@@ -523,6 +536,7 @@
     "userRoleMustBeDefined": "בחרו תפקיד: מנהל או מורה.",
     "userSignInEmailAlreadyInUse": "האימייל הזה כבר משמש משתמש אחר.",
     "userWithTeacherRoleMustHaveLinkedTeacher": "אי אפשר להעביר לתפקיד מורה משתמש שלא מקושר למורה.",
+    "userCurrentPasswordMustBeCorrect": "הסיסמה הנוכחית שגויה.",
     "weekScheduleAlreadyExists": "השבוע של המורה הזה כבר הוכן. רעננו את הדף.",
     "weekScheduleNotFound": "השבוע של המורה הזה עדיין לא הוכן.",
     "weekStartMustBeSunday": "שבוע מתחיל ביום ראשון.",

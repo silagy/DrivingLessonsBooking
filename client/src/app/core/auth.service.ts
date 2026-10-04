@@ -47,12 +47,16 @@ export class AuthService {
   login(email: string, password: string) {
     return this.http
       .post<LoginResponse>('/api/auth/login', { email, password })
-      .pipe(
-        tap((response) => {
-          localStorage.setItem(TOKEN_KEY, response.accessToken);
-          this.token.set(response.accessToken);
-        }),
-      );
+      .pipe(tap((response) => this.useToken(response.accessToken)));
+  }
+
+  useToken(accessToken: string): void {
+    localStorage.setItem(TOKEN_KEY, accessToken);
+    this.token.set(accessToken);
+  }
+
+  storedToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY);
   }
 
   logout(): void {

@@ -14,7 +14,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !req.url.includes('/api/auth/login')) {
-        auth.logout();
+        const stored = auth.storedToken();
+
+        if (stored !== null && stored !== token) {
+          auth.useToken(stored);
+        } else {
+          auth.logout();
+        }
       }
       return throwError(() => error);
     }),

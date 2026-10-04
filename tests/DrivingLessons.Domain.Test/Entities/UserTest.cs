@@ -548,4 +548,106 @@ public class UserTest
         //then
         Should.Throw<UserAlreadyDeletedException>(act);
     }
+
+    [TestMethod]
+    public void ChangePassword()
+    {
+        //given
+        var user = new UserFakeBuilder().Build();
+        var passwordHash = PasswordHash.Of(Faker.FakeString());
+
+        //when
+        user.ChangePassword(passwordHash);
+
+        //then
+        user.PasswordHash.ShouldBe(passwordHash);
+    }
+
+    [TestMethod]
+    public void ChangePassword__Changes_The_Security_Stamp()
+    {
+        //given
+        var user = new UserFakeBuilder().Build();
+        var stampBefore = user.SecurityStamp;
+        var passwordHash = PasswordHash.Of(Faker.FakeString());
+
+        //when
+        user.ChangePassword(passwordHash);
+
+        //then
+        user.SecurityStamp.ShouldNotBe(stampBefore);
+    }
+
+    [TestMethod]
+    [DataRow(Role.Administrator)]
+    [DataRow(Role.Teacher)]
+    public void ChangePassword__Keeps_The_Role_And_The_Linked_Teacher(Role role)
+    {
+        //given
+        var user = new UserFakeBuilder()
+                   .WithRole(role)
+                   .Build();
+        var teacherBefore = user.TeacherId;
+        var passwordHash = PasswordHash.Of(Faker.FakeString());
+
+        //when
+        user.ChangePassword(passwordHash);
+
+        //then
+        user.Role.ShouldBe(role);
+        user.TeacherId.ShouldBe(teacherBefore);
+    }
+
+    [TestMethod]
+    public void ChangePassword__Add_Event()
+    {
+        //given
+        var user = new UserFakeBuilder().Build();
+        var passwordHash = PasswordHash.Of(Faker.FakeString());
+
+        //when
+        user.ChangePassword(passwordHash);
+
+        //then
+        user
+            .UncommittedEvents
+            .OfType<UserPasswordChanged>()
+            .Where(x => x.UserId == user.Id)
+            .ShouldHaveSingleItem();
+    }
+
+    [TestMethod]
+    public void ChangePassword__Does_Not_Raise_The_Temporary_Password_Event()
+    {
+        //given
+        var user = new UserFakeBuilder().Build();
+        var passwordHash = PasswordHash.Of(Faker.FakeString());
+
+        //when
+        user.ChangePassword(passwordHash);
+
+        //then
+        user
+            .UncommittedEvents
+            .OfType<UserTemporaryPasswordSet>()
+            .ShouldBeEmpty();
+    }
+
+    [TestMethod]
+    [DataRow(Role.Administrator)]
+    [DataRow(Role.Teacher)]
+    public void ChangePassword__Must_Not_Be_Deleted(Role role)
+    {
+        //given
+        var user = new UserFakeBuilder()
+                   .WithRole(role)
+                   .BuildDeleted();
+        var passwordHash = PasswordHash.Of(Faker.FakeString());
+
+        //when
+        var act = () => user.ChangePassword(passwordHash);
+
+        //then
+        Should.Throw<UserAlreadyDeletedException>(act);
+    }
 }
