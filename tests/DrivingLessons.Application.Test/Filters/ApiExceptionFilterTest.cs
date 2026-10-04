@@ -210,6 +210,51 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Same_Role_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserAlreadyHasRoleException(UserId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userAlreadyHasRole");
+    }
+
+    [TestMethod]
+    public void Changing_Your_Own_Role_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserMustNotChangeOwnRoleException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userMustNotChangeOwnRole");
+    }
+
+    [TestMethod]
+    public void Demoting_The_Last_Active_Administrator_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserMustNotDemoteLastActiveAdministratorException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userMustNotDemoteLastActiveAdministrator");
+    }
+
+    [TestMethod]
     public void Closed_Window_Keeps_Its_Problem_Type_And_Carries_Its_Rule_As_Code()
     {
         //given

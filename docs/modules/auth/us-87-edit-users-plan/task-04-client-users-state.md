@@ -1,3 +1,85 @@
+# Task 4 of 6: Client API and store for Edit details, Change Role and Set Temporary Password
+
+> Part of [#87: Edit a User's Details and Role, and Set a Temporary Password](README.md). Requires task 3 committed. Work on branch `87-edit-users`.
+
+**Files:**
+- Create: `client\src\app\features\users\data\change-user-details.request.ts`
+- Create: `client\src\app\features\users\data\change-user-role.request.ts`
+- Create: `client\src\app\features\users\data\set-user-temporary-password.request.ts`
+- Modify: `client\src\app\features\users\data\users-api.service.ts`
+- Modify: `client\src\app\features\users\state\users.store.ts`
+- Modify: `client\src\app\features\users\ui\pages\users\users.page.ts` (rename only)
+- Test: `client\src\app\features\users\state\users.store.spec.ts` (rewritten)
+
+**Interfaces:**
+- Consumes: task 3's three routes; the existing `ToastService.success(key)` and `ToastService.messageOf(error)`; `UsersApiService`.
+- Produces:
+  - DTOs whose names are identical to the backend's (`ChangeUserDetailsRequest`, `ChangeUserRoleRequest`, `SetUserTemporaryPasswordRequest`):
+    - `ChangeUserDetailsRequest { name: string; signInEmail: string }`
+    - `ChangeUserRoleRequest { role: Role }`
+    - `SetUserTemporaryPasswordRequest { temporaryPassword: string }`
+  - `UsersApiService` methods:
+    - `changeUserDetails(userId: string, request: ChangeUserDetailsRequest): Observable<void>`, which calls `PUT api/users/{id}/details`
+    - `changeUserRole(userId: string, request: ChangeUserRoleRequest): Observable<void>`, which calls `PUT api/users/{id}/role`
+    - `setUserTemporaryPassword(userId: string, request: SetUserTemporaryPasswordRequest): Observable<void>`, which calls `PUT api/users/{id}/temporary-password`
+  - `UsersStore`:
+    - `refusal: Signal<string | null>` and `clearRefusal(): void` replace `deleteRefusal` and `clearDeleteRefusal`.
+    - `changeDetails(userId: string, request: ChangeUserDetailsRequest): Promise<boolean>`
+    - `changeRole(userId: string, request: ChangeUserRoleRequest): Promise<boolean>`
+    - `setTemporaryPassword(userId: string, request: SetUserTemporaryPasswordRequest): Promise<boolean>`
+    - `delete(userId: string): Promise<boolean>` is unchanged.
+  - Every dialog command returns `true` on success, after a success toast and a list reload. On failure it returns `false`, and the translated message is in `refusal()`; no error toast is shown.
+  - Success toast keys: `users.detailsChanged`, `users.roleChanged`, `users.temporaryPasswordSet`. Task 5 adds them to the translation files.
+
+**Why:**
+- #87 AC 7: violations appear translated, inside the dialog (design 5b, 6c-6f).
+- README decision 7; Review Focus 5.
+
+**Run the tests** (from `client\`, in PowerShell):
+
+```powershell
+& "C:\Program Files\nodejs\node.exe" node_modules\@angular\cli\bin\ng.js test --watch=false --include src/app/features/users/state/users.store.spec.ts
+```
+
+If `--include` isn't accepted, run the whole suite without it.
+
+- [ ] **Step 1: Add the request DTOs**
+
+`client\src\app\features\users\data\change-user-details.request.ts`:
+
+```ts
+export interface ChangeUserDetailsRequest {
+    name: string;
+    signInEmail: string;
+}
+```
+
+`client\src\app\features\users\data\change-user-role.request.ts`:
+
+```ts
+import { Role } from '../domain/role.enum';
+
+export interface ChangeUserRoleRequest {
+    role: Role;
+}
+```
+
+`client\src\app\features\users\data\set-user-temporary-password.request.ts`:
+
+```ts
+export interface SetUserTemporaryPasswordRequest {
+    temporaryPassword: string;
+}
+```
+
+- [ ] **Step 2: Rewrite the store spec (failing)**
+
+Replace the whole of `client\src\app\features\users\state\users.store.spec.ts` with the code below. It does three things:
+- `createStore` now takes one object of API stub overrides instead of four positional functions, so the three new API methods don't push it to seven arguments.
+- Every existing test keeps its name and assertions. The one exception is the rename from `deleteRefusal` / `clearDeleteRefusal` to `refusal` / `clearRefusal`.
+- New tests cover the three commands.
+
+```ts
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApplicationRef, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -472,3 +554,139 @@ describe('UsersStore', () => {
         expect(store.refusal()).toBeNull();
     });
 });
+```
+
+- [ ] **Step 3: Run the spec and watch it fail**
+
+Run the command above. Expected: compile errors for the missing store members (`refusal`, `clearRefusal`, `changeDetails`, `changeRole`, `setTemporaryPassword`).
+
+- [ ] **Step 4: Add the API methods**
+
+In `client\src\app\features\users\data\users-api.service.ts`, add the three imports in alphabetical order with the other `./` imports:
+
+```ts
+import { ChangeUserDetailsRequest } from './change-user-details.request';
+import { ChangeUserRoleRequest } from './change-user-role.request';
+import { SetUserTemporaryPasswordRequest } from './set-user-temporary-password.request';
+```
+
+Then add these methods after `restoreUser`:
+
+```ts
+    changeUserDetails(userId: string, request: ChangeUserDetailsRequest): Observable<void> {
+        return this.http.put<void>(`${this.baseUrl}/${userId}/details`, request);
+    }
+
+    changeUserRole(userId: string, request: ChangeUserRoleRequest): Observable<void> {
+        return this.http.put<void>(`${this.baseUrl}/${userId}/role`, request);
+    }
+
+    setUserTemporaryPassword(userId: string, request: SetUserTemporaryPasswordRequest): Observable<void> {
+        return this.http.put<void>(`${this.baseUrl}/${userId}/temporary-password`, request);
+    }
+```
+
+- [ ] **Step 5: Update the store**
+
+In `client\src\app\features\users\state\users.store.ts`:
+
+1. Add `Observable` to the `rxjs` import: `import { Observable, firstValueFrom } from 'rxjs';`.
+2. Add the three request imports next to `CreateUserRequest`:
+
+```ts
+import { ChangeUserDetailsRequest } from '../data/change-user-details.request';
+import { ChangeUserRoleRequest } from '../data/change-user-role.request';
+import { SetUserTemporaryPasswordRequest } from '../data/set-user-temporary-password.request';
+```
+
+3. Rename the refusal signals. The public name becomes `refusal`, so the private field, which is already called `refusal`, becomes `refusalMessage`. Replace `private readonly refusal = signal<string | null>(null);` with:
+
+```ts
+    private readonly refusalMessage = signal<string | null>(null);
+```
+
+and replace `readonly deleteRefusal = this.refusal.asReadonly();` with:
+
+```ts
+    readonly refusal = this.refusalMessage.asReadonly();
+```
+
+4. Replace `clearDeleteRefusal()` and `delete()` with the block below. It also adds the three new commands and the shared helper:
+
+```ts
+    clearRefusal(): void {
+        this.refusalMessage.set(null);
+    }
+
+    delete(userId: string): Promise<boolean> {
+        return this.runDialogCommand(() => this.api.deleteUser(userId), 'users.deleted');
+    }
+
+    changeDetails(userId: string, request: ChangeUserDetailsRequest): Promise<boolean> {
+        return this.runDialogCommand(() => this.api.changeUserDetails(userId, request), 'users.detailsChanged');
+    }
+
+    changeRole(userId: string, request: ChangeUserRoleRequest): Promise<boolean> {
+        return this.runDialogCommand(() => this.api.changeUserRole(userId, request), 'users.roleChanged');
+    }
+
+    setTemporaryPassword(userId: string, request: SetUserTemporaryPasswordRequest): Promise<boolean> {
+        return this.runDialogCommand(
+            () => this.api.setUserTemporaryPassword(userId, request),
+            'users.temporaryPasswordSet',
+        );
+    }
+```
+
+Keep `restore()` where it is. Then add this private method at the end of the class:
+
+```ts
+    private async runDialogCommand(command: () => Observable<void>, successKey: string): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalMessage.set(null);
+
+        try {
+            await firstValueFrom(command());
+            this.toast.success(successKey);
+            this.usersResource.reload();
+            return true;
+        } catch (error) {
+            this.refusalMessage.set(this.toast.messageOf(error));
+            return false;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+```
+
+`firstValueFrom` on a `void` Observable that completes after one emission resolves just as `delete` did before. Setting a Temporary Password also reloads the list: it's cheap, and it keeps one code path for every command.
+
+- [ ] **Step 6: Follow the rename in the page**
+
+In `client\src\app\features\users\ui\pages\users\users.page.ts`, `onDeleteUser`:
+- `this.store.clearDeleteRefusal();` becomes `this.store.clearRefusal();`
+- `refusal: this.store.deleteRefusal,` becomes `refusal: this.store.refusal,`
+
+`DeleteUserDialogData` keeps its own field names (`refusal`, `isDeleting`, `confirm`), so `delete-user.dialog.ts` needs no change. Search the client for `deleteRefusal` and `clearDeleteRefusal`; after this step, nothing should match:
+
+```bash
+grep -rn "deleteRefusal\|clearDeleteRefusal" client/src
+```
+
+- [ ] **Step 7: Run the spec and watch it pass, then run the whole client suite and build**
+
+```powershell
+& "C:\Program Files\nodejs\node.exe" node_modules\@angular\cli\bin\ng.js test --watch=false
+& "C:\Program Files\nodejs\node.exe" node_modules\@angular\cli\bin\ng.js build --project client
+```
+
+Expected: everything is green and the build succeeds. The success keys `users.detailsChanged`, `users.roleChanged` and `users.temporaryPasswordSet` are only used through the mocked `ToastService` here; task 5 adds them to the translation files.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add client/src/app/features/users
+git commit -m "feat(client): Users store edits details and Role and sets a Temporary Password (#87)"
+```
+
+End the commit message with the attribution trailer from the session's instructions.

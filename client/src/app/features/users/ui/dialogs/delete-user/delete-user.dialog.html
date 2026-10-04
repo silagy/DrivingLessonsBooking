@@ -1,25 +1,9 @@
 <div class="delete-user">
   @if (refusal(); as message) {
-    <p-message severity="error" class="delete-user__refusal">
-      <span class="delete-user__refusal-text">
-        <strong>{{ 'users.refusedTitle' | transloco }}</strong>
-        <span>{{ message }}</span>
-      </span>
-    </p-message>
+    <app-dialog-refusal [message]="message" />
   }
 
-  <div class="delete-user__who">
-    <span class="delete-user__avatar" aria-hidden="true">{{ user.name | initials }}</span>
-    <span class="delete-user__identity">
-      <span class="delete-user__name">{{ user.name }}</span>
-      <bdi dir="ltr" class="delete-user__email">{{ user.signInEmail }}</bdi>
-    </span>
-    <p-tag
-      class="delete-user__role"
-      [class.delete-user__role--administrator]="user.role === roles.administrator"
-      [class.delete-user__role--teacher]="user.role === roles.teacher"
-      [value]="('users.roles.' + user.role) | transloco" />
-  </div>
+  <app-user-who-card [user]="user" />
 
   <ul class="delete-user__effects">
     <li class="delete-user__effect">

@@ -1,0 +1,36 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+  @if (refusal(); as message) {
+    <app-dialog-refusal [message]="message" />
+  }
+
+  <app-user-who-card [user]="user" />
+
+  <div class="field">
+    <label id="change-role-label">{{ 'users.newRole' | transloco }}</label>
+    <p-selectbutton
+      class="role-switch"
+      formControlName="role"
+      [options]="roleOptions"
+      optionLabel="label"
+      optionValue="value"
+      optionDisabled="current"
+      [allowEmpty]="false"
+      ariaLabelledBy="change-role-label" />
+  </div>
+
+  @if (!refusal()) {
+    @if (noteKey(); as key) {
+      <p-message severity="info">{{ key | transloco: { teacher } }}</p-message>
+    }
+  }
+
+  <p class="dialog-form__note">
+    <i class="pi pi-info-circle" aria-hidden="true"></i>
+    <span>{{ 'users.roleEffect' | transloco }}</span>
+  </p>
+
+  <div class="dialog-form__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+    <p-button [label]="'users.changeRole' | transloco" type="submit" [disabled]="isSaving()" />
+  </div>
+</form>
