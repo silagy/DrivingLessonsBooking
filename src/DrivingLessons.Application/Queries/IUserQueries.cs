@@ -15,4 +15,6 @@ public interface IUserQueries
     Task<bool> ExistsLinkedToTeacherAsync(TeacherId teacherId);
 
     Task<bool> ActiveExistsLinkedToTeacherAsync(TeacherId teacherId);
+
+    Task<int> CountActiveAdministratorsAsync();
 }

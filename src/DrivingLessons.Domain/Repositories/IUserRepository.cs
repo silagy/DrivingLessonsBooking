@@ -5,6 +5,8 @@ namespace DrivingLessons.Domain.Repositories;
 
 public interface IUserRepository
 {
+    Task<User?> GetAsync(UserId id);
+
     Task<User?> GetByEmailAsync(Email signInEmail);
 
     Task<bool> AnyExistAsync();

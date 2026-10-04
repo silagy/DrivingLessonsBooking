@@ -87,4 +87,11 @@ public class UserQueries : IUserQueries
                          .Users
                          .AnyAsync(x => x.TeacherId == teacherId && !x.IsDeleted);
     }
+
+    public async Task<int> CountActiveAdministratorsAsync()
+    {
+        return await dbContext
+                         .Users
+                         .CountAsync(x => x.Role == Role.Administrator && !x.IsDeleted);
+    }
 }

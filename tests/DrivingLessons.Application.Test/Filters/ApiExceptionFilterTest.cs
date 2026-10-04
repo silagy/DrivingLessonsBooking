@@ -135,6 +135,81 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Already_Deleted_User_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserAlreadyDeletedException(UserId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userAlreadyDeleted");
+    }
+
+    [TestMethod]
+    public void Already_Active_User_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserAlreadyActiveException(UserId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userAlreadyActive");
+    }
+
+    [TestMethod]
+    public void Deleting_Yourself_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserMustNotDeleteSelfException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userMustNotDeleteSelf");
+    }
+
+    [TestMethod]
+    public void Last_Active_Administrator_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserMustNotBeLastActiveAdministratorException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userMustNotBeLastActiveAdministrator");
+    }
+
+    [TestMethod]
+    public void Deleted_Linked_Teacher_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new UserLinkedTeacherMustNotBeDeletedException(UserId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userLinkedTeacherMustNotBeDeleted");
+    }
+
+    [TestMethod]
     public void Closed_Window_Keeps_Its_Problem_Type_And_Carries_Its_Rule_As_Code()
     {
         //given

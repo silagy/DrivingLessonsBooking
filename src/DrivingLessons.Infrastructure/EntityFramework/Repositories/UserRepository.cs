@@ -1,5 +1,6 @@
 using DrivingLessons.Domain.Entities;
 using DrivingLessons.Domain.Repositories;
+using DrivingLessons.Domain.Values;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingLessons.Infrastructure.EntityFramework.Repositories;
@@ -11,6 +12,11 @@ public class UserRepository : IUserRepository
     public UserRepository(DrivingLessonsDbContext dbContext)
     {
         this.dbContext = dbContext;
+    }
+
+    public async Task<User?> GetAsync(UserId id)
+    {
+        return await dbContext.Users.FindAsync(id);
     }
 
     public async Task<User?> GetByEmailAsync(DrivingLessons.Domain.Values.Email signInEmail)
