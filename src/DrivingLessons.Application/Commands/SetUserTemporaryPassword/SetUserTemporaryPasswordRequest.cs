@@ -1,0 +1,3 @@
+namespace DrivingLessons.Application.Commands.SetUserTemporaryPassword;
+
+public record SetUserTemporaryPasswordRequest(string TemporaryPassword);
