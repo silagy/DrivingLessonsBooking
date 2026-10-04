@@ -88,6 +88,24 @@ public class UserTest
     }
 
     [TestMethod]
+    [DataRow(0)]
+    [DataRow(99)]
+    public void Create__Must_Be_Defined_Role(int value)
+    {
+        //given
+        var name = UserName.Of(Faker.FakeString());
+        var signInEmail = Email.Of(Faker.FakeEmail());
+        var passwordHash = PasswordHash.Of(Faker.FakeString());
+        var role = (Role)value;
+
+        //when
+        var act = () => User.Create(name, signInEmail, passwordHash, role, null);
+
+        //then
+        Should.Throw<UserRoleMustBeDefinedException>(act);
+    }
+
+    [TestMethod]
     public void New_User_Is_Not_Deleted()
     {
         //given

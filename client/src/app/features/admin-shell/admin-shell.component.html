@@ -41,6 +41,12 @@
         class="shell__nav-link">
         {{ 'shell.nav.history' | transloco }}
       </a>
+      <a
+        [routerLink]="['/', appRoutes.users]"
+        routerLinkActive="shell__nav-link--active"
+        class="shell__nav-link">
+        {{ 'shell.nav.users' | transloco }}
+      </a>
     </nav>
 
     <div class="shell__actions">

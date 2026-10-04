@@ -49,6 +49,7 @@ public class User : AggregateRoot<UserId>
         Role role,
         Teacher? teacher)
     {
+        MustHaveDefinedRole(role);
         MustHaveLinkedTeacherForTeacherRole(role, teacher);
 
         const bool isDeleted = false;
@@ -67,6 +68,14 @@ public class User : AggregateRoot<UserId>
         SecurityStamp = SecurityStamp.New();
 
         AddEvent(new UserDeleted(Id));
+    }
+
+    private static void MustHaveDefinedRole(Role role)
+    {
+        if (!Enum.IsDefined(role))
+        {
+            throw new UserRoleMustBeDefinedException();
+        }
     }
 
     private static void MustHaveLinkedTeacherForTeacherRole(Role role, Teacher? teacher)

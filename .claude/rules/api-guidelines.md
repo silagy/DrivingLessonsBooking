@@ -250,6 +250,7 @@ Interactors are registered as themselves (scoped) — no interfaces for interact
 ## Auth
 
 - Admin endpoints require the authenticated admin policy (email + password login per requirements)
+- Administrator-only controllers carry `[Authorize(Policy = AuthorizationPolicies.Administrator)]` (`Presentation.Web\Auth\AuthorizationPolicies.cs`). The policy requires the token's `role` claim to be `administrator`; JWT bearer runs with `MapInboundClaims = false` and `RoleClaimType = "role"`. Until #89 makes it the default policy, every new admin-only controller adds the attribute itself (first used by `api/users`, #85)
 - Student-facing endpoints (`by-link/{token}`) are anonymous by design — the unguessable token is the access control
 - Apply `[AllowAnonymous]` explicitly on the student controllers; everything else requires authorization by default (`MapControllers().RequireAuthorization()`)
 

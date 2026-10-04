@@ -6,8 +6,10 @@ using DrivingLessons.Presentation.Web.OpenApi;
 using DrivingLessons.Application;
 using DrivingLessons.Application.Commands.SeedFirstAdministrator;
 using DrivingLessons.Infrastructure;
+using DrivingLessons.Infrastructure.Auth;
 using DrivingLessons.Infrastructure.Options;
 using DrivingLessons.Infrastructure.EntityFramework;
+using DrivingLessons.Presentation.Web.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +35,7 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -42,12 +45,18 @@ builder.Services
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SigningKey)),
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromMinutes(2)
+            ClockSkew = TimeSpan.FromMinutes(2),
+            RoleClaimType = AuthClaims.Role
         };
     });
 
 builder.Services.AddAuthorization(options =>
-    options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    options.AddPolicy(
+        AuthorizationPolicies.Administrator,
+        policy => policy.RequireRole(AuthClaims.AdministratorRole));
+});
 
 var app = builder.Build();
 
