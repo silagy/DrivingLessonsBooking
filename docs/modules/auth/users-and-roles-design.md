@@ -15,7 +15,7 @@ The Claude Design project with the visual design for spec [#82](https://github.c
 | #82 slice | Uses the design? |
 |-----------|------------------|
 | (1) User aggregate + login + seeding migration, [#84](https://github.com/silagy/DrivingLessonsBooking/issues/84) | No. Backend only, no client change ([plan](us-84-user-aggregate-plan/README.md)) |
-| (2) Roles, policies and Teacher scoping | Yes: navigation by Role, hidden admin controls for Teacher-role Users |
+| (2) Roles, policies and Teacher scoping | Yes: navigation by Role, hidden admin controls for Teacher-role Users. Teacher-role Users reach only Week Schedules and Publications, [#89](https://github.com/silagy/DrivingLessonsBooking/issues/89): [plan](us-89-teacher-role-access-plan/README.md). Teacher data scoping, [#90](https://github.com/silagy/DrivingLessonsBooking/issues/90): not planned yet |
 | (3) Users admin screen | Yes: list, create/edit dialog, role change, temporary password, delete/restore. Add Users, [#85](https://github.com/silagy/DrivingLessonsBooking/issues/85): [plan](us-85-add-users-plan/README.md). Delete and restore Users, [#86](https://github.com/silagy/DrivingLessonsBooking/issues/86): [plan](us-86-delete-restore-users-plan/README.md). Edit details, Role and Temporary Password, [#87](https://github.com/silagy/DrivingLessonsBooking/issues/87): [plan](us-87-edit-users-plan/README.md) |
 | (4) Change own password | Yes: the dialog reachable from the shell. Change my own password, [#88](https://github.com/silagy/DrivingLessonsBooking/issues/88): [plan](us-88-change-my-password-plan/README.md) |
 | (5)-(8) Students, Roster, docs | Check the project's other files before assuming no |
