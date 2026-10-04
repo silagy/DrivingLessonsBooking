@@ -59,6 +59,24 @@ describe('AuthService', () => {
         expect(auth.userId()).toBeNull();
     });
 
+    it('reads the token another tab stored', () => {
+        //given
+        const auth = createService(TOKEN);
+        localStorage.setItem(TOKEN_KEY, FRESH_TOKEN);
+
+        //expected
+        expect(auth.storedToken()).toBe(FRESH_TOKEN);
+        expect(auth.token()).toBe(TOKEN);
+    });
+
+    it('has no stored token when signed out', () => {
+        //given
+        const auth = createService(null);
+
+        //expected
+        expect(auth.storedToken()).toBeNull();
+    });
+
     it('uses a fresh token for the next requests and keeps it across reloads', () => {
         //given
         const auth = createService(TOKEN);

@@ -55,6 +55,10 @@ export class AuthService {
     this.token.set(accessToken);
   }
 
+  storedToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     this.token.set(null);
