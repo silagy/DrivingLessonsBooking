@@ -90,6 +90,36 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Blank_Password_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new PasswordMustNotBeEmptyException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "passwordMustNotBeEmpty");
+    }
+
+    [TestMethod]
+    public void Wrong_Current_Password_Is_A_Conflict_Not_An_Unauthorized()
+    {
+        //given
+        var context = ContextFor(new UserCurrentPasswordMustBeCorrectException(UserId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "userCurrentPasswordMustBeCorrect");
+    }
+
+    [TestMethod]
     public void Undefined_Role_Is_A_Conflict_With_Its_Rule_As_Code()
     {
         //given
