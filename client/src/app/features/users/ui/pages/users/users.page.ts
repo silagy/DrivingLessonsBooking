@@ -9,20 +9,18 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { isolateDirection } from '../../../../../shared/text/isolate-direction';
+import { ChangeUserDetailsRequest } from '../../../data/change-user-details.request';
+import { ChangeUserRoleRequest } from '../../../data/change-user-role.request';
+import { SetUserTemporaryPasswordRequest } from '../../../data/set-user-temporary-password.request';
 import { Role } from '../../../domain/role.enum';
 import { User } from '../../../domain/user.model';
 import { UsersStore } from '../../../state/users.store';
 import { AddUserDialog, AddUserDialogData, AddUserResult } from '../../dialogs/add-user/add-user.dialog';
-import {
-    ChangeUserRoleDialog,
-    ChangeUserRoleDialogData,
-} from '../../dialogs/change-user-role/change-user-role.dialog';
+import { ChangeUserRoleDialog } from '../../dialogs/change-user-role/change-user-role.dialog';
 import { DeleteUserDialog, DeleteUserDialogData } from '../../dialogs/delete-user/delete-user.dialog';
-import { EditUserDialog, EditUserDialogData } from '../../dialogs/edit-user/edit-user.dialog';
-import {
-    SetTemporaryPasswordDialog,
-    SetTemporaryPasswordDialogData,
-} from '../../dialogs/set-temporary-password/set-temporary-password.dialog';
+import { EditUserDialog } from '../../dialogs/edit-user/edit-user.dialog';
+import { SetTemporaryPasswordDialog } from '../../dialogs/set-temporary-password/set-temporary-password.dialog';
+import { UserDialogData } from '../../dialogs/user-dialog-data';
 
 @Component({
     selector: 'app-users-page',
@@ -96,7 +94,7 @@ export class UsersPage {
     }
 
     private onEditUser(user: User): void {
-        const data: EditUserDialogData = {
+        const data: UserDialogData<ChangeUserDetailsRequest> = {
             user,
             refusal: this.store.refusal,
             isSaving: this.store.isMutating,
@@ -112,7 +110,7 @@ export class UsersPage {
     }
 
     private onChangeRole(user: User): void {
-        const data: ChangeUserRoleDialogData = {
+        const data: UserDialogData<ChangeUserRoleRequest> = {
             user,
             refusal: this.store.refusal,
             isSaving: this.store.isMutating,
@@ -128,7 +126,7 @@ export class UsersPage {
     }
 
     private onSetTemporaryPassword(user: User): void {
-        const data: SetTemporaryPasswordDialogData = {
+        const data: UserDialogData<SetUserTemporaryPasswordRequest> = {
             user,
             refusal: this.store.refusal,
             isSaving: this.store.isMutating,
@@ -159,7 +157,7 @@ export class UsersPage {
         );
     }
 
-    private openUserDialog(component: Type<unknown>, header: string, width: string, data: unknown): void {
+    private openUserDialog<TData>(component: Type<unknown>, header: string, width: string, data: TData): void {
         this.store.clearRefusal();
 
         this.dialogs.open(component, {

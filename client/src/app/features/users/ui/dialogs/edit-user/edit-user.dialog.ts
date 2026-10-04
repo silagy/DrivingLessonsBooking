@@ -1,23 +1,16 @@
-import { ChangeDetectionStrategy, Component, Signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageModule } from 'primeng/message';
 import { ChangeUserDetailsRequest } from '../../../data/change-user-details.request';
-import { User } from '../../../domain/user.model';
-
-export interface EditUserDialogData {
-    user: User;
-    refusal: Signal<string | null>;
-    isSaving: Signal<boolean>;
-    confirm: (request: ChangeUserDetailsRequest) => Promise<boolean>;
-}
+import { DialogRefusalComponent } from '../../components/dialog-refusal/dialog-refusal.component';
+import { UserDialogData } from '../user-dialog-data';
 
 @Component({
     selector: 'app-edit-user-dialog',
-    imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, InputTextModule, MessageModule],
+    imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, InputTextModule, DialogRefusalComponent],
     templateUrl: './edit-user.dialog.html',
     styleUrls: ['../dialog-form.scss', './edit-user.dialog.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +18,7 @@ export interface EditUserDialogData {
 export class EditUserDialog {
     private readonly fb = inject(FormBuilder);
     private readonly ref = inject(DynamicDialogRef);
-    private readonly data = inject(DynamicDialogConfig<EditUserDialogData>).data as EditUserDialogData;
+    private readonly data = inject(DynamicDialogConfig<UserDialogData<ChangeUserDetailsRequest>>).data as UserDialogData<ChangeUserDetailsRequest>;
 
     protected readonly user = this.data.user;
     protected readonly refusal = this.data.refusal;

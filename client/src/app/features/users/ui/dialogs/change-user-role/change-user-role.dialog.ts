@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Signal, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -10,19 +10,13 @@ import { isolateDirection } from '../../../../../shared/text/isolate-direction';
 import { ChangeUserRoleRequest } from '../../../data/change-user-role.request';
 import { otherRole, roleChangeNoteKey } from '../../../domain/role-change';
 import { Role } from '../../../domain/role.enum';
-import { User } from '../../../domain/user.model';
+import { DialogRefusalComponent } from '../../components/dialog-refusal/dialog-refusal.component';
 import { UserWhoCardComponent } from '../../components/user-who-card/user-who-card.component';
-
-export interface ChangeUserRoleDialogData {
-    user: User;
-    refusal: Signal<string | null>;
-    isSaving: Signal<boolean>;
-    confirm: (request: ChangeUserRoleRequest) => Promise<boolean>;
-}
+import { UserDialogData } from '../user-dialog-data';
 
 @Component({
     selector: 'app-change-user-role-dialog',
-    imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, MessageModule, SelectButtonModule, UserWhoCardComponent],
+    imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, MessageModule, SelectButtonModule, DialogRefusalComponent, UserWhoCardComponent],
     templateUrl: './change-user-role.dialog.html',
     styleUrl: '../dialog-form.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,7 +25,7 @@ export class ChangeUserRoleDialog {
     private readonly fb = inject(FormBuilder);
     private readonly ref = inject(DynamicDialogRef);
     private readonly transloco = inject(TranslocoService);
-    private readonly data = inject(DynamicDialogConfig<ChangeUserRoleDialogData>).data as ChangeUserRoleDialogData;
+    private readonly data = inject(DynamicDialogConfig<UserDialogData<ChangeUserRoleRequest>>).data as UserDialogData<ChangeUserRoleRequest>;
 
     protected readonly user = this.data.user;
     protected readonly refusal = this.data.refusal;
