@@ -55,6 +55,7 @@
       <p-button
         [styleClass]="isUserMenuOpen() ? 'shell__user shell__user--open' : 'shell__user'"
         [ariaLabel]="'shell.userMenu' | transloco"
+        [pt]="{ root: { 'aria-haspopup': 'menu', 'aria-expanded': isUserMenuOpen() ? 'true' : 'false' } }"
         severity="secondary"
         text
         (onClick)="onUserMenu($event)">

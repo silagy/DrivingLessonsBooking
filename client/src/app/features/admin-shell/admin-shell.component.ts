@@ -68,7 +68,7 @@ export class AdminShellComponent {
       header: this.transloco.translate('myPassword.title'),
       width: AdminShellComponent.dialogWidth,
       modal: true,
-      dismissableMask: true,
+      dismissableMask: false,
     });
   }
 }
