@@ -30,6 +30,7 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
+builder.Services.AddScoped<SignedInUserJwtBearerEvents>();
 
 var jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
           ?? throw new InvalidOperationException("Missing 'Jwt' configuration section.");
@@ -39,6 +40,7 @@ builder.Services
     .AddJwtBearer(options =>
     {
         options.MapInboundClaims = false;
+        options.EventsType = typeof(SignedInUserJwtBearerEvents);
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
