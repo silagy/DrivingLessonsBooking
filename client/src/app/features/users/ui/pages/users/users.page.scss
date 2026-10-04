@@ -194,3 +194,33 @@
 .users__empty-action {
     margin-block-start: 0.625rem;
 }
+
+.users__tag--you {
+    background: transparent;
+    color: var(--app-ink);
+    border-color: var(--app-ink);
+}
+
+.users__actions-header {
+    inline-size: 90px;
+}
+
+.users__actions {
+    text-align: end;
+    white-space: nowrap;
+}
+
+.users__sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+::ng-deep .users-menu__item--danger .p-menu-item-link,
+::ng-deep .users-menu__item--danger .p-menu-item-icon,
+::ng-deep .users-menu__item--danger .p-menu-item-label {
+    color: var(--p-red-600);
+}

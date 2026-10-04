@@ -33,6 +33,9 @@
             <th>{{ 'users.table.role' | transloco }}</th>
             <th>{{ 'users.table.teacher' | transloco }}</th>
             <th>{{ 'users.table.status' | transloco }}</th>
+            <th class="users__actions-header">
+              <span class="users__sr-only">{{ 'users.actions' | transloco }}</span>
+            </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-user>
@@ -41,6 +44,9 @@
               <span class="users__name">
                 <span class="users__avatar" aria-hidden="true">{{ user.name | initials }}</span>
                 <span class="users__name-text">{{ user.name }}</span>
+                @if (user.id === store.currentUserId()) {
+                  <p-tag class="users__tag users__tag--you" [value]="'users.you' | transloco" />
+                }
               </span>
             </td>
             <td class="users__email"><bdi dir="ltr">{{ user.signInEmail }}</bdi></td>
@@ -66,9 +72,29 @@
                 <p-tag class="users__tag" severity="success" [value]="'users.status.active' | transloco" />
               }
             </td>
+            <td class="users__actions">
+              @if (user.isDeleted) {
+                <p-button
+                  [label]="'users.restore' | transloco"
+                  text
+                  size="small"
+                  [disabled]="store.isMutating()"
+                  (onClick)="onRestoreUser(user)" />
+              } @else {
+                <p-button
+                  icon="pi pi-ellipsis-v"
+                  rounded
+                  text
+                  severity="secondary"
+                  [ariaLabel]="'users.actions' | transloco"
+                  (onClick)="onRowActions($event, user)" />
+              }
+            </td>
           </tr>
         </ng-template>
       </p-table>
+
+      <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" />
 
       @if (store.hasOnlyOneUser()) {
         <div class="users__empty">
