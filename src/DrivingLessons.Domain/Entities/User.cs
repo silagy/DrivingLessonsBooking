@@ -70,6 +70,16 @@ public class User : AggregateRoot<UserId>
         AddEvent(new UserDeleted(Id));
     }
 
+    public void Restore()
+    {
+        MustBeDeleted();
+
+        IsDeleted = false;
+        SecurityStamp = SecurityStamp.New();
+
+        AddEvent(new UserRestored(Id));
+    }
+
     private static void MustHaveDefinedRole(Role role)
     {
         if (!Enum.IsDefined(role))
@@ -92,6 +102,14 @@ public class User : AggregateRoot<UserId>
         if (IsDeleted)
         {
             throw new UserAlreadyDeletedException(Id);
+        }
+    }
+
+    private void MustBeDeleted()
+    {
+        if (!IsDeleted)
+        {
+            throw new UserAlreadyActiveException(Id);
         }
     }
 }

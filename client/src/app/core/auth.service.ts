@@ -11,13 +11,24 @@ export interface LoginResponse {
 
 const TOKEN_KEY = 'auth_token';
 
-function readEmailClaim(token: string | null): string | null {
+type TokenClaim = 'email' | 'sub';
+
+const BASE64_BLOCK = 4;
+
+function decodePayload(token: string): Record<string, unknown> {
+  const segment = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  const padded = segment.padEnd(Math.ceil(segment.length / BASE64_BLOCK) * BASE64_BLOCK, '=');
+
+  return JSON.parse(atob(padded)) as Record<string, unknown>;
+}
+
+function readClaim(token: string | null, claim: TokenClaim): string | null {
   if (!token) {
     return null;
   }
   try {
-    const payload = JSON.parse(atob(token.split('.')[1])) as { email?: string };
-    return payload.email ?? null;
+    const value = decodePayload(token)[claim];
+    return typeof value === 'string' ? value : null;
   } catch {
     return null;
   }
@@ -30,7 +41,8 @@ export class AuthService {
 
   readonly token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   readonly isAuthenticated = computed(() => this.token() !== null);
-  readonly email = computed(() => readEmailClaim(this.token()));
+  readonly email = computed(() => readClaim(this.token(), 'email'));
+  readonly userId = computed(() => readClaim(this.token(), 'sub'));
 
   login(email: string, password: string) {
     return this.http

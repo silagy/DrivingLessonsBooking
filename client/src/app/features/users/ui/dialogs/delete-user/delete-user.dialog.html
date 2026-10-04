@@ -1,0 +1,48 @@
+<div class="delete-user">
+  @if (refusal(); as message) {
+    <p-message severity="error" class="delete-user__refusal">
+      <span class="delete-user__refusal-text">
+        <strong>{{ 'users.refusedTitle' | transloco }}</strong>
+        <span>{{ message }}</span>
+      </span>
+    </p-message>
+  }
+
+  <div class="delete-user__who">
+    <span class="delete-user__avatar" aria-hidden="true">{{ user.name | initials }}</span>
+    <span class="delete-user__identity">
+      <span class="delete-user__name">{{ user.name }}</span>
+      <bdi dir="ltr" class="delete-user__email">{{ user.signInEmail }}</bdi>
+    </span>
+    <p-tag
+      class="delete-user__role"
+      [class.delete-user__role--administrator]="user.role === roles.administrator"
+      [class.delete-user__role--teacher]="user.role === roles.teacher"
+      [value]="('users.roles.' + user.role) | transloco" />
+  </div>
+
+  <ul class="delete-user__effects">
+    <li class="delete-user__effect">
+      <i class="pi pi-sign-out delete-user__icon delete-user__icon--mirrored" aria-hidden="true"></i>
+      {{ 'users.deleteSignedOut' | transloco }}
+    </li>
+    <li class="delete-user__effect">
+      <i class="pi pi-shield delete-user__icon" aria-hidden="true"></i>
+      {{ 'users.deleteKeepsTeacher' | transloco }}
+    </li>
+    <li class="delete-user__effect">
+      <i class="pi pi-replay delete-user__icon delete-user__icon--mirrored" aria-hidden="true"></i>
+      {{ 'users.deleteUndo' | transloco }}
+    </li>
+  </ul>
+
+  <div class="delete-user__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+    <p-button
+      [label]="'users.delete' | transloco"
+      severity="danger"
+      type="button"
+      [disabled]="isDeleting()"
+      (onClick)="confirm()" />
+  </div>
+</div>

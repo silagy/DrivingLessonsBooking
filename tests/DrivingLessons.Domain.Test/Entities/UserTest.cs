@@ -186,4 +186,65 @@ public class UserTest
         //then
         Should.Throw<UserAlreadyDeletedException>(act);
     }
+
+    [TestMethod]
+    public void Restore()
+    {
+        //given
+        var user = new UserFakeBuilder().BuildDeleted();
+
+        //when
+        user.Restore();
+
+        //then
+        user.IsDeleted.ShouldBeFalse();
+    }
+
+    [TestMethod]
+    public void Restore__Changes_The_Security_Stamp()
+    {
+        //given
+        var user = new UserFakeBuilder().BuildDeleted();
+        var stampBefore = user.SecurityStamp;
+
+        //when
+        user.Restore();
+
+        //then
+        user.SecurityStamp.ShouldNotBe(stampBefore);
+    }
+
+    [TestMethod]
+    public void Restore__Add_Event()
+    {
+        //given
+        var user = new UserFakeBuilder().BuildDeleted();
+
+        //when
+        user.Restore();
+
+        //then
+        user
+            .UncommittedEvents
+            .OfType<UserRestored>()
+            .Where(x => x.UserId == user.Id)
+            .ShouldHaveSingleItem();
+    }
+
+    [TestMethod]
+    [DataRow(Role.Administrator)]
+    [DataRow(Role.Teacher)]
+    public void Restore__Must_Be_Deleted(Role role)
+    {
+        //given
+        var user = new UserFakeBuilder()
+                   .WithRole(role)
+                   .Build();
+
+        //when
+        var act = () => user.Restore();
+
+        //then
+        Should.Throw<UserAlreadyActiveException>(act);
+    }
 }
