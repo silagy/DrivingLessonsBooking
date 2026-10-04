@@ -5,10 +5,13 @@ import { NEVER, Observable, of, throwError } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { isolateDirection } from '../../../shared/text/isolate-direction';
+import { ChangeUserDetailsRequest } from '../data/change-user-details.request';
+import { ChangeUserRoleRequest } from '../data/change-user-role.request';
 import { CreateUserRequest } from '../data/create-user.request';
 import { CreateUserResponse } from '../data/create-user.response';
 import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
 import { ItemForFindUsersResponse } from '../data/item-for-find-users.response';
+import { SetUserTemporaryPasswordRequest } from '../data/set-user-temporary-password.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { UsersApiService } from '../data/users-api.service';
 import { Role } from '../domain/role.enum';
@@ -60,17 +63,41 @@ const REQUEST: CreateUserRequest = {
     temporaryPassword: 'Temporary#2026',
 };
 
-const SELF_REFUSAL = new HttpErrorResponse({
-    status: HTTP_CONFLICT,
-    error: { status: HTTP_CONFLICT, title: 'Conflict', code: 'userMustNotDeleteSelf' },
-});
+const DETAILS: ChangeUserDetailsRequest = { name: 'Dana Levi-Cohen', signInEmail: 'dana.new@school.example' };
+const TO_ADMINISTRATOR: ChangeUserRoleRequest = { role: Role.administrator };
+const TEMPORARY_PASSWORD: SetUserTemporaryPasswordRequest = { temporaryPassword: 'Fresh#2027' };
 
-function createStore(
-    findUsers: () => Observable<ItemForFindUsersResponse[]>,
-    createUser: () => Observable<CreateUserResponse>,
-    deleteUser: () => Observable<void> = () => of(undefined),
-    restoreUser: () => Observable<void> = () => of(undefined),
-): UsersStore {
+function conflict(code: string): HttpErrorResponse {
+    return new HttpErrorResponse({
+        status: HTTP_CONFLICT,
+        error: { status: HTTP_CONFLICT, title: 'Conflict', code },
+    });
+}
+
+const SELF_REFUSAL = conflict('userMustNotDeleteSelf');
+
+interface ApiStubs {
+    findUsers: () => Observable<ItemForFindUsersResponse[]>;
+    createUser: () => Observable<CreateUserResponse>;
+    deleteUser: () => Observable<void>;
+    restoreUser: () => Observable<void>;
+    changeUserDetails: () => Observable<void>;
+    changeUserRole: () => Observable<void>;
+    setUserTemporaryPassword: () => Observable<void>;
+}
+
+function createStore(overrides: Partial<ApiStubs> = {}): UsersStore {
+    const stubs: ApiStubs = {
+        findUsers: () => of([ADMINISTRATOR]),
+        createUser: () => NEVER,
+        deleteUser: () => of(undefined),
+        restoreUser: () => of(undefined),
+        changeUserDetails: () => of(undefined),
+        changeUserRole: () => of(undefined),
+        setUserTemporaryPassword: () => of(undefined),
+        ...overrides,
+    };
+
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
@@ -78,10 +105,13 @@ function createStore(
             {
                 provide: UsersApiService,
                 useValue: {
-                    findUsers: vi.fn(findUsers),
-                    createUser: vi.fn(createUser),
-                    deleteUser: vi.fn(deleteUser),
-                    restoreUser: vi.fn(restoreUser),
+                    findUsers: vi.fn(stubs.findUsers),
+                    createUser: vi.fn(stubs.createUser),
+                    deleteUser: vi.fn(stubs.deleteUser),
+                    restoreUser: vi.fn(stubs.restoreUser),
+                    changeUserDetails: vi.fn(stubs.changeUserDetails),
+                    changeUserRole: vi.fn(stubs.changeUserRole),
+                    setUserTemporaryPassword: vi.fn(stubs.setUserTemporaryPassword),
                 },
             },
             { provide: TeacherOptionsApiService, useValue: { findTeachers: vi.fn(() => of(TEACHERS)) } },
@@ -103,7 +133,7 @@ async function stable(): Promise<void> {
 describe('UsersStore', () => {
     it('lists the Users', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR, TEACHER_USER]), () => NEVER);
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, TEACHER_USER]) });
 
         //when
         await stable();
@@ -115,10 +145,9 @@ describe('UsersStore', () => {
 
     it('reports the load error instead of throwing when the Users fail to load', async () => {
         //given
-        const store = createStore(
-            () => throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR })),
-            () => NEVER,
-        );
+        const store = createStore({
+            findUsers: () => throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR })),
+        });
 
         //when
         await stable();
@@ -131,7 +160,7 @@ describe('UsersStore', () => {
 
     it('loads the Users again when asked to retry', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR]), () => NEVER);
+        const store = createStore();
         await stable();
         const api = TestBed.inject(UsersApiService);
 
@@ -144,7 +173,7 @@ describe('UsersStore', () => {
 
     it('marks the Teachers that already have a User, ordered by name', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR, TEACHER_USER]), () => NEVER);
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, TEACHER_USER]) });
 
         //when
         await stable();
@@ -158,7 +187,7 @@ describe('UsersStore', () => {
 
     it('knows when the first Administrator is the only User', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR]), () => NEVER);
+        const store = createStore();
 
         //when
         await stable();
@@ -169,7 +198,7 @@ describe('UsersStore', () => {
 
     it('creates the User, confirms it and reloads the list', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR]), () => of({ id: 'user-new' }));
+        const store = createStore({ createUser: () => of({ id: 'user-new' }) });
         await stable();
         const api = TestBed.inject(UsersApiService);
         const toast = TestBed.inject(ToastService);
@@ -186,7 +215,7 @@ describe('UsersStore', () => {
 
     it('loads the Teachers again for a new store instance', async () => {
         //given
-        createStore(() => of([ADMINISTRATOR]), () => NEVER);
+        createStore();
         await stable();
         const teacherOptionsApi = TestBed.inject(TeacherOptionsApiService);
 
@@ -200,11 +229,8 @@ describe('UsersStore', () => {
 
     it('shows the refusal and keeps the list when the server rejects the User', async () => {
         //given
-        const refusal = new HttpErrorResponse({
-            status: HTTP_CONFLICT,
-            error: { status: HTTP_CONFLICT, title: 'Conflict', code: 'userSignInEmailAlreadyInUse' },
-        });
-        const store = createStore(() => of([ADMINISTRATOR]), () => throwError(() => refusal));
+        const refusal = conflict('userSignInEmailAlreadyInUse');
+        const store = createStore({ createUser: () => throwError(() => refusal) });
         await stable();
         const api = TestBed.inject(UsersApiService);
         const toast = TestBed.inject(ToastService);
@@ -221,7 +247,7 @@ describe('UsersStore', () => {
 
     it('knows which User is signed in', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR, TEACHER_USER]), () => NEVER);
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, TEACHER_USER]) });
 
         //expected
         expect(store.currentUserId()).toBe('user-owner');
@@ -229,7 +255,7 @@ describe('UsersStore', () => {
 
     it('deletes the User, confirms it and reloads the list', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR, TEACHER_USER]), () => NEVER);
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, TEACHER_USER]) });
         await stable();
         const api = TestBed.inject(UsersApiService);
         const toast = TestBed.inject(ToastService);
@@ -241,18 +267,14 @@ describe('UsersStore', () => {
         expect(deleted).toBe(true);
         expect(api.deleteUser).toHaveBeenCalledWith('user-levi');
         expect(toast.success).toHaveBeenCalledWith('users.deleted');
-        expect(store.deleteRefusal()).toBeNull();
+        expect(store.refusal()).toBeNull();
         await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
         expect(store.isMutating()).toBe(false);
     });
 
     it('keeps the refusal for the Delete dialog instead of a toast', async () => {
         //given
-        const store = createStore(
-            () => of([ADMINISTRATOR]),
-            () => NEVER,
-            () => throwError(() => SELF_REFUSAL),
-        );
+        const store = createStore({ deleteUser: () => throwError(() => SELF_REFUSAL) });
         await stable();
         const api = TestBed.inject(UsersApiService);
         const toast = TestBed.inject(ToastService);
@@ -263,32 +285,28 @@ describe('UsersStore', () => {
         //then
         expect(deleted).toBe(false);
         expect(toast.messageOf).toHaveBeenCalledWith(SELF_REFUSAL);
-        expect(store.deleteRefusal()).toBe('translated refusal');
+        expect(store.refusal()).toBe('translated refusal');
         expect(toast.apiError).not.toHaveBeenCalled();
         expect(api.findUsers).toHaveBeenCalledTimes(1);
         expect(store.isMutating()).toBe(false);
     });
 
-    it('clears the refusal so a reopened Delete dialog starts clean', async () => {
+    it('clears the refusal so a reopened dialog starts clean', async () => {
         //given
-        const store = createStore(
-            () => of([ADMINISTRATOR]),
-            () => NEVER,
-            () => throwError(() => SELF_REFUSAL),
-        );
+        const store = createStore({ deleteUser: () => throwError(() => SELF_REFUSAL) });
         await stable();
         await store.delete(ADMINISTRATOR.id);
 
         //when
-        store.clearDeleteRefusal();
+        store.clearRefusal();
 
         //then
-        expect(store.deleteRefusal()).toBeNull();
+        expect(store.refusal()).toBeNull();
     });
 
     it('restores the User, names them in the confirmation and reloads the list', async () => {
         //given
-        const store = createStore(() => of([ADMINISTRATOR, DELETED_USER]), () => NEVER);
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, DELETED_USER]) });
         await stable();
         const api = TestBed.inject(UsersApiService);
         const toast = TestBed.inject(ToastService);
@@ -308,16 +326,11 @@ describe('UsersStore', () => {
 
     it('shows a Restore refusal as a toast and keeps the list', async () => {
         //given
-        const refusal = new HttpErrorResponse({
-            status: HTTP_CONFLICT,
-            error: { status: HTTP_CONFLICT, title: 'Conflict', code: 'userAlreadyActive' },
+        const refusal = conflict('userAlreadyActive');
+        const store = createStore({
+            findUsers: () => of([ADMINISTRATOR, DELETED_USER]),
+            restoreUser: () => throwError(() => refusal),
         });
-        const store = createStore(
-            () => of([ADMINISTRATOR, DELETED_USER]),
-            () => NEVER,
-            () => of(undefined),
-            () => throwError(() => refusal),
-        );
         await stable();
         const api = TestBed.inject(UsersApiService);
         const toast = TestBed.inject(ToastService);
@@ -330,5 +343,132 @@ describe('UsersStore', () => {
         expect(toast.success).not.toHaveBeenCalled();
         expect(api.findUsers).toHaveBeenCalledTimes(1);
         expect(store.isMutating()).toBe(false);
+    });
+
+    it('changes the details, confirms it and reloads the list', async () => {
+        //given
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, TEACHER_USER]) });
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const changed = await store.changeDetails(TEACHER_USER.id, DETAILS);
+
+        //then
+        expect(changed).toBe(true);
+        expect(api.changeUserDetails).toHaveBeenCalledWith('user-levi', DETAILS);
+        expect(toast.success).toHaveBeenCalledWith('users.detailsChanged');
+        expect(store.refusal()).toBeNull();
+        await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('keeps an Edit details refusal for the dialog', async () => {
+        //given
+        const refusal = conflict('userSignInEmailAlreadyInUse');
+        const store = createStore({ changeUserDetails: () => throwError(() => refusal) });
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const changed = await store.changeDetails(TEACHER_USER.id, DETAILS);
+
+        //then
+        expect(changed).toBe(false);
+        expect(toast.messageOf).toHaveBeenCalledWith(refusal);
+        expect(store.refusal()).toBe('translated refusal');
+        expect(toast.apiError).not.toHaveBeenCalled();
+        expect(api.findUsers).toHaveBeenCalledTimes(1);
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('changes the Role, confirms it and reloads the list', async () => {
+        //given
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, TEACHER_USER]) });
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const changed = await store.changeRole(TEACHER_USER.id, TO_ADMINISTRATOR);
+
+        //then
+        expect(changed).toBe(true);
+        expect(api.changeUserRole).toHaveBeenCalledWith('user-levi', TO_ADMINISTRATOR);
+        expect(toast.success).toHaveBeenCalledWith('users.roleChanged');
+        await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('keeps a Change Role refusal for the dialog', async () => {
+        //given
+        const refusal = conflict('userMustNotChangeOwnRole');
+        const store = createStore({ changeUserRole: () => throwError(() => refusal) });
+        await stable();
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const changed = await store.changeRole(ADMINISTRATOR.id, { role: Role.teacher });
+
+        //then
+        expect(changed).toBe(false);
+        expect(toast.messageOf).toHaveBeenCalledWith(refusal);
+        expect(store.refusal()).toBe('translated refusal');
+        expect(toast.apiError).not.toHaveBeenCalled();
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('sets the Temporary Password and confirms it', async () => {
+        //given
+        const store = createStore({ findUsers: () => of([ADMINISTRATOR, TEACHER_USER]) });
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const set = await store.setTemporaryPassword(TEACHER_USER.id, TEMPORARY_PASSWORD);
+
+        //then
+        expect(set).toBe(true);
+        expect(api.setUserTemporaryPassword).toHaveBeenCalledWith('user-levi', TEMPORARY_PASSWORD);
+        expect(toast.success).toHaveBeenCalledWith('users.temporaryPasswordSet');
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('keeps a Set Temporary Password refusal for the dialog', async () => {
+        //given
+        const refusal = conflict('userAlreadyDeleted');
+        const store = createStore({ setUserTemporaryPassword: () => throwError(() => refusal) });
+        await stable();
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const set = await store.setTemporaryPassword(TEACHER_USER.id, TEMPORARY_PASSWORD);
+
+        //then
+        expect(set).toBe(false);
+        expect(store.refusal()).toBe('translated refusal');
+        expect(toast.apiError).not.toHaveBeenCalled();
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('starts a new command without the previous refusal', async () => {
+        //given
+        let fail = true;
+        const store = createStore({
+            changeUserRole: () => (fail ? throwError(() => conflict('userAlreadyHasRole')) : of(undefined)),
+        });
+        await stable();
+        await store.changeRole(TEACHER_USER.id, TO_ADMINISTRATOR);
+        fail = false;
+
+        //when
+        const changed = await store.changeRole(TEACHER_USER.id, TO_ADMINISTRATOR);
+
+        //then
+        expect(changed).toBe(true);
+        expect(store.refusal()).toBeNull();
     });
 });

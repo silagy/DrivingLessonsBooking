@@ -70,11 +70,11 @@ export class UsersPage {
     }
 
     private onDeleteUser(user: User): void {
-        this.store.clearDeleteRefusal();
+        this.store.clearRefusal();
 
         const data: DeleteUserDialogData = {
             user,
-            refusal: this.store.deleteRefusal,
+            refusal: this.store.refusal,
             isDeleting: this.store.isMutating,
             confirm: () => this.store.delete(user.id),
         };

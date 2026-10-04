@@ -1,9 +1,12 @@
 import { Injectable, computed, inject, resource, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { isolateDirection } from '../../../shared/text/isolate-direction';
+import { ChangeUserDetailsRequest } from '../data/change-user-details.request';
+import { ChangeUserRoleRequest } from '../data/change-user-role.request';
 import { CreateUserRequest } from '../data/create-user.request';
+import { SetUserTemporaryPasswordRequest } from '../data/set-user-temporary-password.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { UsersApiService } from '../data/users-api.service';
 import { LinkableTeacher } from '../domain/linkable-teacher.model';
@@ -21,7 +24,7 @@ export class UsersStore {
     private readonly auth = inject(AuthService);
 
     private readonly mutating = signal(false);
-    private readonly refusal = signal<string | null>(null);
+    private readonly refusalMessage = signal<string | null>(null);
 
     private readonly usersResource = resource({
         loader: () => firstValueFrom(this.api.findUsers()),
@@ -43,7 +46,7 @@ export class UsersStore {
     readonly loadError = computed(() => (this.usersResource.error() ? 'users.loadFailed' : null));
     readonly hasOnlyOneUser = computed(() => this.users().length === SINGLE_USER_COUNT);
     readonly isMutating = this.mutating.asReadonly();
-    readonly deleteRefusal = this.refusal.asReadonly();
+    readonly refusal = this.refusalMessage.asReadonly();
     readonly currentUserId = computed(() => this.auth.userId());
 
     reload(): void {
@@ -64,25 +67,27 @@ export class UsersStore {
         }
     }
 
-    clearDeleteRefusal(): void {
-        this.refusal.set(null);
+    clearRefusal(): void {
+        this.refusalMessage.set(null);
     }
 
-    async delete(userId: string): Promise<boolean> {
-        this.mutating.set(true);
-        this.refusal.set(null);
+    delete(userId: string): Promise<boolean> {
+        return this.runDialogCommand(() => this.api.deleteUser(userId), 'users.deleted');
+    }
 
-        try {
-            await firstValueFrom(this.api.deleteUser(userId));
-            this.toast.success('users.deleted');
-            this.usersResource.reload();
-            return true;
-        } catch (error) {
-            this.refusal.set(this.toast.messageOf(error));
-            return false;
-        } finally {
-            this.mutating.set(false);
-        }
+    changeDetails(userId: string, request: ChangeUserDetailsRequest): Promise<boolean> {
+        return this.runDialogCommand(() => this.api.changeUserDetails(userId, request), 'users.detailsChanged');
+    }
+
+    changeRole(userId: string, request: ChangeUserRoleRequest): Promise<boolean> {
+        return this.runDialogCommand(() => this.api.changeUserRole(userId, request), 'users.roleChanged');
+    }
+
+    setTemporaryPassword(userId: string, request: SetUserTemporaryPasswordRequest): Promise<boolean> {
+        return this.runDialogCommand(
+            () => this.api.setUserTemporaryPassword(userId, request),
+            'users.temporaryPasswordSet',
+        );
     }
 
     async restore(user: User): Promise<void> {
@@ -94,6 +99,23 @@ export class UsersStore {
             this.usersResource.reload();
         } catch (error) {
             this.toast.apiError(error);
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
+    private async runDialogCommand(command: () => Observable<void>, successKey: string): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalMessage.set(null);
+
+        try {
+            await firstValueFrom(command());
+            this.toast.success(successKey);
+            this.usersResource.reload();
+            return true;
+        } catch (error) {
+            this.refusalMessage.set(this.toast.messageOf(error));
+            return false;
         } finally {
             this.mutating.set(false);
         }
