@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using DrivingLessons.Application.Commands.CreateUser;
+using DrivingLessons.Application.Commands.DeleteUser;
+using DrivingLessons.Application.Commands.RestoreUser;
 using DrivingLessons.Presentation.Web.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,5 +26,33 @@ public class UserCommandController : ControllerBase
         var result = await interactor.ExecuteAsync(request);
 
         return CreatedAtAction(null, result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    [EndpointSummary("Delete the user so they can no longer sign in")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> DeleteAsync(
+        [FromServices] DeleteUserInteractor interactor,
+        [FromRoute] Guid id)
+    {
+        await interactor.ExecuteAsync(id);
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/restore")]
+    [EndpointSummary("Restore a deleted user so they can sign in again")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> RestoreAsync(
+        [FromServices] RestoreUserInteractor interactor,
+        [FromRoute] Guid id)
+    {
+        await interactor.ExecuteAsync(id);
+
+        return NoContent();
     }
 }

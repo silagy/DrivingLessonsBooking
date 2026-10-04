@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using DrivingLessons.Presentation.Web.Filters;
 using DrivingLessons.Presentation.Web.OpenApi;
 using DrivingLessons.Application;
+using DrivingLessons.Application.Auth;
 using DrivingLessons.Application.Commands.SeedFirstAdministrator;
 using DrivingLessons.Infrastructure;
 using DrivingLessons.Infrastructure.Auth;
@@ -27,6 +28,8 @@ builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 
 var jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
           ?? throw new InvalidOperationException("Missing 'Jwt' configuration section.");
