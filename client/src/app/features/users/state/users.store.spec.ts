@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ApplicationRef, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationRef, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { NEVER, Observable, of, throwError } from 'rxjs';
+import { AuthService } from '../../../core/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CreateUserRequest } from '../data/create-user.request';
 import { CreateUserResponse } from '../data/create-user.response';
@@ -35,6 +36,16 @@ const TEACHER_USER: ItemForFindUsersResponse = {
     isDeleted: false,
 };
 
+const DELETED_USER: ItemForFindUsersResponse = {
+    id: 'user-nahum',
+    name: 'Gil Nahum',
+    signInEmail: 'gil@school.example',
+    role: Role.teacher,
+    teacherId: 'teacher-nahum',
+    teacherName: 'Gil Nahum',
+    isDeleted: true,
+};
+
 const TEACHERS: ItemForFindTeachersResponse[] = [
     { id: 'teacher-levi', name: 'Dana Levi', contactEmail: 'dana.teaches@school.example' },
     { id: 'teacher-cohen', name: 'Avi Cohen', contactEmail: 'avi@school.example' },
@@ -48,17 +59,36 @@ const REQUEST: CreateUserRequest = {
     temporaryPassword: 'Temporary#2026',
 };
 
+const SELF_REFUSAL = new HttpErrorResponse({
+    status: HTTP_CONFLICT,
+    error: { status: HTTP_CONFLICT, title: 'Conflict', code: 'userMustNotDeleteSelf' },
+});
+
 function createStore(
     findUsers: () => Observable<ItemForFindUsersResponse[]>,
     createUser: () => Observable<CreateUserResponse>,
+    deleteUser: () => Observable<void> = () => of(undefined),
+    restoreUser: () => Observable<void> = () => of(undefined),
 ): UsersStore {
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
             UsersStore,
-            { provide: UsersApiService, useValue: { findUsers: vi.fn(findUsers), createUser: vi.fn(createUser) } },
+            {
+                provide: UsersApiService,
+                useValue: {
+                    findUsers: vi.fn(findUsers),
+                    createUser: vi.fn(createUser),
+                    deleteUser: vi.fn(deleteUser),
+                    restoreUser: vi.fn(restoreUser),
+                },
+            },
             { provide: TeacherOptionsApiService, useValue: { findTeachers: vi.fn(() => of(TEACHERS)) } },
-            { provide: ToastService, useValue: { success: vi.fn(), apiError: vi.fn() } },
+            {
+                provide: ToastService,
+                useValue: { success: vi.fn(), apiError: vi.fn(), messageOf: vi.fn(() => 'translated refusal') },
+            },
+            { provide: AuthService, useValue: { userId: signal('user-owner') } },
         ],
     });
 
@@ -180,6 +210,119 @@ describe('UsersStore', () => {
 
         //when
         await store.create(REQUEST);
+
+        //then
+        expect(toast.apiError).toHaveBeenCalledWith(refusal);
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(api.findUsers).toHaveBeenCalledTimes(1);
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('knows which User is signed in', async () => {
+        //given
+        const store = createStore(() => of([ADMINISTRATOR, TEACHER_USER]), () => NEVER);
+
+        //expected
+        expect(store.currentUserId()).toBe('user-owner');
+    });
+
+    it('deletes the User, confirms it and reloads the list', async () => {
+        //given
+        const store = createStore(() => of([ADMINISTRATOR, TEACHER_USER]), () => NEVER);
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const deleted = await store.delete(TEACHER_USER.id);
+
+        //then
+        expect(deleted).toBe(true);
+        expect(api.deleteUser).toHaveBeenCalledWith('user-levi');
+        expect(toast.success).toHaveBeenCalledWith('users.deleted');
+        expect(store.deleteRefusal()).toBeNull();
+        await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('keeps the refusal for the Delete dialog instead of a toast', async () => {
+        //given
+        const store = createStore(
+            () => of([ADMINISTRATOR]),
+            () => NEVER,
+            () => throwError(() => SELF_REFUSAL),
+        );
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        const deleted = await store.delete(ADMINISTRATOR.id);
+
+        //then
+        expect(deleted).toBe(false);
+        expect(toast.messageOf).toHaveBeenCalledWith(SELF_REFUSAL);
+        expect(store.deleteRefusal()).toBe('translated refusal');
+        expect(toast.apiError).not.toHaveBeenCalled();
+        expect(api.findUsers).toHaveBeenCalledTimes(1);
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('clears the refusal so a reopened Delete dialog starts clean', async () => {
+        //given
+        const store = createStore(
+            () => of([ADMINISTRATOR]),
+            () => NEVER,
+            () => throwError(() => SELF_REFUSAL),
+        );
+        await stable();
+        await store.delete(ADMINISTRATOR.id);
+
+        //when
+        store.clearDeleteRefusal();
+
+        //then
+        expect(store.deleteRefusal()).toBeNull();
+    });
+
+    it('restores the User, names them in the confirmation and reloads the list', async () => {
+        //given
+        const store = createStore(() => of([ADMINISTRATOR, DELETED_USER]), () => NEVER);
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        await store.restore(DELETED_USER);
+
+        //then
+        expect(api.restoreUser).toHaveBeenCalledWith('user-nahum');
+        expect(toast.success).toHaveBeenCalledWith('users.restored', {
+            key: 'users.restoredDetail',
+            params: { name: 'Gil Nahum' },
+        });
+        await vi.waitFor(() => expect(api.findUsers).toHaveBeenCalledTimes(2));
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('shows a Restore refusal as a toast and keeps the list', async () => {
+        //given
+        const refusal = new HttpErrorResponse({
+            status: HTTP_CONFLICT,
+            error: { status: HTTP_CONFLICT, title: 'Conflict', code: 'userAlreadyActive' },
+        });
+        const store = createStore(
+            () => of([ADMINISTRATOR, DELETED_USER]),
+            () => NEVER,
+            () => of(undefined),
+            () => throwError(() => refusal),
+        );
+        await stable();
+        const api = TestBed.inject(UsersApiService);
+        const toast = TestBed.inject(ToastService);
+
+        //when
+        await store.restore(DELETED_USER);
 
         //then
         expect(toast.apiError).toHaveBeenCalledWith(refusal);

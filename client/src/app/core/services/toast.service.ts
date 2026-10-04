@@ -11,20 +11,36 @@ const GENERIC_ERROR_KEYS: Partial<Record<number, string>> = {
     [HttpStatusCode.Conflict]: 'errors.conflict',
 };
 
+export interface ToastDetail {
+    key: string;
+    params?: Record<string, string>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ToastService {
     private readonly messages = inject(MessageService);
     private readonly transloco = inject(TranslocoService);
 
-    success(key: string): void {
-        this.messages.add({ severity: 'success', summary: this.transloco.translate(key) });
+    success(key: string, detail?: ToastDetail): void {
+        const summary = this.transloco.translate(key);
+
+        if (!detail) {
+            this.messages.add({ severity: 'success', summary });
+            return;
+        }
+
+        this.messages.add({
+            severity: 'success',
+            summary,
+            detail: this.transloco.translate(detail.key, detail.params),
+        });
     }
 
     apiError(error: unknown): void {
-        this.messages.add({ severity: 'error', summary: this.resolveMessage(error) });
+        this.messages.add({ severity: 'error', summary: this.messageOf(error) });
     }
 
-    private resolveMessage(error: unknown): string {
+    messageOf(error: unknown): string {
         if (!(error instanceof HttpErrorResponse)) {
             return this.transloco.translate(UNEXPECTED_ERROR_KEY);
         }

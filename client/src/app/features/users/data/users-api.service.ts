@@ -17,4 +17,12 @@ export class UsersApiService {
     createUser(request: CreateUserRequest): Observable<CreateUserResponse> {
         return this.http.post<CreateUserResponse>(this.baseUrl, request);
     }
+
+    deleteUser(userId: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${userId}`);
+    }
+
+    restoreUser(userId: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/${userId}/restore`, {});
+    }
 }

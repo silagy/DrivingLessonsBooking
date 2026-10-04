@@ -19,6 +19,10 @@ const EN = {
     general: {
         unexpectedError: 'Something went wrong. Please try again.',
     },
+    users: {
+        restored: 'User restored',
+        restoredDetail: '{{name}} can sign in again.',
+    },
 };
 
 function setUp() {
@@ -136,6 +140,53 @@ describe('ToastService', () => {
 
             //then
             expect(shownSummary(add)).toBe('Something went wrong. Please try again.');
+        });
+    });
+
+    describe('success', () => {
+        it('shows the confirmation alone', () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            toast.success('users.restored');
+
+            //then
+            expect(add).toHaveBeenCalledWith({ severity: 'success', summary: 'User restored' });
+        });
+
+        it('adds a detail line with its values filled in', () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            toast.success('users.restored', { key: 'users.restoredDetail', params: { name: 'Gil Nahum' } });
+
+            //then
+            expect(add).toHaveBeenCalledWith({
+                severity: 'success',
+                summary: 'User restored',
+                detail: 'Gil Nahum can sign in again.',
+            });
+        });
+    });
+
+    describe('messageOf', () => {
+        it('gives the same translated rule message without showing a toast', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'carNameMustNotBeEmpty',
+            });
+
+            //when
+            const message = toast.messageOf(error);
+
+            //then
+            expect(message).toBe('Enter the car\'s name.');
+            expect(add).not.toHaveBeenCalled();
         });
     });
 });
