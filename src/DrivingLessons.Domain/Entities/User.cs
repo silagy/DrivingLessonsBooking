@@ -113,6 +113,16 @@ public class User : AggregateRoot<UserId>
         AddEvent(new UserTemporaryPasswordSet(Id));
     }
 
+    public void ChangePassword(PasswordHash passwordHash)
+    {
+        MustNotBeDeleted();
+
+        PasswordHash = passwordHash;
+        SecurityStamp = SecurityStamp.New();
+
+        AddEvent(new UserPasswordChanged(Id));
+    }
+
     private static void MustHaveDefinedRole(Role role)
     {
         if (!Enum.IsDefined(role))
