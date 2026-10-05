@@ -40,6 +40,8 @@ function fakeStore(overrides: Record<string, unknown>) {
         dataAsOf: signal(''),
         slotCounts: signal([]),
         windowTimes: signal({}),
+        canChooseTeacher: signal(true),
+        canManageLifecycle: signal(true),
         selectTeacher: () => undefined,
         selectWeek: () => undefined,
         copyLink: async () => undefined,
@@ -88,6 +90,14 @@ function weekPickerModel(fixture: ComponentFixture<PublicationsDashboardPage>): 
 
     return weekPicker!.injector.get(NgModel);
 }
+
+function buttonLabels(page: HTMLElement): string[] {
+    return Array.from(page.querySelectorAll('.dashboard__actions .p-button-label')).map(
+        (label) => label.textContent?.trim() ?? '',
+    );
+}
+
+const AS_TEACHER = { canChooseTeacher: signal(false), canManageLifecycle: signal(false) };
 
 describe('PublicationsDashboardPage', () => {
     it('shows the share link while the week is open', async () => {
@@ -190,5 +200,80 @@ describe('PublicationsDashboardPage', () => {
                 queryParamsHandling: 'merge',
             }),
         );
+    });
+
+    it('offers an Administrator the lifecycle control for each state', async () => {
+        //given
+        const store = fakeStore({ state: signal(PublicationState.closed) });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(buttonLabels(page)).toEqual(['publications.reopenWindow', 'publications.downloadExcel']);
+        expect(page.querySelector('.dashboard__teacher-select')).not.toBeNull();
+    });
+
+    it('hides the Teacher picker from a Teacher', async () => {
+        //given
+        const store = fakeStore({ ...AS_TEACHER });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.dashboard__teacher-select')).toBeNull();
+    });
+
+    it('keeps refresh and the Excel download for a Teacher while the week is open, without extending', async () => {
+        //given
+        const store = fakeStore({ ...AS_TEACHER });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(buttonLabels(page)).toEqual(['general.refresh', 'publications.downloadExcel']);
+    });
+
+    it('keeps only the Excel download for a Teacher once the week is closed', async () => {
+        //given
+        const store = fakeStore({ ...AS_TEACHER, state: signal(PublicationState.closed) });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(buttonLabels(page)).toEqual(['publications.downloadExcel']);
+    });
+
+    it('tells a Teacher that the Administrator publishes a draft week, with no publish button', async () => {
+        //given
+        const store = fakeStore({ ...AS_TEACHER, state: signal(PublicationState.draft) });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(buttonLabels(page)).toEqual([]);
+        expect(page.textContent).toContain('publications.dashboard.draftPromptTeacher');
+    });
+
+    it('does not link a Teacher to prepare a week that has no Publication', async () => {
+        //given
+        const store = fakeStore({
+            ...AS_TEACHER,
+            state: signal(undefined),
+            publication: signal(undefined),
+            hasPublication: signal(false),
+            weekNumber: signal(undefined),
+        });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.dashboard__empty')).not.toBeNull();
+        expect(page.querySelector('.dashboard__empty a')).toBeNull();
     });
 });

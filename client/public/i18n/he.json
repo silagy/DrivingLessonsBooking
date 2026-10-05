@@ -222,6 +222,7 @@
       "totalPicks": "סה״כ בחירות",
       "lastSubmission": "הגשה אחרונה",
       "draftPrompt": "השבוע הוכן אך טרם פורסם. פרסמו אותו כדי לפתוח את חלון ההגשות וליצור את הקישור.",
+      "draftPromptTeacher": "השבוע הוכן אך טרם פורסם. מנהל המערכת יפרסם אותו ויפתח את חלון ההגשות.",
       "publishedNotice": "ההגשות ייפתחו אוטומטית ב־{{opensAt}}.",
       "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה.",
       "weekTitle": "- שבוע {{weekNumber}}",

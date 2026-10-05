@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ApplicationRef, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { NEVER, Observable, of, throwError } from 'rxjs';
+import { AuthService } from '../../../core/auth.service';
 import { LanguageService } from '../../../core/language.service';
 import { ClipboardService } from '../../../core/services/clipboard.service';
 import { FileDownloadService } from '../../../core/services/file-download.service';
@@ -31,22 +32,40 @@ const OPEN_PUBLICATION: GetPublicationResponse = {
     windowEndUtc: '2026-10-09T11:00:00Z',
 };
 
+interface SignedInAs {
+    isAdministrator: boolean;
+    isTeacher: boolean;
+    teacherId: string | null;
+}
+
+const ADMINISTRATOR: SignedInAs = { isAdministrator: true, isTeacher: false, teacherId: null };
+const TEACHER: SignedInAs = { isAdministrator: false, isTeacher: true, teacherId: 'teacher-yael' };
+
 function createStore(
     teachers: Observable<TeacherOption[]>,
     publication: Observable<GetPublicationResponse>,
+    user: SignedInAs = ADMINISTRATOR,
 ): PublicationsStore {
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
             { provide: LanguageService, useValue: { lang: signal('en'), locale: signal('en-IL') } },
-            { provide: TeacherOptionsApiService, useValue: { findTeachers: () => teachers } },
+            {
+                provide: AuthService,
+                useValue: {
+                    isAdministrator: signal(user.isAdministrator),
+                    isTeacher: signal(user.isTeacher),
+                    teacherId: signal(user.teacherId),
+                },
+            },
+            { provide: TeacherOptionsApiService, useValue: { findTeachers: vi.fn(() => teachers) } },
             {
                 provide: PublicationsApiService,
                 useValue: {
                     getByWeek: () => publication,
                     getDashboard: () => NEVER,
                     findHistory: () => of([]),
-                    downloadExcel: () => of(new Blob()),
+                    downloadExcel: vi.fn(() => of(new Blob())),
                 },
             },
             { provide: ToastService, useValue: { success: () => undefined, apiError: () => undefined } },
@@ -141,5 +160,52 @@ describe('PublicationsStore', () => {
         expect(store.weekNumber()).toBeUndefined();
         expect(store.dashboard()).toBeUndefined();
         expect(store.loadError()).toBe('publications.loadFailed');
+    });
+
+    it('offers the Teacher picker and the lifecycle controls to an Administrator', async () => {
+        //given
+        const store = await loadedStore();
+
+        //expected
+        expect(store.canChooseTeacher()).toBe(true);
+        expect(store.canManageLifecycle()).toBe(true);
+    });
+
+    it('never asks for the teacher list for a Teacher', async () => {
+        //given
+        const store = createStore(of(TEACHERS), of(OPEN_PUBLICATION), TEACHER);
+
+        //when
+        await vi.waitFor(() => expect(store.publication()).toBeDefined());
+
+        //then
+        expect(TestBed.inject(TeacherOptionsApiService).findTeachers).not.toHaveBeenCalled();
+        expect(store.teachers()).toEqual([]);
+        expect(store.canChooseTeacher()).toBe(false);
+        expect(store.canManageLifecycle()).toBe(false);
+    });
+
+    it('selects the linked Teacher for a Teacher and ignores picking another', async () => {
+        //given
+        const store = createStore(of(TEACHERS), of(OPEN_PUBLICATION), TEACHER);
+        await vi.waitFor(() => expect(store.publication()).toBeDefined());
+
+        //when
+        store.selectTeacher('teacher-levi');
+
+        //then
+        expect(store.selectedTeacherId()).toBe('teacher-yael');
+    });
+
+    it('downloads the linked Teacher\'s Excel workbook for a Teacher', async () => {
+        //given
+        const store = createStore(of(TEACHERS), of(OPEN_PUBLICATION), TEACHER);
+        await vi.waitFor(() => expect(store.publication()).toBeDefined());
+
+        //when
+        await store.downloadExcel();
+
+        //then
+        expect(TestBed.inject(PublicationsApiService).downloadExcel).toHaveBeenCalledWith('publication-1', 'teacher-yael');
     });
 });
