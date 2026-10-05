@@ -2,11 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 import { TranslocoService } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { ProblemDetails } from '../../shared/models/problem-details';
 
 const UNEXPECTED_ERROR_KEY = 'general.unexpectedError';
 
 const GENERIC_ERROR_KEYS: Partial<Record<number, string>> = {
+    [HttpStatusCode.Forbidden]: 'errors.forbidden',
     [HttpStatusCode.NotFound]: 'errors.notFound',
     [HttpStatusCode.Conflict]: 'errors.conflict',
 };
@@ -32,6 +34,17 @@ export class ToastService {
         this.messages.add({
             severity: 'success',
             summary,
+            detail: this.transloco.translate(detail.key, detail.params),
+        });
+    }
+
+    async info(key: string, detail: ToastDetail): Promise<void> {
+        const activeLang = this.transloco.getActiveLang();
+        await firstValueFrom(this.transloco.load(activeLang));
+
+        this.messages.add({
+            severity: 'info',
+            summary: this.transloco.translate(key),
             detail: this.transloco.translate(detail.key, detail.params),
         });
     }

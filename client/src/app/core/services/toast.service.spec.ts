@@ -7,12 +7,18 @@ import { ToastService } from './toast.service';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
+const HTTP_FORBIDDEN = 403;
 const HTTP_SERVER_ERROR = 500;
 
 const EN = {
+    access: {
+        refusedTitle: 'You don\'t have access to that page',
+        refusedDetail: 'We\'ve taken you to your Week Schedule.',
+    },
     errors: {
         carNameMustNotBeEmpty: 'Enter the car\'s name.',
         conflict: 'This change conflicts with the latest data. Refresh the page and try again.',
+        forbidden: 'You don\'t have permission to do that.',
         notFound: 'This item no longer exists. Refresh the page.',
         rosterFileMustContainRequiredColumns: 'The file is missing required columns: {{columns}}.',
     },
@@ -25,14 +31,14 @@ const EN = {
     },
 };
 
-function setUp() {
+function setUp(preloadLangs = true) {
     const add = vi.fn();
     TestBed.configureTestingModule({
         imports: [
             TranslocoTestingModule.forRoot({
                 langs: { en: EN },
                 translocoConfig: { availableLangs: ['en'], defaultLang: 'en' },
-                preloadLangs: true,
+                preloadLangs,
             }),
         ],
         providers: [provideZonelessChangeDetection(), { provide: MessageService, useValue: { add } }],
@@ -50,6 +56,34 @@ function shownSummary(add: ReturnType<typeof vi.fn>): string {
 }
 
 describe('ToastService', () => {
+    describe('info', () => {
+        it('shows an info toast with a title and a detail', async () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            await toast.info('access.refusedTitle', { key: 'access.refusedDetail' });
+
+            //then
+            expect(add).toHaveBeenCalledWith({
+                severity: 'info',
+                summary: 'You don\'t have access to that page',
+                detail: 'We\'ve taken you to your Week Schedule.',
+            });
+        });
+
+        it('waits for the translations before showing the info toast', async () => {
+            //given
+            const { toast, add } = setUp(false);
+
+            //when
+            await toast.info('access.refusedTitle', { key: 'access.refusedDetail' });
+
+            //then
+            expect(shownSummary(add)).toBe('You don\'t have access to that page');
+        });
+    });
+
     describe('apiError', () => {
         it('names the broken rule in the active language', () => {
             //given
@@ -140,6 +174,17 @@ describe('ToastService', () => {
 
             //then
             expect(shownSummary(add)).toBe('Something went wrong. Please try again.');
+        });
+
+        it('says the User may not do that when the server refuses with 403', () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            toast.apiError(new HttpErrorResponse({ status: HTTP_FORBIDDEN }));
+
+            //then
+            expect(shownSummary(add)).toBe('You don\'t have permission to do that.');
         });
     });
 

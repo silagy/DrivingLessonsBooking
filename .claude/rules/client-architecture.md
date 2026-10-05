@@ -219,6 +219,7 @@ export const AppRoutes = {
 - Features are lazy: `loadChildren: () => import('./features/publications/publications.routes')`
 - Feature routes files **default-export** a `Routes` array
 - Admin routes are guarded by `authGuard` (functional, `inject()`); the student form route is anonymous — the unguessable link token is the access control, mirroring the backend's `[AllowAnonymous]` posture
+- Role checks live in `core\role.guards.ts` (#89): Administrator-only feature routes add `canMatch: [administratorGuard]` (a Teacher-role User is sent to Weekly prep with an info toast, and never downloads the chunk); the dashboard uses `canActivate: [homeGuard]` with `pathMatch: 'full'` (a Teacher-role User lands on Weekly prep silently). They are UX only — the server's policies are the security boundary
 - The student route is short (`/s/{token}`) because it travels through WhatsApp
 - Enable `withComponentInputBinding()` — route params bind to page `input()`s
 

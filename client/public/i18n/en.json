@@ -455,6 +455,10 @@
       "hint": "If the school reopens the window, this link will work again."
     }
   },
+  "access": {
+    "refusedTitle": "You don't have access to that page",
+    "refusedDetail": "We've taken you to your Week Schedule."
+  },
   "general": {
     "refusedTitle": "That didn't go through",
     "save": "Save",
@@ -466,6 +470,7 @@
   },
   "errors": {
     "conflict": "This change conflicts with the latest data. Refresh the page and try again.",
+    "forbidden": "You don't have permission to do that.",
     "notFound": "This item no longer exists. Refresh the page.",
     "addressMustNotBeEmpty": "The address can't be empty.",
     "carAlreadyDeleted": "This car was already deleted. Refresh the page.",
