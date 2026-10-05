@@ -34,7 +34,8 @@ client\
     │   │   ├── auth\                  admin auth service, authGuard, auth interceptor
     │   │   ├── http\                  problem-details.ts, apiErrorInterceptor
     │   │   ├── layout\                admin shell: topbar, navigation
-    │   │   └── services\              language.service.ts, jerusalem-date.service.ts, toast.service.ts
+    │   │   ├── services\              language.service.ts, jerusalem-date.service.ts, toast.service.ts
+    │   │   └── signed-in-user\        SignedInUserStore over api/me: name, linked Teacher name (#90)
     │   │
     │   ├── features\                  one folder per bounded context, lazy-loaded
     │   │   ├── teachers\              admin: teachers & cars setup
@@ -43,7 +44,7 @@ client\
     │   │   └── student-form\          student: anonymous submission flow (by link token)
     │   │
     │   └── shared\                    feature-agnostic only — never imports from features\
-    │       ├── components\            week-grid, status-tag, empty-state, ...
+    │       ├── components\            week-grid, status-tag, empty-state, locked-field, ...
     │       ├── models\                cross-feature models (problem-details, paging)
     │       ├── pipes\
     │       └── config\
