@@ -17,6 +17,10 @@
     "logout": "Sign out",
     "userMenu": "User menu",
     "changeMyPassword": "Change my password",
+    "roles": {
+      "administrator": "Administrator",
+      "teacher": "Teacher"
+    },
     "languageToggle": "עברית",
     "language": "Language",
     "nav": {

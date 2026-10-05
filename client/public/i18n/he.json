@@ -17,6 +17,10 @@
     "logout": "התנתקות",
     "userMenu": "תפריט משתמש",
     "changeMyPassword": "שינוי הסיסמה שלי",
+    "roles": {
+      "administrator": "מנהל מערכת",
+      "teacher": "מורה"
+    },
     "languageToggle": "English",
     "language": "שפה",
     "nav": {
