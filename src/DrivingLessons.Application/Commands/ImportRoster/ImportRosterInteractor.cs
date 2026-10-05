@@ -153,6 +153,11 @@ public class ImportRosterInteractor
             return RosterRowFailureReason.UnknownCar;
         }
 
+        if (!car.IsAssignedTo(teacher))
+        {
+            return RosterRowFailureReason.CarNotAssignedToTeacher;
+        }
+
         LessonsStartDate? startDate = null;
 
         if (row.StartDate is not null)

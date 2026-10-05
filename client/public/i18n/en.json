@@ -114,7 +114,8 @@
       "missingCar": "Missing car",
       "unknownTeacher": "Teacher not found in the system",
       "unknownCar": "Car not found in the system",
-      "invalidStartDate": "Invalid start date"
+      "invalidStartDate": "Invalid start date",
+      "carNotAssignedToTeacher": "Car is not assigned to this Teacher"
     },
     "imported": "Roster imported",
     "loadFailed": "Failed to load the roster.",

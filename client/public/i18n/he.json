@@ -114,7 +114,8 @@
       "missingCar": "רכב חסר",
       "unknownTeacher": "מורה לא קיים במערכת",
       "unknownCar": "רכב לא קיים במערכת",
-      "invalidStartDate": "תאריך התחלה לא תקין"
+      "invalidStartDate": "תאריך התחלה לא תקין",
+      "carNotAssignedToTeacher": "הרכב לא משויך למורה הזה"
     },
     "imported": "הרשימה יובאה",
     "loadFailed": "טעינת רשימת התלמידים נכשלה.",
