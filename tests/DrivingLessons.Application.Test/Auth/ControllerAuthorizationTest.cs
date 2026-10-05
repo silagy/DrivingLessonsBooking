@@ -111,11 +111,23 @@ public class ControllerAuthorizationTest
 
         var policies = controller.GetCustomAttributes<AuthorizeAttribute>(true)
             .Concat(action.GetCustomAttributes<AuthorizeAttribute>(true))
-            .Select(attribute => attribute.Policy ?? AuthorizationPolicies.Administrator)
+            .Select(RuleOfAttribute)
             .DefaultIfEmpty(AuthorizationPolicies.Administrator)
             .Distinct()
             .Order();
 
         return string.Join("+", policies);
+    }
+
+    private static string RuleOfAttribute(AuthorizeAttribute attribute)
+    {
+        if (attribute.Policy is not null)
+        {
+            return attribute.Policy;
+        }
+
+        return attribute.Roles is null
+            ? AuthorizationPolicies.Administrator
+            : $"Roles:{attribute.Roles}";
     }
 }

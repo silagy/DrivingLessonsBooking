@@ -55,6 +55,9 @@ function storeSignedInAs(
 ) {
     const findTeachers = vi.fn(() => of([{ id: 'teacher-cohen', name: 'Teacher Cohen' }]));
     const create = vi.fn(() => of({ id: 'schedule-1' }));
+    const isAdministrator = signal(user.isAdministrator);
+    const isTeacher = signal(user.isTeacher);
+    const teacherId = signal(user.teacherId);
 
     TestBed.configureTestingModule({
         providers: [
@@ -62,11 +65,7 @@ function storeSignedInAs(
             { provide: LanguageService, useValue: { lang: signal('en'), locale: signal('en-IL') } },
             {
                 provide: AuthService,
-                useValue: {
-                    isAdministrator: signal(user.isAdministrator),
-                    isTeacher: signal(user.isTeacher),
-                    teacherId: signal(user.teacherId),
-                },
+                useValue: { isAdministrator, isTeacher, teacherId },
             },
             { provide: TeacherOptionsApiService, useValue: { findTeachers } },
             { provide: WeekSchedulesApiService, useValue: { getByTeacherAndWeek, create } },
@@ -75,7 +74,13 @@ function storeSignedInAs(
         ],
     });
 
-    return { store: TestBed.inject(WeekSchedulesStore), findTeachers, getByTeacherAndWeek, create };
+    const signIn = (next: SignedInAs) => {
+        isAdministrator.set(next.isAdministrator);
+        isTeacher.set(next.isTeacher);
+        teacherId.set(next.teacherId);
+    };
+
+    return { store: TestBed.inject(WeekSchedulesStore), findTeachers, getByTeacherAndWeek, create, signIn };
 }
 
 async function settle(): Promise<void> {
@@ -83,6 +88,21 @@ async function settle(): Promise<void> {
 }
 
 describe('WeekSchedulesStore', () => {
+    it('resets the selected Teacher when a Teacher signs out and an Administrator signs in', async () => {
+        //given
+        const { store, signIn } = storeSignedInAs(TEACHER);
+        await settle();
+        expect(store.selectedTeacherId()).toBe('teacher-yael');
+
+        //when
+        signIn(ADMINISTRATOR);
+        await settle();
+
+        //then
+        expect(store.selectedTeacherId()).toBeNull();
+        expect(store.canChooseTeacher()).toBe(true);
+    });
+
     it('reports the load error instead of throwing when the week fails to load', async () => {
         //given
         const { store } = storeSignedInAs(ADMINISTRATOR, vi.fn(serverError));

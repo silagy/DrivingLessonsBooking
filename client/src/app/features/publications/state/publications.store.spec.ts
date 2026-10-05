@@ -41,22 +41,30 @@ interface SignedInAs {
 const ADMINISTRATOR: SignedInAs = { isAdministrator: true, isTeacher: false, teacherId: null };
 const TEACHER: SignedInAs = { isAdministrator: false, isTeacher: true, teacherId: 'teacher-yael' };
 
+const isAdministrator = signal(true);
+const isTeacher = signal(false);
+const teacherId = signal<string | null>(null);
+
+function signIn(user: SignedInAs): void {
+    isAdministrator.set(user.isAdministrator);
+    isTeacher.set(user.isTeacher);
+    teacherId.set(user.teacherId);
+}
+
 function createStore(
     teachers: Observable<TeacherOption[]>,
     publication: Observable<GetPublicationResponse>,
     user: SignedInAs = ADMINISTRATOR,
 ): PublicationsStore {
+    signIn(user);
+
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
             { provide: LanguageService, useValue: { lang: signal('en'), locale: signal('en-IL') } },
             {
                 provide: AuthService,
-                useValue: {
-                    isAdministrator: signal(user.isAdministrator),
-                    isTeacher: signal(user.isTeacher),
-                    teacherId: signal(user.teacherId),
-                },
+                useValue: { isAdministrator, isTeacher, teacherId },
             },
             { provide: TeacherOptionsApiService, useValue: { findTeachers: vi.fn(() => teachers) } },
             {
@@ -88,6 +96,20 @@ async function loadedStore(): Promise<PublicationsStore> {
 }
 
 describe('PublicationsStore', () => {
+    it('selects the linked Teacher when an Administrator signs out and a Teacher signs in', async () => {
+        //given
+        const store = await loadedStore();
+        expect(store.selectedTeacherId()).toBe('teacher-cohen');
+
+        //when
+        signIn(TEACHER);
+        await TestBed.inject(ApplicationRef).whenStable();
+
+        //then
+        expect(store.selectedTeacherId()).toBe('teacher-yael');
+        expect(store.canChooseTeacher()).toBe(false);
+    });
+
     it('selects the first teacher by name once the teachers load', async () => {
         //given
         const store = await loadedStore();
