@@ -37,6 +37,7 @@ using DrivingLessons.Application.Queries.FindTeachers;
 using DrivingLessons.Application.Queries.FindUsers;
 using DrivingLessons.Application.Queries.GetCar;
 using DrivingLessons.Application.Queries.GetLatestRosterImport;
+using DrivingLessons.Application.Queries.GetMe;
 using DrivingLessons.Application.Queries.GetPublication;
 using DrivingLessons.Application.Queries.GetPublicationByLink;
 using DrivingLessons.Application.Queries.GetPublicationDashboard;
@@ -65,6 +66,7 @@ public static class DependencyInjection
         services.AddScoped<ChangeMyPasswordInteractor>();
         services.AddScoped<FindUsersInteractor>();
         services.AddScoped<GetUserInteractor>();
+        services.AddScoped<GetMeInteractor>();
         services.AddScoped<CreateTeacherInteractor>();
         services.AddScoped<CreateCarInteractor>();
         services.AddScoped<ChangeTeacherDetailsInteractor>();
