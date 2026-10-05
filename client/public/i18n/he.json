@@ -136,6 +136,7 @@
     "week": "שבוע",
     "selectTeacher": "בחרו מורה",
     "selectTeacherPrompt": "בחרו מורה ושבוע כדי להכין את הרשת.",
+    "notCreatedYet": "מנהל המערכת עדיין לא הכין את השבוע הזה.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
     "publishWeek": "פרסום שבוע...",

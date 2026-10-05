@@ -20,17 +20,19 @@
   </header>
 
   <div class="weekly-prep__selectors">
-    <div class="field">
-      <label for="teacher">{{ 'weekSchedules.teacher' | transloco }}</label>
-      <p-select
-        inputId="teacher"
-        [options]="store.teachers()"
-        optionLabel="name"
-        optionValue="id"
-        [ngModel]="store.selectedTeacherId()"
-        (ngModelChange)="store.selectTeacher($event)"
-        [placeholder]="'weekSchedules.selectTeacher' | transloco" />
-    </div>
+    @if (store.canChooseTeacher()) {
+      <div class="field">
+        <label for="teacher">{{ 'weekSchedules.teacher' | transloco }}</label>
+        <p-select
+          inputId="teacher"
+          [options]="store.teachers()"
+          optionLabel="name"
+          optionValue="id"
+          [ngModel]="store.selectedTeacherId()"
+          (ngModelChange)="store.selectTeacher($event)"
+          [placeholder]="'weekSchedules.selectTeacher' | transloco" />
+      </div>
+    }
     <div class="field">
       <label for="week">{{ 'weekSchedules.week' | transloco }}</label>
       <p-select
@@ -49,6 +51,8 @@
     <div class="weekly-prep__state">{{ errorKey | transloco }}</div>
   } @else if (!store.hasSelection()) {
     <div class="weekly-prep__state">{{ 'weekSchedules.selectTeacherPrompt' | transloco }}</div>
+  } @else if (store.isNotCreatedYet()) {
+    <div class="weekly-prep__state">{{ 'weekSchedules.notCreatedYet' | transloco }}</div>
   } @else if (store.weekSchedule()) {
     <section class="weekly-prep__card">
       <app-week-grid
