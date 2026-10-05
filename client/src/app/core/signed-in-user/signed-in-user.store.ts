@@ -18,6 +18,5 @@ export class SignedInUserStore {
         this.meResource.hasValue() ? this.meResource.value() : null,
     );
 
-    readonly name = computed(() => this.signedInUser()?.name ?? null);
     readonly teacherName = computed(() => this.signedInUser()?.teacherName ?? null);
 }

@@ -34,13 +34,13 @@
           <ng-template pTemplate="selectedItem" let-teacher>
             <span>{{ teacher.name }}</span>
             @if (teacher.isMe) {
-              <span>&nbsp;{{ 'weekSchedules.me' | transloco }}</span>
+              <span class="weekly-prep__me">{{ 'weekSchedules.me' | transloco }}</span>
             }
           </ng-template>
           <ng-template pTemplate="item" let-teacher>
             <span>{{ teacher.name }}</span>
             @if (teacher.isMe) {
-              <span>&nbsp;{{ 'weekSchedules.me' | transloco }}</span>
+              <span class="weekly-prep__me">{{ 'weekSchedules.me' | transloco }}</span>
             }
           </ng-template>
         </p-select>

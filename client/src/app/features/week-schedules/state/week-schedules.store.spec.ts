@@ -84,7 +84,7 @@ function storeSignedInAs(
                 provide: AuthService,
                 useValue: { isAdministrator, isTeacher, teacherId },
             },
-            { provide: SignedInUserStore, useValue: { name: signal<string | null>('Signed In User'), teacherName } },
+            { provide: SignedInUserStore, useValue: { teacherName } },
             { provide: TeacherOptionsApiService, useValue: { findTeachers } },
             { provide: WeekSchedulesApiService, useValue: { getByTeacherAndWeek, create } },
             { provide: PublicationStatusApiService, useValue: { getByWeek: () => of(DRAFT_PUBLICATION) } },

@@ -60,7 +60,6 @@ describe('SignedInUserStore', () => {
         await settle();
 
         //then
-        expect(store.name()).toBe('Yael Carmi');
         expect(store.teacherName()).toBe('Teacher Yael');
         expect(store.teacherName()).toBe('Teacher Yael');
         expect(getMe).toHaveBeenCalledTimes(1);
@@ -75,7 +74,6 @@ describe('SignedInUserStore', () => {
 
         //then
         expect(getMe).not.toHaveBeenCalled();
-        expect(store.name()).toBeNull();
         expect(store.teacherName()).toBeNull();
     });
 
@@ -87,7 +85,6 @@ describe('SignedInUserStore', () => {
         await settle();
 
         //then
-        expect(store.name()).toBe('Dani Levi');
         expect(store.teacherName()).toBeNull();
     });
 
@@ -103,7 +100,6 @@ describe('SignedInUserStore', () => {
 
         //then
         expect(getMe).toHaveBeenCalledTimes(2);
-        expect(store.name()).toBe('Dani Levi');
         expect(store.teacherName()).toBeNull();
     });
 
@@ -118,7 +114,6 @@ describe('SignedInUserStore', () => {
 
         //then
         expect(getMe).toHaveBeenCalledTimes(1);
-        expect(store.name()).toBeNull();
         expect(store.teacherName()).toBeNull();
     });
 
@@ -133,7 +128,6 @@ describe('SignedInUserStore', () => {
         await settle();
 
         //then
-        expect(store.name()).toBeNull();
         expect(store.teacherName()).toBeNull();
     });
 });
