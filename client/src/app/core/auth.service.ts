@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
+import { Role } from '../shared/models/role.enum';
 import { AppRoutes } from '../shared/config/app-routes';
 
 export interface LoginResponse {
@@ -11,7 +12,7 @@ export interface LoginResponse {
 
 const TOKEN_KEY = 'auth_token';
 
-type TokenClaim = 'email' | 'sub';
+type TokenClaim = 'email' | 'sub' | 'role' | 'teacher_id';
 
 const BASE64_BLOCK = 4;
 
@@ -34,6 +35,10 @@ function readClaim(token: string | null, claim: TokenClaim): string | null {
   }
 }
 
+function roleOf(claim: string | null): Role | null {
+  return Object.values(Role).find((role) => role === claim) ?? null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -43,6 +48,10 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.token() !== null);
   readonly email = computed(() => readClaim(this.token(), 'email'));
   readonly userId = computed(() => readClaim(this.token(), 'sub'));
+  readonly role = computed(() => roleOf(readClaim(this.token(), 'role')));
+  readonly teacherId = computed(() => readClaim(this.token(), 'teacher_id'));
+  readonly isAdministrator = computed(() => this.role() === Role.administrator);
+  readonly isTeacher = computed(() => this.role() === Role.teacher);
 
   login(email: string, password: string) {
     return this.http

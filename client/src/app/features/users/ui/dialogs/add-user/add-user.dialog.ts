@@ -16,7 +16,7 @@ import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LinkableTeacher } from '../../../domain/linkable-teacher.model';
-import { Role } from '../../../domain/role.enum';
+import { Role } from '../../../../../shared/models/role.enum';
 import { isTeacherLinkRequired } from '../../../domain/teacher-link';
 
 export interface AddUserDialogData {

@@ -1,4 +1,4 @@
-import { Role } from './role.enum';
+import { Role } from '../../../shared/models/role.enum';
 
 export function otherRole(role: Role): Role {
     return role === Role.administrator ? Role.teacher : Role.administrator;

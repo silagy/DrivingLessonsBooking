@@ -1,4 +1,4 @@
-import { Role } from '../domain/role.enum';
+import { Role } from '../../../shared/models/role.enum';
 
 export interface ItemForFindUsersResponse {
     id: string;
