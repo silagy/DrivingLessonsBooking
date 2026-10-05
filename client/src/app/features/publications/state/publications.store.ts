@@ -6,6 +6,7 @@ import { AppRoutes } from '../../../shared/config/app-routes';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
 import { windowTimesOf } from '../../../shared/dates/window-times';
+import { AuthService } from '../../../core/auth.service';
 import { LanguageService } from '../../../core/language.service';
 import { formatInstantInJerusalem } from '../domain/jerusalem-time';
 import { ClipboardService } from '../../../core/services/clipboard.service';
@@ -28,6 +29,7 @@ const HTTP_NOT_FOUND = 404;
 
 @Injectable({ providedIn: 'root' })
 export class PublicationsStore {
+    private readonly auth = inject(AuthService);
     private readonly api = inject(PublicationsApiService);
     private readonly teachersApi = inject(TeacherOptionsApiService);
     private readonly toast = inject(ToastService);
@@ -41,6 +43,7 @@ export class PublicationsStore {
     private readonly loadedAtState = signal<string | null>(null);
 
     private readonly teachersResource = resource({
+        params: () => (this.auth.isAdministrator() ? true : undefined),
         loader: () => firstValueFrom(this.teachersApi.findTeachers()),
     });
 
@@ -90,10 +93,13 @@ export class PublicationsStore {
 
     private readonly selectedTeacherIdState = linkedSignal<TeacherOption[], string | null>({
         source: this.teachers,
-        computation: (teachers, previous) => previous?.value ?? teachers[0]?.id ?? null,
+        computation: (teachers, previous) =>
+            this.auth.isTeacher() ? this.auth.teacherId() : (previous?.value ?? teachers[0]?.id ?? null),
     });
 
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
+    readonly canChooseTeacher = computed(() => this.auth.isAdministrator());
+    readonly canManageLifecycle = computed(() => this.auth.isAdministrator());
 
     readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
 
@@ -156,6 +162,10 @@ export class PublicationsStore {
     });
 
     selectTeacher(teacherId: string): void {
+        if (!this.canChooseTeacher()) {
+            return;
+        }
+
         this.selectedTeacherIdState.set(teacherId);
     }
 

@@ -3,50 +3,15 @@
     <app-brand-logo />
 
     <nav class="shell__nav">
-      <a
-        routerLink="/"
-        routerLinkActive="shell__nav-link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="shell__nav-link">
-        {{ 'shell.nav.dashboard' | transloco }}
-      </a>
-      <a
-        [routerLink]="['/', appRoutes.teachers]"
-        routerLinkActive="shell__nav-link--active"
-        class="shell__nav-link">
-        {{ 'shell.nav.teachers' | transloco }}
-      </a>
-      <a
-        [routerLink]="['/', appRoutes.roster]"
-        routerLinkActive="shell__nav-link--active"
-        class="shell__nav-link">
-        {{ 'shell.nav.roster' | transloco }}
-      </a>
-      <a
-        [routerLink]="['/', appRoutes.weekSchedules]"
-        routerLinkActive="shell__nav-link--active"
-        class="shell__nav-link">
-        {{ 'shell.nav.weeklyPrep' | transloco }}
-      </a>
-      <a
-        [routerLink]="['/', appRoutes.publications]"
-        routerLinkActive="shell__nav-link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="shell__nav-link">
-        {{ 'shell.nav.publications' | transloco }}
-      </a>
-      <a
-        [routerLink]="['/', appRoutes.publications, appRoutes.publicationsHistory]"
-        routerLinkActive="shell__nav-link--active"
-        class="shell__nav-link">
-        {{ 'shell.nav.history' | transloco }}
-      </a>
-      <a
-        [routerLink]="['/', appRoutes.users]"
-        routerLinkActive="shell__nav-link--active"
-        class="shell__nav-link">
-        {{ 'shell.nav.users' | transloco }}
-      </a>
+      @for (item of navigation(); track item.labelKey) {
+        <a
+          [routerLink]="item.commands"
+          routerLinkActive="shell__nav-link--active"
+          [routerLinkActiveOptions]="{ exact: item.exact }"
+          class="shell__nav-link">
+          {{ item.labelKey | transloco }}
+        </a>
+      }
     </nav>
 
     <div class="shell__actions">
@@ -77,9 +42,19 @@
         <ng-template #start>
           <div class="shell-user-menu__header">
             <span class="shell__avatar shell__avatar--large" aria-hidden="true">{{ initials() }}</span>
-            @if (auth.email(); as email) {
-              <bdi class="shell-user-menu__email" dir="ltr">{{ email }}</bdi>
-            }
+            <div class="shell-user-menu__identity">
+              @if (auth.email(); as email) {
+                <bdi class="shell-user-menu__email" dir="ltr">{{ email }}</bdi>
+              }
+              @if (auth.role(); as role) {
+                <span
+                  class="shell-user-menu__role"
+                  [class.shell-user-menu__role--administrator]="role === roles.administrator"
+                  [class.shell-user-menu__role--teacher]="role === roles.teacher">
+                  {{ 'shell.roles.' + role | transloco }}
+                </span>
+              }
+            </div>
           </div>
         </ng-template>
       </p-menu>

@@ -14,7 +14,7 @@ import { ItemForFindUsersResponse } from '../data/item-for-find-users.response';
 import { SetUserTemporaryPasswordRequest } from '../data/set-user-temporary-password.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { UsersApiService } from '../data/users-api.service';
-import { Role } from '../domain/role.enum';
+import { Role } from '../../../shared/models/role.enum';
 import { UsersStore } from './users.store';
 
 const HTTP_CONFLICT = 409;

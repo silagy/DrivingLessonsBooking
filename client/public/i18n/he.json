@@ -17,6 +17,10 @@
     "logout": "התנתקות",
     "userMenu": "תפריט משתמש",
     "changeMyPassword": "שינוי הסיסמה שלי",
+    "roles": {
+      "administrator": "מנהל מערכת",
+      "teacher": "מורה"
+    },
     "languageToggle": "English",
     "language": "שפה",
     "nav": {
@@ -132,6 +136,7 @@
     "week": "שבוע",
     "selectTeacher": "בחרו מורה",
     "selectTeacherPrompt": "בחרו מורה ושבוע כדי להכין את הרשת.",
+    "notCreatedYet": "מנהל המערכת עדיין לא הכין את השבוע הזה.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
     "publishWeek": "פרסום שבוע...",
@@ -217,6 +222,7 @@
       "totalPicks": "סה״כ בחירות",
       "lastSubmission": "הגשה אחרונה",
       "draftPrompt": "השבוע הוכן אך טרם פורסם. פרסמו אותו כדי לפתוח את חלון ההגשות וליצור את הקישור.",
+      "draftPromptTeacher": "השבוע הוכן אך טרם פורסם. מנהל המערכת יפרסם אותו ויפתח את חלון ההגשות.",
       "publishedNotice": "ההגשות ייפתחו אוטומטית ב־{{opensAt}}.",
       "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה.",
       "weekTitle": "- שבוע {{weekNumber}}",
@@ -455,6 +461,10 @@
       "hint": "אם בית הספר יפתח את החלון מחדש, הקישור יעבוד שוב."
     }
   },
+  "access": {
+    "refusedTitle": "אין לך גישה לדף הזה",
+    "refusedDetail": "הועברת למערכת השבועית שלך."
+  },
   "general": {
     "refusedTitle": "הפעולה לא בוצעה",
     "save": "שמירה",
@@ -466,6 +476,7 @@
   },
   "errors": {
     "conflict": "השינוי מתנגש בנתונים העדכניים. רעננו את הדף ונסו שוב.",
+    "forbidden": "אין לך הרשאה לבצע את הפעולה הזו.",
     "notFound": "הפריט הזה כבר לא קיים. רעננו את הדף.",
     "addressMustNotBeEmpty": "הכתובת לא יכולה להיות ריקה.",
     "carAlreadyDeleted": "הרכב הזה כבר נמחק. רעננו את הדף.",
