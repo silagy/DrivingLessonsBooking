@@ -18,8 +18,7 @@ public class StudentTest
         var nationalId = Faker.FakeNationalId();
         var name = StudentName.Of(Faker.FakeString());
         var phone = PhoneNumber.Of(Faker.FakePhoneNumber());
-        var teacher = TeacherFakeBuilder.Build();
-        var car = CarFakeBuilder.Build();
+        var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
         var address = Address.Of(Faker.FakeString());
         var startDate = LessonsStartDate.Of(Faker.FakeDate());
         var licenseType = LicenseType.Of(Faker.FakeString());
@@ -46,8 +45,7 @@ public class StudentTest
         var nationalId = Faker.FakeNationalId();
         var name = StudentName.Of(Faker.FakeString());
         var phone = PhoneNumber.Of(Faker.FakePhoneNumber());
-        var teacher = TeacherFakeBuilder.Build();
-        var car = CarFakeBuilder.Build();
+        var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
         var address = Address.Of(Faker.FakeString());
         var startDate = LessonsStartDate.Of(Faker.FakeDate());
         var licenseType = LicenseType.Of(Faker.FakeString());
@@ -68,14 +66,58 @@ public class StudentTest
     }
 
     [TestMethod]
+    public void Create_With_A_Shared_Car()
+    {
+        //given
+        var (car, otherTeacher) = CarFakeBuilder.Build().AssignFakeTeacher();
+        var teacher = TeacherFakeBuilder.Build();
+        car.AssignTeacher(teacher);
+        var nationalId = Faker.FakeNationalId();
+        var name = StudentName.Of(Faker.FakeString());
+        var phone = PhoneNumber.Of(Faker.FakePhoneNumber());
+
+        //when
+        var student = Student.Create(nationalId, name, phone, teacher, car, null, null, null);
+
+        //then
+        student.TeacherId.ShouldBe(teacher.Id);
+        student.TeacherId.ShouldNotBe(otherTeacher.Id);
+        student.CarId.ShouldBe(car.Id);
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Create__Must_Be_Car_Of_Teacher(bool carAssignedToAnotherTeacher)
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+        var car = CarFakeBuilder.Build();
+
+        if (carAssignedToAnotherTeacher)
+        {
+            car.AssignFakeTeacher();
+        }
+
+        var nationalId = Faker.FakeNationalId();
+        var name = StudentName.Of(Faker.FakeString());
+        var phone = PhoneNumber.Of(Faker.FakePhoneNumber());
+
+        //when
+        var act = () => Student.Create(nationalId, name, phone, teacher, car, null, null, null);
+
+        //then
+        Should.Throw<StudentCarMustBeAssignedToTeacherException>(act);
+    }
+
+    [TestMethod]
     public void Update_From_Roster()
     {
         //given
         var student = new StudentFakeBuilder().Build();
         var newName = StudentName.Of(Faker.FakeString());
         var newPhone = PhoneNumber.Of(Faker.FakePhoneNumber());
-        var newTeacher = TeacherFakeBuilder.Build();
-        var newCar = CarFakeBuilder.Build();
+        var (newCar, newTeacher) = CarFakeBuilder.Build().AssignFakeTeacher();
         var newAddress = Address.Of(Faker.FakeString());
         var newStartDate = LessonsStartDate.Of(Faker.FakeDate());
         var newLicenseType = LicenseType.Of(Faker.FakeString());
@@ -100,8 +142,7 @@ public class StudentTest
         var student = new StudentFakeBuilder().Build();
         var newName = StudentName.Of(Faker.FakeString());
         var newPhone = PhoneNumber.Of(Faker.FakePhoneNumber());
-        var newTeacher = TeacherFakeBuilder.Build();
-        var newCar = CarFakeBuilder.Build();
+        var (newCar, newTeacher) = CarFakeBuilder.Build().AssignFakeTeacher();
         var newAddress = Address.Of(Faker.FakeString());
         var newStartDate = LessonsStartDate.Of(Faker.FakeDate());
         var newLicenseType = LicenseType.Of(Faker.FakeString());
@@ -117,6 +158,57 @@ public class StudentTest
                         && x.TeacherId == newTeacher.Id
                         && x.CarId == newCar.Id)
             .ShouldHaveSingleItem();
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Update_From_Roster__Must_Be_Car_Of_Teacher(bool carAssignedToAnotherTeacher)
+    {
+        //given
+        var student = new StudentFakeBuilder().Build();
+        var newTeacher = TeacherFakeBuilder.Build();
+        var newCar = CarFakeBuilder.Build();
+
+        if (carAssignedToAnotherTeacher)
+        {
+            newCar.AssignFakeTeacher();
+        }
+
+        var newName = StudentName.Of(Faker.FakeString());
+        var newPhone = PhoneNumber.Of(Faker.FakePhoneNumber());
+
+        //when
+        var act = () => student.UpdateFromRoster(newName, newPhone, newTeacher, newCar, null, null, null);
+
+        //then
+        Should.Throw<StudentCarMustBeAssignedToTeacherException>(act);
+    }
+
+    [TestMethod]
+    public void Update_From_Roster__Rejected_Car_Leaves_Student_Unchanged()
+    {
+        //given
+        var student = new StudentFakeBuilder().Build();
+        var originalName = student.Name;
+        var originalPhone = student.Phone;
+        var originalTeacherId = student.TeacherId;
+        var originalCarId = student.CarId;
+        var newTeacher = TeacherFakeBuilder.Build();
+        var newCar = CarFakeBuilder.Build();
+        var newName = StudentName.Of(Faker.FakeString());
+        var newPhone = PhoneNumber.Of(Faker.FakePhoneNumber());
+
+        //when
+        Should.Throw<StudentCarMustBeAssignedToTeacherException>(
+            () => student.UpdateFromRoster(newName, newPhone, newTeacher, newCar, null, null, null));
+
+        //then
+        student.Name.ShouldBe(originalName);
+        student.Phone.ShouldBe(originalPhone);
+        student.TeacherId.ShouldBe(originalTeacherId);
+        student.CarId.ShouldBe(originalCarId);
+        student.UncommittedEvents.OfType<StudentUpdatedFromRoster>().ShouldBeEmpty();
     }
 
     [TestMethod]

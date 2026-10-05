@@ -27,6 +27,12 @@ public class StudentFakeBuilder
     {
         var resolvedTeacher = teacher ?? TeacherFakeBuilder.Build();
         var resolvedCar = car ?? CarFakeBuilder.Build();
+
+        if (!resolvedCar.IsAssignedTo(resolvedTeacher))
+        {
+            resolvedCar.AssignTeacher(resolvedTeacher);
+        }
+
         var nationalId = Faker.FakeNationalId();
         var name = StudentName.Of(Faker.FakeString());
         var phone = PhoneNumber.Of(Faker.FakePhoneNumber());

@@ -58,6 +58,8 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
+        MustBeCarOfTeacher(car, teacher);
+
         const bool isActive = true;
         var id = StudentId.New();
 
@@ -83,6 +85,8 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
+        MustBeCarOfTeacher(car, teacher);
+
         Name = name;
         Phone = phone;
         TeacherId = teacher.Id;
@@ -125,6 +129,14 @@ public class Student : AggregateRoot<StudentId>
         if (IsActive)
         {
             throw new StudentAlreadyActiveException(Id);
+        }
+    }
+
+    private static void MustBeCarOfTeacher(Car car, Teacher teacher)
+    {
+        if (!car.IsAssignedTo(teacher))
+        {
+            throw new StudentCarMustBeAssignedToTeacherException(car.Id, teacher.Id);
         }
     }
 }

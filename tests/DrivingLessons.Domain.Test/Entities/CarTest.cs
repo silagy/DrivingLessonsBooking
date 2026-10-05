@@ -231,6 +231,58 @@ public class CarTest
     }
 
     [TestMethod]
+    public void Is_Assigned_To_Assigned_Teacher()
+    {
+        //given
+        var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
+
+        //when
+        var isAssigned = car.IsAssignedTo(teacher);
+
+        //then
+        isAssigned.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Is_Assigned_To_Each_Teacher_Of_A_Shared_Car()
+    {
+        //given
+        var (car, first) = CarFakeBuilder.Build().AssignFakeTeacher();
+        var second = TeacherFakeBuilder.Build();
+        car.AssignTeacher(second);
+
+        //when
+        var isAssignedToFirst = car.IsAssignedTo(first);
+        var isAssignedToSecond = car.IsAssignedTo(second);
+
+        //then
+        isAssignedToFirst.ShouldBeTrue();
+        isAssignedToSecond.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Is_Not_Assigned_To_Other_Teacher(bool wasAssignedBefore)
+    {
+        //given
+        var car = CarFakeBuilder.Build();
+        var teacher = TeacherFakeBuilder.Build();
+
+        if (wasAssignedBefore)
+        {
+            car.AssignTeacher(teacher);
+            car.UnassignTeacher(teacher);
+        }
+
+        //when
+        var isAssigned = car.IsAssignedTo(teacher);
+
+        //then
+        isAssigned.ShouldBeFalse();
+    }
+
+    [TestMethod]
     public void Delete()
     {
         //given

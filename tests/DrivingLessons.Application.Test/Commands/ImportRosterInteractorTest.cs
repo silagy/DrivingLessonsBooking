@@ -43,6 +43,7 @@ public class ImportRosterInteractorTest
 
         teacher = Teacher.Create(TeacherName.Of("משה לוי"), Email.Of("moshe@school.co.il"));
         car = Car.Create(CarName.Of("טויוטה 123"), CarType.Of("יאריס"), Transmission.Manual);
+        car.AssignTeacher(teacher);
         persistedImport = null;
 
         A.CallTo(() => teacherRepository.FindActiveAsync())
