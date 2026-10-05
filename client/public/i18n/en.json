@@ -26,7 +26,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "teachers": "Cars & teachers",
-      "roster": "Roster",
+      "students": "Students",
       "weeklyPrep": "Weekly prep",
       "publications": "Publications",
       "history": "History",
@@ -79,8 +79,9 @@
     "carsEmptySubtitle": "Add the first car to build the shared pool."
   },
   "roster": {
-    "title": "Student roster",
-    "subtitle": "Upload the school's CSV to add students and update their teachers and cars.",
+    "title": "Import Roster",
+    "subtitle": "A CSV file adds new Students and updates existing ones by national ID. It never deactivates anyone.",
+    "back": "Back to Students",
     "uploadCsv": "Upload CSV",
     "processed": "Processed",
     "rowsSummary": "{{rows}} rows · {{time}}",
@@ -124,6 +125,50 @@
     "imported": "Roster imported",
     "loadFailed": "Failed to load the roster.",
     "empty": "No students yet. Upload the school's CSV to build the roster."
+  },
+  "students": {
+    "title": "Students",
+    "subtitle": "Students are the people who submit weekly requests. This list includes Students from the Roster and Students added by hand.",
+    "importRoster": "Import Roster",
+    "filters": {
+      "teacher": "Teacher",
+      "allTeachers": "All Teachers",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "all": "All",
+      "search": "Search",
+      "searchPlaceholder": "Name or national ID"
+    },
+    "table": {
+      "name": "Name",
+      "nationalId": "National ID",
+      "phone": "Phone",
+      "teacher": "Teacher",
+      "car": "Car",
+      "status": "Status",
+      "student": "Student",
+      "teacherAndCar": "Teacher and Car"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "transmissions": {
+      "automatic": "Automatic",
+      "manual": "Manual"
+    },
+    "new": "New",
+    "footer": "{{count}} Students",
+    "footerOne": "1 Student",
+    "loading": "Loading Students...",
+    "loadFailed": "We couldn't load the Students.",
+    "retry": "Try again",
+    "emptyTitle": "No Students yet",
+    "emptyHint": "Add a Student by hand, or import the Roster file.",
+    "noMatchTitle": "No Students match these filters",
+    "noMatchHint": "Try another Teacher or status.",
+    "clearFilters": "Clear filters"
   },
   "dashboard": {
     "title": "Dashboard",

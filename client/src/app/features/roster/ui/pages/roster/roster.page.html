@@ -1,4 +1,8 @@
 <div class="roster">
+    <a class="roster__back" [routerLink]="studentsLink">
+        <i class="pi pi-chevron-left roster__back-icon" aria-hidden="true"></i>
+        {{ 'roster.back' | transloco }}
+    </a>
     <header class="roster__header">
         <div>
             <h2 class="roster__title">{{ 'roster.title' | transloco }}</h2>
