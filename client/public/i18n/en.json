@@ -135,6 +135,7 @@
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
+    "me": "(me)",
     "selectTeacherPrompt": "Select a teacher and week to prepare the grid.",
     "notCreatedYet": "The Administrator hasn't prepared this week yet.",
     "cellOpen": "Open",

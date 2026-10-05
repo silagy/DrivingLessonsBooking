@@ -135,6 +135,7 @@
     "teacher": "מורה",
     "week": "שבוע",
     "selectTeacher": "בחרו מורה",
+    "me": "(אני)",
     "selectTeacherPrompt": "בחרו מורה ושבוע כדי להכין את הרשת.",
     "notCreatedYet": "מנהל המערכת עדיין לא הכין את השבוע הזה.",
     "cellOpen": "פתוח",

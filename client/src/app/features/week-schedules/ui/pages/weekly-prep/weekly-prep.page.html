@@ -30,8 +30,26 @@
           optionValue="id"
           [ngModel]="store.selectedTeacherId()"
           (ngModelChange)="store.selectTeacher($event)"
-          [placeholder]="'weekSchedules.selectTeacher' | transloco" />
+          [placeholder]="'weekSchedules.selectTeacher' | transloco">
+          <ng-template pTemplate="selectedItem" let-teacher>
+            <span>{{ teacher.name }}</span>
+            @if (teacher.isMe) {
+              <span>&nbsp;{{ 'weekSchedules.me' | transloco }}</span>
+            }
+          </ng-template>
+          <ng-template pTemplate="item" let-teacher>
+            <span>{{ teacher.name }}</span>
+            @if (teacher.isMe) {
+              <span>&nbsp;{{ 'weekSchedules.me' | transloco }}</span>
+            }
+          </ng-template>
+        </p-select>
       </div>
+    } @else {
+      <app-locked-field
+        class="field"
+        [label]="'weekSchedules.teacher' | transloco"
+        [value]="store.ownTeacherName() ?? ''" />
     }
     <div class="field">
       <label for="week">{{ 'weekSchedules.week' | transloco }}</label>

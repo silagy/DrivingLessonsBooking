@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { LanguageService } from '../../../core/language.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { SignedInUserStore } from '../../../core/signed-in-user/signed-in-user.store';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
 import { GetPublicationResponse } from '../data/get-publication.response';
 import { GetWeekScheduleResponse } from '../data/get-week-schedule.response';
@@ -23,7 +24,13 @@ interface SignedInAs {
 }
 
 const ADMINISTRATOR: SignedInAs = { isAdministrator: true, isTeacher: false, teacherId: null };
+const LINKED_ADMINISTRATOR: SignedInAs = { isAdministrator: true, isTeacher: false, teacherId: 'teacher-cohen' };
 const TEACHER: SignedInAs = { isAdministrator: false, isTeacher: true, teacherId: 'teacher-yael' };
+
+const TEACHER_NAMES: Record<string, string> = {
+    'teacher-yael': 'Yael Carmi',
+    'teacher-cohen': 'Teacher Cohen',
+};
 
 const WEEK_SCHEDULE: GetWeekScheduleResponse = {
     id: 'schedule-1',
@@ -49,15 +56,25 @@ function serverError() {
     return throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR }));
 }
 
+function teacherNameOf(user: SignedInAs): string | null {
+    return user.teacherId ? TEACHER_NAMES[user.teacherId] : null;
+}
+
 function storeSignedInAs(
     user: SignedInAs,
     getByTeacherAndWeek: ReturnType<typeof vi.fn> = vi.fn(() => of(WEEK_SCHEDULE)),
 ) {
-    const findTeachers = vi.fn(() => of([{ id: 'teacher-cohen', name: 'Teacher Cohen' }]));
+    const findTeachers = vi.fn(() =>
+        of([
+            { id: 'teacher-levi', name: 'Teacher Levi' },
+            { id: 'teacher-cohen', name: 'Teacher Cohen' },
+        ]),
+    );
     const create = vi.fn(() => of({ id: 'schedule-1' }));
     const isAdministrator = signal(user.isAdministrator);
     const isTeacher = signal(user.isTeacher);
     const teacherId = signal(user.teacherId);
+    const teacherName = signal<string | null>(teacherNameOf(user));
 
     TestBed.configureTestingModule({
         providers: [
@@ -67,6 +84,7 @@ function storeSignedInAs(
                 provide: AuthService,
                 useValue: { isAdministrator, isTeacher, teacherId },
             },
+            { provide: SignedInUserStore, useValue: { name: signal<string | null>('Signed In User'), teacherName } },
             { provide: TeacherOptionsApiService, useValue: { findTeachers } },
             { provide: WeekSchedulesApiService, useValue: { getByTeacherAndWeek, create } },
             { provide: PublicationStatusApiService, useValue: { getByWeek: () => of(DRAFT_PUBLICATION) } },
@@ -78,6 +96,7 @@ function storeSignedInAs(
         isAdministrator.set(next.isAdministrator);
         isTeacher.set(next.isTeacher);
         teacherId.set(next.teacherId);
+        teacherName.set(teacherNameOf(next));
     };
 
     return { store: TestBed.inject(WeekSchedulesStore), findTeachers, getByTeacherAndWeek, create, signIn };
@@ -149,6 +168,48 @@ describe('WeekSchedulesStore', () => {
         expect(store.isNotCreatedYet()).toBe(false);
     });
 
+    it('opens a linked Administrator\'s own Teacher by default', async () => {
+        //given
+        const { store, getByTeacherAndWeek } = storeSignedInAs(LINKED_ADMINISTRATOR);
+
+        //when
+        await settle();
+
+        //then
+        expect(store.canChooseTeacher()).toBe(true);
+        expect(store.selectedTeacherId()).toBe('teacher-cohen');
+        expect(getByTeacherAndWeek).toHaveBeenCalledWith('teacher-cohen', store.selectedWeekStart());
+        expect(store.weekSchedule()?.id).toBe('schedule-1');
+    });
+
+    it('still lets a linked Administrator choose another Teacher', async () => {
+        //given
+        const { store, getByTeacherAndWeek } = storeSignedInAs(LINKED_ADMINISTRATOR);
+        await settle();
+
+        //when
+        store.selectTeacher('teacher-levi');
+        await settle();
+
+        //then
+        expect(store.selectedTeacherId()).toBe('teacher-levi');
+        expect(getByTeacherAndWeek).toHaveBeenLastCalledWith('teacher-levi', store.selectedWeekStart());
+    });
+
+    it('marks the signed-in User\'s own Teacher as me', async () => {
+        //given
+        const { store } = storeSignedInAs(LINKED_ADMINISTRATOR);
+
+        //when
+        await settle();
+
+        //then
+        expect(store.teachers()).toEqual([
+            { id: 'teacher-cohen', name: 'Teacher Cohen', isMe: true },
+            { id: 'teacher-levi', name: 'Teacher Levi', isMe: false },
+        ]);
+    });
+
     it('never asks for the teacher list for a Teacher', async () => {
         //given
         const { store, findTeachers } = storeSignedInAs(TEACHER);
@@ -174,6 +235,18 @@ describe('WeekSchedulesStore', () => {
         expect(store.selectedTeacherId()).toBe('teacher-yael');
         expect(getByTeacherAndWeek).toHaveBeenCalledWith('teacher-yael', store.selectedWeekStart());
         expect(store.weekSchedule()?.id).toBe('schedule-1');
+    });
+
+    it('names the Teacher\'s own Teacher for the locked field', async () => {
+        //given
+        const { store } = storeSignedInAs(TEACHER);
+
+        //when
+        await settle();
+
+        //then
+        expect(store.canChooseTeacher()).toBe(false);
+        expect(store.ownTeacherName()).toBe('Yael Carmi');
     });
 
     it('ignores a Teacher picking another Teacher', async () => {
