@@ -306,6 +306,25 @@ public class ImportRosterInteractorTest
     }
 
     [TestMethod]
+    public async Task Car_Not_Of_Teacher_Row_Does_Not_Reactivate_Inactive_Student()
+    {
+        //given
+        var student = ExistingStudent("123456782");
+        student.Deactivate();
+        StudentsAre(student);
+        RowsAre(MismatchedRow(2, "דנה כהן", "123456782"));
+
+        //when
+        var response = await interactor.ExecuteAsync(Request());
+
+        //then
+        response.Failed.ShouldBe(1);
+        response.Updated.ShouldBe(0);
+        student.IsActive.ShouldBeFalse();
+        student.UncommittedEvents.OfType<StudentReactivated>().ShouldBeEmpty();
+    }
+
+    [TestMethod]
     public async Task Shared_Car_Row_Is_Imported()
     {
         //given

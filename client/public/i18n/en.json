@@ -76,7 +76,7 @@
   },
   "roster": {
     "title": "Student roster",
-    "subtitle": "Upload the school's CSV to sync students, their teachers, and cars.",
+    "subtitle": "Upload the school's CSV to add students and update their teachers and cars.",
     "uploadCsv": "Upload CSV",
     "processed": "Processed",
     "rowsSummary": "{{rows}} rows · {{time}}",
