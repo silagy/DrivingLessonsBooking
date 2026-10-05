@@ -3,6 +3,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
+import { isolateDirection } from '../../shared/text/isolate-direction';
 import { ToastService } from './toast.service';
 
 const HTTP_NOT_FOUND = 404;
@@ -232,6 +233,25 @@ describe('ToastService', () => {
             //then
             expect(message).toBe('Enter the car\'s name.');
             expect(add).not.toHaveBeenCalled();
+        });
+
+        it('isolates the direction of only the params it is asked to', () => {
+            //given
+            const { toast } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'rosterFileMustContainRequiredColumns',
+                params: { columns: 'name' },
+            });
+
+            //when
+            const plain = toast.messageOf(error);
+            const isolatedMessage = toast.messageOf(error, ['columns']);
+
+            //then
+            expect(plain).toBe('The file is missing required columns: name.');
+            expect(isolatedMessage).toBe(`The file is missing required columns: ${isolateDirection('name')}.`);
         });
     });
 });

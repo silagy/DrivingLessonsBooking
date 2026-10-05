@@ -11,4 +11,5 @@ export interface AddStudentDialogData {
     isSaving: Signal<boolean>;
     confirm: (newStudent: NewStudent) => Promise<boolean>;
     refreshCars: () => void;
+    clearRefusal: () => void;
 }

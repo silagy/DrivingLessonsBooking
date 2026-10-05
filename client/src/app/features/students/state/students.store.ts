@@ -19,6 +19,7 @@ import { Student } from '../domain/student.model';
 import { TeacherOption } from '../domain/teacher-option.model';
 
 const SINGLE_STUDENT_COUNT = 1;
+const ISOLATED_REFUSAL_PARAMS = ['name'];
 
 @Injectable()
 export class StudentsStore {
@@ -128,7 +129,7 @@ export class StudentsStore {
         } catch (error) {
             this.refusalState.set({
                 kind: refusalKindOf(problemCodeOf(error)),
-                message: this.toast.messageOf(error),
+                message: this.toast.messageOf(error, ISOLATED_REFUSAL_PARAMS),
             });
             return false;
         } finally {

@@ -96,6 +96,7 @@ export class StudentsPage {
             isSaving: this.store.isMutating,
             confirm: (newStudent) => this.store.create(newStudent),
             refreshCars: () => this.store.refreshCarOptions(),
+            clearRefusal: () => this.store.clearRefusal(),
         };
 
         this.dialogs.open(AddStudentDialog, {

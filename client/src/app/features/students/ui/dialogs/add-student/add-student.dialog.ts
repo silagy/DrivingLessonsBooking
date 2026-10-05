@@ -11,6 +11,7 @@ import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import { DialogRefusalComponent } from '../../../../../shared/components/dialog-refusal/dialog-refusal.component';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
+import { isolateDirection } from '../../../../../shared/text/isolate-direction';
 import { AddStudentRefusalKind } from '../../../domain/add-student-refusal';
 import { pickCarFor, teacherHasCars } from '../../../domain/car-pick';
 import { toNewStudent } from '../../../domain/new-student';
@@ -87,8 +88,8 @@ export class AddStudentDialog {
         computation: () => false,
     });
 
-    protected readonly teacherName = computed(
-        () => this.data.teachers().find((teacher) => teacher.id === this.teacherId())?.name ?? '',
+    protected readonly teacherName = computed(() =>
+        isolateDirection(this.data.teachers().find((teacher) => teacher.id === this.teacherId())?.name ?? ''),
     );
 
     protected readonly canSave = computed(
@@ -119,7 +120,16 @@ export class AddStudentDialog {
     }
 
     protected onRefreshCars(): void {
+        this.isCarRefused.set(false);
         this.data.refreshCars();
+    }
+
+    protected onNationalIdInput(): void {
+        const kind = this.refusal()?.kind;
+
+        if (kind === AddStudentRefusalKind.nationalIdInUse || kind === AddStudentRefusalKind.nationalIdInvalid) {
+            this.data.clearRefusal();
+        }
     }
 
     protected close(): void {

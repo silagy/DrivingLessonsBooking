@@ -362,7 +362,7 @@ describe('StudentsStore', () => {
 
         //then
         expect(saved).toBe(false);
-        expect(toast.messageOf).toHaveBeenCalledWith(refusal);
+        expect(toast.messageOf).toHaveBeenCalledWith(refusal, ['name']);
         expect(toast.success).not.toHaveBeenCalled();
         expect(store.refusal()).toEqual({
             kind: AddStudentRefusalKind.nationalIdInUse,
