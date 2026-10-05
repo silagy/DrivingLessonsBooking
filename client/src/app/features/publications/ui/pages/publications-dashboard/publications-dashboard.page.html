@@ -12,7 +12,20 @@
                             [ngModel]="store.selectedTeacherId()"
                             (ngModelChange)="store.selectTeacher($event)"
                             [placeholder]="'publications.selectTeacher' | transloco"
-                            [ariaLabel]="'publications.selectTeacher' | transloco" />
+                            [ariaLabel]="'publications.selectTeacher' | transloco">
+                            <ng-template pTemplate="selectedItem" let-teacher>
+                                <span>{{ teacher.name }}</span>
+                                @if (teacher.isMe) {
+                                    <span class="dashboard__me">{{ 'publications.me' | transloco }}</span>
+                                }
+                            </ng-template>
+                            <ng-template pTemplate="item" let-teacher>
+                                <span>{{ teacher.name }}</span>
+                                @if (teacher.isMe) {
+                                    <span class="dashboard__me">{{ 'publications.me' | transloco }}</span>
+                                }
+                            </ng-template>
+                        </p-select>
                     }
                     @if (store.weekNumber(); as weekNumber) {
                         <span class="dashboard__week-title">{{ 'publications.dashboard.weekTitle' | transloco: { weekNumber } }}</span>
@@ -22,6 +35,9 @@
                     <app-publication-state-tag [state]="state" />
                 }
             </div>
+            @if (!store.canChooseTeacher()) {
+                <p class="dashboard__only-yours">{{ 'publications.dashboard.onlyYours' | transloco }}</p>
+            }
             <div class="dashboard__subtitle">
                 <p-select
                     styleClass="dashboard__week-select"

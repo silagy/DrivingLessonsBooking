@@ -135,6 +135,7 @@
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
+    "me": "(me)",
     "selectTeacherPrompt": "Select a teacher and week to prepare the grid.",
     "notCreatedYet": "The Administrator hasn't prepared this week yet.",
     "cellOpen": "Open",
@@ -170,6 +171,7 @@
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
+    "me": "(me)",
     "state": {
       "draft": "Draft",
       "published": "Published",
@@ -223,6 +225,7 @@
       "lastSubmission": "last submission",
       "draftPrompt": "This week is prepared but not published. Publish it to open the submission window and generate the link.",
       "draftPromptTeacher": "This week is prepared but not published yet. The Administrator publishes it to open the submission window.",
+      "onlyYours": "Only your Publications: what Students requested from you each week.",
       "publishedNotice": "Submissions open automatically at {{opensAt}}.",
       "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher.",
       "weekTitle": "- Week {{weekNumber}}",

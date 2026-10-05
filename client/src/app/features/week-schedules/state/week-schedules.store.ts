@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
+import { SignedInUserStore } from '../../../core/signed-in-user/signed-in-user.store';
 import { ToastService } from '../../../core/services/toast.service';
 import { LanguageService } from '../../../core/language.service';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
@@ -28,10 +29,9 @@ export class WeekSchedulesStore {
     private readonly toast = inject(ToastService);
     private readonly language = inject(LanguageService);
     private readonly auth = inject(AuthService);
+    private readonly signedInUser = inject(SignedInUserStore);
 
-    private readonly selectedTeacherIdState = linkedSignal<string | null>(() =>
-        this.auth.isTeacher() ? this.auth.teacherId() : null,
-    );
+    private readonly selectedTeacherIdState = linkedSignal<string | null>(() => this.auth.teacherId());
     private readonly selectedWeekStartState = signal<string>(defaultWeekStart());
     private readonly mutating = signal(false);
 
@@ -63,14 +63,17 @@ export class WeekSchedulesStore {
     );
 
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
+    readonly ownTeacherName = this.signedInUser.teacherName;
     readonly selectedWeekStart = this.selectedWeekStartState.asReadonly();
     readonly isMutating = this.mutating.asReadonly();
 
     readonly teachers = computed<TeacherOption[]>(() => {
         const items = this.teachersResource.hasValue() ? this.teachersResource.value() : [];
 
+        const ownTeacherId = this.auth.teacherId();
+
         return items
-            .map((item) => ({ id: item.id, name: item.name }))
+            .map((item) => ({ id: item.id, name: item.name, isMe: item.id === ownTeacherId }))
             .sort((a, b) => a.name.localeCompare(b.name));
     });
 

@@ -8,6 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { WeekGridComponent } from '../../../../../shared/components/week-grid/week-grid.component';
 import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
 import { PublicationStateTagComponent } from '../../../../../shared/components/publication-state-tag/publication-state-tag.component';
+import { LockedFieldComponent } from '../../../../../shared/components/locked-field/locked-field.component';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { SlotState } from '../../../../../shared/models/slot-state.enum';
 import { WeekSchedulesStore } from '../../../state/week-schedules.store';
@@ -24,6 +25,7 @@ import { WeekSchedulesStore } from '../../../state/week-schedules.store';
         ButtonModule,
         RouterLink,
         PublicationStateTagComponent,
+        LockedFieldComponent,
     ],
     templateUrl: './weekly-prep.page.html',
     styleUrl: './weekly-prep.page.scss',

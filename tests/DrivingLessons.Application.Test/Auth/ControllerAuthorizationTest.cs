@@ -22,6 +22,7 @@ public class ControllerAuthorizationTest
         "PublicationQueryController.FindHistory",
         "PublicationQueryController.DownloadExcel",
         "MeCommandController.ChangePasswordAsync",
+        "MeQueryController.GetAsync",
     ];
 
     private static readonly string[] AnonymousEndpoints =
@@ -34,7 +35,7 @@ public class ControllerAuthorizationTest
     ];
 
     [TestMethod]
-    public void Teachers_Reach_Only_Week_Schedules_Publications_And_Their_Own_Password()
+    public void Teachers_Reach_Only_Week_Schedules_Publications_And_Their_Own_User()
     {
         //when
         var endpoints = EndpointsWithRule(AuthorizationPolicies.TeacherOrAdministrator);

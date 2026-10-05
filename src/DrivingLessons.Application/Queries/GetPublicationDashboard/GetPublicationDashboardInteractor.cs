@@ -1,3 +1,4 @@
+using DrivingLessons.Application.Auth;
 using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Domain.Values;
@@ -8,22 +9,33 @@ public class GetPublicationDashboardInteractor
 {
     private readonly IPublicationQueries publicationQueries;
     private readonly ISubmissionQueries submissionQueries;
+    private readonly ICurrentUser currentUser;
 
     public GetPublicationDashboardInteractor(
         IPublicationQueries publicationQueries,
-        ISubmissionQueries submissionQueries)
+        ISubmissionQueries submissionQueries,
+        ICurrentUser currentUser)
     {
         this.publicationQueries = publicationQueries;
         this.submissionQueries = submissionQueries;
+        this.currentUser = currentUser;
     }
 
     public async Task<GetPublicationDashboardResponse> ExecuteAsync(Guid publicationId, Guid teacherId)
     {
+        var resolvedPublicationId = PublicationId.Of(publicationId);
+        var resolvedTeacherId = TeacherId.Of(teacherId);
+
+        if (!currentUser.MayReach(resolvedTeacherId))
+        {
+            throw new PublicationNotFoundException(resolvedPublicationId);
+        }
+
         var dashboard = await publicationQueries.GetDashboardAsync(publicationId, teacherId);
 
         if (dashboard is null)
         {
-            throw new PublicationNotFoundException(PublicationId.Of(publicationId));
+            throw new PublicationNotFoundException(resolvedPublicationId);
         }
 
         var counts = await submissionQueries.GetSlotRequestCountsAsync(publicationId, teacherId);

@@ -6,13 +6,14 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ChangeUserDetailsRequest } from '../../../data/change-user-details.request';
 import { DialogRefusalComponent } from '../../../../../shared/components/dialog-refusal/dialog-refusal.component';
+import { LockedFieldComponent } from '../../../../../shared/components/locked-field/locked-field.component';
 import { UserDialogData } from '../user-dialog-data';
 
 @Component({
     selector: 'app-edit-user-dialog',
-    imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, InputTextModule, DialogRefusalComponent],
+    imports: [ReactiveFormsModule, TranslocoPipe, ButtonModule, InputTextModule, DialogRefusalComponent, LockedFieldComponent],
     templateUrl: './edit-user.dialog.html',
-    styleUrls: ['../../../../../shared/dialogs/dialog-form.scss', './edit-user.dialog.scss'],
+    styleUrls: ['../../../../../shared/dialogs/dialog-form.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EditUserDialog {

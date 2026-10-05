@@ -16,7 +16,7 @@ const WEEK_LABEL = '4 Oct - 9 Oct 2026';
 
 function fakeStore(overrides: Record<string, unknown>) {
     return {
-        teachers: signal([{ id: 'teacher-cohen', name: 'Teacher Cohen' }]),
+        teachers: signal([{ id: 'teacher-cohen', name: 'Teacher Cohen', isMe: false }]),
         selectedTeacherId: signal('teacher-cohen'),
         weekNumber: signal(41),
         weekChoices: signal([{ weekStart: WEEK_START, label: WEEK_LABEL }]),
@@ -275,5 +275,34 @@ describe('PublicationsDashboardPage', () => {
         //then
         expect(page.querySelector('.dashboard__empty')).not.toBeNull();
         expect(page.querySelector('.dashboard__empty a')).toBeNull();
+    });
+
+    it('tells a Teacher these are only their Publications', async () => {
+        //given
+        const store = fakeStore({ ...AS_TEACHER });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.dashboard__only-yours')?.textContent?.trim()).toBe(
+            'publications.dashboard.onlyYours',
+        );
+    });
+
+    it('shows (me) for the signed-in User\'s own Teacher', async () => {
+        //given
+        const store = fakeStore({
+            teachers: signal([{ id: 'teacher-cohen', name: 'Teacher Cohen', isMe: true }]),
+        });
+
+        //when
+        const page = await render(store);
+
+        //then
+        const label = page.querySelector('.dashboard__teacher-select .p-select-label');
+        expect(label?.textContent).toContain('Teacher Cohen');
+        expect(label?.querySelector('.dashboard__me')?.textContent?.trim()).toBe('publications.me');
+        expect(page.querySelector('.dashboard__only-yours')).toBeNull();
     });
 });

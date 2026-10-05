@@ -70,6 +70,7 @@ export class PublicationsStore {
     });
 
     private readonly historyResource = resource({
+        params: () => this.auth.token() ?? undefined,
         loader: () => firstValueFrom(this.api.findHistory()),
     });
 
@@ -85,16 +86,33 @@ export class PublicationsStore {
 
     readonly teachers = computed<TeacherOption[]>(() => {
         const items = this.teachersResource.hasValue() ? this.teachersResource.value() : [];
+        const ownTeacherId = this.auth.teacherId();
 
         return items
-            .map((item) => ({ id: item.id, name: item.name }))
+            .map((item) => ({ id: item.id, name: item.name, isMe: item.id === ownTeacherId }))
             .sort((a, b) => a.name.localeCompare(b.name));
     });
 
-    private readonly selectedTeacherIdState = linkedSignal<TeacherOption[], string | null>({
-        source: this.teachers,
-        computation: (teachers, previous) =>
-            this.auth.isTeacher() ? this.auth.teacherId() : (previous?.value ?? teachers[0]?.id ?? null),
+    private readonly teacherSelectionSource = computed(() => ({
+        teachers: this.teachers(),
+        userId: this.auth.userId(),
+    }));
+
+    private readonly selectedTeacherIdState = linkedSignal<
+        { teachers: TeacherOption[]; userId: string | null },
+        string | null
+    >({
+        source: this.teacherSelectionSource,
+        computation: (source, previous) => {
+            if (this.auth.isTeacher()) {
+                return this.auth.teacherId();
+            }
+
+            const choiceOfSameUser = previous?.source.userId === source.userId ? previous.value : null;
+            const ownTeacher = source.teachers.find((teacher) => teacher.isMe);
+
+            return choiceOfSameUser ?? ownTeacher?.id ?? source.teachers[0]?.id ?? null;
+        },
     });
 
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
