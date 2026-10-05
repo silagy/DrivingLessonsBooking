@@ -73,8 +73,6 @@ public class ImportRosterInteractor
             failures.Add(failure);
         }
 
-        DeactivateAbsentees(existingStudents, seenIds, entries);
-
         var fileName = RosterFileName.Of(request.FileName);
         var importedAtUtc = timeProvider.GetUtcNow().UtcDateTime;
         var rosterImport = RosterImport.Create(fileName, importedAtUtc, entries, failures);
@@ -87,7 +85,6 @@ public class ImportRosterInteractor
             rosterImport.Id.Value,
             rosterImport.AddedCount,
             rosterImport.UpdatedCount,
-            rosterImport.DeactivatedCount,
             rosterImport.FailedCount);
     }
 
@@ -201,22 +198,6 @@ public class ImportRosterInteractor
         entries.Add(addedEntry);
 
         return null;
-    }
-
-    private static void DeactivateAbsentees(
-        IReadOnlyCollection<Student> existingStudents,
-        HashSet<NationalId> seenIds,
-        List<RosterImportEntry> entries)
-    {
-        var absentees = existingStudents.Where(x => x.IsActive && !seenIds.Contains(x.NationalId));
-
-        foreach (var student in absentees)
-        {
-            student.Deactivate();
-
-            var entry = RosterImportEntry.Of(student.NationalId, RosterEntryOutcome.Deactivated);
-            entries.Add(entry);
-        }
     }
 
     private static bool TryParseStartDate(string value, out DateOnly result)

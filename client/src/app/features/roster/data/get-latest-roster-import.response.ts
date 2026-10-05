@@ -7,7 +7,6 @@ export interface GetLatestRosterImportResponse {
     importedAtUtc: string;
     added: number;
     updated: number;
-    deactivated: number;
     failed: number;
     entries: EntryForGetLatestRosterImportResponse[];
     failures: FailureForGetLatestRosterImportResponse[];

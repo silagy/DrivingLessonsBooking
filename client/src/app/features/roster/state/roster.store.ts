@@ -60,9 +60,7 @@ export class RosterStore {
         const badges = new Map<string, RosterEntryOutcome>();
 
         for (const entry of this.latestImport()?.entries ?? []) {
-            if (entry.outcome !== RosterEntryOutcome.deactivated) {
-                badges.set(entry.nationalId, entry.outcome);
-            }
+            badges.set(entry.nationalId, entry.outcome);
         }
 
         return badges;

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-export type StatTileTone = 'success' | 'info' | 'neutral' | 'danger';
+export type StatTileTone = 'success' | 'info' | 'danger';
 
 @Component({
     selector: 'app-roster-stat-tile',

@@ -83,7 +83,6 @@
     "stats": {
       "added": "Added",
       "updated": "Updated",
-      "deactivated": "Deactivated (missing from file)",
       "failed": "Failed rows"
     },
     "table": {

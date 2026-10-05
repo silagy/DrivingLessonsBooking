@@ -11,7 +11,6 @@ public class GetLatestRosterImportResponse
     public DateTime ImportedAtUtc { get; init; }
     public int Added { get; init; }
     public int Updated { get; init; }
-    public int Deactivated { get; init; }
     public int Failed { get; init; }
     public IReadOnlyCollection<EntryForGetLatestRosterImportResponse> Entries { get; init; } = [];
     public IReadOnlyCollection<FailureForGetLatestRosterImportResponse> Failures { get; init; } = [];
@@ -24,7 +23,6 @@ public class GetLatestRosterImportResponse
             ImportedAtUtc = x.ImportedAtUtc,
             Added = x.AddedCount,
             Updated = x.UpdatedCount,
-            Deactivated = x.DeactivatedCount,
             Failed = x.FailedCount,
             Entries = x.Entries
                        .Select(entry => new EntryForGetLatestRosterImportResponse

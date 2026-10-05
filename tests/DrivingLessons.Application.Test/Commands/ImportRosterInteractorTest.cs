@@ -2,6 +2,7 @@ using DrivingLessons.Application.Abstractions;
 using DrivingLessons.Application.Commands.ImportRoster;
 using DrivingLessons.Application.Common;
 using DrivingLessons.Domain.Entities;
+using DrivingLessons.Domain.Events;
 using DrivingLessons.Domain.Repositories;
 using DrivingLessons.Domain.Values;
 using FakeItEasy;
@@ -111,7 +112,7 @@ public class ImportRosterInteractorTest
     }
 
     [TestMethod]
-    public async Task Absent_Student_Is_Deactivated()
+    public async Task Absent_Student_Stays_Active()
     {
         //given
         var student = ExistingStudent("123456782");
@@ -119,17 +120,17 @@ public class ImportRosterInteractorTest
         RowsAre(Row(2, "יוסי מזרחי", "987654324"));
 
         //when
-        var response = await interactor.ExecuteAsync(Request());
+        await interactor.ExecuteAsync(Request());
 
         //then
-        student.IsActive.ShouldBeFalse();
-        response.Deactivated.ShouldBe(1);
-        persistedImport!.Entries.ShouldContain(x =>
-            x.NationalId == NationalId.Of("123456782") && x.Outcome == RosterEntryOutcome.Deactivated);
+        student.IsActive.ShouldBeTrue();
+        student.Name.ShouldBe(StudentName.Of("תלמיד קיים"));
+        student.UncommittedEvents.OfType<StudentDeactivated>().ShouldBeEmpty();
+        persistedImport!.Entries.ShouldNotContain(x => x.NationalId == NationalId.Of("123456782"));
     }
 
     [TestMethod]
-    public async Task Absent_Inactive_Student_Is_Skipped()
+    public async Task Absent_Inactive_Student_Stays_Inactive()
     {
         //given
         var student = ExistingStudent("123456782");
@@ -138,11 +139,34 @@ public class ImportRosterInteractorTest
         RowsAre(Row(2, "יוסי מזרחי", "987654324"));
 
         //when
+        await interactor.ExecuteAsync(Request());
+
+        //then
+        student.IsActive.ShouldBeFalse();
+        student.UncommittedEvents.OfType<StudentReactivated>().ShouldBeEmpty();
+    }
+
+    [TestMethod]
+    public async Task Import_Records_Only_Added_And_Updated_Entries()
+    {
+        //given
+        var updated = ExistingStudent("123456782");
+        var absent = ExistingStudent("987654324");
+        StudentsAre(updated, absent);
+        RowsAre(Row(2, "דנה כהן", "123456782"), Row(3, "יוסי מזרחי", "111111118"));
+
+        //when
         var response = await interactor.ExecuteAsync(Request());
 
         //then
-        response.Deactivated.ShouldBe(0);
-        student.IsActive.ShouldBeFalse();
+        response.Added.ShouldBe(1);
+        response.Updated.ShouldBe(1);
+        response.Failed.ShouldBe(0);
+        persistedImport!.Entries.Count.ShouldBe(2);
+        persistedImport.Entries.ShouldContain(x =>
+            x.NationalId == NationalId.Of("123456782") && x.Outcome == RosterEntryOutcome.Updated);
+        persistedImport.Entries.ShouldContain(x =>
+            x.NationalId == NationalId.Of("111111118") && x.Outcome == RosterEntryOutcome.Added);
     }
 
     [TestMethod]

@@ -38,10 +38,6 @@ public class RosterImportConfiguration : IEntityTypeConfiguration<RosterImport>
             .HasColumnName("updated_count");
 
         builder
-            .Property(x => x.DeactivatedCount)
-            .HasColumnName("deactivated_count");
-
-        builder
             .Property(x => x.FailedCount)
             .HasColumnName("failed_count");
 
