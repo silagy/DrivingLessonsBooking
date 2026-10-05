@@ -85,16 +85,19 @@ export class PublicationsStore {
 
     readonly teachers = computed<TeacherOption[]>(() => {
         const items = this.teachersResource.hasValue() ? this.teachersResource.value() : [];
+        const ownTeacherId = this.auth.teacherId();
 
         return items
-            .map((item) => ({ id: item.id, name: item.name }))
+            .map((item) => ({ id: item.id, name: item.name, isMe: item.id === ownTeacherId }))
             .sort((a, b) => a.name.localeCompare(b.name));
     });
 
     private readonly selectedTeacherIdState = linkedSignal<TeacherOption[], string | null>({
         source: this.teachers,
         computation: (teachers, previous) =>
-            this.auth.isTeacher() ? this.auth.teacherId() : (previous?.value ?? teachers[0]?.id ?? null),
+            this.auth.isTeacher()
+                ? this.auth.teacherId()
+                : (previous?.value ?? this.auth.teacherId() ?? teachers[0]?.id ?? null),
     });
 
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();

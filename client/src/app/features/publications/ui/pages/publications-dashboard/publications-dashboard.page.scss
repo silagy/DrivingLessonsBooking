@@ -44,6 +44,16 @@
     }
 }
 
+.dashboard__me {
+    margin-inline-start: 4px;
+    color: var(--app-text-secondary);
+}
+
+.dashboard__only-yours {
+    margin-block: 4px 0;
+    color: var(--app-text-secondary);
+}
+
 .dashboard__subtitle {
     display: flex;
     flex-wrap: wrap;

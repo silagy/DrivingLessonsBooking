@@ -9,6 +9,7 @@ import { FileDownloadService } from '../../../core/services/file-download.servic
 import { ToastService } from '../../../core/services/toast.service';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
 import { GetPublicationResponse } from '../data/get-publication.response';
+import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
 import { PublicationsApiService } from '../data/publications-api.service';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { TeacherOption } from '../domain/teacher-option.model';
@@ -17,9 +18,10 @@ import { PublicationsStore } from './publications.store';
 const HTTP_NOT_FOUND = 404;
 const HTTP_INTERNAL_SERVER_ERROR = 500;
 
-const TEACHERS: TeacherOption[] = [
+const TEACHERS: ItemForFindTeachersResponse[] = [
     { id: 'teacher-levi', name: 'Teacher Levi' },
     { id: 'teacher-cohen', name: 'Teacher Cohen' },
+    { id: 'teacher-mizrahi', name: 'Teacher Mizrahi' },
 ];
 
 const OPEN_PUBLICATION: GetPublicationResponse = {
@@ -40,6 +42,7 @@ interface SignedInAs {
 
 const ADMINISTRATOR: SignedInAs = { isAdministrator: true, isTeacher: false, teacherId: null };
 const TEACHER: SignedInAs = { isAdministrator: false, isTeacher: true, teacherId: 'teacher-yael' };
+const LINKED_ADMINISTRATOR: SignedInAs = { isAdministrator: true, isTeacher: false, teacherId: 'teacher-levi' };
 
 const isAdministrator = signal(true);
 const isTeacher = signal(false);
@@ -52,7 +55,7 @@ function signIn(user: SignedInAs): void {
 }
 
 function createStore(
-    teachers: Observable<TeacherOption[]>,
+    teachers: Observable<ItemForFindTeachersResponse[]>,
     publication: Observable<GetPublicationResponse>,
     user: SignedInAs = ADMINISTRATOR,
 ): PublicationsStore {
@@ -85,10 +88,11 @@ function createStore(
     return TestBed.inject(PublicationsStore);
 }
 
-async function loadedStore(): Promise<PublicationsStore> {
+async function loadedStore(user: SignedInAs = ADMINISTRATOR): Promise<PublicationsStore> {
     const store = createStore(
         of(TEACHERS),
         throwError(() => new HttpErrorResponse({ status: HTTP_NOT_FOUND })),
+        user,
     );
     await TestBed.inject(ApplicationRef).whenStable();
 
@@ -229,5 +233,59 @@ describe('PublicationsStore', () => {
 
         //then
         expect(TestBed.inject(PublicationsApiService).downloadExcel).toHaveBeenCalledWith('publication-1', 'teacher-yael');
+    });
+
+    it('selects a linked Administrator\'s own Teacher once the teachers load', async () => {
+        //given
+        const store = await loadedStore(LINKED_ADMINISTRATOR);
+
+        //expected
+        expect(store.selectedTeacherId()).toBe('teacher-levi');
+        expect(store.canChooseTeacher()).toBe(true);
+    });
+
+    it('keeps the query-param Teacher over the linked default', async () => {
+        //given
+        const store = createStore(
+            of(TEACHERS),
+            throwError(() => new HttpErrorResponse({ status: HTTP_NOT_FOUND })),
+            LINKED_ADMINISTRATOR,
+        );
+        expect(store.teachers()).toEqual([]);
+
+        //when
+        store.selectTeacher('teacher-mizrahi');
+        await TestBed.inject(ApplicationRef).whenStable();
+
+        //then
+        expect(store.teachers().length).toBe(3);
+        expect(store.selectedTeacherId()).toBe('teacher-mizrahi');
+    });
+
+    it('keeps the query-param Teacher over the linked default when it arrives after the teachers', async () => {
+        //given
+        const store = await loadedStore(LINKED_ADMINISTRATOR);
+
+        //when
+        store.selectTeacher('teacher-mizrahi');
+        await TestBed.inject(ApplicationRef).whenStable();
+
+        //then
+        expect(store.selectedTeacherId()).toBe('teacher-mizrahi');
+    });
+
+    it('marks the signed-in User\'s own Teacher as me', async () => {
+        //given
+        const expected: TeacherOption[] = [
+            { id: 'teacher-cohen', name: 'Teacher Cohen', isMe: false },
+            { id: 'teacher-levi', name: 'Teacher Levi', isMe: true },
+            { id: 'teacher-mizrahi', name: 'Teacher Mizrahi', isMe: false },
+        ];
+
+        //when
+        const store = await loadedStore(LINKED_ADMINISTRATOR);
+
+        //then
+        expect(store.teachers()).toEqual(expected);
     });
 });
