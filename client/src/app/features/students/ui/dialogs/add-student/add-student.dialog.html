@@ -1,0 +1,142 @@
+@let refusedNow = refusal();
+@let refusalText = refusedNow?.kind === refusalKinds.nationalIdInvalid ? ('students.add.nationalIdInvalid' | transloco) : refusedNow?.message;
+
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+  @if (refusedNow) {
+    <app-dialog-refusal [message]="refusalText ?? ''">
+      @if (refusedNow.kind === refusalKinds.staleCar) {
+        <button type="button" class="add-student__refresh" (click)="onRefreshCars()">
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ 'general.refresh' | transloco }}
+        </button>
+      }
+    </app-dialog-refusal>
+  }
+
+  <div class="field">
+    <label for="student-national-id">{{ 'students.add.nationalId' | transloco }}</label>
+    <input
+      pInputText
+      id="student-national-id"
+      formControlName="nationalId"
+      dir="ltr"
+      inputmode="numeric"
+      autocomplete="off" />
+    @if (form.controls.nationalId.hasError(refused)) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ refusalText }}</small>
+    } @else {
+      <small class="field__hint">{{ 'students.add.nationalIdHint' | transloco }}</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="student-name">{{ 'students.add.fullName' | transloco }}</label>
+    <input pInputText id="student-name" formControlName="name" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label for="student-phone">{{ 'students.add.phone' | transloco }}</label>
+    <input pInputText id="student-phone" formControlName="phone" type="tel" dir="ltr" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label for="student-teacher">{{ 'students.add.teacher' | transloco }}</label>
+    <p-select
+      inputId="student-teacher"
+      formControlName="teacherId"
+      [options]="teacherOptions()"
+      optionLabel="name"
+      optionValue="id"
+      [placeholder]="'students.add.teacherPlaceholder' | transloco"
+      appendTo="body"
+      fluid>
+      <ng-template pTemplate="item" let-teacher>
+        <span class="add-student__option">
+          <span>{{ teacher.name }}</span>
+          @if (!teacher.hasCars) {
+            <small class="add-student__option-note">{{ 'students.add.noCarsOption' | transloco }}</small>
+          }
+        </span>
+      </ng-template>
+    </p-select>
+  </div>
+
+  <div class="field">
+    <label for="student-car">{{ 'students.add.car' | transloco }}</label>
+    <p-select
+      inputId="student-car"
+      [ngModel]="carId()"
+      (ngModelChange)="selectCar($event)"
+      [ngModelOptions]="{ standalone: true }"
+      [disabled]="!carPick().options.length"
+      [class.ng-invalid]="isCarRefused()"
+      [class.ng-dirty]="isCarRefused()"
+      [options]="carPick().options"
+      optionLabel="name"
+      optionValue="id"
+      [placeholder]="(carPick().isLocked ? 'students.add.carPlaceholderLocked' : 'students.add.carPlaceholder') | transloco"
+      appendTo="body"
+      fluid>
+      <ng-template pTemplate="selectedItem" let-car>
+        <span class="add-student__option">
+          <span>{{ car.name }}</span>
+          <app-transmission-tag [transmission]="car.transmission" />
+        </span>
+      </ng-template>
+      <ng-template pTemplate="item" let-car>
+        <span class="add-student__option">
+          <span>{{ car.name }}</span>
+          <app-transmission-tag [transmission]="car.transmission" />
+        </span>
+      </ng-template>
+    </p-select>
+    @if (carPick().hasNoCars) {
+      <p-message severity="info" styleClass="add-student__no-cars">
+        <span class="add-student__no-cars-text">
+          <span>{{ 'students.add.noCars' | transloco }}</span>
+          <a class="add-student__link" [routerLink]="carsAndTeachersLink" (click)="close()">{{ 'students.add.noCarsLink' | transloco }}</a>
+        </span>
+      </p-message>
+    } @else if (isCarRefused()) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ refusalText }}</small>
+    } @else if (!carPick().isLocked) {
+      <small class="field__hint">
+        {{ (carPick().isOnlyCar ? 'students.add.carOnly' : 'students.add.carScoped') | transloco: { teacher: teacherName() } }}
+      </small>
+    }
+  </div>
+
+  <p class="add-student__group">{{ 'students.add.optionalGroup' | transloco }}</p>
+
+  <div class="field">
+    <label for="student-address">{{ 'students.add.address' | transloco }}</label>
+    <input pInputText id="student-address" formControlName="address" autocomplete="off" />
+  </div>
+
+  <div class="add-student__pair">
+    <div class="field">
+      <label for="student-start-date">{{ 'students.add.startDate' | transloco }}</label>
+      <p-datepicker
+        inputId="student-start-date"
+        formControlName="startDate"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        appendTo="body"
+        [placeholder]="'students.add.datePlaceholder' | transloco" />
+    </div>
+    <div class="field">
+      <label for="student-license-type">{{ 'students.add.licenseType' | transloco }}</label>
+      <input
+        pInputText
+        id="student-license-type"
+        formControlName="licenseType"
+        autocomplete="off"
+        [placeholder]="'students.add.licenseTypePlaceholder' | transloco" />
+    </div>
+  </div>
+
+  <div class="dialog-form__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="close()" />
+    <p-button [label]="'general.save' | transloco" type="submit" [disabled]="!canSave()" [loading]="isSaving()" />
+  </div>
+</form>

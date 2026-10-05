@@ -12,6 +12,10 @@
         icon="pi pi-upload"
         [label]="'students.importRoster' | transloco"
         [routerLink]="importRosterLink"></a>
+      <p-button
+        [label]="'students.addStudent' | transloco"
+        [disabled]="store.isMutating() || !!store.loadError()"
+        (onClick)="onAddStudent()" />
     </div>
   </header>
 
@@ -104,6 +108,11 @@
             size="small"
             [label]="'students.importRoster' | transloco"
             [routerLink]="importRosterLink"></a>
+          <p-button
+            [label]="'students.addStudent' | transloco"
+            size="small"
+            [disabled]="store.isMutating()"
+            (onClick)="onAddStudent()" />
         </div>
       </div>
     } @else {
