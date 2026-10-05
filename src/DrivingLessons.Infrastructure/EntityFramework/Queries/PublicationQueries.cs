@@ -96,12 +96,20 @@ public class PublicationQueries : IPublicationQueries
         };
     }
 
-    public async Task<IReadOnlyList<ItemForFindPublicationHistoryResponse>> FindHistoryAsync()
+    public async Task<IReadOnlyList<ItemForFindPublicationHistoryResponse>> FindHistoryAsync(Guid? teacherId)
     {
+        var teachers = dbContext.Teachers.AsQueryable();
+
+        if (teacherId is not null)
+        {
+            var resolvedTeacherId = TeacherId.Of(teacherId.Value);
+            teachers = teachers.Where(x => x.Id == resolvedTeacherId);
+        }
+
         var query = from publication in dbContext.Publications
                     from weekSchedule in dbContext.WeekSchedules
                         .Where(ws => ws.WeekStart == publication.WeekStart)
-                    join teacher in dbContext.Teachers
+                    join teacher in teachers
                         on weekSchedule.TeacherId equals teacher.Id
                     orderby publication.WeekStart descending, teacher.Name
                     select new ItemForFindPublicationHistoryResponse
