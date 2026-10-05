@@ -1,6 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { computed, inject, Injectable, resource, signal } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../../core/auth.service';
+import { SignedInUserStore } from '../../../core/signed-in-user/signed-in-user.store';
 import { ToastService } from '../../../core/services/toast.service';
 import { LanguageService } from '../../../core/language.service';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
@@ -26,12 +28,15 @@ export class WeekSchedulesStore {
     private readonly publicationApi = inject(PublicationStatusApiService);
     private readonly toast = inject(ToastService);
     private readonly language = inject(LanguageService);
+    private readonly auth = inject(AuthService);
+    private readonly signedInUser = inject(SignedInUserStore);
 
-    private readonly selectedTeacherIdState = signal<string | null>(null);
+    private readonly selectedTeacherIdState = linkedSignal<string | null>(() => this.auth.teacherId());
     private readonly selectedWeekStartState = signal<string>(defaultWeekStart());
     private readonly mutating = signal(false);
 
     private readonly teachersResource = resource({
+        params: () => (this.auth.isAdministrator() ? true : undefined),
         loader: () => firstValueFrom(this.teachersApi.findTeachers()),
     });
 
@@ -52,24 +57,34 @@ export class WeekSchedulesStore {
     readonly publicationState = computed<PublicationState | undefined>(() =>
         this.publicationResource.hasValue() ? this.publicationResource.value() : undefined,
     );
-    readonly canPublish = computed(() => this.publicationState() === PublicationState.draft);
+    readonly canChooseTeacher = computed(() => this.auth.isAdministrator());
+    readonly canPublish = computed(
+        () => this.publicationState() === PublicationState.draft && this.auth.isAdministrator(),
+    );
 
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
+    readonly ownTeacherName = this.signedInUser.teacherName;
     readonly selectedWeekStart = this.selectedWeekStartState.asReadonly();
     readonly isMutating = this.mutating.asReadonly();
 
     readonly teachers = computed<TeacherOption[]>(() => {
         const items = this.teachersResource.hasValue() ? this.teachersResource.value() : [];
 
+        const ownTeacherId = this.auth.teacherId();
+
         return items
-            .map((item) => ({ id: item.id, name: item.name }))
+            .map((item) => ({ id: item.id, name: item.name, isMe: item.id === ownTeacherId }))
             .sort((a, b) => a.name.localeCompare(b.name));
     });
 
     readonly weekOptions = computed<WeekOption[]>(() => buildWeekOptions(this.language.locale()));
 
     readonly weekSchedule = computed<WeekSchedule | undefined>(() =>
-        this.scheduleResource.hasValue() ? this.scheduleResource.value() : undefined,
+        this.scheduleResource.hasValue() ? (this.scheduleResource.value() ?? undefined) : undefined,
+    );
+
+    readonly isNotCreatedYet = computed(
+        () => this.scheduleResource.hasValue() && this.scheduleResource.value() === null,
     );
 
     readonly slots = computed<Slot[]>(() => this.weekSchedule()?.slots ?? []);
@@ -93,6 +108,10 @@ export class WeekSchedulesStore {
     readonly hasSelection = computed(() => this.selectedTeacherIdState() !== null);
 
     selectTeacher(teacherId: string): void {
+        if (!this.canChooseTeacher()) {
+            return;
+        }
+
         this.selectedTeacherIdState.set(teacherId);
     }
 
@@ -124,13 +143,17 @@ export class WeekSchedulesStore {
         }
     }
 
-    private async loadOrCreate(teacherId: string, weekStart: string): Promise<GetWeekScheduleResponse> {
+    private async loadOrCreate(teacherId: string, weekStart: string): Promise<GetWeekScheduleResponse | null> {
         try {
             return await firstValueFrom(this.api.getByTeacherAndWeek(teacherId, weekStart));
         } catch (error) {
             if (!isStatus(error, HTTP_NOT_FOUND)) {
                 throw error;
             }
+        }
+
+        if (!this.auth.isAdministrator()) {
+            return null;
         }
 
         try {

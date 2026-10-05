@@ -1,4 +1,4 @@
-import { Role } from './role.enum';
+import { Role } from '../../../shared/models/role.enum';
 import { otherRole, roleChangeNoteKey } from './role-change';
 
 describe('role change', () => {

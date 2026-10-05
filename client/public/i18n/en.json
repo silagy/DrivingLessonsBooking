@@ -17,6 +17,10 @@
     "logout": "Sign out",
     "userMenu": "User menu",
     "changeMyPassword": "Change my password",
+    "roles": {
+      "administrator": "Administrator",
+      "teacher": "Teacher"
+    },
     "languageToggle": "עברית",
     "language": "Language",
     "nav": {
@@ -131,7 +135,9 @@
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
+    "me": "(me)",
     "selectTeacherPrompt": "Select a teacher and week to prepare the grid.",
+    "notCreatedYet": "The Administrator hasn't prepared this week yet.",
     "cellOpen": "Open",
     "cellUnavailable": "Unavailable",
     "publishWeek": "Publish week...",
@@ -165,6 +171,7 @@
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
+    "me": "(me)",
     "state": {
       "draft": "Draft",
       "published": "Published",
@@ -217,6 +224,8 @@
       "totalPicks": "total picks",
       "lastSubmission": "last submission",
       "draftPrompt": "This week is prepared but not published. Publish it to open the submission window and generate the link.",
+      "draftPromptTeacher": "This week is prepared but not published yet. The Administrator publishes it to open the submission window.",
+      "onlyYours": "Only your Publications: what Students requested from you each week.",
       "publishedNotice": "Submissions open automatically at {{opensAt}}.",
       "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher.",
       "weekTitle": "- Week {{weekNumber}}",
@@ -455,6 +464,10 @@
       "hint": "If the school reopens the window, this link will work again."
     }
   },
+  "access": {
+    "refusedTitle": "You don't have access to that page",
+    "refusedDetail": "We've taken you to your Week Schedule."
+  },
   "general": {
     "refusedTitle": "That didn't go through",
     "save": "Save",
@@ -466,6 +479,7 @@
   },
   "errors": {
     "conflict": "This change conflicts with the latest data. Refresh the page and try again.",
+    "forbidden": "You don't have permission to do that.",
     "notFound": "This item no longer exists. Refresh the page.",
     "addressMustNotBeEmpty": "The address can't be empty.",
     "carAlreadyDeleted": "This car was already deleted. Refresh the page.",

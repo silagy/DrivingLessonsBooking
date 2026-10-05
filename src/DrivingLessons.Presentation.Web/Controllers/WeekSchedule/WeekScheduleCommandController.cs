@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using DrivingLessons.Application.Commands.CreateWeekSchedule;
 using DrivingLessons.Application.Commands.MarkSlotUnavailable;
 using DrivingLessons.Application.Commands.MarkSlotAvailable;
+using DrivingLessons.Presentation.Web.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +28,7 @@ public class WeekScheduleCommandController : ControllerBase
         return CreatedAtAction(null, result);
     }
 
+    [Authorize(Policy = AuthorizationPolicies.TeacherOrAdministrator)]
     [HttpPost("{id:guid}/slots/{slotId:guid}/mark-unavailable")]
     [EndpointSummary("Marks an open slot unavailable")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -41,6 +44,7 @@ public class WeekScheduleCommandController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Policy = AuthorizationPolicies.TeacherOrAdministrator)]
     [HttpPost("{id:guid}/slots/{slotId:guid}/mark-available")]
     [EndpointSummary("Marks an unavailable slot as available")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -34,7 +34,8 @@ client\
     │   │   ├── auth\                  admin auth service, authGuard, auth interceptor
     │   │   ├── http\                  problem-details.ts, apiErrorInterceptor
     │   │   ├── layout\                admin shell: topbar, navigation
-    │   │   └── services\              language.service.ts, jerusalem-date.service.ts, toast.service.ts
+    │   │   ├── services\              language.service.ts, jerusalem-date.service.ts, toast.service.ts
+    │   │   └── signed-in-user\        SignedInUserStore over api/me: name, linked Teacher name (#90)
     │   │
     │   ├── features\                  one folder per bounded context, lazy-loaded
     │   │   ├── teachers\              admin: teachers & cars setup
@@ -43,7 +44,7 @@ client\
     │   │   └── student-form\          student: anonymous submission flow (by link token)
     │   │
     │   └── shared\                    feature-agnostic only — never imports from features\
-    │       ├── components\            week-grid, status-tag, empty-state, ...
+    │       ├── components\            week-grid, status-tag, empty-state, locked-field, ...
     │       ├── models\                cross-feature models (problem-details, paging)
     │       ├── pipes\
     │       └── config\
@@ -219,6 +220,7 @@ export const AppRoutes = {
 - Features are lazy: `loadChildren: () => import('./features/publications/publications.routes')`
 - Feature routes files **default-export** a `Routes` array
 - Admin routes are guarded by `authGuard` (functional, `inject()`); the student form route is anonymous — the unguessable link token is the access control, mirroring the backend's `[AllowAnonymous]` posture
+- Role checks live in `core\role.guards.ts` (#89): Administrator-only feature routes add `canMatch: [administratorGuard]` (a Teacher-role User is sent to Weekly prep with an info toast, and never downloads the chunk); the dashboard uses `canActivate: [homeGuard]` with `pathMatch: 'full'` (a Teacher-role User lands on Weekly prep silently). They are UX only — the server's policies are the security boundary
 - The student route is short (`/s/{token}`) because it travels through WhatsApp
 - Enable `withComponentInputBinding()` — route params bind to page `input()`s
 

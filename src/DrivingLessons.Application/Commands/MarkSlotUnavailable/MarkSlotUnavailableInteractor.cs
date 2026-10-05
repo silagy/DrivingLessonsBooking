@@ -1,3 +1,4 @@
+using DrivingLessons.Application.Auth;
 using DrivingLessons.Application.Common;
 using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Domain.Repositories;
@@ -9,11 +10,16 @@ public class MarkSlotUnavailableInteractor
 {
     private readonly IWeekScheduleRepository repository;
     private readonly IUnitOfWork unitOfWork;
+    private readonly ICurrentUser currentUser;
 
-    public MarkSlotUnavailableInteractor(IWeekScheduleRepository repository, IUnitOfWork unitOfWork)
+    public MarkSlotUnavailableInteractor(
+        IWeekScheduleRepository repository,
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser)
     {
         this.repository = repository;
         this.unitOfWork = unitOfWork;
+        this.currentUser = currentUser;
     }
 
     public async Task ExecuteAsync(Guid id, Guid slotId)
@@ -22,6 +28,11 @@ public class MarkSlotUnavailableInteractor
 
         var weekSchedule = await repository.GetAsync(weekScheduleId)
                            ?? throw new WeekScheduleNotFoundException(weekScheduleId);
+
+        if (!currentUser.MayReach(weekSchedule.TeacherId))
+        {
+            throw new WeekScheduleNotFoundException(weekScheduleId);
+        }
 
         var resolvedSlotId = SlotId.Of(slotId);
 

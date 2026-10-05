@@ -13,7 +13,7 @@ public interface IPublicationQueries
 
     Task<GetPublicationDashboardResponse?> GetDashboardAsync(Guid publicationId, Guid teacherId);
 
-    Task<IReadOnlyList<ItemForFindPublicationHistoryResponse>> FindHistoryAsync();
+    Task<IReadOnlyList<ItemForFindPublicationHistoryResponse>> FindHistoryAsync(Guid? teacherId);
 
     Task<IReadOnlyList<Guid>> GetTeacherIdsWithScheduleForWeekAsync(DateOnly weekStart);
 }

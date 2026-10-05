@@ -6,9 +6,10 @@ import { ButtonModule } from 'primeng/button';
 import { DialogService } from 'primeng/dynamicdialog';
 import { Menu, MenuModule } from 'primeng/menu';
 import { AuthService } from '../../core/auth.service';
-import { AppRoutes } from '../../shared/config/app-routes';
+import { Role } from '../../shared/models/role.enum';
 import { BrandLogoComponent } from '../../shared/brand-logo/brand-logo.component';
 import { LanguageToggleComponent } from '../../shared/language-toggle/language-toggle.component';
+import { navigationFor } from './domain/navigation';
 import { ChangeMyPasswordDialog } from './ui/dialogs/change-my-password/change-my-password.dialog';
 
 @Component({
@@ -35,7 +36,8 @@ export class AdminShellComponent {
   private readonly dialogs = inject(DialogService);
   private readonly transloco = inject(TranslocoService);
 
-  protected readonly appRoutes = AppRoutes;
+  protected readonly roles = Role;
+  protected readonly navigation = computed(() => navigationFor(this.auth.role()));
   protected readonly userMenuItems = signal<MenuItem[]>([]);
   protected readonly isUserMenuOpen = signal(false);
 

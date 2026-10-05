@@ -120,7 +120,11 @@ export class PublicationsDashboardPage {
         });
 
         effect(() => {
-            if (this.publish() === PUBLISH_FLAG && this.store.state() === PublicationState.draft) {
+            if (
+                this.publish() === PUBLISH_FLAG &&
+                this.store.canManageLifecycle() &&
+                this.store.state() === PublicationState.draft
+            ) {
                 this.onPublish();
             }
         });

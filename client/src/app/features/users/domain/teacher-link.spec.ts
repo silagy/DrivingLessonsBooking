@@ -1,4 +1,4 @@
-import { Role } from './role.enum';
+import { Role } from '../../../shared/models/role.enum';
 import { isTeacherLinkRequired, toLinkableTeachers } from './teacher-link';
 import { TeacherOption } from './teacher-option.model';
 import { User } from './user.model';

@@ -91,7 +91,7 @@
 
 .shell-user-menu__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
   padding: 0.75rem 0.75rem 0.875rem;
   margin-block-end: 0.25rem;
@@ -101,6 +101,37 @@
 .shell-user-menu__email {
   font-size: 0.8125rem;
   color: var(--app-text-secondary);
+}
+
+.shell-user-menu__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  min-inline-size: 0;
+}
+
+.shell-user-menu__role {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.shell-user-menu__role--administrator {
+  background: var(--p-sky-50);
+  color: var(--p-sky-700);
+  border-color: var(--p-sky-100);
+}
+
+.shell-user-menu__role--teacher {
+  background: var(--p-ocean-50);
+  color: var(--p-ocean-700);
+  border-color: var(--p-ocean-100);
 }
 
 ::ng-deep .p-menu.shell-user-menu {
