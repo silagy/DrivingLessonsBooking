@@ -52,7 +52,7 @@ export class RosterPage {
     protected readonly processedRows = computed(() => {
         const latest = this.store.latestImport();
 
-        return latest ? latest.added + latest.updated + latest.deactivated + latest.failed : 0;
+        return latest ? latest.added + latest.updated + latest.failed : 0;
     });
 
     protected readonly importedAtLabel = computed(() => {

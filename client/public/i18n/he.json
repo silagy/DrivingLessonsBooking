@@ -80,14 +80,13 @@
   },
   "roster": {
     "title": "רשימת תלמידים",
-    "subtitle": "העלו את קובץ ה-CSV של בית הספר כדי לסנכרן תלמידים, מורים ורכבים.",
+    "subtitle": "העלו את קובץ ה-CSV של בית הספר כדי להוסיף תלמידים ולעדכן את המורים והרכבים שלהם.",
     "uploadCsv": "העלאת קובץ CSV",
     "processed": "נקלט",
     "rowsSummary": "{{rows}} שורות · {{time}}",
     "stats": {
       "added": "נוספו",
       "updated": "עודכנו",
-      "deactivated": "הושבתו (חסרים בקובץ)",
       "failed": "שורות שנכשלו"
     },
     "table": {
@@ -119,7 +118,8 @@
       "missingCar": "רכב חסר",
       "unknownTeacher": "מורה לא קיים במערכת",
       "unknownCar": "רכב לא קיים במערכת",
-      "invalidStartDate": "תאריך התחלה לא תקין"
+      "invalidStartDate": "תאריך התחלה לא תקין",
+      "carNotAssignedToTeacher": "הרכב לא משויך למורה הזה"
     },
     "imported": "הרשימה יובאה",
     "loadFailed": "טעינת רשימת התלמידים נכשלה.",

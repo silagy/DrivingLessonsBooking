@@ -10,5 +10,6 @@ public enum RosterRowFailureReason
     MissingCar = 60,
     UnknownTeacher = 70,
     UnknownCar = 80,
-    InvalidStartDate = 90
+    InvalidStartDate = 90,
+    CarNotAssignedToTeacher = 100
 }

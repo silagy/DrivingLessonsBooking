@@ -1,6 +1,6 @@
 # ADR 0003: Roster CSV, National-ID Identity, and Single Weekly Link
 
-**Status:** Accepted
+**Status:** Accepted, amended 5 October 2026 (see [Amendment](#amendment-5-october-2026-the-roster-is-no-longer-the-single-source-of-truth))
 **Date:** 13 June 2026
 
 ## Context
@@ -15,7 +15,7 @@ These changes ripple through identity, the publication/link model, and the stude
 ## Decision
 
 - **National ID is the student identifier**, validated against an admin-uploaded roster. There is no self-registration; an ID not in the roster is rejected ("contact your school").
-- **The roster is the single source of truth** for every student profile field — full name (single field), phone, assigned teacher, assigned car (hence transmission), address, license type. Re-upload **upserts by national ID**; students absent from a new upload are **deactivated, not deleted**, so historical submissions survive.
+- **The roster is the single source of truth** (superseded by the Amendment below) for every student profile field — full name (single field), phone, assigned teacher, assigned car (hence transmission), address, license type. Re-upload **upserts by national ID**; students absent from a new upload are **deactivated, not deleted**, so historical submissions survive.
 - **One Publication per week, school-wide**, generating a **single unguessable link**. The Publication aggregates the per-teacher Week Schedules for that week. The student's roster record selects which teacher's grid they see. Window, extend, and reopen act on the whole week.
 - **The student form drops** the email step, the new-student name step, the teacher-confirmation / mismatch-warning / "this is not my teacher" flow, the conditional transmission question, and link-based default-teacher stamping. The teacher and transmission are shown read-only from the roster.
 - **Excel stays per teacher** (one file per teacher per publication, emailed to each teacher's contact email, versioned per teacher on each close). The detail-sheet identifier column changes from Email to National ID (with Phone added).
@@ -38,3 +38,21 @@ This supersedes decisions #3 (link scope), #6 (email reloads submission), and #1
 - **Wider security blast radius:** the link is now school-wide and national IDs are semi-guessable (9 digits + check digit). The risk surface grows from one teacher's preference list to the whole school's. The mitigation (the teacher knows his students and reviews the Excel) is weaker at school scale; flagged for revisit if abuse appears. No passwords or verification are added in v1, consistent with the accepted-risk posture in requirements §8.2.
 - **Publication cardinality change** is the largest model impact: "Publication" now means per-week-school-wide, aggregating per-teacher Week Schedules. Downstream artifacts (dashboard, history, versioning) become per-teacher views *within* a single weekly publication.
 - **Issue backlog grooming:** several student-form user stories are closed as superseded; new stories are added for roster upload, ID identification, and ID-based routing (see requirements §11 and the issue tracker).
+
+## Amendment (5 October 2026): the Roster is no longer the single source of truth
+
+**Context:** spec [#82](https://github.com/silagy/DrivingLessonsBooking/issues/82) lets Administrators add and edit Students by hand, Change Teacher and Change Car. A Roster that deactivates every Student missing from the file, and overwrites whatever it carries, would undo that work on the next import. Nothing stopped a Student being placed on a Car their Teacher doesn't teach on, although the Car decides the Student's transmission.
+
+**Decision** (implemented in [#92](https://github.com/silagy/DrivingLessonsBooking/issues/92)):
+- The Roster import still **adds new Students and updates existing ones by national ID**, but it **never deactivates** a Student. Students absent from the file are left unchanged. The import result no longer has a "deactivated" count.
+- **A Student's Car is always one of their Teacher's Cars.** The Student aggregate enforces it. The import checks it per row before touching the Student: a row whose Car is not assigned to its Teacher is rejected and listed in the import result ("car is not assigned to this teacher"), and the rest of the file still imports. A Car shared by several Teachers is valid for each of them.
+- **The most recent change wins**: whatever a Roster import or a manual edit wrote last is what the Student shows. A Student who reappears in the file is reactivated.
+- **National-ID corrections must also be made at the Roster source.** If an Administrator corrects a national ID by hand and a later file still carries the old ID, the import creates a second Student under the old ID. This is accepted; no guard is added.
+- Students who already break the Car rule (from before the rule existed) are not scanned or changed by the import or by any migration, unless a consistent row updates them.
+
+**Consequences:**
+- Students added by hand survive every import; leaving the school is now an explicit deactivation, not an omission from the file.
+- A Roster file can't silently put a Student on the wrong Car; the Administrator sees the rejected row and fixes the file or the Car assignment.
+- Deactivating Students who left the school is an Administrator action (spec #82), no longer a side effect of the file.
+
+The "Delete students missing from a re-upload" alternative above stays rejected; the soft-deactivation it argued for is now a manual action rather than an import step.

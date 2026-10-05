@@ -47,7 +47,6 @@ public class RosterImportTest
             .Where(x => x.RosterImportId == rosterImport.Id
                         && x.AddedCount == 1
                         && x.UpdatedCount == 0
-                        && x.DeactivatedCount == 0
                         && x.FailedCount == 1
                         && x.ImportedAtUtc == importedAtUtc)
             .ShouldHaveSingleItem();
@@ -63,8 +62,7 @@ public class RosterImportTest
         {
             RosterImportEntry.Of(Faker.FakeNationalId(), RosterEntryOutcome.Added),
             RosterImportEntry.Of(Faker.FakeNationalId(), RosterEntryOutcome.Added),
-            RosterImportEntry.Of(Faker.FakeNationalId(), RosterEntryOutcome.Updated),
-            RosterImportEntry.Of(Faker.FakeNationalId(), RosterEntryOutcome.Deactivated)
+            RosterImportEntry.Of(Faker.FakeNationalId(), RosterEntryOutcome.Updated)
         };
         var failures = new List<RosterImportFailure>
         {
@@ -78,7 +76,6 @@ public class RosterImportTest
         //then
         rosterImport.AddedCount.ShouldBe(2);
         rosterImport.UpdatedCount.ShouldBe(1);
-        rosterImport.DeactivatedCount.ShouldBe(1);
         rosterImport.FailedCount.ShouldBe(2);
     }
 }

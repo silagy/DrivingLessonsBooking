@@ -69,6 +69,11 @@ public class Car : AggregateRoot<CarId>
         AddEvent(new CarUnassignedFromTeacher(Id, teacher.Id));
     }
 
+    public bool IsAssignedTo(Teacher teacher)
+    {
+        return teacherAssignments.Any(x => x.TeacherId == teacher.Id);
+    }
+
     public void Delete()
     {
         MustNotBeDeleted();
@@ -80,9 +85,7 @@ public class Car : AggregateRoot<CarId>
 
     private void MustNotBeAssigned(Teacher teacher)
     {
-        var isAssigned = teacherAssignments.Any(x => x.TeacherId == teacher.Id);
-
-        if (isAssigned)
+        if (IsAssignedTo(teacher))
         {
             throw new TeacherAlreadyAssignedToCarException(Id, teacher.Id);
         }

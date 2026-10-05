@@ -80,14 +80,13 @@
   },
   "roster": {
     "title": "Student roster",
-    "subtitle": "Upload the school's CSV to sync students, their teachers, and cars.",
+    "subtitle": "Upload the school's CSV to add students and update their teachers and cars.",
     "uploadCsv": "Upload CSV",
     "processed": "Processed",
     "rowsSummary": "{{rows}} rows · {{time}}",
     "stats": {
       "added": "Added",
       "updated": "Updated",
-      "deactivated": "Deactivated (missing from file)",
       "failed": "Failed rows"
     },
     "table": {
@@ -119,7 +118,8 @@
       "missingCar": "Missing car",
       "unknownTeacher": "Teacher not found in the system",
       "unknownCar": "Car not found in the system",
-      "invalidStartDate": "Invalid start date"
+      "invalidStartDate": "Invalid start date",
+      "carNotAssignedToTeacher": "Car is not assigned to this Teacher"
     },
     "imported": "Roster imported",
     "loadFailed": "Failed to load the roster.",

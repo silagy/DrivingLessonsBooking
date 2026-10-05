@@ -1,9 +1,9 @@
 # Requirements Document: Weekly Demand Collection System for Driving Lessons
  
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 13 July 2026
 **Status:** Approved scope for v1
-**Changelog:** v1.3 — Car remodeled as its own aggregate: a **shared school pool** of cars, each assignable to any number of teachers (many-to-many); a teacher may have zero cars (the last-car rule is dropped); cars are soft-deleted like teachers (see decision #21). v1.2 — teacher car limit removed: a teacher owns **one or more** cars (was 1–2); the minimum-one rule binds as "the last car can never be removed" (see decision #20). v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
+**Changelog:** v1.4 - the roster is no longer the single source of truth: an import adds and updates students but never deactivates anyone, and a row whose car is not assigned to its teacher is rejected and reported while the rest imports; a student's car is always one of their teacher's cars (see decision #23, the ADR 0003 amendment and issue #92). v1.3 — Car remodeled as its own aggregate: a **shared school pool** of cars, each assignable to any number of teachers (many-to-many); a teacher may have zero cars (the last-car rule is dropped); cars are soft-deleted like teachers (see decision #21). v1.2 — teacher car limit removed: a teacher owns **one or more** cars (was 1–2); the minimum-one rule binds as "the last car can never be removed" (see decision #20). v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
 **Scope discipline:** This document is technology-agnostic. A separate technology document (latest .NET, latest Angular, PrimeNG, signal-based patterns) will govern implementation.
  
 ---
@@ -80,12 +80,15 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Profile fields, all sourced from the roster and read-only to the student: full name (single field), phone, assigned teacher, assigned car, address, license type, start date
 - **Transmission** is derived from the assigned car's transmission (via the car / license type), never asked
 - **Teacher association** comes directly from the roster record, never stamped from a link
-- The roster is the single source of truth for every student profile field
+- A student's **car is always one of their teacher's cars** (see decision #23)
+- The roster is **not** the single source of truth: an import updates the profile fields it carries, and the most recent change (a roster import or an Administrator's manual edit, spec #82) is what the student shows
 
 ### 5.5.1 Student Roster (CSV import)
 - The admin uploads a CSV; each row is one student. Columns map to: full name, national ID (identifier), phone, assigned car, assigned teacher, address, notes, start date, license type (transmission), and admin-only bookkeeping fields.
-- Re-uploading **upserts by national ID**: existing students are updated, new rows are added, and students absent from the new file are **deactivated, not deleted** (historical submissions are preserved).
+- Re-uploading **upserts by national ID**: existing students are updated and new rows are added. Students absent from the new file are **left unchanged**: an import never deactivates a student, so students added or edited by hand survive the next import.
 - The assigned teacher and car strings in the CSV must resolve to existing Teacher/Car records; unresolved rows are reported as errors and skipped.
+- A row whose car is **not assigned to the row's teacher** is rejected and reported ("car is not assigned to this teacher"); the rest of the file still imports. Students who already break this rule are left as they are unless a consistent row updates them.
+- A national ID corrected by hand must also be corrected in the roster at its source: a later file still carrying the old ID creates a second student under the old ID (accepted, no guard).
 ### 5.6 Submission (per student, per publication)
 - Target session count (integer ≥ 1, no upper limit)
 - An **ordered list of Slot Requests**, ranked by selection sequence
@@ -213,6 +216,7 @@ One row per slot request, sorted by day, then slot, then student rank:
 | 20 | ~~No maximum on cars per teacher (was 1–2); minimum one binds as "the last car can never be removed" and a teacher may exist carless until their first car is added~~ **superseded by #21** | Fleet size is the school's business, not a system rule; the minimum only matters once car removal exists |
 | 21 | **Car is its own aggregate — a shared school pool**: one car may be assigned to any number of teachers (many-to-many), a teacher may have zero cars (the last-car rule is dropped), and cars soft-delete like teachers | One physical car is shared between teachers in practice; modeling Car as owned by a single teacher was a modeling error |
 | 22 | **The teacher's Excel email is Hebrew**: subject "בקשות לשבוע N - {teacher} - גרסה K", a right-to-left body, and the attachment named after the subject | Teachers read Hebrew and the workbook is already Hebrew (Excel roadmap decision 1); the version in the attachment's name keeps a saved file identifiable after it leaves the inbox |
+| 23 | **The roster adds and updates but never deactivates, and a student's car must be one of their teacher's cars**; a roster row that breaks the rule is rejected and reported while the rest of the file imports | Students added or edited by hand must survive the next import; the car fixes the student's transmission, so it must be a car their teacher actually teaches on (see the ADR 0003 amendment, issue #92) |
  
 ## 12. Explicitly Deferred (v2 candidates)
  
