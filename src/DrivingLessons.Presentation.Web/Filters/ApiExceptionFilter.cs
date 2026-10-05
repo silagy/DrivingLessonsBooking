@@ -69,6 +69,10 @@ public sealed class ApiExceptionFilter : IExceptionFilter
             {
                 ["maxLength"] = tooLong.MaxLength.ToString(CultureInfo.InvariantCulture)
             },
+            StudentNationalIdAlreadyInUseException inUse => new Dictionary<string, string>
+            {
+                ["name"] = inUse.ExistingStudentName.Value
+            },
             _ => null
         };
     }

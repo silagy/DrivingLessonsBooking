@@ -9,6 +9,7 @@ using DrivingLessons.Application.Commands.ChangeUserRole;
 using DrivingLessons.Application.Commands.ClosePublication;
 using DrivingLessons.Application.Commands.Common;
 using DrivingLessons.Application.Commands.CreateCar;
+using DrivingLessons.Application.Commands.CreateStudent;
 using DrivingLessons.Application.Commands.CreateSubmission;
 using DrivingLessons.Application.Commands.CreateTeacher;
 using DrivingLessons.Application.Commands.CreateUser;
@@ -96,6 +97,7 @@ public static class DependencyInjection
         services.AddScoped<DownloadPublicationExcelInteractor>();
         services.AddScoped<ImportRosterInteractor>();
         services.AddScoped<FindStudentsInteractor>();
+        services.AddScoped<CreateStudentInteractor>();
         services.AddScoped<GetStudentInteractor>();
         services.AddScoped<IdentifyStudentInteractor>();
         services.AddScoped<SubmissionContextResolver>();

@@ -515,6 +515,8 @@
     "studentAlreadyActive": "This student is already active.",
     "studentAlreadyDeactivated": "This student is already inactive.",
     "studentNameMustNotBeEmpty": "The student's name can't be empty.",
+    "studentCarMustBeAssignedToTeacher": "This Car is not assigned to this Teacher. Refresh and choose again.",
+    "studentNationalIdAlreadyInUse": "A Student with this national ID already exists: {{name}}.",
     "studentNotFound": "No active student on the roster has this national ID.",
     "submissionAlreadyExists": "A list was already sent for this week.",
     "submissionMustBeForPublicationAndStudent": "This list belongs to another week or student.",

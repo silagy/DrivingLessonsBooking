@@ -515,6 +515,8 @@
     "studentAlreadyActive": "התלמיד הזה כבר פעיל.",
     "studentAlreadyDeactivated": "התלמיד הזה כבר לא פעיל.",
     "studentNameMustNotBeEmpty": "שם התלמיד לא יכול להיות ריק.",
+    "studentCarMustBeAssignedToTeacher": "הרכב הזה לא משויך למורה הזה. יש לרענן ולבחור שוב.",
+    "studentNationalIdAlreadyInUse": "כבר קיים תלמיד עם תעודת הזהות הזו: {{name}}.",
     "studentNotFound": "אין ברשימה תלמיד פעיל עם תעודת הזהות הזו.",
     "submissionAlreadyExists": "כבר נשלחה רשימה לשבוע הזה.",
     "submissionMustBeForPublicationAndStudent": "הרשימה הזו שייכת לשבוע אחר או לתלמיד אחר.",

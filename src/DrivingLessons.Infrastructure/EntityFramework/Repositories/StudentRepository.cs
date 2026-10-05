@@ -26,6 +26,13 @@ public class StudentRepository : IStudentRepository
                          .FirstOrDefaultAsync(x => x.NationalId == nationalId && x.IsActive);
     }
 
+    public async Task<Student?> GetByNationalIdAsync(NationalId nationalId)
+    {
+        return await dbContext
+                         .Students
+                         .FirstOrDefaultAsync(x => x.NationalId == nationalId);
+    }
+
     public void Add(Student student)
     {
         dbContext.Students.Add(student);
