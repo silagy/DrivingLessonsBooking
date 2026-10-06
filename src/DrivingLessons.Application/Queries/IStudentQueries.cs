@@ -12,4 +12,6 @@ public interface IStudentQueries
     Task<GetStudentResponse?> GetAsync(Guid id);
 
     Task<IdentifyStudentResponse?> GetActiveByNationalIdAsync(NationalId nationalId, DateOnly weekStart);
+
+    Task<bool> IsInactiveAsync(NationalId nationalId);
 }

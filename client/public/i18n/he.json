@@ -172,6 +172,34 @@
     "addStudent": "הוספת תלמיד",
     "added": "התלמיד נוסף",
     "addedDetail": "{{name}} נוסף/ה לרשימה של {{teacher}}.",
+    "actions": {
+      "editDetails": "עריכת פרטים",
+      "menu": "פעולות",
+      "menuFor": "פעולות - {{name}}",
+      "deactivate": "סימון כלא פעיל",
+      "reactivate": "סימון כפעיל"
+    },
+    "who": {
+      "teacher": "מורה:",
+      "car": "רכב:"
+    },
+    "deactivate": {
+      "title": "לסמן את {{name}} כלא פעיל/ה?",
+      "cannotSubmit": "עד לסימון מחדש כפעיל/ה, לא תהיה אפשרות להגיש בטופס התלמידים.",
+      "submissionsStay": "ההגשות הקודמות נשמרות.",
+      "rosterReactivates": "קובץ רשימת תלמידים שעדיין כולל אותם יסמן אותם שוב כפעילים."
+    },
+    "deactivated": "התלמיד סומן כלא פעיל",
+    "deactivatedDetail": "{{name}} לא יוכל/תוכל להגיש עד לסימון מחדש כפעיל/ה.",
+    "reactivated": "התלמיד סומן כפעיל",
+    "reactivatedDetail": "{{name}} יכול/ה להגיש שוב בטופס התלמידים.",
+    "edit": {
+      "title": "עריכת פרטים",
+      "nationalIdNote": "השינוי כאן לא משנה את קובץ רשימת התלמידים. קובץ מאוחר יותר עם תעודת הזהות הישנה יוסיף תלמיד שני, ולכן צריך לתקן גם את הקובץ.",
+      "nationalIdUsed": "תעודת הזהות הזו שייכת לתלמיד אחר: {{name}}.",
+      "teacherAndCar": "מורה ורכב"
+    },
+    "detailsSaved": "הפרטים נשמרו",
     "add": {
       "title": "הוספת תלמיד",
       "nationalId": "תעודת זהות",
@@ -447,6 +475,9 @@
       "foundBody": "בואו נאסוף את הזמינות שלכם לשבוע {{weekNumber}} אצל {{teacherName}}.",
       "notOnRosterTitle": "אינכם מופיעים אצלנו.",
       "notOnRosterBody": "תעודת הזהות הזו לא מופיעה ברשימת התלמידים של בית הספר, ולכן אין מה להגיש. פנו לבית הספר כדי שיוסיפו אתכם.",
+      "inactiveTitle": "ההרשמה שלכם לא פעילה.",
+      "inactiveBody": "לכן אי אפשר להגיש בקשות השבוע. כדי לחזור לשיעורים, פנו לבית הספר.",
+      "inactiveLocked": "אפשר להמשיך רק עם הרשמה פעילה",
       "invalidId": "זה לא נראה כמו מספר תעודת זהות תקין. בדקו את הספרות ונסו שוב.",
       "failed": "לא הצלחנו לבדוק את תעודת הזהות כרגע. בדקו את החיבור ונסו שוב.",
       "welcomeBackTitle": "ברוכים השבים, {{studentName}}.",
@@ -584,8 +615,8 @@
     "slotMustBeUnavailable": "המשבצת הזו כבר פתוחה. רעננו את הדף.",
     "slotNotFound": "המשבצת הזו כבר לא קיימת. רעננו את הדף.",
     "slotNotInWeekSchedule": "המשבצת הזו אינה חלק מהשבוע. רעננו את הדף.",
-    "studentAlreadyActive": "התלמיד הזה כבר פעיל.",
-    "studentAlreadyDeactivated": "התלמיד הזה כבר לא פעיל.",
+    "studentAlreadyActive": "התלמיד הזה כבר פעיל. הרשימה רועננה.",
+    "studentAlreadyDeactivated": "התלמיד הזה כבר לא פעיל. הרשימה רועננה.",
     "studentNameMustNotBeEmpty": "שם התלמיד לא יכול להיות ריק.",
     "studentCarMustBeAssignedToTeacher": "הרכב הזה לא משויך למורה הזה. יש לרענן ולבחור שוב.",
     "studentNationalIdAlreadyInUse": "כבר קיים תלמיד עם תעודת הזהות הזו: {{name}}.",

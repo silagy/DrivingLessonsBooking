@@ -115,6 +115,10 @@ function failingWith(status: number): () => Observable<never> {
     return () => throwError(() => new HttpErrorResponse({ status }));
 }
 
+function refusedWith(status: number, code: string): () => Observable<never> {
+    return () => throwError(() => new HttpErrorResponse({ status, error: { status, title: 'Conflict', code } }));
+}
+
 function closingWindow(): () => Observable<never> {
     return () =>
         throwError(
@@ -454,6 +458,23 @@ describe('StudentFormPage', () => {
             //then
             expect(page(fixture).querySelector('.identify__not-on-roster')).not.toBeNull();
             expect(page(fixture).querySelector('.identify__found')).toBeNull();
+            expect(continueButton(fixture)!.disabled).toBe(true);
+            expect(page(fixture).querySelector('app-details-step')).toBeNull();
+        });
+
+        it("tells an Inactive Student their registration isn't active and keeps Continue locked", async () => {
+            //given
+            provideOpenLinkIdentifying(refusedWith(HTTP_CONFLICT, 'submissionStudentMustBeActive'));
+            const fixture = await renderPage();
+
+            //when
+            await typeNationalId(fixture, ROSTER_NATIONAL_ID);
+
+            //then
+            expect(page(fixture).querySelector('.identify__inactive')).not.toBeNull();
+            expect(page(fixture).querySelector('.identify__locked')).not.toBeNull();
+            expect(page(fixture).querySelector('.identify__not-on-roster')).toBeNull();
+            expect(page(fixture).querySelector('.identify__invalid')).toBeNull();
             expect(continueButton(fixture)!.disabled).toBe(true);
             expect(page(fixture).querySelector('app-details-step')).toBeNull();
         });

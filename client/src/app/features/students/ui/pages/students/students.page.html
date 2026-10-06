@@ -131,6 +131,9 @@
             </th>
             <th class="students__wide-only">{{ 'students.table.car' | transloco }}</th>
             <th>{{ 'students.table.status' | transloco }}</th>
+            <th class="students__row-actions-header">
+              <span class="students__sr-only">{{ 'students.actions.menu' | transloco }}</span>
+            </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-row>
@@ -175,11 +178,21 @@
                 [severity]="row.isActive ? 'success' : 'secondary'"
                 [value]="(row.isActive ? 'students.status.active' : 'students.status.inactive') | transloco" />
             </td>
+            <td class="students__row-actions">
+              <p-button
+                icon="pi pi-ellipsis-v"
+                rounded
+                text
+                severity="secondary"
+                [ariaLabel]="'students.actions.menuFor' | transloco: { name: row.name }"
+                [disabled]="store.isMutating()"
+                (onClick)="onRowActions($event, row)" />
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="6">
+            <td colspan="7">
               <div class="students__empty">
                 <span class="students__empty-icon" aria-hidden="true"><i class="pi pi-search"></i></span>
                 <p class="students__empty-title">{{ 'students.noMatchTitle' | transloco }}</p>
@@ -197,6 +210,8 @@
           </tr>
         </ng-template>
       </p-table>
+
+      <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" />
 
       @if (store.visibleStudents().length) {
         <p class="students__footer">{{ store.footerKey() | transloco: { count: store.visibleStudents().length } }}</p>

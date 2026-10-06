@@ -172,6 +172,34 @@
     "addStudent": "Add Student",
     "added": "Student added",
     "addedDetail": "{{name}} is now on {{teacher}}'s list.",
+    "actions": {
+      "editDetails": "Edit details",
+      "menu": "Actions",
+      "menuFor": "Actions - {{name}}",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate"
+    },
+    "who": {
+      "teacher": "Teacher:",
+      "car": "Car:"
+    },
+    "deactivate": {
+      "title": "Deactivate {{name}}?",
+      "cannotSubmit": "Until reactivated, they can't submit on the student form.",
+      "submissionsStay": "Their past Submissions stay.",
+      "rosterReactivates": "A Roster file that still lists them will reactivate them."
+    },
+    "deactivated": "Student deactivated",
+    "deactivatedDetail": "{{name}} can't submit until reactivated.",
+    "reactivated": "Student reactivated",
+    "reactivatedDetail": "{{name}} can submit on the student form again.",
+    "edit": {
+      "title": "Edit details",
+      "nationalIdNote": "Changing it here doesn't change the Roster file. A later Roster file with the old ID would add a second Student, so correct the file too.",
+      "nationalIdUsed": "This national ID belongs to another Student: {{name}}.",
+      "teacherAndCar": "Teacher and Car"
+    },
+    "detailsSaved": "Details saved",
     "add": {
       "title": "Add Student",
       "nationalId": "National ID",
@@ -447,6 +475,9 @@
       "foundBody": "Let's collect your availability for week {{weekNumber}} with {{teacherName}}.",
       "notOnRosterTitle": "We don't have you on file.",
       "notOnRosterBody": "This ID isn't on the school's roster, so there's nothing to submit. Please contact your school to be added.",
+      "inactiveTitle": "Your registration isn't active.",
+      "inactiveBody": "So you can't submit requests this week. To get back to lessons, contact the school.",
+      "inactiveLocked": "You can continue only with an active registration",
       "invalidId": "This doesn't look like a valid national ID. Check the digits and try again.",
       "failed": "We couldn't check your ID right now. Check your connection and try again.",
       "welcomeBackTitle": "Welcome back, {{studentName}}.",
@@ -584,8 +615,8 @@
     "slotMustBeUnavailable": "This slot is already open. Refresh the page.",
     "slotNotFound": "This slot no longer exists. Refresh the page.",
     "slotNotInWeekSchedule": "This slot isn't part of the week. Refresh the page.",
-    "studentAlreadyActive": "This student is already active.",
-    "studentAlreadyDeactivated": "This student is already inactive.",
+    "studentAlreadyActive": "This Student is already active. The list has been refreshed.",
+    "studentAlreadyDeactivated": "This Student is already inactive. The list has been refreshed.",
     "studentNameMustNotBeEmpty": "The student's name can't be empty.",
     "studentCarMustBeAssignedToTeacher": "This Car is not assigned to this Teacher. Refresh and choose again.",
     "studentNationalIdAlreadyInUse": "A Student with this national ID already exists: {{name}}.",

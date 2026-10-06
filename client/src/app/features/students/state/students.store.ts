@@ -8,18 +8,26 @@ import { CarOptionsApiService } from '../data/car-options-api.service';
 import { ItemForFindCarsResponse } from '../data/item-for-find-cars.response';
 import { StudentsApiService } from '../data/students-api.service';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
-import { AddStudentRefusal, refusalKindOf } from '../domain/add-student-refusal';
+import { StudentRefusal, refusalKindOf } from '../domain/student-refusal';
 import { CarOption } from '../domain/car-option.model';
 import { NewStudent } from '../domain/new-student.model';
 import { DEFAULT_STUDENT_FILTERS, StudentFilters } from '../domain/student-filters.model';
 import { visibleStudents } from '../domain/student-list';
+import { StudentDetailsChange } from '../domain/student-details-change.model';
+import { StudentDetails } from '../domain/student-details.model';
 import { StudentRow } from '../domain/student-row.model';
 import { StudentStatusFilter } from '../domain/student-status-filter.enum';
 import { Student } from '../domain/student.model';
 import { TeacherOption } from '../domain/teacher-option.model';
 
 const SINGLE_STUDENT_COUNT = 1;
-const ISOLATED_REFUSAL_PARAMS = ['name'];
+const EXISTING_STUDENT_NAME_PARAM = 'name';
+const ISOLATED_REFUSAL_PARAMS = [EXISTING_STUDENT_NAME_PARAM];
+const STALE_TOGGLE_CODES: ReadonlySet<string> = new Set([
+    'studentAlreadyDeactivated',
+    'studentAlreadyActive',
+    'studentNotFound',
+]);
 
 @Injectable()
 export class StudentsStore {
@@ -29,7 +37,7 @@ export class StudentsStore {
     private readonly toast = inject(ToastService);
 
     private readonly mutating = signal(false);
-    private readonly refusalState = signal<AddStudentRefusal | null>(null);
+    private readonly refusalState = signal<StudentRefusal | null>(null);
     private readonly filtersState = signal<StudentFilters>(DEFAULT_STUDENT_FILTERS);
     private readonly newStudentIds = signal<ReadonlySet<string>>(new Set<string>());
 
@@ -127,14 +135,96 @@ export class StudentsStore {
             this.studentsResource.reload();
             return true;
         } catch (error) {
-            this.refusalState.set({
-                kind: refusalKindOf(problemCodeOf(error)),
-                message: this.toast.messageOf(error, ISOLATED_REFUSAL_PARAMS),
-            });
+            this.refusalState.set(this.refusalOf(error));
             return false;
         } finally {
             this.mutating.set(false);
         }
+    }
+
+    async loadDetails(studentId: string): Promise<StudentDetails | null> {
+        this.mutating.set(true);
+
+        try {
+            return await firstValueFrom(this.api.getStudent(studentId));
+        } catch (error) {
+            this.toast.apiError(error);
+            return null;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
+    async changeDetails(studentId: string, change: StudentDetailsChange): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalState.set(null);
+
+        try {
+            await firstValueFrom(this.api.changeStudentDetails(studentId, change));
+            this.toast.success('students.detailsSaved');
+            this.studentsResource.reload();
+            return true;
+        } catch (error) {
+            this.refusalState.set(this.refusalOf(error));
+            return false;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
+    async deactivate(student: Student): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalState.set(null);
+
+        try {
+            await firstValueFrom(this.api.deactivateStudent(student.id));
+            this.toast.success('students.deactivated', {
+                key: 'students.deactivatedDetail',
+                params: { name: isolateDirection(student.name) },
+            });
+            this.studentsResource.reload();
+            return true;
+        } catch (error) {
+            if (!isStaleToggle(error)) {
+                this.refusalState.set(this.refusalOf(error));
+                return false;
+            }
+
+            this.toast.apiError(error);
+            this.studentsResource.reload();
+            return true;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
+    async reactivate(student: Student): Promise<void> {
+        this.mutating.set(true);
+
+        try {
+            await firstValueFrom(this.api.reactivateStudent(student.id));
+            this.toast.success('students.reactivated', {
+                key: 'students.reactivatedDetail',
+                params: { name: isolateDirection(student.name) },
+            });
+            this.studentsResource.reload();
+        } catch (error) {
+            this.toast.apiError(error);
+
+            if (isStaleToggle(error)) {
+                this.studentsResource.reload();
+            }
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
+    private refusalOf(error: unknown): StudentRefusal {
+        return {
+            kind: refusalKindOf(problemCodeOf(error)),
+            message: this.toast.messageOf(error, ISOLATED_REFUSAL_PARAMS),
+            existingStudentName: existingStudentNameOf(error),
+        };
     }
 
     private teacherNameOf(teacherId: string): string {
@@ -151,12 +241,26 @@ function toCarOption(car: ItemForFindCarsResponse): CarOption {
     };
 }
 
-function problemCodeOf(error: unknown): string | undefined {
+function problemOf(error: unknown): ProblemDetails | null {
     if (!(error instanceof HttpErrorResponse)) {
-        return undefined;
+        return null;
     }
 
-    const problem = error.error as ProblemDetails | null;
+    return error.error as ProblemDetails | null;
+}
 
-    return problem?.code;
+function problemCodeOf(error: unknown): string | undefined {
+    return problemOf(error)?.code;
+}
+
+function existingStudentNameOf(error: unknown): string | null {
+    const name = problemOf(error)?.params?.[EXISTING_STUDENT_NAME_PARAM];
+
+    return name ? isolateDirection(name) : null;
+}
+
+function isStaleToggle(error: unknown): boolean {
+    const code = problemCodeOf(error);
+
+    return code !== undefined && STALE_TOGGLE_CODES.has(code);
 }

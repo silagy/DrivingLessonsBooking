@@ -1,0 +1,37 @@
+.edit-student__subtitle {
+    margin: -0.5rem 0 0;
+    font-size: 0.875rem;
+    color: var(--app-text-secondary);
+}
+
+.edit-student__note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.375rem;
+
+    .pi {
+        margin-block-start: 0.15rem;
+        font-size: 0.875rem;
+    }
+}
+
+.edit-student__pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.875rem;
+}
+
+:host ::ng-deep .edit-student__pair p-datepicker,
+:host ::ng-deep .edit-student__pair .p-datepicker,
+:host ::ng-deep .edit-student__pair .p-datepicker-input {
+    display: flex;
+    inline-size: 100%;
+}
+
+.edit-student__car {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--app-ink);
+}

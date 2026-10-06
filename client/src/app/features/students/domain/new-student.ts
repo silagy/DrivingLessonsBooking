@@ -1,3 +1,4 @@
+import { optionalText, toIsoDate } from './form-values';
 import { NewStudent } from './new-student.model';
 
 export interface AddStudentFormValue {
@@ -11,10 +12,6 @@ export interface AddStudentFormValue {
     licenseType: string;
 }
 
-const MONTH_OFFSET = 1;
-const DATE_PART_LENGTH = 2;
-const DATE_PART_PAD = '0';
-
 export function toNewStudent(value: AddStudentFormValue): NewStudent {
     return {
         nationalId: value.nationalId.trim(),
@@ -26,18 +23,4 @@ export function toNewStudent(value: AddStudentFormValue): NewStudent {
         startDate: value.startDate ? toIsoDate(value.startDate) : null,
         licenseType: optionalText(value.licenseType),
     };
-}
-
-function optionalText(value: string): string | null {
-    const trimmed = value.trim();
-
-    return trimmed ? trimmed : null;
-}
-
-function toIsoDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + MONTH_OFFSET).padStart(DATE_PART_LENGTH, DATE_PART_PAD);
-    const day = String(date.getDate()).padStart(DATE_PART_LENGTH, DATE_PART_PAD);
-
-    return `${year}-${month}-${day}`;
 }

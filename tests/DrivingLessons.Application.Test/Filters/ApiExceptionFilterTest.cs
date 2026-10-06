@@ -90,6 +90,66 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Student_Already_Deactivated_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyDeactivatedException(StudentId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyDeactivated");
+    }
+
+    [TestMethod]
+    public void Student_Already_Active_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyActiveException(StudentId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyActive");
+    }
+
+    [TestMethod]
+    public void Student_Not_Found_By_Id_Is_A_Not_Found_With_Its_Code()
+    {
+        //given
+        var context = ContextFor(new StudentNotFoundException(StudentId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status404NotFound);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentNotFound");
+    }
+
+    [TestMethod]
+    public void Inactive_Student_Submitting_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new SubmissionStudentMustBeActiveException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "submissionStudentMustBeActive");
+    }
+
+    [TestMethod]
     public void National_Id_In_Use_Is_A_Conflict_With_Its_Rule_As_Code()
     {
         //given

@@ -340,3 +340,31 @@
         display: flex;
     }
 }
+
+.students__row-actions-header {
+    inline-size: 60px;
+}
+
+.students__row-actions {
+    text-align: end;
+    white-space: nowrap;
+}
+
+.students__sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+::ng-deep .students-menu__item--danger .p-menu-item-link,
+::ng-deep .students-menu__item--danger .p-menu-item-icon,
+::ng-deep .students-menu__item--danger .p-menu-item-label {
+    color: var(--p-red-600);
+}
+
+::ng-deep [dir='rtl'] .students-menu__item--mirrored-icon .p-menu-item-icon {
+    transform: scaleX(-1);
+}
