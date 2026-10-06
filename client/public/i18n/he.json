@@ -198,6 +198,10 @@
     "deactivatedDetail": "{{name}} לא יוכל/תוכל להגיש עד לסימון מחדש כפעיל/ה.",
     "reactivated": "התלמיד סומן כפעיל",
     "reactivatedDetail": "{{name}} יכול/ה להגיש שוב בטופס התלמידים.",
+    "teacherChanged": "המורה הוחלף",
+    "teacherChangedDetail": "המורה של {{name}}: {{teacher}}, על {{car}}.",
+    "carChanged": "הרכב הוחלף",
+    "carChangedDetail": "{{name}} ילמד/תלמד על {{car}}.",
     "edit": {
       "title": "עריכת פרטים",
       "nationalIdNote": "השינוי כאן לא משנה את קובץ רשימת התלמידים. קובץ מאוחר יותר עם תעודת הזהות הישנה יוסיף תלמיד שני, ולכן צריך לתקן גם את הקובץ.",

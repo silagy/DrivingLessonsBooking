@@ -15,7 +15,7 @@ export function pickCarFor(teacherId: string | null, cars: readonly CarOption[])
         return { options: [], selectedCarId: null, isLocked: true, hasNoCars: false, isOnlyCar: false };
     }
 
-    const options = carsOf(teacherId, cars);
+    const options = carsOfTeacher(teacherId, cars);
     const isOnlyCar = options.length === SINGLE_CAR_COUNT;
 
     return {
@@ -27,11 +27,30 @@ export function pickCarFor(teacherId: string | null, cars: readonly CarOption[])
     };
 }
 
+export interface TeacherChangeCarPick extends CarPick {
+    keepsCurrentCar: boolean;
+}
+
+export function pickCarForNewTeacher(
+    teacherId: string | null,
+    cars: readonly CarOption[],
+    currentCarId: string,
+): TeacherChangeCarPick {
+    const pick = pickCarFor(teacherId, cars);
+    const keepsCurrentCar = pick.options.some((car) => car.id === currentCarId);
+
+    return {
+        ...pick,
+        selectedCarId: keepsCurrentCar ? currentCarId : pick.selectedCarId,
+        keepsCurrentCar,
+    };
+}
+
 export function teacherHasCars(teacherId: string, cars: readonly CarOption[]): boolean {
     return cars.some((car) => car.teacherIds.includes(teacherId));
 }
 
-function carsOf(teacherId: string, cars: readonly CarOption[]): CarOption[] {
+export function carsOfTeacher(teacherId: string, cars: readonly CarOption[]): CarOption[] {
     return cars
         .filter((car) => car.teacherIds.includes(teacherId))
         .sort((first, second) => first.name.localeCompare(second.name));

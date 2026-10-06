@@ -219,6 +219,53 @@ export class StudentsStore {
         }
     }
 
+    async changeTeacher(student: Student, teacherId: string, carId: string): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalState.set(null);
+
+        try {
+            await firstValueFrom(this.api.changeStudentTeacher(student.id, { teacherId, carId }));
+            this.toast.success('students.teacherChanged', {
+                key: 'students.teacherChangedDetail',
+                params: {
+                    name: isolateDirection(student.name),
+                    teacher: isolateDirection(this.teacherNameOf(teacherId)),
+                    car: isolateDirection(this.carNameOf(carId)),
+                },
+            });
+            this.studentsResource.reload();
+            return true;
+        } catch (error) {
+            this.refusalState.set(this.refusalOf(error));
+            return false;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
+    async changeCar(student: Student, carId: string): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalState.set(null);
+
+        try {
+            await firstValueFrom(this.api.changeStudentCar(student.id, { carId }));
+            this.toast.success('students.carChanged', {
+                key: 'students.carChangedDetail',
+                params: {
+                    name: isolateDirection(student.name),
+                    car: isolateDirection(this.carNameOf(carId)),
+                },
+            });
+            this.studentsResource.reload();
+            return true;
+        } catch (error) {
+            this.refusalState.set(this.refusalOf(error));
+            return false;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
     private refusalOf(error: unknown): StudentRefusal {
         return {
             kind: refusalKindOf(problemCodeOf(error)),
@@ -229,6 +276,10 @@ export class StudentsStore {
 
     private teacherNameOf(teacherId: string): string {
         return this.teacherOptions().find((teacher) => teacher.id === teacherId)?.name ?? '';
+    }
+
+    private carNameOf(carId: string): string {
+        return this.carOptions().find((car) => car.id === carId)?.name ?? '';
     }
 }
 

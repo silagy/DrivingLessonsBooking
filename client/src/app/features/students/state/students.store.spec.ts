@@ -152,6 +152,8 @@ interface ApiStubs {
     changeStudentDetails: () => Observable<void>;
     deactivateStudent: () => Observable<void>;
     reactivateStudent: () => Observable<void>;
+    changeStudentTeacher: () => Observable<void>;
+    changeStudentCar: () => Observable<void>;
     findTeachers: () => Observable<ItemForFindTeachersResponse[]>;
     findCars: () => Observable<ItemForFindCarsResponse[]>;
 }
@@ -164,6 +166,8 @@ function createStore(overrides: Partial<ApiStubs> = {}) {
         changeStudentDetails: () => of(undefined),
         deactivateStudent: () => of(undefined),
         reactivateStudent: () => of(undefined),
+        changeStudentTeacher: () => of(undefined),
+        changeStudentCar: () => of(undefined),
         findTeachers: () => of(TEACHERS),
         findCars: () => of(CARS),
         ...overrides,
@@ -177,6 +181,8 @@ function createStore(overrides: Partial<ApiStubs> = {}) {
         changeStudentDetails: vi.fn(stubs.changeStudentDetails),
         deactivateStudent: vi.fn(stubs.deactivateStudent),
         reactivateStudent: vi.fn(stubs.reactivateStudent),
+        changeStudentTeacher: vi.fn(stubs.changeStudentTeacher),
+        changeStudentCar: vi.fn(stubs.changeStudentCar),
     };
 
     TestBed.configureTestingModule({
@@ -633,5 +639,88 @@ describe('StudentsStore', () => {
         //then
         expect(toast.apiError).toHaveBeenCalledWith(failure);
         expect(api.findStudents).toHaveBeenCalledTimes(1);
+    });
+
+    it('changes the Teacher, names the Student, Teacher and Car in the confirmation and reloads', async () => {
+        //given
+        const { store, toast, api } = createStore();
+        await stable();
+
+        //when
+        const saved = await store.changeTeacher(NOA, 'teacher-yael', 'car-i20');
+
+        //then
+        expect(saved).toBe(true);
+        expect(api.changeStudentTeacher).toHaveBeenCalledWith(NOA.id, { teacherId: 'teacher-yael', carId: 'car-i20' });
+        expect(toast.success).toHaveBeenCalledWith('students.teacherChanged', {
+            key: 'students.teacherChangedDetail',
+            params: {
+                name: isolateDirection('Noa Mizrahi'),
+                teacher: isolateDirection('Yael Carmi'),
+                car: isolateDirection('i20 Silver'),
+            },
+        });
+        await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
+    });
+
+    it('keeps the same-Teacher refusal for the dialog', async () => {
+        //given
+        const refusal = problem(HTTP_CONFLICT, 'studentAlreadyWithTeacher');
+        const { store, toast } = createStore({ changeStudentTeacher: () => throwError(() => refusal) });
+        await stable();
+
+        //when
+        const saved = await store.changeTeacher(NOA, 'teacher-yael', 'car-i20');
+
+        //then
+        expect(saved).toBe(false);
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(store.refusal()?.kind).toBe(StudentRefusalKind.sameTeacher);
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it("treats a Car that is not the new Teacher's as a stale Car", async () => {
+        //given
+        const refusal = problem(HTTP_CONFLICT, 'studentCarMustBeAssignedToTeacher');
+        const { store } = createStore({ changeStudentTeacher: () => throwError(() => refusal) });
+        await stable();
+
+        //when
+        await store.changeTeacher(NOA, 'teacher-yael', 'car-i20');
+
+        //then
+        expect(store.refusal()?.kind).toBe(StudentRefusalKind.staleCar);
+    });
+
+    it('changes the Car, names the Student and Car in the confirmation and reloads', async () => {
+        //given
+        const { store, toast, api } = createStore();
+        await stable();
+
+        //when
+        const saved = await store.changeCar(NOA, 'car-i20');
+
+        //then
+        expect(saved).toBe(true);
+        expect(api.changeStudentCar).toHaveBeenCalledWith(NOA.id, { carId: 'car-i20' });
+        expect(toast.success).toHaveBeenCalledWith('students.carChanged', {
+            key: 'students.carChangedDetail',
+            params: { name: isolateDirection('Noa Mizrahi'), car: isolateDirection('i20 Silver') },
+        });
+        await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
+    });
+
+    it('keeps the same-Car refusal for the dialog', async () => {
+        //given
+        const refusal = problem(HTTP_CONFLICT, 'studentAlreadyOnCar');
+        const { store } = createStore({ changeStudentCar: () => throwError(() => refusal) });
+        await stable();
+
+        //when
+        const saved = await store.changeCar(NOA, 'car-i20');
+
+        //then
+        expect(saved).toBe(false);
+        expect(store.refusal()?.kind).toBe(StudentRefusalKind.sameCar);
     });
 });

@@ -2,6 +2,8 @@ export enum StudentRefusalKind {
     nationalIdInUse = 'nationalIdInUse',
     nationalIdInvalid = 'nationalIdInvalid',
     staleCar = 'staleCar',
+    sameTeacher = 'sameTeacher',
+    sameCar = 'sameCar',
     other = 'other',
 }
 
@@ -18,6 +20,8 @@ const KIND_BY_CODE: Partial<Record<string, StudentRefusalKind>> = {
     nationalIdMustHaveValidCheckDigit: StudentRefusalKind.nationalIdInvalid,
     studentCarMustBeAssignedToTeacher: StudentRefusalKind.staleCar,
     carNotFound: StudentRefusalKind.staleCar,
+    studentAlreadyWithTeacher: StudentRefusalKind.sameTeacher,
+    studentAlreadyOnCar: StudentRefusalKind.sameCar,
 };
 
 export function refusalKindOf(code: string | undefined): StudentRefusalKind {

@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { ChangeStudentCarRequest } from './change-student-car.request';
 import { ChangeStudentDetailsRequest } from './change-student-details.request';
+import { ChangeStudentTeacherRequest } from './change-student-teacher.request';
 import { CreateStudentRequest } from './create-student.request';
 import { CreateStudentResponse } from './create-student.response';
 import { GetStudentResponse } from './get-student.response';
@@ -34,5 +36,13 @@ export class StudentsApiService {
 
     reactivateStudent(studentId: string): Observable<void> {
         return this.http.post<void>(`${this.baseUrl}/${studentId}/reactivate`, {});
+    }
+
+    changeStudentTeacher(studentId: string, request: ChangeStudentTeacherRequest): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/${studentId}/change-teacher`, request);
+    }
+
+    changeStudentCar(studentId: string, request: ChangeStudentCarRequest): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/${studentId}/change-car`, request);
     }
 }

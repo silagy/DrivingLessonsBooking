@@ -198,6 +198,10 @@
     "deactivatedDetail": "{{name}} can't submit until reactivated.",
     "reactivated": "Student reactivated",
     "reactivatedDetail": "{{name}} can submit on the student form again.",
+    "teacherChanged": "Teacher changed",
+    "teacherChangedDetail": "{{name}}'s Teacher is now {{teacher}}, on {{car}}.",
+    "carChanged": "Car changed",
+    "carChangedDetail": "{{name}} now learns on {{car}}.",
     "edit": {
       "title": "Edit details",
       "nationalIdNote": "Changing it here doesn't change the Roster file. A later Roster file with the old ID would add a second Student, so correct the file too.",
