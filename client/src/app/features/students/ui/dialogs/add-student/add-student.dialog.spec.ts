@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { AddStudentRefusal, AddStudentRefusalKind } from '../../../domain/add-student-refusal';
+import { StudentRefusal, StudentRefusalKind } from '../../../domain/student-refusal';
 import { CarOption } from '../../../domain/car-option.model';
 import { NewStudent } from '../../../domain/new-student.model';
 import { Transmission } from '../../../domain/transmission.enum';
@@ -32,18 +32,20 @@ const TEACHERS = [
     { id: DAFNA, name: 'Dafna Levi' },
 ];
 
-const NATIONAL_ID_REFUSAL: AddStudentRefusal = {
-    kind: AddStudentRefusalKind.nationalIdInUse,
+const NATIONAL_ID_REFUSAL: StudentRefusal = {
+    kind: StudentRefusalKind.nationalIdInUse,
     message: 'A Student with this national ID already exists.',
+    existingStudentName: 'Noa Mizrahi',
 };
-const STALE_CAR_REFUSAL: AddStudentRefusal = {
-    kind: AddStudentRefusalKind.staleCar,
+const STALE_CAR_REFUSAL: StudentRefusal = {
+    kind: StudentRefusalKind.staleCar,
     message: 'Refresh and choose again.',
+    existingStudentName: null,
 };
 
 interface Setup {
     fixture: ComponentFixture<AddStudentDialog>;
-    refusal: ReturnType<typeof signal<AddStudentRefusal | null>>;
+    refusal: ReturnType<typeof signal<StudentRefusal | null>>;
     isSaving: ReturnType<typeof signal<boolean>>;
     confirm: ReturnType<typeof vi.fn<(newStudent: NewStudent) => Promise<boolean>>>;
     refreshCars: ReturnType<typeof vi.fn>;
@@ -51,7 +53,7 @@ interface Setup {
 }
 
 async function setUp(confirmResult = true): Promise<Setup> {
-    const refusal = signal<AddStudentRefusal | null>(null);
+    const refusal = signal<StudentRefusal | null>(null);
     const isSaving = signal(false);
     const confirm = vi.fn<(newStudent: NewStudent) => Promise<boolean>>(() => Promise.resolve(confirmResult));
     const refreshCars = vi.fn();

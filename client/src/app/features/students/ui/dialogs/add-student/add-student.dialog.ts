@@ -12,7 +12,7 @@ import { SelectModule } from 'primeng/select';
 import { DialogRefusalComponent } from '../../../../../shared/components/dialog-refusal/dialog-refusal.component';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { isolateDirection } from '../../../../../shared/text/isolate-direction';
-import { AddStudentRefusalKind } from '../../../domain/add-student-refusal';
+import { StudentRefusalKind } from '../../../domain/student-refusal';
 import { pickCarFor, teacherHasCars } from '../../../domain/car-pick';
 import { toNewStudent } from '../../../domain/new-student';
 import { TransmissionTagComponent } from '../../components/transmission-tag/transmission-tag.component';
@@ -53,7 +53,7 @@ export class AddStudentDialog {
 
     protected readonly refusal = this.data.refusal;
     protected readonly isSaving = this.data.isSaving;
-    protected readonly refusalKinds = AddStudentRefusalKind;
+    protected readonly refusalKinds = StudentRefusalKind;
     protected readonly refused = REFUSED;
     protected readonly carsAndTeachersLink = ['/', AppRoutes.teachers];
 
@@ -127,7 +127,7 @@ export class AddStudentDialog {
     protected onNationalIdInput(): void {
         const kind = this.refusal()?.kind;
 
-        if (kind === AddStudentRefusalKind.nationalIdInUse || kind === AddStudentRefusalKind.nationalIdInvalid) {
+        if (kind === StudentRefusalKind.nationalIdInUse || kind === StudentRefusalKind.nationalIdInvalid) {
             this.data.clearRefusal();
         }
     }
@@ -139,7 +139,7 @@ export class AddStudentDialog {
     private markRefusedField(): void {
         const kind = this.refusal()?.kind;
 
-        if (kind === AddStudentRefusalKind.staleCar) {
+        if (kind === StudentRefusalKind.staleCar) {
             this.isCarRefused.set(true);
             return;
         }
@@ -154,10 +154,10 @@ export class AddStudentDialog {
         control.markAsDirty();
     }
 
-    private refusedControl(kind: AddStudentRefusalKind | undefined): AbstractControl | null {
+    private refusedControl(kind: StudentRefusalKind | undefined): AbstractControl | null {
         switch (kind) {
-            case AddStudentRefusalKind.nationalIdInUse:
-            case AddStudentRefusalKind.nationalIdInvalid:
+            case StudentRefusalKind.nationalIdInUse:
+            case StudentRefusalKind.nationalIdInvalid:
                 return this.form.controls.nationalId;
             default:
                 return null;

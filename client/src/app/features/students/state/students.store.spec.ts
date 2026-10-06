@@ -6,12 +6,14 @@ import { ToastService } from '../../../core/services/toast.service';
 import { isolateDirection } from '../../../shared/text/isolate-direction';
 import { CarOptionsApiService } from '../data/car-options-api.service';
 import { CreateStudentResponse } from '../data/create-student.response';
+import { GetStudentResponse } from '../data/get-student.response';
 import { ItemForFindCarsResponse } from '../data/item-for-find-cars.response';
 import { ItemForFindStudentsResponse } from '../data/item-for-find-students.response';
 import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
 import { StudentsApiService } from '../data/students-api.service';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
-import { AddStudentRefusalKind } from '../domain/add-student-refusal';
+import { StudentDetailsChange } from '../domain/student-details-change.model';
+import { StudentRefusalKind } from '../domain/student-refusal';
 import { NewStudent } from '../domain/new-student.model';
 import { DEFAULT_STUDENT_FILTERS } from '../domain/student-filters.model';
 import { StudentStatusFilter } from '../domain/student-status-filter.enum';
@@ -118,13 +120,33 @@ const NEW_STUDENT: NewStudent = {
     licenseType: null,
 };
 
-function problem(status: number, code: string): HttpErrorResponse {
-    return new HttpErrorResponse({ status, error: { status, title: 'Refused', code } });
+const NOA_DETAILS: GetStudentResponse = {
+    ...NOA,
+    address: '12 HaRimon St, Modiin',
+    startDate: '2026-09-01',
+    licenseType: 'B',
+};
+
+const NOA_CHANGE: StudentDetailsChange = {
+    nationalId: NOA.nationalId,
+    name: NOA.name,
+    phone: '050-1234568',
+    address: null,
+    startDate: null,
+    licenseType: 'B',
+};
+
+function problem(status: number, code: string, params?: Record<string, string>): HttpErrorResponse {
+    return new HttpErrorResponse({ status, error: { status, title: 'Refused', code, params } });
 }
 
 interface ApiStubs {
     findStudents: () => Observable<ItemForFindStudentsResponse[]>;
+    getStudent: () => Observable<GetStudentResponse>;
     createStudent: () => Observable<CreateStudentResponse>;
+    changeStudentDetails: () => Observable<void>;
+    deactivateStudent: () => Observable<void>;
+    reactivateStudent: () => Observable<void>;
     findTeachers: () => Observable<ItemForFindTeachersResponse[]>;
     findCars: () => Observable<ItemForFindCarsResponse[]>;
 }
@@ -132,29 +154,38 @@ interface ApiStubs {
 function createStore(overrides: Partial<ApiStubs> = {}) {
     const stubs: ApiStubs = {
         findStudents: () => of(STUDENTS),
+        getStudent: () => of(NOA_DETAILS),
         createStudent: () => of({ id: SHAKED.id }),
+        changeStudentDetails: () => of(undefined),
+        deactivateStudent: () => of(undefined),
+        reactivateStudent: () => of(undefined),
         findTeachers: () => of(TEACHERS),
         findCars: () => of(CARS),
         ...overrides,
     };
     const toast = { success: vi.fn(), apiError: vi.fn(), messageOf: vi.fn(() => 'translated refusal') };
     const findCars = vi.fn(stubs.findCars);
+    const api = {
+        findStudents: vi.fn(stubs.findStudents),
+        getStudent: vi.fn(stubs.getStudent),
+        createStudent: vi.fn(stubs.createStudent),
+        changeStudentDetails: vi.fn(stubs.changeStudentDetails),
+        deactivateStudent: vi.fn(stubs.deactivateStudent),
+        reactivateStudent: vi.fn(stubs.reactivateStudent),
+    };
 
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
             StudentsStore,
-            {
-                provide: StudentsApiService,
-                useValue: { findStudents: vi.fn(stubs.findStudents), createStudent: vi.fn(stubs.createStudent) },
-            },
+            { provide: StudentsApiService, useValue: api },
             { provide: TeacherOptionsApiService, useValue: { findTeachers: vi.fn(stubs.findTeachers) } },
             { provide: CarOptionsApiService, useValue: { findCars } },
             { provide: ToastService, useValue: toast },
         ],
     });
 
-    return { store: TestBed.inject(StudentsStore), toast, findCars };
+    return { store: TestBed.inject(StudentsStore), toast, findCars, api };
 }
 
 async function stable(): Promise<void> {
@@ -365,8 +396,9 @@ describe('StudentsStore', () => {
         expect(toast.messageOf).toHaveBeenCalledWith(refusal, ['name']);
         expect(toast.success).not.toHaveBeenCalled();
         expect(store.refusal()).toEqual({
-            kind: AddStudentRefusalKind.nationalIdInUse,
+            kind: StudentRefusalKind.nationalIdInUse,
             message: 'translated refusal',
+            existingStudentName: null,
         });
         expect(store.isMutating()).toBe(false);
     });
@@ -382,7 +414,7 @@ describe('StudentsStore', () => {
             await store.create(NEW_STUDENT);
 
             //then
-            expect(store.refusal()?.kind).toBe(AddStudentRefusalKind.nationalIdInvalid);
+            expect(store.refusal()?.kind).toBe(StudentRefusalKind.nationalIdInvalid);
         },
     );
 
@@ -398,7 +430,7 @@ describe('StudentsStore', () => {
         await store.create(NEW_STUDENT);
 
         //then
-        expect(store.refusal()?.kind).toBe(AddStudentRefusalKind.staleCar);
+        expect(store.refusal()?.kind).toBe(StudentRefusalKind.staleCar);
     });
 
     it('treats any other refusal as other', async () => {
@@ -412,7 +444,11 @@ describe('StudentsStore', () => {
         await store.create(NEW_STUDENT);
 
         //then
-        expect(store.refusal()).toEqual({ kind: AddStudentRefusalKind.other, message: 'translated refusal' });
+        expect(store.refusal()).toEqual({
+            kind: StudentRefusalKind.other,
+            message: 'translated refusal',
+            existingStudentName: null,
+        });
     });
 
     it('reloads the Car options and forgets the stale refusal', async () => {
@@ -429,5 +465,168 @@ describe('StudentsStore', () => {
         //then
         expect(store.refusal()).toBeNull();
         await vi.waitFor(() => expect(findCars).toHaveBeenCalledTimes(2));
+    });
+
+    it("loads a Student's details for editing", async () => {
+        //given
+        const { store, api } = createStore();
+        await stable();
+
+        //when
+        const details = await store.loadDetails(NOA.id);
+
+        //then
+        expect(api.getStudent).toHaveBeenCalledWith(NOA.id);
+        expect(details).toEqual(NOA_DETAILS);
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('reports a details load failure as a toast and opens nothing', async () => {
+        //given
+        const failure = problem(HTTP_NOT_FOUND, 'studentNotFound');
+        const { store, toast } = createStore({ getStudent: () => throwError(() => failure) });
+        await stable();
+
+        //when
+        const details = await store.loadDetails(NOA.id);
+
+        //then
+        expect(details).toBeNull();
+        expect(toast.apiError).toHaveBeenCalledWith(failure);
+    });
+
+    it('saves the details, confirms them and reloads the list', async () => {
+        //given
+        const { store, toast, api } = createStore();
+        await stable();
+
+        //when
+        const saved = await store.changeDetails(NOA.id, NOA_CHANGE);
+
+        //then
+        expect(saved).toBe(true);
+        expect(api.changeStudentDetails).toHaveBeenCalledWith(NOA.id, NOA_CHANGE);
+        expect(toast.success).toHaveBeenCalledWith('students.detailsSaved');
+        expect(store.refusal()).toBeNull();
+        await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
+    });
+
+    it("keeps the other Student's name for the Edit dialog when the national ID is theirs", async () => {
+        //given
+        const refusal = problem(HTTP_CONFLICT, 'studentNationalIdAlreadyInUse', { name: 'Omer Shalev' });
+        const { store, toast } = createStore({ changeStudentDetails: () => throwError(() => refusal) });
+        await stable();
+
+        //when
+        const saved = await store.changeDetails(NOA.id, NOA_CHANGE);
+
+        //then
+        expect(saved).toBe(false);
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(store.refusal()).toEqual({
+            kind: StudentRefusalKind.nationalIdInUse,
+            message: 'translated refusal',
+            existingStudentName: isolateDirection('Omer Shalev'),
+        });
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('deactivates a Student, names them in the confirmation and reloads the list', async () => {
+        //given
+        const { store, toast, api } = createStore();
+        await stable();
+
+        //when
+        const done = await store.deactivate(NOA);
+
+        //then
+        expect(done).toBe(true);
+        expect(api.deactivateStudent).toHaveBeenCalledWith(NOA.id);
+        expect(toast.success).toHaveBeenCalledWith('students.deactivated', {
+            key: 'students.deactivatedDetail',
+            params: { name: isolateDirection('Noa Mizrahi') },
+        });
+        await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
+    });
+
+    it.each([
+        [HTTP_CONFLICT, 'studentAlreadyDeactivated'],
+        [HTTP_NOT_FOUND, 'studentNotFound'],
+    ])('treats a %i %s on Deactivate as stale: toast, reload, close', async (status, code) => {
+        //given
+        const failure = problem(status, code);
+        const { store, toast, api } = createStore({ deactivateStudent: () => throwError(() => failure) });
+        await stable();
+
+        //when
+        const done = await store.deactivate(NOA);
+
+        //then
+        expect(done).toBe(true);
+        expect(toast.apiError).toHaveBeenCalledWith(failure);
+        expect(store.refusal()).toBeNull();
+        await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
+    });
+
+    it('keeps any other Deactivate failure in the dialog', async () => {
+        //given
+        const failure = new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR });
+        const { store, toast } = createStore({ deactivateStudent: () => throwError(() => failure) });
+        await stable();
+
+        //when
+        const done = await store.deactivate(NOA);
+
+        //then
+        expect(done).toBe(false);
+        expect(toast.apiError).not.toHaveBeenCalled();
+        expect(store.refusal()?.message).toBe('translated refusal');
+    });
+
+    it('reactivates a Student, names them in the confirmation and reloads the list', async () => {
+        //given
+        const { store, toast, api } = createStore();
+        await stable();
+
+        //when
+        await store.reactivate(DANA);
+
+        //then
+        expect(api.reactivateStudent).toHaveBeenCalledWith(DANA.id);
+        expect(toast.success).toHaveBeenCalledWith('students.reactivated', {
+            key: 'students.reactivatedDetail',
+            params: { name: isolateDirection('Dana Sasson') },
+        });
+        await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it('reloads when Reactivate finds the Student already active', async () => {
+        //given
+        const failure = problem(HTTP_CONFLICT, 'studentAlreadyActive');
+        const { store, toast, api } = createStore({ reactivateStudent: () => throwError(() => failure) });
+        await stable();
+
+        //when
+        await store.reactivate(DANA);
+
+        //then
+        expect(toast.apiError).toHaveBeenCalledWith(failure);
+        await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
+    });
+
+    it('reports any other Reactivate failure without reloading', async () => {
+        //given
+        const failure = new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR });
+        const { store, toast, api } = createStore({ reactivateStudent: () => throwError(() => failure) });
+        await stable();
+
+        //when
+        await store.reactivate(DANA);
+        await stable();
+
+        //then
+        expect(toast.apiError).toHaveBeenCalledWith(failure);
+        expect(api.findStudents).toHaveBeenCalledTimes(1);
     });
 });
