@@ -164,13 +164,21 @@
                   {{ row.carName }}
                   <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
                 </span>
+                @if (!row.isCarOfTeacher) {
+                  <app-car-flag [teacherName]="row.teacherName" [isActive]="row.isActive" />
+                }
               </div>
             </td>
             <td class="students__wide-only">
-              <span class="students__car">
-                {{ row.carName }}
-                <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
-              </span>
+              <div class="students__car-cell">
+                <span class="students__car">
+                  {{ row.carName }}
+                  <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
+                </span>
+                @if (!row.isCarOfTeacher) {
+                  <app-car-flag [teacherName]="row.teacherName" [isActive]="row.isActive" />
+                }
+              </div>
             </td>
             <td>
               <p-tag

@@ -159,6 +159,11 @@
       "manual": "Manual"
     },
     "new": "New",
+    "flag": {
+      "car": "Not this Teacher's Car",
+      "tip": "This Car isn't one of {{teacher}}'s Cars. It was probably set before the rule existed. Fix it with Change Car.",
+      "tipInactive": "This Car isn't one of {{teacher}}'s Cars. To fix it with Change Car, mark the Student as active first."
+    },
     "footer": "{{count}} Students",
     "footerOne": "1 Student",
     "loading": "Loading Students...",

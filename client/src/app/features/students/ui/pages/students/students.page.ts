@@ -21,6 +21,7 @@ import { StudentRow } from '../../../domain/student-row.model';
 import { StudentStatusFilter } from '../../../domain/student-status-filter.enum';
 import { TeacherOption } from '../../../domain/teacher-option.model';
 import { StudentsStore } from '../../../state/students.store';
+import { CarFlagComponent } from '../../components/car-flag/car-flag.component';
 import { TransmissionTagComponent } from '../../components/transmission-tag/transmission-tag.component';
 import { AddStudentDialog } from '../../dialogs/add-student/add-student.dialog';
 import { AddStudentDialogData } from '../../dialogs/add-student/add-student-dialog-data';
@@ -56,6 +57,7 @@ interface StatusOption {
         TableModule,
         TagModule,
         TransmissionTagComponent,
+        CarFlagComponent,
     ],
     templateUrl: './students.page.html',
     styleUrl: './students.page.scss',

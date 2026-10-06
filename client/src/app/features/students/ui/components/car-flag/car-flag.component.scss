@@ -1,0 +1,26 @@
+.car-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    padding-block-end: 1px;
+    border-block-end: 1px dotted var(--p-red-600);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--p-red-600);
+    white-space: nowrap;
+    cursor: help;
+}
+
+.car-flag:focus-visible {
+    outline: 2px solid var(--p-sky-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.car-flag .pi {
+    font-size: 0.875rem;
+}
+
+.car-flag--muted {
+    opacity: 0.75;
+}

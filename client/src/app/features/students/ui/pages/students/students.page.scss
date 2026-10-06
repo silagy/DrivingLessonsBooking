@@ -210,7 +210,17 @@
 }
 
 .students__car-line {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3125rem;
     margin-block-start: 0.3125rem;
+}
+
+.students__car-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3125rem;
 }
 
 .students__tag {
