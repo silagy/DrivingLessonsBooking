@@ -135,6 +135,21 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Inactive_Student_Submitting_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new SubmissionStudentMustBeActiveException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "submissionStudentMustBeActive");
+    }
+
+    [TestMethod]
     public void National_Id_In_Use_Is_A_Conflict_With_Its_Rule_As_Code()
     {
         //given

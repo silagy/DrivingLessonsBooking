@@ -85,6 +85,13 @@ public class StudentQueries : IStudentQueries
         return await query.FirstOrDefaultAsync();
     }
 
+    public async Task<bool> IsInactiveAsync(NationalId nationalId)
+    {
+        return await dbContext
+                         .Students
+                         .AnyAsync(x => x.NationalId == nationalId && !x.IsActive);
+    }
+
     public async Task<IdentifyStudentResponse?> GetActiveByNationalIdAsync(NationalId nationalId, DateOnly weekStart)
     {
         var resolvedWeekStart = WeekStart.Of(weekStart);

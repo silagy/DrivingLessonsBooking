@@ -26,6 +26,7 @@ import { MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
 import { weekRangeLabel } from '../domain/week-label';
 import { WelcomeBack } from '../domain/welcome-back';
 import { isolateDirection } from '../../../shared/text/isolate-direction';
+import { ProblemDetails } from '../../../shared/models/problem-details';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
@@ -43,7 +44,8 @@ const SUBMIT_LOCKING_STATUSES: ReadonlySet<SubmitStatus> = new Set([
     SubmitStatus.notFound,
 ]);
 
-const CAPTION_KEY_BY_STEP: Record<StudentFormStep, string | null> = {
+const INACTIVE_STUDENT_CODE = 'submissionStudentMustBeActive';
+const CAPTION_KEY_BY_STEP:Record<StudentFormStep, string | null> = {
     [StudentFormStep.identify]: null,
     [StudentFormStep.details]: 'studentForm.weekCaption',
     [StudentFormStep.target]: 'studentForm.weekTeacherCaption',
@@ -60,7 +62,7 @@ interface IdentifyLookup {
 
 type IdentifyResult =
     | { status: IdentifyStatus.found; student: IdentifyStudentResponse }
-    | { status: IdentifyStatus.notOnRoster | IdentifyStatus.invalidId };
+    | { status: IdentifyStatus.notOnRoster | IdentifyStatus.inactive | IdentifyStatus.invalidId };
 
 @Injectable()
 export class StudentFormStore {
@@ -459,7 +461,11 @@ export class StudentFormStore {
             }
 
             if (isStatus(error, HTTP_CONFLICT)) {
-                return { status: IdentifyStatus.invalidId };
+                const status = problemCodeOf(error) === INACTIVE_STUDENT_CODE
+                    ? IdentifyStatus.inactive
+                    : IdentifyStatus.invalidId;
+
+                return { status };
             }
 
             throw error;
@@ -469,6 +475,16 @@ export class StudentFormStore {
 
 function isStatus(error: unknown, status: number): boolean {
     return error instanceof HttpErrorResponse && error.status === status;
+}
+
+function problemCodeOf(error: unknown): string | undefined {
+    if (!(error instanceof HttpErrorResponse)) {
+        return undefined;
+    }
+
+    const problem = error.error as ProblemDetails | null;
+
+    return problem?.code;
 }
 
 function submitFailureOf(error: unknown): SubmitStatus {
