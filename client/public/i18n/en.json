@@ -180,6 +180,8 @@
     "actions": {
       "editDetails": "Edit details",
       "changeTeacher": "Change Teacher",
+      "changeCar": "Change Car",
+      "fix": "Fix",
       "menu": "Actions",
       "menuFor": "Actions - {{name}}",
       "deactivate": "Deactivate",
@@ -207,7 +209,8 @@
       "title": "Edit details",
       "nationalIdNote": "Changing it here doesn't change the Roster file. A later Roster file with the old ID would add a second Student, so correct the file too.",
       "nationalIdUsed": "This national ID belongs to another Student: {{name}}.",
-      "teacherAndCar": "Teacher and Car"
+      "teacherAndCar": "Teacher and Car",
+      "teacherAndCarHint": "To change them, use Change Teacher or Change Car in the row menu."
     },
     "changeTeacher": {
       "title": "Change Teacher",
@@ -219,6 +222,18 @@
       "save": "Change Teacher",
       "sameTeacher": "{{teacher}} is already this Student's Teacher. Refresh the screen.",
       "carNotOfTeacher": "This Car isn't assigned to {{teacher}}. Refresh and choose again."
+    },
+    "changeCar": {
+      "title": "Change Car",
+      "newCar": "New Car",
+      "hint": "Only {{teacher}}'s Cars are listed.",
+      "none": "{{teacher}} has no other Cars.",
+      "noneHint": "You can assign another Car to this Teacher in Cars & teachers.",
+      "flagTitle": "The current Car isn't one of {{teacher}}'s Cars",
+      "flagBody": "{{car}} was set before the rule existed. Choose one of {{teacher}}'s Cars.",
+      "save": "Change Car",
+      "sameCar": "This is already this Student's Car. Refresh the screen.",
+      "carGone": "This Car is no longer assigned to {{teacher}}. Refresh and choose again."
     },
     "detailsSaved": "Details saved",
     "add": {
@@ -596,6 +611,7 @@
     "refusedTitle": "That didn't go through",
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "delete": "Delete",
     "refresh": "Refresh",
     "apply": "Apply",

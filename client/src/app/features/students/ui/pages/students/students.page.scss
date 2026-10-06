@@ -375,6 +375,28 @@
     color: var(--p-red-600);
 }
 
+::ng-deep .students-menu__item--fix .p-menu-item-content {
+    background: var(--app-bg-muted);
+}
+
+::ng-deep .students-menu__item--fix .p-menu-item-icon {
+    color: var(--p-red-600);
+}
+
+::ng-deep .students-menu__fix-badge.p-badge {
+    margin-inline-start: auto;
+    min-inline-size: 0;
+    block-size: auto;
+    padding: 1px 8px;
+    border: 1px solid var(--p-red-200);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--p-red-600);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
 ::ng-deep [dir='rtl'] .students-menu__item--mirrored-icon .p-menu-item-icon {
     transform: scaleX(-1);
 }
