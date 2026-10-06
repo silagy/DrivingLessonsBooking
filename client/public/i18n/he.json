@@ -172,6 +172,26 @@
     "addStudent": "הוספת תלמיד",
     "added": "התלמיד נוסף",
     "addedDetail": "{{name}} נוסף/ה לרשימה של {{teacher}}.",
+    "actions": {
+      "menu": "פעולות",
+      "menuFor": "פעולות - {{name}}",
+      "deactivate": "סימון כלא פעיל",
+      "reactivate": "סימון כפעיל"
+    },
+    "who": {
+      "teacher": "מורה:",
+      "car": "רכב:"
+    },
+    "deactivate": {
+      "title": "לסמן את {{name}} כלא פעיל/ה?",
+      "cannotSubmit": "עד לסימון מחדש כפעיל/ה, לא תהיה אפשרות להגיש בטופס התלמידים.",
+      "submissionsStay": "ההגשות הקודמות נשמרות.",
+      "rosterReactivates": "קובץ רשימת תלמידים שעדיין כולל אותם יסמן אותם שוב כפעילים."
+    },
+    "deactivated": "התלמיד סומן כלא פעיל",
+    "deactivatedDetail": "{{name}} לא יוכל/תוכל להגיש עד לסימון מחדש כפעיל/ה.",
+    "reactivated": "התלמיד סומן כפעיל",
+    "reactivatedDetail": "{{name}} יכול/ה להגיש שוב בטופס התלמידים.",
     "add": {
       "title": "הוספת תלמיד",
       "nationalId": "תעודת זהות",

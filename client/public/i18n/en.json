@@ -172,6 +172,26 @@
     "addStudent": "Add Student",
     "added": "Student added",
     "addedDetail": "{{name}} is now on {{teacher}}'s list.",
+    "actions": {
+      "menu": "Actions",
+      "menuFor": "Actions - {{name}}",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate"
+    },
+    "who": {
+      "teacher": "Teacher:",
+      "car": "Car:"
+    },
+    "deactivate": {
+      "title": "Deactivate {{name}}?",
+      "cannotSubmit": "Until reactivated, they can't submit on the student form.",
+      "submissionsStay": "Their past Submissions stay.",
+      "rosterReactivates": "A Roster file that still lists them will reactivate them."
+    },
+    "deactivated": "Student deactivated",
+    "deactivatedDetail": "{{name}} can't submit until reactivated.",
+    "reactivated": "Student reactivated",
+    "reactivatedDetail": "{{name}} can submit on the student form again.",
     "add": {
       "title": "Add Student",
       "nationalId": "National ID",

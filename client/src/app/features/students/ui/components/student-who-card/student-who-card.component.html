@@ -1,0 +1,18 @@
+<div class="who-card">
+  <span class="who-card__avatar" aria-hidden="true">{{ student().name | initials }}</span>
+  <span class="who-card__identity">
+    <span class="who-card__name">{{ student().name }}</span>
+    <bdi dir="ltr" class="who-card__national-id">{{ student().nationalId }}</bdi>
+  </span>
+  <span class="who-card__assignment">
+    <span>
+      {{ 'students.who.teacher' | transloco }}
+      <span class="who-card__value">{{ student().teacherName }}</span>
+    </span>
+    <span class="who-card__car">
+      {{ 'students.who.car' | transloco }}
+      <span class="who-card__value">{{ student().carName }}</span>
+      <app-transmission-tag [transmission]="student().carTransmission" />
+    </span>
+  </span>
+</div>

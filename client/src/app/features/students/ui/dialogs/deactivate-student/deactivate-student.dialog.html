@@ -1,0 +1,34 @@
+<div class="deactivate-student">
+  @if (refusal(); as refused) {
+    <app-dialog-refusal [message]="refused.message" />
+  }
+
+  <app-student-who-card [student]="student" />
+
+  <ul class="deactivate-student__effects">
+    <li class="deactivate-student__effect">
+      <i class="pi pi-pause-circle deactivate-student__icon" aria-hidden="true"></i>
+      {{ 'students.deactivate.cannotSubmit' | transloco }}
+    </li>
+    <li class="deactivate-student__effect">
+      <i class="pi pi-check deactivate-student__icon" aria-hidden="true"></i>
+      {{ 'students.deactivate.submissionsStay' | transloco }}
+    </li>
+    <li class="deactivate-student__effect">
+      <i class="pi pi-replay deactivate-student__icon deactivate-student__icon--mirrored" aria-hidden="true"></i>
+      {{ 'students.deactivate.rosterReactivates' | transloco }}
+    </li>
+  </ul>
+
+  <div class="deactivate-student__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="cancel()" />
+    <p-button
+      class="deactivate-student__confirm"
+      [label]="'students.actions.deactivate' | transloco"
+      severity="danger"
+      [outlined]="true"
+      type="button"
+      [disabled]="isDeactivating()"
+      (onClick)="confirm()" />
+  </div>
+</div>
