@@ -173,6 +173,7 @@
     "added": "Student added",
     "addedDetail": "{{name}} is now on {{teacher}}'s list.",
     "actions": {
+      "editDetails": "Edit details",
       "menu": "Actions",
       "menuFor": "Actions - {{name}}",
       "deactivate": "Deactivate",
@@ -192,6 +193,13 @@
     "deactivatedDetail": "{{name}} can't submit until reactivated.",
     "reactivated": "Student reactivated",
     "reactivatedDetail": "{{name}} can submit on the student form again.",
+    "edit": {
+      "title": "Edit details",
+      "nationalIdNote": "Changing it here doesn't change the Roster file. A later Roster file with the old ID would add a second Student, so correct the file too.",
+      "nationalIdUsed": "This national ID belongs to another Student: {{name}}.",
+      "teacherAndCar": "Teacher and Car"
+    },
+    "detailsSaved": "Details saved",
     "add": {
       "title": "Add Student",
       "nationalId": "National ID",

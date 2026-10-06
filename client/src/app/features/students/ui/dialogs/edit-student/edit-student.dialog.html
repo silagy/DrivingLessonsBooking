@@ -1,0 +1,84 @@
+@let refusedNow = refusal();
+@let refusalText =
+  refusedNow?.kind === refusalKinds.nationalIdInvalid
+    ? ('students.add.nationalIdInvalid' | transloco)
+    : refusedNow?.kind === refusalKinds.nationalIdInUse
+      ? ('students.edit.nationalIdUsed' | transloco: { name: refusedNow?.existingStudentName ?? '' })
+      : refusedNow?.message;
+
+<form [formGroup]="form" (ngSubmit)="submit()" class="dialog-form">
+  <p class="edit-student__subtitle">{{ details.name }}</p>
+
+  @if (refusedNow) {
+    <app-dialog-refusal [message]="refusalText ?? ''" />
+  }
+
+  <div class="field">
+    <label for="edit-student-national-id">{{ 'students.add.nationalId' | transloco }}</label>
+    <input
+      pInputText
+      id="edit-student-national-id"
+      formControlName="nationalId"
+      (input)="onNationalIdInput()"
+      dir="ltr"
+      inputmode="numeric"
+      autocomplete="off" />
+    @if (form.controls.nationalId.hasError(refused)) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ refusalText }}</small>
+    } @else {
+      <small class="field__hint edit-student__note">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        <span>{{ 'students.edit.nationalIdNote' | transloco }}</span>
+      </small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="edit-student-name">{{ 'students.add.fullName' | transloco }}</label>
+    <input pInputText id="edit-student-name" formControlName="name" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label for="edit-student-phone">{{ 'students.add.phone' | transloco }}</label>
+    <input pInputText id="edit-student-phone" formControlName="phone" type="tel" dir="ltr" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label for="edit-student-address">{{ 'students.add.address' | transloco }}</label>
+    <input pInputText id="edit-student-address" formControlName="address" autocomplete="off" />
+  </div>
+
+  <div class="edit-student__pair">
+    <div class="field">
+      <label for="edit-student-start-date">{{ 'students.add.startDate' | transloco }}</label>
+      <p-datepicker
+        inputId="edit-student-start-date"
+        formControlName="startDate"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        appendTo="body"
+        [placeholder]="'students.add.datePlaceholder' | transloco" />
+    </div>
+    <div class="field">
+      <label for="edit-student-license-type">{{ 'students.add.licenseType' | transloco }}</label>
+      <input
+        pInputText
+        id="edit-student-license-type"
+        formControlName="licenseType"
+        autocomplete="off"
+        [placeholder]="'students.add.licenseTypePlaceholder' | transloco" />
+    </div>
+  </div>
+
+  <app-locked-field [label]="'students.edit.teacherAndCar' | transloco" [value]="details.teacherName">
+    <span class="edit-student__car">
+      · {{ details.carName }}
+      <app-transmission-tag [transmission]="details.carTransmission" />
+    </span>
+  </app-locked-field>
+
+  <div class="dialog-form__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="close()" />
+    <p-button [label]="'general.save' | transloco" type="submit" [disabled]="!canSave()" [loading]="isSaving()" />
+  </div>
+</form>

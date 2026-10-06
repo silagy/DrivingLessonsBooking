@@ -28,6 +28,8 @@ import {
     DeactivateStudentDialog,
     DeactivateStudentDialogData,
 } from '../../dialogs/deactivate-student/deactivate-student.dialog';
+import { EditStudentDialog } from '../../dialogs/edit-student/edit-student.dialog';
+import { EditStudentDialogData } from '../../dialogs/edit-student/edit-student-dialog-data';
 
 const ALL_TEACHERS = 'all';
 
@@ -120,6 +122,8 @@ export class StudentsPage {
 
     private activeRowActions(student: StudentRow): MenuItem[] {
         return [
+            this.editDetailsAction(student),
+            { separator: true },
             {
                 label: this.transloco.translate('students.actions.deactivate'),
                 icon: 'pi pi-pause-circle',
@@ -131,12 +135,39 @@ export class StudentsPage {
 
     private inactiveRowActions(student: StudentRow): MenuItem[] {
         return [
+            this.editDetailsAction(student),
             {
                 label: this.transloco.translate('students.actions.reactivate'),
                 icon: 'pi pi-replay',
                 command: () => void this.store.reactivate(student),
             },
         ];
+    }
+
+    private editDetailsAction(student: StudentRow): MenuItem {
+        return {
+            label: this.transloco.translate('students.actions.editDetails'),
+            icon: 'pi pi-pencil',
+            command: () => void this.onEditDetails(student),
+        };
+    }
+
+    private async onEditDetails(student: StudentRow): Promise<void> {
+        const details = await this.store.loadDetails(student.id);
+
+        if (!details) {
+            return;
+        }
+
+        const data: EditStudentDialogData = {
+            details,
+            refusal: this.store.refusal,
+            isSaving: this.store.isMutating,
+            confirm: (change) => this.store.changeDetails(student.id, change),
+            clearRefusal: () => this.store.clearRefusal(),
+        };
+
+        this.openDialog(EditStudentDialog, this.transloco.translate('students.edit.title'), StudentsPage.dialogWidth, data);
     }
 
     private onDeactivate(student: StudentRow): void {
