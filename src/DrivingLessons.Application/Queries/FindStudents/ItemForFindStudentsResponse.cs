@@ -1,3 +1,5 @@
+using DrivingLessons.Domain.Values;
+
 namespace DrivingLessons.Application.Queries.FindStudents;
 
 public class ItemForFindStudentsResponse
@@ -10,5 +12,6 @@ public class ItemForFindStudentsResponse
     public string TeacherName { get; init; } = string.Empty;
     public Guid CarId { get; init; }
     public string CarName { get; init; } = string.Empty;
+    public Transmission CarTransmission { get; init; }
     public bool IsActive { get; init; }
 }

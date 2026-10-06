@@ -90,6 +90,21 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void National_Id_In_Use_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentNationalIdAlreadyInUseException(StudentName.Of("נועה מזרחי")));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentNationalIdAlreadyInUse");
+    }
+
+    [TestMethod]
     public void Blank_Temporary_Password_Is_A_Conflict_With_Its_Rule_As_Code()
     {
         //given
@@ -355,6 +370,33 @@ public class ApiExceptionFilterTest
         //then
         var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
         parameters.ShouldBe(new Dictionary<string, string> { ["maxLength"] = "200" });
+    }
+
+    [TestMethod]
+    public void National_Id_In_Use_Names_The_Existing_Student_In_Params()
+    {
+        //given
+        var context = ContextFor(new StudentNationalIdAlreadyInUseException(StudentName.Of("נועה מזרחי")));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["name"] = "נועה מזרחי" });
+    }
+
+    [TestMethod]
+    public void National_Id_In_Use_Keeps_The_Name_Out_Of_Its_Detail()
+    {
+        //given
+        var context = ContextFor(new StudentNationalIdAlreadyInUseException(StudentName.Of("נועה מזרחי")));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        ProblemOf(context).Detail.ShouldBe("Another Student already has this national ID.");
     }
 
     [TestMethod]

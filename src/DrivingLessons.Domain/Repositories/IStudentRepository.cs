@@ -9,5 +9,7 @@ public interface IStudentRepository
 
     Task<Student?> GetActiveByNationalIdAsync(NationalId nationalId);
 
+    Task<Student?> GetByNationalIdAsync(NationalId nationalId);
+
     void Add(Student student);
 }

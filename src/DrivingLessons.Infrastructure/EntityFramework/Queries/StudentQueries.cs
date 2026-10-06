@@ -1,5 +1,6 @@
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.FindStudents;
+using DrivingLessons.Application.Queries.GetStudent;
 using DrivingLessons.Application.Queries.IdentifyStudent;
 using DrivingLessons.Domain.Values;
 using Microsoft.EntityFrameworkCore;
@@ -41,10 +42,47 @@ public class StudentQueries : IStudentQueries
                         TeacherName = teacher.Name.Value,
                         CarId = car.Id.Value,
                         CarName = car.Name.Value,
+                        CarTransmission = car.Transmission,
                         IsActive = student.IsActive
                     };
 
         return await query.ToListAsync();
+    }
+
+    public async Task<GetStudentResponse?> GetAsync(Guid id)
+    {
+        var studentId = StudentId.Of(id);
+
+        var query = from student in dbContext.Students
+                    join teacher in dbContext.Teachers
+                        on student.TeacherId equals teacher.Id
+                    join car in dbContext.Cars
+                        on student.CarId equals car.Id
+                    where student.Id == studentId
+                    select new GetStudentResponse
+                    {
+                        Id = student.Id.Value,
+                        NationalId = student.NationalId.Value,
+                        Name = student.Name.Value,
+                        Phone = student.Phone.Value,
+                        TeacherId = teacher.Id.Value,
+                        TeacherName = teacher.Name.Value,
+                        CarId = car.Id.Value,
+                        CarName = car.Name.Value,
+                        CarTransmission = car.Transmission,
+                        Address = student.Address == null
+                            ? null
+                            : student.Address.Value,
+                        StartDate = student.StartDate == null
+                            ? null
+                            : (DateOnly?)student.StartDate.Value,
+                        LicenseType = student.LicenseType == null
+                            ? null
+                            : student.LicenseType.Value,
+                        IsActive = student.IsActive
+                    };
+
+        return await query.FirstOrDefaultAsync();
     }
 
     public async Task<IdentifyStudentResponse?> GetActiveByNationalIdAsync(NationalId nationalId, DateOnly weekStart)

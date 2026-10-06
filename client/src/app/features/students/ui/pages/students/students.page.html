@@ -1,0 +1,206 @@
+<div class="students">
+  <header class="students__header">
+    <div>
+      <h2 class="students__title">{{ 'students.title' | transloco }}</h2>
+      <p class="students__subtitle">{{ 'students.subtitle' | transloco }}</p>
+    </div>
+    <div class="students__actions">
+      <a
+        pButton
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-upload"
+        [label]="'students.importRoster' | transloco"
+        [routerLink]="importRosterLink"></a>
+      <p-button
+        [label]="'students.addStudent' | transloco"
+        [disabled]="store.isMutating() || !!store.loadError()"
+        (onClick)="onAddStudent()" />
+    </div>
+  </header>
+
+  @if (!store.isEmpty()) {
+    <div class="students__filters">
+      <div class="students__filter students__filter--teacher">
+        <label class="students__filter-label" for="students-teacher">{{ 'students.filters.teacher' | transloco }}</label>
+        <p-select
+          inputId="students-teacher"
+          [options]="teacherFilterOptions()"
+          optionLabel="name"
+          optionValue="id"
+          [ngModel]="selectedTeacher()"
+          (ngModelChange)="onTeacherFilter($event)"
+          appendTo="body"
+          fluid>
+          <ng-template pTemplate="selectedItem" let-option>
+            @if (option.id === allTeachers) {
+              {{ 'students.filters.allTeachers' | transloco }}
+            } @else {
+              {{ option.name }}
+            }
+          </ng-template>
+          <ng-template pTemplate="item" let-option>
+            @if (option.id === allTeachers) {
+              {{ 'students.filters.allTeachers' | transloco }}
+            } @else {
+              {{ option.name }}
+            }
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div class="students__filter students__filter--status">
+        <span class="students__filter-label" id="students-status-label">{{ 'students.filters.status' | transloco }}</span>
+        <p-selectbutton
+          class="students__status"
+          [options]="statusOptions"
+          optionValue="value"
+          [allowEmpty]="false"
+          [ngModel]="store.filters().status"
+          (ngModelChange)="onStatusFilter($event)"
+          ariaLabelledBy="students-status-label">
+          <ng-template pTemplate="item" let-option>{{ option.labelKey | transloco }}</ng-template>
+        </p-selectbutton>
+      </div>
+
+      <div class="students__filter students__filter--search">
+        <label class="students__filter-label" for="students-search">{{ 'students.filters.search' | transloco }}</label>
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            id="students-search"
+            class="students__search"
+            type="search"
+            autocomplete="off"
+            [placeholder]="'students.filters.searchPlaceholder' | transloco"
+            [ngModel]="store.filters().search"
+            (ngModelChange)="onSearch($event)" />
+        </p-iconfield>
+      </div>
+    </div>
+  }
+
+  <section class="students__card">
+    @if (store.isLoading()) {
+      <div class="students__state">
+        <p-progressSpinner />
+        <span class="students__state-text">{{ 'students.loading' | transloco }}</span>
+      </div>
+    } @else if (store.loadError(); as errorKey) {
+      <div class="students__state" role="alert">
+        <span class="students__error">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          {{ errorKey | transloco }}
+        </span>
+        <p-button [label]="'students.retry' | transloco" text size="small" (onClick)="store.reload()" />
+      </div>
+    } @else if (store.isEmpty()) {
+      <div class="students__empty">
+        <span class="students__empty-icon" aria-hidden="true"><i class="pi pi-user"></i></span>
+        <p class="students__empty-title">{{ 'students.emptyTitle' | transloco }}</p>
+        <p class="students__empty-hint">{{ 'students.emptyHint' | transloco }}</p>
+        <div class="students__empty-actions">
+          <a
+            pButton
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            [label]="'students.importRoster' | transloco"
+            [routerLink]="importRosterLink"></a>
+          <p-button
+            [label]="'students.addStudent' | transloco"
+            size="small"
+            [disabled]="store.isMutating()"
+            (onClick)="onAddStudent()" />
+        </div>
+      </div>
+    } @else {
+      <p-table [value]="store.visibleStudents()" dataKey="id">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>
+              <span class="students__wide-only">{{ 'students.table.name' | transloco }}</span>
+              <span class="students__compact-only">{{ 'students.table.student' | transloco }}</span>
+            </th>
+            <th class="students__wide-only">{{ 'students.table.nationalId' | transloco }}</th>
+            <th class="students__wide-only">{{ 'students.table.phone' | transloco }}</th>
+            <th>
+              <span class="students__wide-only">{{ 'students.table.teacher' | transloco }}</span>
+              <span class="students__compact-only">{{ 'students.table.teacherAndCar' | transloco }}</span>
+            </th>
+            <th class="students__wide-only">{{ 'students.table.car' | transloco }}</th>
+            <th>{{ 'students.table.status' | transloco }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr [class.students__row--inactive]="!row.isActive" [class.students__row--new]="row.isNew">
+            <td>
+              <div class="students__name">
+                <span class="students__avatar" aria-hidden="true">{{ row.name | initials }}</span>
+                <div class="students__name-block">
+                  <div class="students__name-line">
+                    <span class="students__name-text">{{ row.name }}</span>
+                    @if (row.isNew) {
+                      <p-tag class="students__tag students__tag--new" [value]="'students.new' | transloco" />
+                    }
+                  </div>
+                  <div class="students__ids students__compact-only">
+                    <bdi dir="ltr" class="students__ltr">{{ row.nationalId }}</bdi>
+                    <bdi dir="ltr" class="students__ltr">{{ row.phone }}</bdi>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="students__wide-only"><bdi dir="ltr" class="students__ltr">{{ row.nationalId }}</bdi></td>
+            <td class="students__wide-only"><bdi dir="ltr" class="students__ltr">{{ row.phone }}</bdi></td>
+            <td class="students__teacher">
+              <span>{{ row.teacherName }}</span>
+              <div class="students__car-line students__compact-only">
+                <span class="students__car">
+                  {{ row.carName }}
+                  <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
+                </span>
+              </div>
+            </td>
+            <td class="students__wide-only">
+              <span class="students__car">
+                {{ row.carName }}
+                <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
+              </span>
+            </td>
+            <td>
+              <p-tag
+                class="students__tag"
+                [severity]="row.isActive ? 'success' : 'secondary'"
+                [value]="(row.isActive ? 'students.status.active' : 'students.status.inactive') | transloco" />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <div class="students__empty">
+                <span class="students__empty-icon" aria-hidden="true"><i class="pi pi-search"></i></span>
+                <p class="students__empty-title">{{ 'students.noMatchTitle' | transloco }}</p>
+                <p class="students__empty-hint">{{ 'students.noMatchHint' | transloco }}</p>
+                <div class="students__empty-actions">
+                  <p-button
+                    [label]="'students.clearFilters' | transloco"
+                    severity="secondary"
+                    [outlined]="true"
+                    size="small"
+                    (onClick)="store.clearFilters()" />
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      @if (store.visibleStudents().length) {
+        <p class="students__footer">{{ store.footerKey() | transloco: { count: store.visibleStudents().length } }}</p>
+      }
+    }
+  </section>
+</div>

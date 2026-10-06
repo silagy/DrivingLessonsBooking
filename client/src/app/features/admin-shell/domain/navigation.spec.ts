@@ -1,3 +1,4 @@
+import { AppRoutes } from '../../../shared/config/app-routes';
 import { Role } from '../../../shared/models/role.enum';
 import { navigationFor } from './navigation';
 
@@ -11,7 +12,7 @@ describe('navigationFor', () => {
         expect(labelsOf(Role.administrator)).toEqual([
             'shell.nav.dashboard',
             'shell.nav.teachers',
-            'shell.nav.roster',
+            'shell.nav.students',
             'shell.nav.weeklyPrep',
             'shell.nav.publications',
             'shell.nav.history',
@@ -42,7 +43,7 @@ describe('navigationFor', () => {
         //expected
         expect(commandsByLabel.get('shell.nav.dashboard')).toEqual(['/']);
         expect(commandsByLabel.get('shell.nav.teachers')).toEqual(['/', 'teachers']);
-        expect(commandsByLabel.get('shell.nav.roster')).toEqual(['/', 'roster']);
+        expect(commandsByLabel.get('shell.nav.students')).toEqual(['/', 'students']);
         expect(commandsByLabel.get('shell.nav.weeklyPrep')).toEqual(['/', 'week-schedules']);
         expect(commandsByLabel.get('shell.nav.publications')).toEqual(['/', 'publications']);
         expect(commandsByLabel.get('shell.nav.history')).toEqual(['/', 'publications', 'history']);
@@ -57,5 +58,15 @@ describe('navigationFor', () => {
 
         //expected
         expect(exactLabels).toEqual(['shell.nav.dashboard', 'shell.nav.publications']);
+    });
+
+    it('keeps Students highlighted on the Roster import page below it', () => {
+        //given
+        const students = navigationFor(Role.administrator).find((item) => item.labelKey === 'shell.nav.students');
+        const rosterImport = ['/', AppRoutes.students, AppRoutes.rosterImport];
+
+        //expected
+        expect(students?.exact).toBe(false);
+        expect(rosterImport.slice(0, students?.commands.length)).toEqual(students?.commands);
     });
 });

@@ -16,9 +16,19 @@ export const ADMIN_ROUTES: Routes = [
         loadChildren: () => import('../teachers/teachers.routes'),
       },
       {
-        path: AppRoutes.roster,
+        path: `${AppRoutes.students}/${AppRoutes.rosterImport}`,
         canMatch: [administratorGuard],
         loadChildren: () => import('../roster/roster.routes'),
+      },
+      {
+        path: AppRoutes.students,
+        canMatch: [administratorGuard],
+        loadChildren: () => import('../students/students.routes'),
+      },
+      {
+        path: AppRoutes.roster,
+        pathMatch: 'full',
+        redirectTo: `${AppRoutes.students}/${AppRoutes.rosterImport}`,
       },
       {
         path: AppRoutes.weekSchedules,

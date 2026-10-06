@@ -1,0 +1,342 @@
+.students__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.students__title {
+    margin: 0;
+    font-family: var(--app-font-display);
+    font-weight: 600;
+    font-size: 1.625rem;
+    color: var(--app-ink);
+    letter-spacing: -0.01em;
+}
+
+.students__subtitle {
+    margin: 0.25rem 0 0;
+    max-inline-size: 46rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--app-text-secondary);
+}
+
+.students__actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.students__filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-block-start: 1.25rem;
+}
+
+.students__filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    min-inline-size: 0;
+}
+
+.students__filter--teacher {
+    inline-size: 13.75rem;
+}
+
+.students__filter--status {
+    inline-size: 18.75rem;
+}
+
+.students__filter--search {
+    inline-size: 18.75rem;
+    margin-inline-start: auto;
+}
+
+.students__filter-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--app-text-secondary);
+}
+
+.students__search {
+    inline-size: 100%;
+}
+
+:host ::ng-deep .students__status.p-selectbutton {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    background: var(--app-bg-muted);
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+
+    .p-togglebutton {
+        flex: 1;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--app-text-secondary);
+    }
+
+    .p-togglebutton-content {
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .p-togglebutton-checked {
+        background: var(--app-bg-card);
+        border-color: var(--app-border);
+        color: var(--app-ink);
+        font-weight: 600;
+        box-shadow: var(--app-shadow-card);
+    }
+}
+
+.students__card {
+    margin-block-start: 1rem;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    box-shadow: var(--app-shadow-card);
+    overflow: hidden;
+}
+
+:host ::ng-deep .students__card .p-datatable {
+    overflow-x: auto;
+
+    .p-datatable-thead > tr > th {
+        padding: 0.75rem 1rem;
+        background: var(--app-bg-page);
+        border-block-end: 1px solid var(--app-border);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--app-text-secondary);
+        text-align: start;
+        white-space: nowrap;
+    }
+
+    .p-datatable-tbody > tr > td {
+        padding: 0.75rem 1rem;
+        border-block-end: 1px solid var(--app-bg-muted);
+        font-size: 0.875rem;
+        color: var(--app-ink);
+        vertical-align: middle;
+    }
+
+    .p-datatable-tbody > tr.students__row--inactive {
+        background: var(--app-bg-page);
+    }
+
+    .p-datatable-tbody > tr.students__row--inactive > td {
+        color: var(--app-text-muted);
+    }
+
+    .p-datatable-tbody > tr.students__row--new {
+        background: var(--p-sky-50);
+    }
+}
+
+.students__name {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.students__name-block {
+    min-inline-size: 0;
+}
+
+.students__name-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.students__name-text {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.students__avatar {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 30px;
+    block-size: 30px;
+    border-radius: 999px;
+    background: var(--app-steel-light);
+    color: var(--app-whale);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.students__row--inactive .students__avatar {
+    background: var(--app-bg-muted);
+    color: var(--app-text-muted);
+}
+
+.students__ltr {
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+    color: var(--app-text-secondary);
+    white-space: nowrap;
+}
+
+.students__row--inactive .students__ltr {
+    color: var(--app-text-muted);
+}
+
+.students__ids {
+    gap: 0.625rem;
+    margin-block-start: 0.125rem;
+    font-size: 0.78rem;
+}
+
+.students__teacher {
+    white-space: nowrap;
+}
+
+.students__car {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    white-space: nowrap;
+}
+
+.students__car-line {
+    margin-block-start: 0.3125rem;
+}
+
+.students__tag {
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.students__tag--new {
+    background: var(--p-sky-50);
+    color: var(--p-sky-700);
+    border-color: var(--p-sky-100);
+}
+
+.students__state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-block-size: 320px;
+}
+
+.students__state-text {
+    font-size: 0.85rem;
+    color: var(--app-text-secondary);
+}
+
+.students__error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--p-red-600);
+}
+
+.students__footer {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.78rem;
+    color: var(--app-text-muted);
+}
+
+.students__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2.75rem 1.5rem 3rem;
+    text-align: center;
+}
+
+.students__empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 44px;
+    block-size: 44px;
+    border-radius: 999px;
+    background: var(--app-bg-muted);
+    border: 1px solid var(--app-border);
+    color: var(--p-sky-500);
+    font-size: 1.25rem;
+}
+
+.students__empty-title {
+    margin: 0.25rem 0 0;
+    font-size: 1.06rem;
+    font-weight: 600;
+    color: var(--app-ink);
+}
+
+.students__empty-hint {
+    margin: 0;
+    max-inline-size: 460px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--app-text-secondary);
+}
+
+.students__empty-actions {
+    display: flex;
+    gap: 0.625rem;
+    margin-block-start: 0.625rem;
+}
+
+.students__compact-only {
+    display: none;
+}
+
+@media screen and (max-width: 992px) {
+    .students__header {
+        flex-wrap: wrap;
+    }
+
+    .students__filters {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+        gap: 0.75rem;
+        margin-block-start: 1.125rem;
+    }
+
+    .students__filter--teacher,
+    .students__filter--status {
+        inline-size: auto;
+    }
+
+    .students__filter--search {
+        grid-column: 1 / -1;
+        inline-size: auto;
+        margin-inline-start: 0;
+    }
+
+    .students__wide-only {
+        display: none;
+    }
+
+    .students__compact-only {
+        display: inline;
+    }
+
+    .students__ids.students__compact-only,
+    .students__car-line.students__compact-only {
+        display: flex;
+    }
+}

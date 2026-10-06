@@ -9,7 +9,11 @@ export interface NavigationItem {
 
 const DASHBOARD: NavigationItem = { labelKey: 'shell.nav.dashboard', commands: ['/'], exact: true };
 const TEACHERS: NavigationItem = { labelKey: 'shell.nav.teachers', commands: ['/', AppRoutes.teachers], exact: false };
-const ROSTER: NavigationItem = { labelKey: 'shell.nav.roster', commands: ['/', AppRoutes.roster], exact: false };
+const STUDENTS: NavigationItem = {
+    labelKey: 'shell.nav.students',
+    commands: ['/', AppRoutes.students],
+    exact: false,
+};
 const WEEKLY_PREP: NavigationItem = {
     labelKey: 'shell.nav.weeklyPrep',
     commands: ['/', AppRoutes.weekSchedules],
@@ -30,7 +34,7 @@ const USERS: NavigationItem = { labelKey: 'shell.nav.users', commands: ['/', App
 const ADMINISTRATOR_NAVIGATION: readonly NavigationItem[] = [
     DASHBOARD,
     TEACHERS,
-    ROSTER,
+    STUDENTS,
     WEEKLY_PREP,
     PUBLICATIONS,
     HISTORY,

@@ -82,6 +82,19 @@ public class ControllerAuthorizationTest
         rule.ShouldBe(AuthorizationPolicies.Administrator);
     }
 
+    [TestMethod]
+    [DataRow("StudentQueryController.FindAsync")]
+    [DataRow("StudentQueryController.GetAsync")]
+    [DataRow("StudentCommandController.CreateAsync")]
+    public void Students_Stay_Administrator_Only(string endpoint)
+    {
+        //when
+        var rule = Endpoints()[endpoint];
+
+        //then
+        rule.ShouldBe(AuthorizationPolicies.Administrator);
+    }
+
     private static List<string> EndpointsWithRule(string rule)
     {
         return Endpoints()
