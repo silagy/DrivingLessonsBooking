@@ -416,6 +416,22 @@ public class StudentTest
     }
 
     [TestMethod]
+    public void Change_Teacher__Current_Teacher_Is_Refused_Before_The_Car_Rule()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).Build();
+        var carOfAnotherTeacher = CarFakeBuilder.Build();
+        carOfAnotherTeacher.AssignFakeTeacher();
+
+        //when
+        var act = () => student.ChangeTeacher(teacher, carOfAnotherTeacher);
+
+        //then
+        Should.Throw<StudentAlreadyWithTeacherException>(act);
+    }
+
+    [TestMethod]
     public void Change_Teacher_Of_An_Inactive_Student()
     {
         //given
@@ -558,6 +574,39 @@ public class StudentTest
         //then
         student.CarId.ShouldBe(originalCarId);
         student.UncommittedEvents.OfType<StudentCarChanged>().ShouldBeEmpty();
+    }
+
+    [TestMethod]
+    public void Change_Car__Current_Car_Is_Refused_Before_The_Teacher_Rule()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+        var car = CarFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
+        car.UnassignTeacher(teacher);
+
+        //when
+        var act = () => student.ChangeCar(car);
+
+        //then
+        Should.Throw<StudentAlreadyOnCarException>(act);
+    }
+
+    [TestMethod]
+    public void Change_Car_Of_An_Inactive_Student()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).BuildInactive();
+        var newCar = CarFakeBuilder.Build();
+        newCar.AssignTeacher(teacher);
+
+        //when
+        student.ChangeCar(newCar);
+
+        //then
+        student.CarId.ShouldBe(newCar.Id);
+        student.IsActive.ShouldBeFalse();
     }
 
     [TestMethod]

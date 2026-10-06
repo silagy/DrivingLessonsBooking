@@ -81,9 +81,12 @@ export class ChangeTeacherDialog {
         return pick.isOnlyCar ? 'students.add.carOnly' : 'students.add.carScoped';
     });
 
-    protected readonly canSave = computed(
-        () => this.teacherId() !== null && this.carId() !== null && !this.refusal() && !this.isSaving(),
-    );
+    protected readonly canSave = computed(() => {
+        const kind = this.refusal()?.kind;
+        const isStale = kind === StudentRefusalKind.sameTeacher || kind === StudentRefusalKind.staleCar;
+
+        return this.teacherId() !== null && this.carId() !== null && !isStale && !this.isSaving();
+    });
 
     protected selectTeacher(teacherId: string): void {
         this.forgetRefusal();

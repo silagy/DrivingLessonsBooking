@@ -42,6 +42,7 @@ describe('CarFlagComponent', () => {
         const fixture = await render(true);
 
         //then
+        expect(flag(fixture).getAttribute('role')).toBe('note');
         expect(flag(fixture).getAttribute('tabindex')).toBe('0');
         expect(flag(fixture).getAttribute('aria-label')).toBe('students.flag.tip');
     });

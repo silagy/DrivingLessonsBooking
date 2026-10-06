@@ -225,6 +225,7 @@
     },
     "changeCar": {
       "title": "Change Car",
+      "current": "(current)",
       "newCar": "New Car",
       "hint": "Only {{teacher}}'s Cars are listed.",
       "none": "{{teacher}} has no other Cars.",

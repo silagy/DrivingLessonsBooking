@@ -48,9 +48,12 @@ export class ChangeCarDialog {
 
     protected readonly selectedCarId = signal<string | null>(null);
 
-    protected readonly canSave = computed(
-        () => this.selectedCarId() !== null && !this.refusal() && !this.isSaving(),
-    );
+    protected readonly canSave = computed(() => {
+        const kind = this.refusal()?.kind;
+        const isStale = kind === StudentRefusalKind.sameCar || kind === StudentRefusalKind.staleCar;
+
+        return this.selectedCarId() !== null && !isStale && !this.isSaving();
+    });
 
     protected selectCar(carId: string): void {
         if (this.refusal()) {

@@ -46,6 +46,12 @@ const SAME_TEACHER: StudentRefusal = {
     existingStudentName: null,
 };
 
+const OTHER_REFUSAL: StudentRefusal = {
+    kind: StudentRefusalKind.other,
+    message: 'Something went wrong.',
+    existingStudentName: null,
+};
+
 interface Setup {
     fixture: ComponentFixture<ChangeTeacherDialog>;
     refusal: ReturnType<typeof signal<StudentRefusal | null>>;
@@ -227,5 +233,31 @@ describe('ChangeTeacherDialog', () => {
         //then
         expect(clearRefusal).toHaveBeenCalled();
         expect(host(fixture).querySelector('app-dialog-refusal')).toBeNull();
+    });
+
+    it('keeps Save enabled after a refusal that is not stale so the Administrator can retry', async () => {
+        //given
+        const { fixture, refusal } = await setUp(false);
+        await chooseTeacher(fixture, 'teacher-yael');
+
+        //when
+        refusal.set(OTHER_REFUSAL);
+        await fixture.whenStable();
+
+        //then
+        expect(internals(fixture).canSave()).toBe(true);
+    });
+
+    it('keeps Save disabled while a stale refusal shows', async () => {
+        //given
+        const { fixture, refusal } = await setUp(false);
+        await chooseTeacher(fixture, 'teacher-yael');
+
+        //when
+        refusal.set(SAME_TEACHER);
+        await fixture.whenStable();
+
+        //then
+        expect(internals(fixture).canSave()).toBe(false);
     });
 });

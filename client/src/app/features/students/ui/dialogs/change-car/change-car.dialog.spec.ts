@@ -65,6 +65,12 @@ const SAME_CAR: StudentRefusal = {
     existingStudentName: null,
 };
 
+const OTHER_REFUSAL: StudentRefusal = {
+    kind: StudentRefusalKind.other,
+    message: 'Something went wrong.',
+    existingStudentName: null,
+};
+
 interface Setup {
     fixture: ComponentFixture<ChangeCarDialog>;
     refusal: ReturnType<typeof signal<StudentRefusal | null>>;
@@ -228,5 +234,31 @@ describe('ChangeCarDialog', () => {
         //then
         expect(clearRefusal).toHaveBeenCalled();
         expect(internals(fixture).canSave()).toBe(true);
+    });
+
+    it('keeps Save enabled after a refusal that is not stale so the Administrator can retry', async () => {
+        //given
+        const { fixture, refusal } = await setUp(NOA, false);
+        internals(fixture).selectCar('car-i20');
+
+        //when
+        refusal.set(OTHER_REFUSAL);
+        await fixture.whenStable();
+
+        //then
+        expect(internals(fixture).canSave()).toBe(true);
+    });
+
+    it('keeps Save disabled while a stale refusal shows', async () => {
+        //given
+        const { fixture, refusal } = await setUp(NOA, false);
+        internals(fixture).selectCar('car-i20');
+
+        //when
+        refusal.set(SAME_CAR);
+        await fixture.whenStable();
+
+        //then
+        expect(internals(fixture).canSave()).toBe(false);
     });
 });
