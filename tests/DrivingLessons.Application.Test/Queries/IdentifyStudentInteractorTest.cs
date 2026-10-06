@@ -69,6 +69,33 @@ public class IdentifyStudentInteractorTest
     }
 
     [TestMethod]
+    public async Task Identifies_With_The_Teacher_The_Student_Has_Now()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+        var afterChangeTeacher = new IdentifyStudentResponse
+        {
+            StudentName = "Test Student",
+            TeacherName = "Teacher Carmi",
+            CarName = "i20 Silver",
+            Transmission = Transmission.Manual
+        };
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns(afterChangeTeacher);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var response = await interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        response.TeacherName.ShouldBe("Teacher Carmi");
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [TestMethod]
     public async Task Publication_Must_Exist_For_The_Link()
     {
         //given

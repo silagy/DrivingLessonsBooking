@@ -616,6 +616,8 @@
     "slotNotFound": "המשבצת הזו כבר לא קיימת. רעננו את הדף.",
     "slotNotInWeekSchedule": "המשבצת הזו אינה חלק מהשבוע. רעננו את הדף.",
     "studentAlreadyActive": "התלמיד הזה כבר פעיל. הרשימה רועננה.",
+    "studentAlreadyWithTeacher": "זה כבר המורה של התלמיד הזה. יש לרענן את המסך.",
+    "studentAlreadyOnCar": "זה כבר הרכב של התלמיד הזה. יש לרענן את המסך.",
     "studentAlreadyDeactivated": "התלמיד הזה כבר לא פעיל. הרשימה רועננה.",
     "studentNameMustNotBeEmpty": "שם התלמיד לא יכול להיות ריק.",
     "studentCarMustBeAssignedToTeacher": "הרכב הזה לא משויך למורה הזה. יש לרענן ולבחור שוב.",

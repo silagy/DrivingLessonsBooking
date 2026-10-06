@@ -616,6 +616,8 @@
     "slotNotFound": "This slot no longer exists. Refresh the page.",
     "slotNotInWeekSchedule": "This slot isn't part of the week. Refresh the page.",
     "studentAlreadyActive": "This Student is already active. The list has been refreshed.",
+    "studentAlreadyWithTeacher": "This is already this Student's Teacher. Refresh the screen.",
+    "studentAlreadyOnCar": "This is already this Student's Car. Refresh the screen.",
     "studentAlreadyDeactivated": "This Student is already inactive. The list has been refreshed.",
     "studentNameMustNotBeEmpty": "The student's name can't be empty.",
     "studentCarMustBeAssignedToTeacher": "This Car is not assigned to this Teacher. Refresh and choose again.",
