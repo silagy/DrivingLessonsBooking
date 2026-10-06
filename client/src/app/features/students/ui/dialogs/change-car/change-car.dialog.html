@@ -45,6 +45,7 @@
             [inputId]="'change-car-' + choice.id"
             [value]="choice.id"
             [ngModel]="selectedCarId()"
+            [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="selectCar($event)"
             [disabled]="choice.isCurrent" />
           <i class="pi pi-car change-car__icon" aria-hidden="true"></i>

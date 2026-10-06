@@ -39,6 +39,15 @@ const ROI: Student = {
     isCarOfTeacher: false,
 };
 
+const OMER: Student = {
+    ...NOA,
+    id: 'student-omer',
+    name: 'Omer Shalev',
+    carId: 'car-i20',
+    carName: 'i20 Silver',
+    carTransmission: Transmission.manual,
+};
+
 const LIA: Student = {
     ...NOA,
     id: 'student-lia',
@@ -133,6 +142,26 @@ describe('ChangeCarDialog', () => {
         expect(cards(fixture)[1].classList).not.toContain('change-car__card--current');
         expect(internals(fixture).canSave()).toBe(false);
         expect(host(fixture).querySelector('.change-car__flag')).toBeNull();
+    });
+
+    it('keeps the other cards selectable while the current one is disabled', async () => {
+        //given
+        const { fixture } = await setUp();
+        await fixture.whenStable();
+
+        //then
+        const inputs = cards(fixture).map((card) => card.querySelector('input') as HTMLInputElement);
+        expect(inputs.map((input) => input.disabled)).toEqual([true, false]);
+    });
+
+    it('keeps the other cards selectable when the current Car is listed last', async () => {
+        //given
+        const { fixture } = await setUp(OMER);
+        await fixture.whenStable();
+
+        //then
+        const inputs = cards(fixture).map((card) => card.querySelector('input') as HTMLInputElement);
+        expect(inputs.map((input) => input.disabled)).toEqual([false, true]);
     });
 
     it('changes the Car and closes', async () => {
