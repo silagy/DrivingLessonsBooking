@@ -21,9 +21,14 @@ import { StudentRow } from '../../../domain/student-row.model';
 import { StudentStatusFilter } from '../../../domain/student-status-filter.enum';
 import { TeacherOption } from '../../../domain/teacher-option.model';
 import { StudentsStore } from '../../../state/students.store';
+import { CarFlagComponent } from '../../components/car-flag/car-flag.component';
 import { TransmissionTagComponent } from '../../components/transmission-tag/transmission-tag.component';
 import { AddStudentDialog } from '../../dialogs/add-student/add-student.dialog';
 import { AddStudentDialogData } from '../../dialogs/add-student/add-student-dialog-data';
+import { ChangeCarDialog } from '../../dialogs/change-car/change-car.dialog';
+import { ChangeCarDialogData } from '../../dialogs/change-car/change-car-dialog-data';
+import { ChangeTeacherDialog } from '../../dialogs/change-teacher/change-teacher.dialog';
+import { ChangeTeacherDialogData } from '../../dialogs/change-teacher/change-teacher-dialog-data';
 import {
     DeactivateStudentDialog,
     DeactivateStudentDialogData,
@@ -56,6 +61,7 @@ interface StatusOption {
         TableModule,
         TagModule,
         TransmissionTagComponent,
+        CarFlagComponent,
     ],
     templateUrl: './students.page.html',
     styleUrl: './students.page.scss',
@@ -123,6 +129,12 @@ export class StudentsPage {
     private activeRowActions(student: StudentRow): MenuItem[] {
         return [
             this.editDetailsAction(student),
+            {
+                label: this.transloco.translate('students.actions.changeTeacher'),
+                icon: 'pi pi-arrow-right-arrow-left',
+                command: () => this.onChangeTeacher(student),
+            },
+            this.changeCarAction(student),
             { separator: true },
             {
                 label: this.transloco.translate('students.actions.deactivate'),
@@ -169,6 +181,60 @@ export class StudentsPage {
         };
 
         this.openDialog(EditStudentDialog, this.transloco.translate('students.edit.title'), StudentsPage.dialogWidth, data);
+    }
+
+    private changeCarAction(student: StudentRow): MenuItem {
+        const action: MenuItem = {
+            label: this.transloco.translate('students.actions.changeCar'),
+            icon: 'pi pi-car',
+            command: () => this.onChangeCar(student),
+        };
+
+        if (student.isCarOfTeacher) {
+            return action;
+        }
+
+        return {
+            ...action,
+            icon: 'pi pi-exclamation-circle',
+            styleClass: 'students-menu__item--fix',
+            badge: this.transloco.translate('students.actions.fix'),
+            badgeStyleClass: 'students-menu__fix-badge',
+        };
+    }
+
+    private onChangeTeacher(student: StudentRow): void {
+        const data: ChangeTeacherDialogData = {
+            student,
+            teachers: this.store.teacherOptions,
+            cars: this.store.carOptions,
+            refusal: this.store.refusal,
+            isSaving: this.store.isMutating,
+            confirm: (teacherId, carId) => this.store.changeTeacher(student, teacherId, carId),
+            refresh: () => this.store.reload(),
+            clearRefusal: () => this.store.clearRefusal(),
+        };
+
+        this.openDialog(
+            ChangeTeacherDialog,
+            this.transloco.translate('students.changeTeacher.title'),
+            StudentsPage.dialogWidth,
+            data,
+        );
+    }
+
+    private onChangeCar(student: StudentRow): void {
+        const data: ChangeCarDialogData = {
+            student,
+            cars: this.store.carOptions,
+            refusal: this.store.refusal,
+            isSaving: this.store.isMutating,
+            confirm: (carId) => this.store.changeCar(student, carId),
+            refresh: () => this.store.reload(),
+            clearRefusal: () => this.store.clearRefusal(),
+        };
+
+        this.openDialog(ChangeCarDialog, this.transloco.translate('students.changeCar.title'), StudentsPage.dialogWidth, data);
     }
 
     private onDeactivate(student: StudentRow): void {

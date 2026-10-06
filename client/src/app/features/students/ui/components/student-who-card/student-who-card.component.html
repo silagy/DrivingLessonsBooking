@@ -13,6 +13,13 @@
       {{ 'students.who.car' | transloco }}
       <span class="who-card__value">{{ student().carName }}</span>
       <app-transmission-tag [transmission]="student().carTransmission" />
+      @if (!student().isCarOfTeacher) {
+        <i
+          class="pi pi-exclamation-circle who-card__flag"
+          role="img"
+          [attr.title]="'students.flag.car' | transloco"
+          [attr.aria-label]="'students.flag.car' | transloco"></i>
+      }
     </span>
   </span>
 </div>

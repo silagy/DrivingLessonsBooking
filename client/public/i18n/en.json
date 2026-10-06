@@ -159,6 +159,11 @@
       "manual": "Manual"
     },
     "new": "New",
+    "flag": {
+      "car": "Not this Teacher's Car",
+      "tip": "This Car isn't one of {{teacher}}'s Cars. It was probably set before the rule existed. Fix it with Change Car.",
+      "tipInactive": "This Car isn't one of {{teacher}}'s Cars. To fix it with Change Car, mark the Student as active first."
+    },
     "footer": "{{count}} Students",
     "footerOne": "1 Student",
     "loading": "Loading Students...",
@@ -174,6 +179,9 @@
     "addedDetail": "{{name}} is now on {{teacher}}'s list.",
     "actions": {
       "editDetails": "Edit details",
+      "changeTeacher": "Change Teacher",
+      "changeCar": "Change Car",
+      "fix": "Fix",
       "menu": "Actions",
       "menuFor": "Actions - {{name}}",
       "deactivate": "Deactivate",
@@ -193,11 +201,40 @@
     "deactivatedDetail": "{{name}} can't submit until reactivated.",
     "reactivated": "Student reactivated",
     "reactivatedDetail": "{{name}} can submit on the student form again.",
+    "teacherChanged": "Teacher changed",
+    "teacherChangedDetail": "{{name}}'s Teacher is now {{teacher}}, on {{car}}.",
+    "carChanged": "Car changed",
+    "carChangedDetail": "{{name}} now learns on {{car}}.",
     "edit": {
       "title": "Edit details",
       "nationalIdNote": "Changing it here doesn't change the Roster file. A later Roster file with the old ID would add a second Student, so correct the file too.",
       "nationalIdUsed": "This national ID belongs to another Student: {{name}}.",
-      "teacherAndCar": "Teacher and Car"
+      "teacherAndCar": "Teacher and Car",
+      "teacherAndCarHint": "To change them, use Change Teacher or Change Car in the row menu."
+    },
+    "changeTeacher": {
+      "title": "Change Teacher",
+      "newTeacher": "New Teacher",
+      "current": "(current)",
+      "currentCar": "(current Car)",
+      "carKept": "{{teacher}} also teaches on the current Car, so it's selected.",
+      "note": "Existing Submissions stay with the week they were made in. From their next identification, the Student sees the new Teacher's week.",
+      "save": "Change Teacher",
+      "sameTeacher": "{{teacher}} is already this Student's Teacher. Refresh the screen.",
+      "carNotOfTeacher": "This Car isn't assigned to {{teacher}}. Refresh and choose again."
+    },
+    "changeCar": {
+      "title": "Change Car",
+      "current": "(current)",
+      "newCar": "New Car",
+      "hint": "Only {{teacher}}'s Cars are listed.",
+      "none": "{{teacher}} has no other Cars.",
+      "noneHint": "You can assign another Car to this Teacher in Cars & teachers.",
+      "flagTitle": "The current Car isn't one of {{teacher}}'s Cars",
+      "flagBody": "{{car}} was set before the rule existed. Choose one of {{teacher}}'s Cars.",
+      "save": "Change Car",
+      "sameCar": "This is already this Student's Car. Refresh the screen.",
+      "carGone": "This Car is no longer assigned to {{teacher}}. Refresh and choose again."
     },
     "detailsSaved": "Details saved",
     "add": {
@@ -575,6 +612,7 @@
     "refusedTitle": "That didn't go through",
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "delete": "Delete",
     "refresh": "Refresh",
     "apply": "Apply",
@@ -616,6 +654,8 @@
     "slotNotFound": "This slot no longer exists. Refresh the page.",
     "slotNotInWeekSchedule": "This slot isn't part of the week. Refresh the page.",
     "studentAlreadyActive": "This Student is already active. The list has been refreshed.",
+    "studentAlreadyWithTeacher": "This is already this Student's Teacher. Refresh the screen.",
+    "studentAlreadyOnCar": "This is already this Student's Car. Refresh the screen.",
     "studentAlreadyDeactivated": "This Student is already inactive. The list has been refreshed.",
     "studentNameMustNotBeEmpty": "The student's name can't be empty.",
     "studentCarMustBeAssignedToTeacher": "This Car is not assigned to this Teacher. Refresh and choose again.",

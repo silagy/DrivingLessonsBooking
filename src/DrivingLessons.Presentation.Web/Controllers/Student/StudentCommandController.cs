@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using DrivingLessons.Application.Commands.ChangeStudentCar;
 using DrivingLessons.Application.Commands.ChangeStudentDetails;
+using DrivingLessons.Application.Commands.ChangeStudentTeacher;
 using DrivingLessons.Application.Commands.CreateStudent;
 using DrivingLessons.Application.Commands.DeactivateStudent;
 using DrivingLessons.Application.Commands.ReactivateStudent;
@@ -65,6 +67,36 @@ public class StudentCommandController : ControllerBase
         [FromRoute] Guid id)
     {
         await interactor.ExecuteAsync(id);
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/change-teacher")]
+    [EndpointSummary("Change the student's teacher, together with one of the new teacher's cars")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ChangeTeacherAsync(
+        [FromServices] ChangeStudentTeacherInteractor interactor,
+        [FromRoute] Guid id,
+        [FromBody] [Required] ChangeStudentTeacherRequest request)
+    {
+        await interactor.ExecuteAsync(id, request);
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/change-car")]
+    [EndpointSummary("Change the student's car to another of their teacher's cars")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ChangeCarAsync(
+        [FromServices] ChangeStudentCarInteractor interactor,
+        [FromRoute] Guid id,
+        [FromBody] [Required] ChangeStudentCarRequest request)
+    {
+        await interactor.ExecuteAsync(id, request);
 
         return NoContent();
     }

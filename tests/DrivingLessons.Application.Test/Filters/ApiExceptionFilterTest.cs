@@ -120,6 +120,36 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Student_Already_With_Teacher_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyWithTeacherException(StudentId.New(), TeacherId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyWithTeacher");
+    }
+
+    [TestMethod]
+    public void Student_Already_On_Car_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyOnCarException(StudentId.New(), CarId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyOnCar");
+    }
+
+    [TestMethod]
     public void Student_Not_Found_By_Id_Is_A_Not_Found_With_Its_Code()
     {
         //given

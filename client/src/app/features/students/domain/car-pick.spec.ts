@@ -1,5 +1,5 @@
 import { CarOption } from './car-option.model';
-import { pickCarFor, teacherHasCars } from './car-pick';
+import { carsOfTeacher, pickCarFor, pickCarForNewTeacher, teacherHasCars } from './car-pick';
 import { Transmission } from './transmission.enum';
 
 const COROLLA: CarOption = {
@@ -107,5 +107,75 @@ describe('teacherHasCars', () => {
     it('knows a Teacher with no Cars', () => {
         //expected
         expect(teacherHasCars('teacher-michal', CARS)).toBe(false);
+    });
+});
+
+describe('pickCarForNewTeacher', () => {
+    it('locks the Car until a new Teacher is chosen', () => {
+        //when
+        const pick = pickCarForNewTeacher(null, CARS, COROLLA.id);
+
+        //then
+        expect(pick.isLocked).toBe(true);
+        expect(pick.selectedCarId).toBeNull();
+        expect(pick.keepsCurrentCar).toBe(false);
+    });
+
+    it('keeps the current Car when the new Teacher teaches on it', () => {
+        //when
+        const pick = pickCarForNewTeacher('teacher-yael', CARS, I20.id);
+
+        //then
+        expect(pick.options).toEqual([I20, PICANTO]);
+        expect(pick.selectedCarId).toBe(I20.id);
+        expect(pick.keepsCurrentCar).toBe(true);
+    });
+
+    it("starts empty when the new Teacher doesn't teach on the current Car", () => {
+        //when
+        const pick = pickCarForNewTeacher('teacher-yael', CARS, COROLLA.id);
+
+        //then
+        expect(pick.options).toEqual([I20, PICANTO]);
+        expect(pick.selectedCarId).toBeNull();
+        expect(pick.keepsCurrentCar).toBe(false);
+    });
+
+    it("preselects the new Teacher's only Car", () => {
+        //when
+        const pick = pickCarForNewTeacher('teacher-oren', CARS, COROLLA.id);
+
+        //then
+        expect(pick.selectedCarId).toBe(MAZDA.id);
+        expect(pick.isOnlyCar).toBe(true);
+        expect(pick.keepsCurrentCar).toBe(false);
+    });
+
+    it('says the current Car was kept, not that it is the only one, when both are true', () => {
+        //when
+        const pick = pickCarForNewTeacher('teacher-oren', CARS, MAZDA.id);
+
+        //then
+        expect(pick.selectedCarId).toBe(MAZDA.id);
+        expect(pick.keepsCurrentCar).toBe(true);
+    });
+
+    it('selects nothing for a new Teacher with no Cars', () => {
+        //when
+        const pick = pickCarForNewTeacher('teacher-michal', CARS, COROLLA.id);
+
+        //then
+        expect(pick.hasNoCars).toBe(true);
+        expect(pick.selectedCarId).toBeNull();
+    });
+});
+
+describe('carsOfTeacher', () => {
+    it("lists a Teacher's Cars by name", () => {
+        //when
+        const cars = carsOfTeacher('teacher-ronit', CARS);
+
+        //then
+        expect(cars).toEqual([COROLLA, I20]);
     });
 });

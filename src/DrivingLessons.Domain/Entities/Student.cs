@@ -116,6 +116,27 @@ public class Student : AggregateRoot<StudentId>
         AddEvent(new StudentDetailsChanged(Id, nationalId, name));
     }
 
+    public void ChangeTeacher(Teacher teacher, Car car)
+    {
+        MustNotBeWithTeacher(teacher);
+        MustBeCarOfTeacher(car, teacher);
+
+        TeacherId = teacher.Id;
+        CarId = car.Id;
+
+        AddEvent(new StudentTeacherChanged(Id, teacher.Id, car.Id));
+    }
+
+    public void ChangeCar(Car car)
+    {
+        MustNotBeOnCar(car);
+        MustBeCarOfCurrentTeacher(car);
+
+        CarId = car.Id;
+
+        AddEvent(new StudentCarChanged(Id, car.Id));
+    }
+
     public void Deactivate()
     {
         MustBeActive();
@@ -147,6 +168,30 @@ public class Student : AggregateRoot<StudentId>
         if (IsActive)
         {
             throw new StudentAlreadyActiveException(Id);
+        }
+    }
+
+    private void MustNotBeWithTeacher(Teacher teacher)
+    {
+        if (teacher.Id == TeacherId)
+        {
+            throw new StudentAlreadyWithTeacherException(Id, teacher.Id);
+        }
+    }
+
+    private void MustNotBeOnCar(Car car)
+    {
+        if (car.Id == CarId)
+        {
+            throw new StudentAlreadyOnCarException(Id, car.Id);
+        }
+    }
+
+    private void MustBeCarOfCurrentTeacher(Car car)
+    {
+        if (!car.IsAssignedTo(TeacherId))
+        {
+            throw new StudentCarMustBeAssignedToTeacherException(car.Id, TeacherId);
         }
     }
 
