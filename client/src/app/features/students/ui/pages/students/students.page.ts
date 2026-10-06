@@ -139,6 +139,7 @@ export class StudentsPage {
             {
                 label: this.transloco.translate('students.actions.reactivate'),
                 icon: 'pi pi-replay',
+                styleClass: 'students-menu__item--mirrored-icon',
                 command: () => void this.store.reactivate(student),
             },
         ];

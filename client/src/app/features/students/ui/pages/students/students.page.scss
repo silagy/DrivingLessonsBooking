@@ -364,3 +364,7 @@
 ::ng-deep .students-menu__item--danger .p-menu-item-label {
     color: var(--p-red-600);
 }
+
+::ng-deep [dir='rtl'] .students-menu__item--mirrored-icon .p-menu-item-icon {
+    transform: scaleX(-1);
+}

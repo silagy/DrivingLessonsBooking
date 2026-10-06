@@ -44,8 +44,7 @@ const SUBMIT_LOCKING_STATUSES: ReadonlySet<SubmitStatus> = new Set([
     SubmitStatus.notFound,
 ]);
 
-const INACTIVE_STUDENT_CODE = 'submissionStudentMustBeActive';
-const CAPTION_KEY_BY_STEP:Record<StudentFormStep, string | null> = {
+const CAPTION_KEY_BY_STEP: Record<StudentFormStep, string | null> = {
     [StudentFormStep.identify]: null,
     [StudentFormStep.details]: 'studentForm.weekCaption',
     [StudentFormStep.target]: 'studentForm.weekTeacherCaption',
@@ -54,6 +53,7 @@ const CAPTION_KEY_BY_STEP:Record<StudentFormStep, string | null> = {
     [StudentFormStep.done]: null,
     [StudentFormStep.windowClosed]: null,
 };
+const INACTIVE_STUDENT_CODE = 'submissionStudentMustBeActive';
 
 interface IdentifyLookup {
     token: string;
