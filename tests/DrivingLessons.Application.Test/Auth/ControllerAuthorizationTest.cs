@@ -86,6 +86,7 @@ public class ControllerAuthorizationTest
     [DataRow("StudentQueryController.FindAsync")]
     [DataRow("StudentQueryController.GetAsync")]
     [DataRow("StudentCommandController.CreateAsync")]
+    [DataRow("StudentCommandController.ChangeDetailsAsync")]
     public void Students_Stay_Administrator_Only(string endpoint)
     {
         //when

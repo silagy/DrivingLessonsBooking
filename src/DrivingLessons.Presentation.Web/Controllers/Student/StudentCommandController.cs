@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DrivingLessons.Application.Commands.ChangeStudentDetails;
 using DrivingLessons.Application.Commands.CreateStudent;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,5 +22,20 @@ public class StudentCommandController : ControllerBase
         var result = await interactor.ExecuteAsync(request);
 
         return CreatedAtAction(null, result);
+    }
+
+    [HttpPut("{id:guid}/details")]
+    [EndpointSummary("Change the student's national ID, name, phone, address, start date and license type")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ChangeDetailsAsync(
+        [FromServices] ChangeStudentDetailsInteractor interactor,
+        [FromRoute] Guid id,
+        [FromBody] [Required] ChangeStudentDetailsRequest request)
+    {
+        await interactor.ExecuteAsync(id, request);
+
+        return NoContent();
     }
 }

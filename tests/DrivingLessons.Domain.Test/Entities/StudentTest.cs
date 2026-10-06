@@ -212,6 +212,92 @@ public class StudentTest
     }
 
     [TestMethod]
+    public void Change_Details()
+    {
+        //given
+        var student = new StudentFakeBuilder().Build();
+        var originalTeacherId = student.TeacherId;
+        var originalCarId = student.CarId;
+        var newNationalId = Faker.FakeNationalId();
+        var newName = StudentName.Of(Faker.FakeString());
+        var newPhone = PhoneNumber.Of(Faker.FakePhoneNumber());
+        var newAddress = Address.Of(Faker.FakeString());
+        var newStartDate = LessonsStartDate.Of(Faker.FakeDate());
+        var newLicenseType = LicenseType.Of(Faker.FakeString());
+
+        //when
+        student.ChangeDetails(newNationalId, newName, newPhone, newAddress, newStartDate, newLicenseType);
+
+        //then
+        student.NationalId.ShouldBe(newNationalId);
+        student.Name.ShouldBe(newName);
+        student.Phone.ShouldBe(newPhone);
+        student.Address.ShouldBe(newAddress);
+        student.StartDate.ShouldBe(newStartDate);
+        student.LicenseType.ShouldBe(newLicenseType);
+        student.TeacherId.ShouldBe(originalTeacherId);
+        student.CarId.ShouldBe(originalCarId);
+        student.IsActive.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Change_Details__Add_Event()
+    {
+        //given
+        var student = new StudentFakeBuilder().Build();
+        var newNationalId = Faker.FakeNationalId();
+        var newName = StudentName.Of(Faker.FakeString());
+        var newPhone = PhoneNumber.Of(Faker.FakePhoneNumber());
+
+        //when
+        student.ChangeDetails(newNationalId, newName, newPhone, null, null, null);
+
+        //then
+        student
+            .UncommittedEvents
+            .OfType<StudentDetailsChanged>()
+            .Where(x => x.StudentId == student.Id
+                        && x.NationalId == newNationalId
+                        && x.Name == newName)
+            .ShouldHaveSingleItem();
+    }
+
+    [TestMethod]
+    public void Change_Details_Clears_The_Optional_Details()
+    {
+        //given
+        var student = new StudentFakeBuilder().Build();
+        var nationalId = student.NationalId;
+        var name = student.Name;
+        var phone = student.Phone;
+
+        //when
+        student.ChangeDetails(nationalId, name, phone, null, null, null);
+
+        //then
+        student.Address.ShouldBeNull();
+        student.StartDate.ShouldBeNull();
+        student.LicenseType.ShouldBeNull();
+    }
+
+    [TestMethod]
+    public void Change_Details_Of_An_Inactive_Student()
+    {
+        //given
+        var student = new StudentFakeBuilder().BuildInactive();
+        var newName = StudentName.Of(Faker.FakeString());
+        var nationalId = student.NationalId;
+        var phone = student.Phone;
+
+        //when
+        student.ChangeDetails(nationalId, newName, phone, null, null, null);
+
+        //then
+        student.Name.ShouldBe(newName);
+        student.IsActive.ShouldBeFalse();
+    }
+
+    [TestMethod]
     public void Deactivate()
     {
         //given

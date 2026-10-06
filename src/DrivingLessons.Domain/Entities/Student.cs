@@ -98,6 +98,24 @@ public class Student : AggregateRoot<StudentId>
         AddEvent(new StudentUpdatedFromRoster(Id, teacher.Id, car.Id));
     }
 
+    public void ChangeDetails(
+        NationalId nationalId,
+        StudentName name,
+        PhoneNumber phone,
+        Address? address,
+        LessonsStartDate? startDate,
+        LicenseType? licenseType)
+    {
+        NationalId = nationalId;
+        Name = name;
+        Phone = phone;
+        Address = address;
+        StartDate = startDate;
+        LicenseType = licenseType;
+
+        AddEvent(new StudentDetailsChanged(Id, nationalId, name));
+    }
+
     public void Deactivate()
     {
         MustBeActive();

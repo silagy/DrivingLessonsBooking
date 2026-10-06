@@ -19,6 +19,13 @@ public class StudentRepository : IStudentRepository
         return await dbContext.Students.ToListAsync();
     }
 
+    public async Task<Student?> GetAsync(StudentId id)
+    {
+        return await dbContext
+                         .Students
+                         .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<Student?> GetActiveByNationalIdAsync(NationalId nationalId)
     {
         return await dbContext
