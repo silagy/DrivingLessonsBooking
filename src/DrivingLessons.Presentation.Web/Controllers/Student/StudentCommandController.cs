@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using DrivingLessons.Application.Commands.ChangeStudentDetails;
 using DrivingLessons.Application.Commands.CreateStudent;
+using DrivingLessons.Application.Commands.DeactivateStudent;
+using DrivingLessons.Application.Commands.ReactivateStudent;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DrivingLessons.Presentation.Web.Controllers.Student;
@@ -35,6 +37,34 @@ public class StudentCommandController : ControllerBase
         [FromBody] [Required] ChangeStudentDetailsRequest request)
     {
         await interactor.ExecuteAsync(id, request);
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/deactivate")]
+    [EndpointSummary("Deactivate the student so they can no longer submit on the student form")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> DeactivateAsync(
+        [FromServices] DeactivateStudentInteractor interactor,
+        [FromRoute] Guid id)
+    {
+        await interactor.ExecuteAsync(id);
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/reactivate")]
+    [EndpointSummary("Reactivate an inactive student so they can submit again")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ReactivateAsync(
+        [FromServices] ReactivateStudentInteractor interactor,
+        [FromRoute] Guid id)
+    {
+        await interactor.ExecuteAsync(id);
 
         return NoContent();
     }
