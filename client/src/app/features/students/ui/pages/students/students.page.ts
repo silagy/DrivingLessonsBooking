@@ -29,6 +29,8 @@ import {
     DeactivateStudentDialog,
     DeactivateStudentDialogData,
 } from '../../dialogs/deactivate-student/deactivate-student.dialog';
+import { ChangeTeacherDialog } from '../../dialogs/change-teacher/change-teacher.dialog';
+import { ChangeTeacherDialogData } from '../../dialogs/change-teacher/change-teacher-dialog-data';
 import { EditStudentDialog } from '../../dialogs/edit-student/edit-student.dialog';
 import { EditStudentDialogData } from '../../dialogs/edit-student/edit-student-dialog-data';
 
@@ -125,6 +127,11 @@ export class StudentsPage {
     private activeRowActions(student: StudentRow): MenuItem[] {
         return [
             this.editDetailsAction(student),
+            {
+                label: this.transloco.translate('students.actions.changeTeacher'),
+                icon: 'pi pi-arrow-right-arrow-left',
+                command: () => this.onChangeTeacher(student),
+            },
             { separator: true },
             {
                 label: this.transloco.translate('students.actions.deactivate'),
@@ -171,6 +178,26 @@ export class StudentsPage {
         };
 
         this.openDialog(EditStudentDialog, this.transloco.translate('students.edit.title'), StudentsPage.dialogWidth, data);
+    }
+
+    private onChangeTeacher(student: StudentRow): void {
+        const data: ChangeTeacherDialogData = {
+            student,
+            teachers: this.store.teacherOptions,
+            cars: this.store.carOptions,
+            refusal: this.store.refusal,
+            isSaving: this.store.isMutating,
+            confirm: (teacherId, carId) => this.store.changeTeacher(student, teacherId, carId),
+            refresh: () => this.store.reload(),
+            clearRefusal: () => this.store.clearRefusal(),
+        };
+
+        this.openDialog(
+            ChangeTeacherDialog,
+            this.transloco.translate('students.changeTeacher.title'),
+            StudentsPage.dialogWidth,
+            data,
+        );
     }
 
     private onDeactivate(student: StudentRow): void {

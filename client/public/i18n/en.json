@@ -179,6 +179,7 @@
     "addedDetail": "{{name}} is now on {{teacher}}'s list.",
     "actions": {
       "editDetails": "Edit details",
+      "changeTeacher": "Change Teacher",
       "menu": "Actions",
       "menuFor": "Actions - {{name}}",
       "deactivate": "Deactivate",
@@ -207,6 +208,17 @@
       "nationalIdNote": "Changing it here doesn't change the Roster file. A later Roster file with the old ID would add a second Student, so correct the file too.",
       "nationalIdUsed": "This national ID belongs to another Student: {{name}}.",
       "teacherAndCar": "Teacher and Car"
+    },
+    "changeTeacher": {
+      "title": "Change Teacher",
+      "newTeacher": "New Teacher",
+      "current": "(current)",
+      "currentCar": "(current Car)",
+      "carKept": "{{teacher}} also teaches on the current Car, so it's selected.",
+      "note": "Existing Submissions stay with the week they were made in. From their next identification, the Student sees the new Teacher's week.",
+      "save": "Change Teacher",
+      "sameTeacher": "{{teacher}} is already this Student's Teacher. Refresh the screen.",
+      "carNotOfTeacher": "This Car isn't assigned to {{teacher}}. Refresh and choose again."
     },
     "detailsSaved": "Details saved",
     "add": {
