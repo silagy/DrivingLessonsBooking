@@ -710,6 +710,30 @@ describe('StudentsStore', () => {
         await vi.waitFor(() => expect(api.findStudents).toHaveBeenCalledTimes(2));
     });
 
+    it('confirms a Teacher change without blank names when the chosen Car is no longer listed', async () => {
+        //given
+        const { store, toast } = createStore();
+        await stable();
+
+        //when
+        await store.changeTeacher(NOA, 'teacher-yael', 'car-gone');
+
+        //then
+        expect(toast.success).toHaveBeenCalledWith('students.teacherChanged', undefined);
+    });
+
+    it('confirms a Car change without a blank name when the chosen Car is no longer listed', async () => {
+        //given
+        const { store, toast } = createStore();
+        await stable();
+
+        //when
+        await store.changeCar(NOA, 'car-gone');
+
+        //then
+        expect(toast.success).toHaveBeenCalledWith('students.carChanged', undefined);
+    });
+
     it('keeps the same-Car refusal for the dialog', async () => {
         //given
         const refusal = problem(HTTP_CONFLICT, 'studentAlreadyOnCar');

@@ -14,9 +14,11 @@ namespace DrivingLessons.Application.Test.Commands;
 public class ChangeStudentCarInteractorTest
 {
     private IStudentRepository repository = null!;
+    private ITeacherRepository teacherRepository = null!;
     private ICarRepository carRepository = null!;
     private IUnitOfWork unitOfWork = null!;
     private ChangeStudentCarInteractor interactor = null!;
+    private Teacher ronit = null!;
     private Car corolla = null!;
     private Car i20 = null!;
     private Car mazda = null!;
@@ -26,11 +28,12 @@ public class ChangeStudentCarInteractorTest
     public void Init()
     {
         repository = A.Fake<IStudentRepository>();
+        teacherRepository = A.Fake<ITeacherRepository>();
         carRepository = A.Fake<ICarRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new ChangeStudentCarInteractor(repository, carRepository, unitOfWork);
+        interactor = new ChangeStudentCarInteractor(repository, teacherRepository, carRepository, unitOfWork);
 
-        var ronit = Teacher.Create(TeacherName.Of("רונית אברהם"), Email.Of("ronit@school.example"));
+        ronit = Teacher.Create(TeacherName.Of("רונית אברהם"), Email.Of("ronit@school.example"));
         var oren = Teacher.Create(TeacherName.Of("אורן לוי"), Email.Of("oren@school.example"));
         corolla = Car.Create(CarName.Of("קורולה לבנה"), CarType.Of("קורולה"), Transmission.Automatic);
         i20 = Car.Create(CarName.Of("i20 כסופה"), CarType.Of("i20"), Transmission.Manual);
@@ -50,6 +53,8 @@ public class ChangeStudentCarInteractorTest
 
         A.CallTo(() => repository.GetAsync(A<StudentId>._)).Returns((Student?)null);
         A.CallTo(() => repository.GetAsync(noa.Id)).Returns(noa);
+        A.CallTo(() => teacherRepository.GetAsync(A<TeacherId>._)).Returns((Teacher?)null);
+        A.CallTo(() => teacherRepository.GetAsync(ronit.Id)).Returns(ronit);
         A.CallTo(() => carRepository.GetAsync(A<CarId>._)).Returns((Car?)null);
         A.CallTo(() => carRepository.GetAsync(corolla.Id)).Returns(corolla);
         A.CallTo(() => carRepository.GetAsync(i20.Id)).Returns(i20);
@@ -124,6 +129,22 @@ public class ChangeStudentCarInteractorTest
 
         //then
         await Should.ThrowAsync<CarNotFoundException>(act);
+        A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Student_Whose_Teacher_Is_Gone_Is_Not_Found()
+    {
+        //given
+        A.CallTo(() => teacherRepository.GetAsync(ronit.Id)).Returns((Teacher?)null);
+        var request = new ChangeStudentCarRequest(i20.Id.Value);
+
+        //when
+        var act = () => interactor.ExecuteAsync(noa.Id.Value, request);
+
+        //then
+        await Should.ThrowAsync<TeacherNotFoundException>(act);
+        noa.CarId.ShouldBe(corolla.Id);
         A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
     }
 }

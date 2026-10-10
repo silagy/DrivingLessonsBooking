@@ -8,15 +8,18 @@ namespace DrivingLessons.Application.Commands.ChangeStudentCar;
 public class ChangeStudentCarInteractor
 {
     private readonly IStudentRepository repository;
+    private readonly ITeacherRepository teacherRepository;
     private readonly ICarRepository carRepository;
     private readonly IUnitOfWork unitOfWork;
 
     public ChangeStudentCarInteractor(
         IStudentRepository repository,
+        ITeacherRepository teacherRepository,
         ICarRepository carRepository,
         IUnitOfWork unitOfWork)
     {
         this.repository = repository;
+        this.teacherRepository = teacherRepository;
         this.carRepository = carRepository;
         this.unitOfWork = unitOfWork;
     }
@@ -27,6 +30,14 @@ public class ChangeStudentCarInteractor
 
         var student = await repository.GetAsync(studentId)
                       ?? throw new StudentNotFoundException(studentId);
+
+        var teacherId = student.TeacherId;
+        var teacher = await teacherRepository.GetAsync(teacherId);
+
+        if (teacher is null)
+        {
+            throw new TeacherNotFoundException(teacherId);
+        }
 
         var carId = CarId.Of(request.CarId);
 

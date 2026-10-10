@@ -58,7 +58,7 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
-        MustBeCarOfTeacher(car, teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         const bool isActive = true;
         var id = StudentId.New();
@@ -85,7 +85,7 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
-        MustBeCarOfTeacher(car, teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         Name = name;
         Phone = phone;
@@ -119,7 +119,7 @@ public class Student : AggregateRoot<StudentId>
     public void ChangeTeacher(Teacher teacher, Car car)
     {
         MustNotBeWithTeacher(teacher);
-        MustBeCarOfTeacher(car, teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         TeacherId = teacher.Id;
         CarId = car.Id;
@@ -130,7 +130,7 @@ public class Student : AggregateRoot<StudentId>
     public void ChangeCar(Car car)
     {
         MustNotBeOnCar(car);
-        MustBeCarOfCurrentTeacher(car);
+        MustBeCarOfTeacher(car, TeacherId);
 
         CarId = car.Id;
 
@@ -187,19 +187,11 @@ public class Student : AggregateRoot<StudentId>
         }
     }
 
-    private void MustBeCarOfCurrentTeacher(Car car)
+    private static void MustBeCarOfTeacher(Car car, TeacherId teacherId)
     {
-        if (!car.IsAssignedTo(TeacherId))
+        if (!car.IsAssignedTo(teacherId))
         {
-            throw new StudentCarMustBeAssignedToTeacherException(car.Id, TeacherId);
-        }
-    }
-
-    private static void MustBeCarOfTeacher(Car car, Teacher teacher)
-    {
-        if (!car.IsAssignedTo(teacher))
-        {
-            throw new StudentCarMustBeAssignedToTeacherException(car.Id, teacher.Id);
+            throw new StudentCarMustBeAssignedToTeacherException(car.Id, teacherId);
         }
     }
 }
