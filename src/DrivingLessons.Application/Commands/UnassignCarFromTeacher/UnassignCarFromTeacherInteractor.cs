@@ -9,15 +9,18 @@ public class UnassignCarFromTeacherInteractor
 {
     private readonly ICarRepository carRepository;
     private readonly ITeacherRepository teacherRepository;
+    private readonly IStudentRepository studentRepository;
     private readonly IUnitOfWork unitOfWork;
 
     public UnassignCarFromTeacherInteractor(
         ICarRepository carRepository,
         ITeacherRepository teacherRepository,
+        IStudentRepository studentRepository,
         IUnitOfWork unitOfWork)
     {
         this.carRepository = carRepository;
         this.teacherRepository = teacherRepository;
+        this.studentRepository = studentRepository;
         this.unitOfWork = unitOfWork;
     }
 
@@ -33,7 +36,9 @@ public class UnassignCarFromTeacherInteractor
         var teacher = await teacherRepository.GetAsync(resolvedTeacherId)
                       ?? throw new TeacherNotFoundException(resolvedTeacherId);
 
-        car.UnassignTeacher(teacher);
+        var students = await studentRepository.FindByCarAsync(carId);
+
+        car.UnassignTeacher(teacher, students);
 
         await unitOfWork.CommitAsync();
     }

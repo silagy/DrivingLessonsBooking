@@ -50,8 +50,8 @@ export class ToastService {
         });
     }
 
-    apiError(error: unknown): void {
-        this.messages.add({ severity: 'error', summary: this.messageOf(error) });
+    apiError(error: unknown, isolatedParams: readonly string[] = []): void {
+        this.messages.add({ severity: 'error', summary: this.messageOf(error, isolatedParams) });
     }
 
     messageOf(error: unknown, isolatedParams: readonly string[] = []): string {

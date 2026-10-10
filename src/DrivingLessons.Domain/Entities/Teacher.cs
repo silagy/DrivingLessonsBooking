@@ -42,9 +42,10 @@ public class Teacher : AggregateRoot<TeacherId>
         AddEvent(new TeacherDetailsChanged(Id, name, contactEmail));
     }
 
-    public void Delete()
+    public void Delete(IReadOnlyCollection<Student> students)
     {
         MustNotBeDeleted();
+        MustNotHaveActiveStudents(students);
 
         IsDeleted = true;
 
@@ -56,6 +57,20 @@ public class Teacher : AggregateRoot<TeacherId>
         if (IsDeleted)
         {
             throw new TeacherAlreadyDeletedException(Id);
+        }
+    }
+
+    private void MustNotHaveActiveStudents(IReadOnlyCollection<Student> students)
+    {
+        var activeStudentNames = students
+                                 .Where(x => x.IsActive && x.TeacherId == Id)
+                                 .Select(x => x.Name)
+                                 .OrderBy(x => x.Value, StringComparer.Ordinal)
+                                 .ToList();
+
+        if (activeStudentNames.Count > 0)
+        {
+            throw new TeacherMustNotHaveActiveStudentsException(Id, activeStudentNames);
         }
     }
 }

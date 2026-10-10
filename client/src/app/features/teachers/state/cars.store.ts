@@ -6,6 +6,9 @@ import { CarsApiService } from '../data/cars-api.service';
 import { ChangeCarDetailsRequest } from '../data/change-car-details.request';
 import { CreateCarRequest } from '../data/create-car.request';
 
+const ACTIVE_STUDENTS_PARAMS: readonly string[] = ['names'];
+const ASSIGNMENT_PARAMS: readonly string[] = ['teacher', 'names'];
+
 @Injectable({ providedIn: 'root' })
 export class CarsStore {
     private readonly api = inject(CarsApiService);
@@ -55,7 +58,7 @@ export class CarsStore {
     }
 
     async delete(carId: string): Promise<void> {
-        await this.executeCommand(() => this.api.deleteCar(carId), 'teachers.carDeleted');
+        await this.executeCommand(() => this.api.deleteCar(carId), 'teachers.carDeleted', ACTIVE_STUDENTS_PARAMS);
     }
 
     async applyAssignments(carId: string, selectedTeacherIds: string[], currentTeacherIds: string[]): Promise<void> {
@@ -73,24 +76,28 @@ export class CarsStore {
         this.mutating.set(true);
 
         try {
-            for (const teacherId of toAssign) {
-                await firstValueFrom(this.api.assignTeacher(carId, teacherId));
-            }
-
             for (const teacherId of toUnassign) {
                 await firstValueFrom(this.api.unassignTeacher(carId, teacherId));
             }
 
+            for (const teacherId of toAssign) {
+                await firstValueFrom(this.api.assignTeacher(carId, teacherId));
+            }
+
             this.toast.success('teachers.assignmentsUpdated');
         } catch (error) {
-            this.toast.apiError(error);
+            this.toast.apiError(error, ASSIGNMENT_PARAMS);
         } finally {
             this.carsResource.reload();
             this.mutating.set(false);
         }
     }
 
-    private async executeCommand(command: () => Observable<unknown>, successKey: string): Promise<void> {
+    private async executeCommand(
+        command: () => Observable<unknown>,
+        successKey: string,
+        isolatedParams: readonly string[] = [],
+    ): Promise<void> {
         this.mutating.set(true);
 
         try {
@@ -98,7 +105,7 @@ export class CarsStore {
             this.toast.success(successKey);
             this.carsResource.reload();
         } catch (error) {
-            this.toast.apiError(error);
+            this.toast.apiError(error, isolatedParams);
         } finally {
             this.mutating.set(false);
         }
