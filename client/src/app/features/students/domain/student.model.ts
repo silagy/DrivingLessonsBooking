@@ -10,5 +10,6 @@ export interface Student {
     carId: string;
     carName: string;
     carTransmission: Transmission;
+    isCarOfTeacher: boolean;
     isActive: boolean;
 }

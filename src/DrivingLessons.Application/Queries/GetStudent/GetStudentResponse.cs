@@ -13,6 +13,7 @@ public class GetStudentResponse
     public Guid CarId { get; init; }
     public string CarName { get; init; } = string.Empty;
     public Transmission CarTransmission { get; init; }
+    public bool IsCarOfTeacher { get; init; }
     public string? Address { get; init; }
     public DateOnly? StartDate { get; init; }
     public string? LicenseType { get; init; }

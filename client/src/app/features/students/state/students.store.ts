@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ToastService } from '../../../core/services/toast.service';
+import { ToastDetail, ToastService } from '../../../core/services/toast.service';
 import { ProblemDetails } from '../../../shared/models/problem-details';
 import { isolateDirection } from '../../../shared/text/isolate-direction';
 import { CarOptionsApiService } from '../data/car-options-api.service';
@@ -219,6 +219,44 @@ export class StudentsStore {
         }
     }
 
+    async changeTeacher(student: Student, teacherId: string, carId: string): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalState.set(null);
+
+        const detail = this.teacherChangedDetail(student, teacherId, carId);
+
+        try {
+            await firstValueFrom(this.api.changeStudentTeacher(student.id, { teacherId, carId }));
+            this.toast.success('students.teacherChanged', detail);
+            this.studentsResource.reload();
+            return true;
+        } catch (error) {
+            this.refusalState.set(this.refusalOf(error));
+            return false;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
+    async changeCar(student: Student, carId: string): Promise<boolean> {
+        this.mutating.set(true);
+        this.refusalState.set(null);
+
+        const detail = this.carChangedDetail(student, carId);
+
+        try {
+            await firstValueFrom(this.api.changeStudentCar(student.id, { carId }));
+            this.toast.success('students.carChanged', detail);
+            this.studentsResource.reload();
+            return true;
+        } catch (error) {
+            this.refusalState.set(this.refusalOf(error));
+            return false;
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
     private refusalOf(error: unknown): StudentRefusal {
         return {
             kind: refusalKindOf(problemCodeOf(error)),
@@ -227,8 +265,43 @@ export class StudentsStore {
         };
     }
 
+    private teacherChangedDetail(student: Student, teacherId: string, carId: string): ToastDetail | undefined {
+        const teacherName = this.teacherNameOf(teacherId);
+        const carName = this.carNameOf(carId);
+
+        if (!teacherName || !carName) {
+            return undefined;
+        }
+
+        return {
+            key: 'students.teacherChangedDetail',
+            params: {
+                name: isolateDirection(student.name),
+                teacher: isolateDirection(teacherName),
+                car: isolateDirection(carName),
+            },
+        };
+    }
+
+    private carChangedDetail(student: Student, carId: string): ToastDetail | undefined {
+        const carName = this.carNameOf(carId);
+
+        if (!carName) {
+            return undefined;
+        }
+
+        return {
+            key: 'students.carChangedDetail',
+            params: { name: isolateDirection(student.name), car: isolateDirection(carName) },
+        };
+    }
+
     private teacherNameOf(teacherId: string): string {
         return this.teacherOptions().find((teacher) => teacher.id === teacherId)?.name ?? '';
+    }
+
+    private carNameOf(carId: string): string {
+        return this.carOptions().find((car) => car.id === carId)?.name ?? '';
     }
 }
 

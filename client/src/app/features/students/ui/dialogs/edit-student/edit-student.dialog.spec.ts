@@ -19,6 +19,7 @@ const NOA: StudentDetails = {
     carId: 'car-corolla',
     carName: 'Corolla White',
     carTransmission: Transmission.automatic,
+    isCarOfTeacher: true,
     address: '12 HaRimon St, Modiin',
     startDate: '2026-09-01',
     licenseType: 'B',
@@ -109,6 +110,7 @@ describe('EditStudentDialog', () => {
         });
         expect(host(fixture).querySelector('.locked-field__value')?.textContent).toContain('Ronit Avraham');
         expect(host(fixture).querySelector('#edit-student-national-id')?.getAttribute('dir')).toBe('ltr');
+        expect(host(fixture).querySelector('.edit-student__teacher-and-car-hint')?.textContent).toContain('students.edit.teacherAndCarHint');
     });
 
     it('saves the changed details and closes', async () => {

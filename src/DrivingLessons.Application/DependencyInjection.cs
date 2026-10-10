@@ -3,7 +3,9 @@ using DrivingLessons.Application.Common;
 using DrivingLessons.Application.Commands.AssignCarToTeacher;
 using DrivingLessons.Application.Commands.ChangeCarDetails;
 using DrivingLessons.Application.Commands.ChangeMyPassword;
+using DrivingLessons.Application.Commands.ChangeStudentCar;
 using DrivingLessons.Application.Commands.ChangeStudentDetails;
+using DrivingLessons.Application.Commands.ChangeStudentTeacher;
 using DrivingLessons.Application.Commands.ChangeTeacherDetails;
 using DrivingLessons.Application.Commands.ChangeUserDetails;
 using DrivingLessons.Application.Commands.ChangeUserRole;
@@ -104,6 +106,8 @@ public static class DependencyInjection
         services.AddScoped<ChangeStudentDetailsInteractor>();
         services.AddScoped<DeactivateStudentInteractor>();
         services.AddScoped<ReactivateStudentInteractor>();
+        services.AddScoped<ChangeStudentTeacherInteractor>();
+        services.AddScoped<ChangeStudentCarInteractor>();
         services.AddScoped<GetStudentInteractor>();
         services.AddScoped<IdentifyStudentInteractor>();
         services.AddScoped<SubmissionContextResolver>();

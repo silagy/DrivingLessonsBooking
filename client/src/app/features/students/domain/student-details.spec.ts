@@ -12,6 +12,7 @@ const NOA: StudentDetails = {
     carId: 'car-corolla',
     carName: 'Corolla White',
     carTransmission: Transmission.automatic,
+    isCarOfTeacher: true,
     address: '12 HaRimon St, Modiin',
     startDate: '2026-09-01',
     licenseType: 'B',

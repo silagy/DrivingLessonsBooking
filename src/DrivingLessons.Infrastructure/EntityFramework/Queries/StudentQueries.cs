@@ -43,6 +43,7 @@ public class StudentQueries : IStudentQueries
                         CarId = car.Id.Value,
                         CarName = car.Name.Value,
                         CarTransmission = car.Transmission,
+                        IsCarOfTeacher = car.TeacherAssignments.Any(assignment => assignment.TeacherId == teacher.Id),
                         IsActive = student.IsActive
                     };
 
@@ -70,6 +71,7 @@ public class StudentQueries : IStudentQueries
                         CarId = car.Id.Value,
                         CarName = car.Name.Value,
                         CarTransmission = car.Transmission,
+                        IsCarOfTeacher = car.TeacherAssignments.Any(assignment => assignment.TeacherId == teacher.Id),
                         Address = student.Address == null
                             ? null
                             : student.Address.Value,

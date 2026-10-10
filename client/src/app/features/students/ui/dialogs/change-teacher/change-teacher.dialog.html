@@ -1,0 +1,118 @@
+@let refusedNow = refusal();
+@let isSameTeacher = refusedNow?.kind === refusalKinds.sameTeacher;
+@let isStaleCar = refusedNow?.kind === refusalKinds.staleCar;
+@let refusalText = isSameTeacher
+  ? ('students.changeTeacher.sameTeacher' | transloco: { teacher: teacherName() })
+  : isStaleCar
+    ? ('students.changeTeacher.carNotOfTeacher' | transloco: { teacher: teacherName() })
+    : refusedNow?.message;
+
+<form (ngSubmit)="submit()" class="dialog-form">
+  @if (refusedNow) {
+    <app-dialog-refusal [message]="refusalText ?? ''">
+      @if (isSameTeacher || isStaleCar) {
+        <button type="button" class="change-teacher__refresh" (click)="onRefresh()">
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ 'general.refresh' | transloco }}
+        </button>
+      }
+    </app-dialog-refusal>
+  }
+
+  <app-student-who-card [student]="student" />
+
+  <div class="field">
+    <label for="change-teacher-teacher">{{ 'students.changeTeacher.newTeacher' | transloco }}</label>
+    <p-select
+      inputId="change-teacher-teacher"
+      name="teacherId"
+      [ngModel]="teacherId()"
+      (ngModelChange)="selectTeacher($event)"
+      [options]="teacherChoices()"
+      optionLabel="name"
+      optionValue="id"
+      optionDisabled="isCurrent"
+      [class.ng-invalid]="isSameTeacher"
+      [class.ng-dirty]="isSameTeacher"
+      [placeholder]="'students.add.teacherPlaceholder' | transloco"
+      appendTo="body"
+      fluid>
+      <ng-template pTemplate="item" let-teacher>
+        <span class="change-teacher__option">
+          <span>{{ teacher.name }}</span>
+          @if (teacher.isCurrent) {
+            <small class="change-teacher__option-note">{{ 'students.changeTeacher.current' | transloco }}</small>
+          } @else if (!teacher.hasCars) {
+            <small class="change-teacher__option-note">{{ 'students.add.noCarsOption' | transloco }}</small>
+          }
+        </span>
+      </ng-template>
+    </p-select>
+    @if (isSameTeacher) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ refusalText }}</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="change-teacher-car">{{ 'students.add.car' | transloco }}</label>
+    <p-select
+      inputId="change-teacher-car"
+      name="carId"
+      [ngModel]="carId()"
+      (ngModelChange)="selectCar($event)"
+      [disabled]="!carPick().options.length"
+      [class.ng-invalid]="isStaleCar"
+      [class.ng-dirty]="isStaleCar"
+      [options]="carPick().options"
+      optionLabel="name"
+      optionValue="id"
+      [placeholder]="(carPick().isLocked ? 'students.add.carPlaceholderLocked' : 'students.add.carPlaceholder') | transloco"
+      appendTo="body"
+      fluid>
+      <ng-template pTemplate="selectedItem" let-car>
+        <span class="change-teacher__option">
+          <span>{{ car.name }}</span>
+          <app-transmission-tag [transmission]="car.transmission" />
+          @if (car.id === student.carId) {
+            <small class="change-teacher__current-car">{{ 'students.changeTeacher.currentCar' | transloco }}</small>
+          }
+        </span>
+      </ng-template>
+      <ng-template pTemplate="item" let-car>
+        <span class="change-teacher__option">
+          <span>{{ car.name }}</span>
+          <app-transmission-tag [transmission]="car.transmission" />
+          @if (car.id === student.carId) {
+            <small class="change-teacher__option-note">{{ 'students.changeTeacher.currentCar' | transloco }}</small>
+          }
+        </span>
+      </ng-template>
+    </p-select>
+    @if (carPick().hasNoCars) {
+      <p-message severity="info" styleClass="change-teacher__no-cars">
+        <span class="change-teacher__no-cars-text">
+          <span>{{ 'students.add.noCars' | transloco }}</span>
+          <a class="change-teacher__link" [routerLink]="carsAndTeachersLink" (click)="close()">{{ 'students.add.noCarsLink' | transloco }}</a>
+        </span>
+      </p-message>
+    } @else if (isStaleCar) {
+      <small class="field__error"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ refusalText }}</small>
+    } @else if (!carPick().isLocked) {
+      <small class="field__hint change-teacher__car-hint">{{ carHintKey() | transloco: { teacher: teacherName() } }}</small>
+    }
+  </div>
+
+  <p class="change-teacher__note">
+    <i class="pi pi-info-circle" aria-hidden="true"></i>
+    <span>{{ 'students.changeTeacher.note' | transloco }}</span>
+  </p>
+
+  <div class="dialog-form__actions">
+    <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="close()" />
+    <p-button
+      [label]="'students.changeTeacher.save' | transloco"
+      type="submit"
+      [disabled]="!canSave()"
+      [loading]="isSaving()" />
+  </div>
+</form>

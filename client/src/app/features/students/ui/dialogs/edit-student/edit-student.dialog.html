@@ -76,6 +76,7 @@
       <app-transmission-tag [transmission]="details.carTransmission" />
     </span>
   </app-locked-field>
+  <small class="field__hint edit-student__teacher-and-car-hint">{{ 'students.edit.teacherAndCarHint' | transloco }}</small>
 
   <div class="dialog-form__actions">
     <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="close()" />

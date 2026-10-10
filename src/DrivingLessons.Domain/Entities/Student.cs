@@ -58,7 +58,7 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
-        MustBeCarOfTeacher(car, teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         const bool isActive = true;
         var id = StudentId.New();
@@ -85,7 +85,7 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
-        MustBeCarOfTeacher(car, teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         Name = name;
         Phone = phone;
@@ -114,6 +114,27 @@ public class Student : AggregateRoot<StudentId>
         LicenseType = licenseType;
 
         AddEvent(new StudentDetailsChanged(Id, nationalId, name));
+    }
+
+    public void ChangeTeacher(Teacher teacher, Car car)
+    {
+        MustNotBeWithTeacher(teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
+
+        TeacherId = teacher.Id;
+        CarId = car.Id;
+
+        AddEvent(new StudentTeacherChanged(Id, teacher.Id, car.Id));
+    }
+
+    public void ChangeCar(Car car)
+    {
+        MustNotBeOnCar(car);
+        MustBeCarOfTeacher(car, TeacherId);
+
+        CarId = car.Id;
+
+        AddEvent(new StudentCarChanged(Id, car.Id));
     }
 
     public void Deactivate()
@@ -159,11 +180,27 @@ public class Student : AggregateRoot<StudentId>
         }
     }
 
-    private static void MustBeCarOfTeacher(Car car, Teacher teacher)
+    private void MustNotBeWithTeacher(Teacher teacher)
     {
-        if (!car.IsAssignedTo(teacher))
+        if (teacher.Id == TeacherId)
         {
-            throw new StudentCarMustBeAssignedToTeacherException(car.Id, teacher.Id);
+            throw new StudentAlreadyWithTeacherException(Id, teacher.Id);
+        }
+    }
+
+    private void MustNotBeOnCar(Car car)
+    {
+        if (car.Id == CarId)
+        {
+            throw new StudentAlreadyOnCarException(Id, car.Id);
+        }
+    }
+
+    private static void MustBeCarOfTeacher(Car car, TeacherId teacherId)
+    {
+        if (!car.IsAssignedTo(teacherId))
+        {
+            throw new StudentCarMustBeAssignedToTeacherException(car.Id, teacherId);
         }
     }
 }

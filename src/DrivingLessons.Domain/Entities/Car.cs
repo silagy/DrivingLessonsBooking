@@ -73,7 +73,12 @@ public class Car : AggregateRoot<CarId>
 
     public bool IsAssignedTo(Teacher teacher)
     {
-        return teacherAssignments.Any(x => x.TeacherId == teacher.Id);
+        return IsAssignedTo(teacher.Id);
+    }
+
+    public bool IsAssignedTo(TeacherId teacherId)
+    {
+        return teacherAssignments.Any(x => x.TeacherId == teacherId);
     }
 
     public void Delete(IReadOnlyCollection<Student> students)

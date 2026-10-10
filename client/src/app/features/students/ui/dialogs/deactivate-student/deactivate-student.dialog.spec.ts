@@ -17,6 +17,7 @@ const ITAI: Student = {
     carId: 'car-i20',
     carName: 'i20 Silver',
     carTransmission: Transmission.manual,
+    isCarOfTeacher: true,
     isActive: true,
 };
 
@@ -27,12 +28,12 @@ interface Setup {
     close: ReturnType<typeof vi.fn>;
 }
 
-async function setUp(confirmResult: boolean): Promise<Setup> {
+async function setUp(confirmResult: boolean, student: Student = ITAI): Promise<Setup> {
     const refusal = signal<StudentRefusal | null>(null);
     const isDeactivating = signal(false);
     const close = vi.fn();
     const data: DeactivateStudentDialogData = {
-        student: ITAI,
+        student,
         refusal,
         isDeactivating,
         confirm: () => Promise.resolve(confirmResult),
@@ -76,6 +77,14 @@ describe('DeactivateStudentDialog', () => {
         expect(host(fixture).querySelector('.who-card__name')?.textContent).toContain('Itai Peretz');
         expect(host(fixture).querySelector('.who-card__national-id')?.getAttribute('dir')).toBe('ltr');
         expect(host(fixture).querySelectorAll('.deactivate-student__effect').length).toBe(3);
+    });
+
+    it('marks a Car that is not the Teacher\'s in the who card', async () => {
+        //given
+        const { fixture } = await setUp(true, { ...ITAI, isCarOfTeacher: false });
+
+        //then
+        expect(host(fixture).querySelector('.who-card__flag')?.getAttribute('aria-label')).toBe('students.flag.car');
     });
 
     it('closes once the Student is deactivated', async () => {
