@@ -22,6 +22,7 @@ const EN = {
         forbidden: 'You don\'t have permission to do that.',
         notFound: 'This item no longer exists. Refresh the page.',
         rosterFileMustContainRequiredColumns: 'The file is missing required columns: {{columns}}.',
+        teacherAssignmentMustNotHaveActiveStudents: 'Active Students of {{teacher}} learn on this Car ({{count}}): {{names}}.',
     },
     general: {
         unexpectedError: 'Something went wrong. Please try again.',
@@ -252,6 +253,45 @@ describe('ToastService', () => {
             //then
             expect(plain).toBe('The file is missing required columns: name.');
             expect(isolatedMessage).toBe(`The file is missing required columns: ${isolateDirection('name')}.`);
+        });
+    });
+
+    describe('apiError with isolated params', () => {
+        it('isolates the names in a refusal toast', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'teacherAssignmentMustNotHaveActiveStudents',
+                params: { teacher: 'רונית אברהם', count: '2', names: 'נועה מזרחי, עומר שלו' },
+            });
+
+            //when
+            toast.apiError(error, ['teacher', 'names']);
+
+            //then
+            expect(add.mock.calls[0][0].severity).toBe('error');
+            expect(shownSummary(add)).toBe(
+                `Active Students of ${isolateDirection('רונית אברהם')} learn on this Car (2): ${isolateDirection('נועה מזרחי, עומר שלו')}.`,
+            );
+        });
+
+        it('leaves the params as they are when none are named', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'teacherAssignmentMustNotHaveActiveStudents',
+                params: { teacher: 'Ronit', count: '1', names: 'Noa' },
+            });
+
+            //when
+            toast.apiError(error);
+
+            //then
+            expect(shownSummary(add)).toBe('Active Students of Ronit learn on this Car (1): Noa.');
         });
     });
 });
