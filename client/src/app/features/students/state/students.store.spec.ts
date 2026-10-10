@@ -651,6 +651,25 @@ describe('StudentsStore', () => {
         expect(api.findStudents).toHaveBeenCalledTimes(1);
     });
 
+    it.each(['studentTeacherMustNotBeDeleted', 'studentCarMustNotBeDeleted', 'studentCarMustBeAssignedToTeacher'])(
+        'explains a %s Reactivate refusal without reloading',
+        async (code) => {
+            //given
+            const failure = problem(HTTP_CONFLICT, code);
+            const { store, toast, api } = createStore({ reactivateStudent: () => throwError(() => failure) });
+            await stable();
+
+            //when
+            await store.reactivate(DANA);
+            await stable();
+
+            //then
+            expect(toast.apiError).toHaveBeenCalledWith(failure);
+            expect(api.findStudents).toHaveBeenCalledTimes(1);
+            expect(store.isMutating()).toBe(false);
+        },
+    );
+
     it('changes the Teacher, names the Student, Teacher and Car in the confirmation and reloads', async () => {
         //given
         const { store, toast, api } = createStore();

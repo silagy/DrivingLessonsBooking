@@ -90,6 +90,38 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Student_Teacher_Deleted_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentTeacherMustNotBeDeletedException(StudentId.New(), TeacherId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentTeacherMustNotBeDeleted");
+        problem.Extensions.ShouldNotContainKey("params");
+    }
+
+    [TestMethod]
+    public void Student_Car_Deleted_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentCarMustNotBeDeletedException(StudentId.New(), CarId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentCarMustNotBeDeleted");
+        problem.Extensions.ShouldNotContainKey("params");
+    }
+
+    [TestMethod]
     public void Student_Already_Deactivated_Is_A_Conflict_With_Its_Rule_As_Code()
     {
         //given
