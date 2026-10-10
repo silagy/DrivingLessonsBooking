@@ -413,7 +413,8 @@ public class ApiExceptionFilterTest
         new ApiExceptionFilter().OnException(context);
 
         //then
-        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
         parameters.ShouldBe(new Dictionary<string, string> { ["columns"] = "טלפון, מורה" });
     }
 
@@ -499,8 +500,13 @@ public class ApiExceptionFilterTest
         new ApiExceptionFilter().OnException(context);
 
         //then
-        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
-        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "5", ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad..." });
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string>
+        {
+            ["count"] = "5",
+            ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad"
+        });
     }
 
     [TestMethod]
@@ -514,7 +520,8 @@ public class ApiExceptionFilterTest
         new ApiExceptionFilter().OnException(context);
 
         //then
-        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
         parameters.ShouldBe(new Dictionary<string, string> { ["maxLength"] = "200" });
     }
 
@@ -528,7 +535,8 @@ public class ApiExceptionFilterTest
         new ApiExceptionFilter().OnException(context);
 
         //then
-        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
         parameters.ShouldBe(new Dictionary<string, string> { ["name"] = "נועה מזרחי" });
     }
 

@@ -9,7 +9,10 @@ import { CarsStore } from './cars.store';
 const HTTP_INTERNAL_SERVER_ERROR = 500;
 const HTTP_CONFLICT = 409;
 
-function storeWithApi(apiError: ReturnType<typeof vi.fn>, api: Partial<Record<keyof CarsApiService, unknown>>): CarsStore {
+function storeWithApi(
+    apiError: ReturnType<typeof vi.fn>,
+    api: Partial<Record<keyof CarsApiService, unknown>>
+): CarsStore {
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),

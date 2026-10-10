@@ -47,7 +47,7 @@ Seed with task 2 step 8's script (the part up to and including `create omer`), p
 
 Start the client with `preview_start {name: "client"}`. Open `http://localhost:4200`, sign in as `admin@local.dev` / `DevAdmin#2026` (Hebrew) and open "רכבים ומורים". Before any screenshot, `await document.fonts.ready` (memory note); if screenshots hang, verify via `read_page` / `get_page_text`.
 
-1. Delete "קורולה לבנה" and confirm. Expected: an error toast "תלמידים פעילים לומדים על הרכב הזה (5): ...", three names then `...`; the Car is still listed.
+1. Delete "קורולה לבנה" and confirm. Expected: an error toast "תלמידים פעילים לומדים על הרכב הזה (5): ...", three names, no trailing dots; the Car is still listed.
 2. Open the Corolla's assign popover, uncheck "רונית אברהם", Apply. Expected: an error toast naming "רונית אברהם" and the Students; the popover reopens with Ronit still checked (the Cars reloaded).
 3. Open the i20's assign popover, uncheck "רונית אברהם", Apply. Expected: a success toast "שיוכי המורים עודכנו" (Omer is Yael's Student and doesn't block, Review Focus 1). Re-assign Ronit to the i20 for the next steps.
 4. On the Users screen, add a Teacher-role User linked to "רונית אברהם". Back on "רכבים ומורים", delete Ronit. Expected: the existing toast "למורה הזה יש משתמש פעיל, ולכן אי אפשר למחוק אותו." (Review Focus 5). Delete that User on the Users screen, then delete Ronit again. Expected: "למורה הזה יש תלמידים פעילים (5): ..."

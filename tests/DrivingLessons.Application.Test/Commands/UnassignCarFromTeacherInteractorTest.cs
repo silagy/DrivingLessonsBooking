@@ -28,7 +28,11 @@ public class UnassignCarFromTeacherInteractorTest
         teacherRepository = A.Fake<ITeacherRepository>();
         studentRepository = A.Fake<IStudentRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new UnassignCarFromTeacherInteractor(carRepository, teacherRepository, studentRepository, unitOfWork);
+        interactor = new UnassignCarFromTeacherInteractor(
+            carRepository,
+            teacherRepository,
+            studentRepository,
+            unitOfWork);
         teacher = Teacher.Create(TeacherName.Of("Ronit Avraham"), Email.Of("ronit@school.example"));
         car = Car.Create(CarName.Of("Corolla White"), CarType.Of("Corolla"), Transmission.Automatic);
         car.AssignTeacher(teacher);

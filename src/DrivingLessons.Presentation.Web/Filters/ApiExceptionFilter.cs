@@ -15,7 +15,6 @@ public sealed class ApiExceptionFilter : IExceptionFilter
     private const string ParamsExtension = "params";
     private const string ColumnSeparator = ", ";
     private const int NamedStudentsLimit = 3;
-    private const string MoreNamesSuffix = "...";
 
     public void OnException(ExceptionContext context)
     {
@@ -83,7 +82,8 @@ public sealed class ApiExceptionFilter : IExceptionFilter
         };
     }
 
-    private static Dictionary<string, string> AssignmentParams(TeacherAssignmentMustNotHaveActiveStudentsException assignment)
+    private static Dictionary<string, string> AssignmentParams(
+        TeacherAssignmentMustNotHaveActiveStudentsException assignment)
     {
         var parameters = ActiveStudentsParams(assignment.ActiveStudentNames);
         parameters["teacher"] = assignment.TeacherName.Value;
@@ -96,10 +96,7 @@ public sealed class ApiExceptionFilter : IExceptionFilter
         var namedStudents = activeStudentNames
                             .Take(NamedStudentsLimit)
                             .Select(x => x.Value);
-        var joinedNames = string.Join(ColumnSeparator, namedStudents);
-        var names = activeStudentNames.Count > NamedStudentsLimit
-            ? joinedNames + MoreNamesSuffix
-            : joinedNames;
+        var names = string.Join(ColumnSeparator, namedStudents);
 
         return new Dictionary<string, string>
         {

@@ -10,7 +10,7 @@
 **Interfaces:**
 - Consumes: task 1's three exceptions (`ActiveStudentNames: IReadOnlyList<StudentName>`, and `TeacherName: TeacherName` on the assignment one); the filter's existing `CodeOf` (code = type name without `Exception`, camelCase) and `ColumnSeparator = ", "`.
 - Produces (tasks 3 and 4 rely on these):
-  - 409 problems with `code` `teacherMustNotHaveActiveStudents` / `carMustNotHaveActiveStudents` / `teacherAssignmentMustNotHaveActiveStudents`, `type` null, and `params`: `count` (string, all active Students), `names` (first three, `, `-joined, `...` appended when there are more), plus `teacher` on the assignment one.
+  - 409 problems with `code` `teacherMustNotHaveActiveStudents` / `carMustNotHaveActiveStudents` / `teacherAssignmentMustNotHaveActiveStudents`, `type` null, and `params`: `count` (string, all active Students), `names` (first three, `, `-joined, nothing appended when there are more), plus `teacher` on the assignment one.
   - Translations `errors.teacherMustNotHaveActiveStudents`, `errors.carMustNotHaveActiveStudents`, `errors.teacherAssignmentMustNotHaveActiveStudents` using `{{count}}`, `{{names}}`, `{{teacher}}`.
 
 - [ ] **Step 1: Write the failing filter tests**
@@ -101,7 +101,7 @@ In `ApiExceptionFilterTest.cs`, after `Missing_Roster_Columns_Are_Named_In_Param
 
         //then
         var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
-        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "5", ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad..." });
+        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "5", ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad" });
     }
 ```
 
@@ -114,11 +114,10 @@ Expected: the four new tests FAIL with `KeyNotFoundException` on `"params"` (the
 
 - [ ] **Step 3: Add the params**
 
-In `ApiExceptionFilter.cs`, add `using DrivingLessons.Domain.Values;` (alphabetical, after `DrivingLessons.Domain.Exceptions`), and two constants after `ColumnSeparator`:
+In `ApiExceptionFilter.cs`, add `using DrivingLessons.Domain.Values;` (alphabetical, after `DrivingLessons.Domain.Exceptions`), and a constant after `ColumnSeparator`:
 
 ```csharp
     private const int NamedStudentsLimit = 3;
-    private const string MoreNamesSuffix = "...";
 ```
 
 Add three arms to the `ParamsOf` switch, before `_ => null`:
@@ -132,7 +131,8 @@ Add three arms to the `ParamsOf` switch, before `_ => null`:
 and the helpers after `ParamsOf`:
 
 ```csharp
-    private static Dictionary<string, string> AssignmentParams(TeacherAssignmentMustNotHaveActiveStudentsException assignment)
+    private static Dictionary<string, string> AssignmentParams(
+        TeacherAssignmentMustNotHaveActiveStudentsException assignment)
     {
         var parameters = ActiveStudentsParams(assignment.ActiveStudentNames);
         parameters["teacher"] = assignment.TeacherName.Value;
@@ -145,10 +145,7 @@ and the helpers after `ParamsOf`:
         var namedStudents = activeStudentNames
                             .Take(NamedStudentsLimit)
                             .Select(x => x.Value);
-        var joinedNames = string.Join(ColumnSeparator, namedStudents);
-        var names = activeStudentNames.Count > NamedStudentsLimit
-            ? joinedNames + MoreNamesSuffix
-            : joinedNames;
+        var names = string.Join(ColumnSeparator, namedStudents);
 
         return new Dictionary<string, string>
         {
@@ -167,7 +164,7 @@ Expected: PASS, every test.
 
 - [ ] **Step 5: Check the source-text rule**
 
-The `...` suffix is three plain dots, not the ellipsis character. Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~SourceText"`
+Run: `dotnet test tests\DrivingLessons.Application.Test\DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~SourceText"`
 Expected: PASS (or "No test matches" if the source-text test lives in another project; then run that project's test the same way, `git grep -l SourceTextTest tests` finds it).
 
 - [ ] **Step 6: Add the error translations**

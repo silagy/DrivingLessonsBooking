@@ -22,7 +22,8 @@ const EN = {
         forbidden: 'You don\'t have permission to do that.',
         notFound: 'This item no longer exists. Refresh the page.',
         rosterFileMustContainRequiredColumns: 'The file is missing required columns: {{columns}}.',
-        teacherAssignmentMustNotHaveActiveStudents: 'Active Students of {{teacher}} learn on this Car ({{count}}): {{names}}.',
+        teacherAssignmentMustNotHaveActiveStudents:
+            'Active Students of {{teacher}} learn on this Car ({{count}}): {{names}}.',
     },
     general: {
         unexpectedError: 'Something went wrong. Please try again.',
@@ -273,7 +274,8 @@ describe('ToastService', () => {
             //then
             expect(add.mock.calls[0][0].severity).toBe('error');
             expect(shownSummary(add)).toBe(
-                `Active Students of ${isolateDirection('רונית אברהם')} learn on this Car (2): ${isolateDirection('נועה מזרחי, עומר שלו')}.`,
+                `Active Students of ${isolateDirection('רונית אברהם')} learn on this Car (2): ` +
+                    `${isolateDirection('נועה מזרחי, עומר שלו')}.`,
             );
         });
 

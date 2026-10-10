@@ -407,6 +407,21 @@ public class CarTest
     }
 
     [TestMethod]
+    public void Delete__Must_Not_Be_Deleted_Before_Active_Students_Are_Checked()
+    {
+        //given
+        var car = CarFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithCar(car).Build();
+        car.Delete([]);
+
+        //when
+        var act = () => car.Delete([student]);
+
+        //then
+        Should.Throw<CarAlreadyDeletedException>(act);
+    }
+
+    [TestMethod]
     public void Delete_With_Only_Inactive_Students()
     {
         //given
