@@ -509,7 +509,7 @@ public class StudentTest
         var teacher = TeacherFakeBuilder.Build();
         var oldCar = CarFakeBuilder.Build();
         var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(oldCar).Build();
-        oldCar.UnassignTeacher(teacher);
+        oldCar.UnassignTeacher(teacher, []);
         var newCar = CarFakeBuilder.Build();
         newCar.AssignTeacher(teacher);
 
@@ -583,7 +583,7 @@ public class StudentTest
         var teacher = TeacherFakeBuilder.Build();
         var car = CarFakeBuilder.Build();
         var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
-        car.UnassignTeacher(teacher);
+        car.UnassignTeacher(teacher, []);
 
         //when
         var act = () => student.ChangeCar(car);
