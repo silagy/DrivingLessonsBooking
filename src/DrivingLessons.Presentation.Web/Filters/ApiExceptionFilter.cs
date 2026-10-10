@@ -3,6 +3,7 @@ using System.Text.Json;
 using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Domain.Common;
 using DrivingLessons.Domain.Exceptions;
+using DrivingLessons.Domain.Values;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -13,6 +14,8 @@ public sealed class ApiExceptionFilter : IExceptionFilter
     private const string CodeExtension = "code";
     private const string ParamsExtension = "params";
     private const string ColumnSeparator = ", ";
+    private const int NamedStudentsLimit = 3;
+    private const string MoreNamesSuffix = "...";
 
     public void OnException(ExceptionContext context)
     {
@@ -73,7 +76,35 @@ public sealed class ApiExceptionFilter : IExceptionFilter
             {
                 ["name"] = inUse.ExistingStudentName.Value
             },
+            TeacherMustNotHaveActiveStudentsException teacher => ActiveStudentsParams(teacher.ActiveStudentNames),
+            CarMustNotHaveActiveStudentsException car => ActiveStudentsParams(car.ActiveStudentNames),
+            TeacherAssignmentMustNotHaveActiveStudentsException assignment => AssignmentParams(assignment),
             _ => null
+        };
+    }
+
+    private static Dictionary<string, string> AssignmentParams(TeacherAssignmentMustNotHaveActiveStudentsException assignment)
+    {
+        var parameters = ActiveStudentsParams(assignment.ActiveStudentNames);
+        parameters["teacher"] = assignment.TeacherName.Value;
+
+        return parameters;
+    }
+
+    private static Dictionary<string, string> ActiveStudentsParams(IReadOnlyList<StudentName> activeStudentNames)
+    {
+        var namedStudents = activeStudentNames
+                            .Take(NamedStudentsLimit)
+                            .Select(x => x.Value);
+        var joinedNames = string.Join(ColumnSeparator, namedStudents);
+        var names = activeStudentNames.Count > NamedStudentsLimit
+            ? joinedNames + MoreNamesSuffix
+            : joinedNames;
+
+        return new Dictionary<string, string>
+        {
+            ["count"] = activeStudentNames.Count.ToString(CultureInfo.InvariantCulture),
+            ["names"] = names
         };
     }
 

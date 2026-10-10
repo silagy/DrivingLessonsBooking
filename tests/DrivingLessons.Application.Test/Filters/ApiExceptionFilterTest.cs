@@ -418,6 +418,92 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Teacher_With_Active_Students_Is_A_Conflict_Naming_Them()
+    {
+        //given
+        var names = new[] { StudentName.Of("Avi Cohen"), StudentName.Of("Noa Mizrahi") };
+        var context = ContextFor(new TeacherMustNotHaveActiveStudentsException(TeacherId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Type.ShouldBeNull();
+        problem.Extensions.ShouldContainKeyAndValue("code", "teacherMustNotHaveActiveStudents");
+        var parameters = problem.Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "2", ["names"] = "Avi Cohen, Noa Mizrahi" });
+    }
+
+    [TestMethod]
+    public void Car_With_Active_Students_Is_A_Conflict_Naming_Them()
+    {
+        //given
+        var names = new[] { StudentName.Of("נועה מזרחי") };
+        var context = ContextFor(new CarMustNotHaveActiveStudentsException(CarId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "carMustNotHaveActiveStudents");
+        var parameters = problem.Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "1", ["names"] = "נועה מזרחי" });
+    }
+
+    [TestMethod]
+    public void Teacher_Assignment_With_Active_Students_Is_A_Conflict_Naming_The_Teacher_And_Them()
+    {
+        //given
+        var names = new[] { StudentName.Of("Noa Mizrahi") };
+        var context = ContextFor(new TeacherAssignmentMustNotHaveActiveStudentsException(
+            CarId.New(),
+            TeacherId.New(),
+            TeacherName.Of("Ronit Avraham"),
+            names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "teacherAssignmentMustNotHaveActiveStudents");
+        var parameters = problem.Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string>
+        {
+            ["count"] = "1",
+            ["names"] = "Noa Mizrahi",
+            ["teacher"] = "Ronit Avraham"
+        });
+    }
+
+    [TestMethod]
+    public void Active_Students_Beyond_Three_Are_Counted_Not_Named()
+    {
+        //given
+        var names = new[]
+        {
+            StudentName.Of("Avi Cohen"),
+            StudentName.Of("Dana Sasson"),
+            StudentName.Of("Lia Hadad"),
+            StudentName.Of("Noa Mizrahi"),
+            StudentName.Of("Omer Shalev")
+        };
+        var context = ContextFor(new CarMustNotHaveActiveStudentsException(CarId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "5", ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad..." });
+    }
+
+    [TestMethod]
     public void Constraint_Length_Limit_Is_Named_In_Params()
     {
         //given
