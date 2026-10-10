@@ -191,7 +191,7 @@ In `Student.cs`, replace `Reactivate()` with:
         MustBeInactive();
         TeacherMustNotBeDeleted(teacher);
         CarMustNotBeDeleted(car);
-        MustBeCarOfTeacher(car, teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         IsActive = true;
 
