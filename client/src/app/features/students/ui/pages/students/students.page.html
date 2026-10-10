@@ -158,10 +158,12 @@
             <td class="students__wide-only"><bdi dir="ltr" class="students__ltr">{{ row.nationalId }}</bdi></td>
             <td class="students__wide-only"><bdi dir="ltr" class="students__ltr">{{ row.phone }}</bdi></td>
             <td class="students__teacher">
-              <span>{{ row.teacherName }}</span>
-              @if (row.isTeacherDeleted) {
-                <app-deleted-flag [part]="removedParts.teacher" />
-              }
+              <div class="students__teacher-line">
+                <span>{{ row.teacherName }}</span>
+                @if (row.isTeacherDeleted) {
+                  <app-deleted-flag [part]="removedParts.teacher" />
+                }
+              </div>
               <div class="students__car-line students__compact-only">
                 <span class="students__car">
                   {{ row.carName }}
