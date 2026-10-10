@@ -6,6 +6,8 @@ import { ChangeTeacherDetailsRequest } from '../data/change-teacher-details.requ
 import { CreateTeacherRequest } from '../data/create-teacher.request';
 import { TeachersApiService } from '../data/teachers-api.service';
 
+const ACTIVE_STUDENTS_PARAMS: readonly string[] = ['names'];
+
 @Injectable({ providedIn: 'root' })
 export class TeachersStore {
     private readonly api = inject(TeachersApiService);
@@ -35,10 +37,14 @@ export class TeachersStore {
     }
 
     async delete(teacherId: string): Promise<void> {
-        await this.executeCommand(() => this.api.deleteTeacher(teacherId), 'teachers.deleted');
+        await this.executeCommand(() => this.api.deleteTeacher(teacherId), 'teachers.deleted', ACTIVE_STUDENTS_PARAMS);
     }
 
-    private async executeCommand(command: () => Observable<unknown>, successKey: string): Promise<void> {
+    private async executeCommand(
+        command: () => Observable<unknown>,
+        successKey: string,
+        isolatedParams: readonly string[] = [],
+    ): Promise<void> {
         this.mutating.set(true);
 
         try {
@@ -46,7 +52,7 @@ export class TeachersStore {
             this.toast.success(successKey);
             this.teachersResource.reload();
         } catch (error) {
-            this.toast.apiError(error);
+            this.toast.apiError(error, isolatedParams);
         } finally {
             this.mutating.set(false);
         }

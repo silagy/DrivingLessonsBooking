@@ -155,6 +155,15 @@ public class Student : AggregateRoot<StudentId>
         AddEvent(new StudentReactivated(Id));
     }
 
+    internal static List<StudentName> ActiveNamesOf(IEnumerable<Student> students)
+    {
+        return students
+               .Where(x => x.IsActive)
+               .Select(x => x.Name)
+               .OrderBy(x => x.Value, StringComparer.Ordinal)
+               .ToList();
+    }
+
     private void MustBeActive()
     {
         if (!IsActive)

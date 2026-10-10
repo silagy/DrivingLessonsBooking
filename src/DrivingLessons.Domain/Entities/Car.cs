@@ -59,10 +59,12 @@ public class Car : AggregateRoot<CarId>
         AddEvent(new CarAssignedToTeacher(Id, teacher.Id));
     }
 
-    public void UnassignTeacher(Teacher teacher)
+    public void UnassignTeacher(Teacher teacher, IReadOnlyCollection<Student> students)
     {
         var assignment = teacherAssignments.FirstOrDefault(x => x.TeacherId == teacher.Id)
                          ?? throw new TeacherNotAssignedToCarException(Id, teacher.Id);
+
+        MustNotHaveActiveStudentsOf(teacher, students);
 
         teacherAssignments.Remove(assignment);
 
@@ -79,9 +81,10 @@ public class Car : AggregateRoot<CarId>
         return teacherAssignments.Any(x => x.TeacherId == teacherId);
     }
 
-    public void Delete()
+    public void Delete(IReadOnlyCollection<Student> students)
     {
         MustNotBeDeleted();
+        MustNotHaveActiveStudents(students);
 
         IsDeleted = true;
 
@@ -101,6 +104,32 @@ public class Car : AggregateRoot<CarId>
         if (IsDeleted)
         {
             throw new CarAlreadyDeletedException(Id);
+        }
+    }
+
+    private void MustNotHaveActiveStudentsOf(Teacher teacher, IReadOnlyCollection<Student> students)
+    {
+        var studentsOfTeacherOnCar = students.Where(x => x.TeacherId == teacher.Id && x.CarId == Id);
+        var activeStudentNames = Student.ActiveNamesOf(studentsOfTeacherOnCar);
+
+        if (activeStudentNames.Any())
+        {
+            throw new TeacherAssignmentMustNotHaveActiveStudentsException(
+                Id,
+                teacher.Id,
+                teacher.Name,
+                activeStudentNames);
+        }
+    }
+
+    private void MustNotHaveActiveStudents(IReadOnlyCollection<Student> students)
+    {
+        var studentsOnCar = students.Where(x => x.CarId == Id);
+        var activeStudentNames = Student.ActiveNamesOf(studentsOnCar);
+
+        if (activeStudentNames.Any())
+        {
+            throw new CarMustNotHaveActiveStudentsException(Id, activeStudentNames);
         }
     }
 }
