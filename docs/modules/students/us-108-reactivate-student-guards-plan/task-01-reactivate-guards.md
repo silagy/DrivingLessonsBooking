@@ -12,6 +12,7 @@ Part of [#108 plan](README.md). Read the README's Decisions and Global Constrain
 - Modify: `src\DrivingLessons.Application\Commands\ImportRoster\ImportRosterInteractor.cs` (~line 190)
 - Test: `tests\DrivingLessons.Domain.Test\Entities\StudentTest.cs`
 - Test: `tests\DrivingLessons.Application.Test\Commands\ReactivateStudentInteractorTest.cs`
+- Test: `tests\DrivingLessons.Domain.Test\Entities\CarTest.cs` (delete one test, Decision 14)
 
 **Interfaces:**
 - Consumes (#91): `Teacher.Delete(IReadOnlyCollection<Student>)`, `Car.Delete(IReadOnlyCollection<Student>)`, `Car.UnassignTeacher(Teacher, IReadOnlyCollection<Student>)`; these refuse only *active* Students, so an Inactive Student in the collection is fine.
@@ -499,12 +500,21 @@ public class ReactivateStudentInteractor
 
 Check the `TeacherNotFoundException` / `CarNotFoundException` constructors in `Application\Common\Exceptions\` and match them (both take the typed ID elsewhere). DI needs no change: interactors are resolved by constructor.
 
-- [ ] **Step 7: Run the whole backend test suite**
+- [ ] **Step 7: Delete the Car test whose setup task 1 makes unreachable**
+
+In `CarTest.cs`, delete the whole `Unassign_Teacher__Teacher_Must_Be_Assigned_Before_Active_Students_Are_Checked` test (~line 378-393). Its setup is `flagged.Deactivate(); car.UnassignTeacher(teacher, [flagged]); flagged.Reactivate();`, which now throws `StudentCarMustBeAssignedToTeacherException`. Passing `(teacher, car)` would compile, but the test would still fail in its `//given`. See Decision 14 for why it's deleted instead of rewritten. Leave the other `Unassign_Teacher*` tests as they are.
+
+Then check that nothing else calls `Reactivate()`:
+
+Run: `git grep -n "\.Reactivate(" -- src tests`
+Expected: only `Student.cs`, `ReactivateStudentInteractor.cs`, `ImportRosterInteractor.cs`, `StudentTest.cs` and `ReactivateStudentInteractorTest.cs`, all already using `(teacher, car)`.
+
+- [ ] **Step 8: Run the whole backend test suite**
 
 Run: `dotnet test`
-Expected: all green, including `StudentTest`, `ReactivateStudentInteractorTest`, and the existing `ImportRosterInteractorTest` that reactivates an Inactive Student (Review Focus 3). If any other caller of `Reactivate()` fails to compile (`git grep -n "\.Reactivate(" -- src tests`), pass it the Student's resolved Teacher and Car.
+Expected: all green, including `StudentTest`, `ReactivateStudentInteractorTest`, `CarTest`, and the existing `ImportRosterInteractorTest` that reactivates an Inactive Student (Review Focus 3).
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 git add src tests
