@@ -19,19 +19,19 @@ public class StudentRepository : IStudentRepository
         return await dbContext.Students.ToListAsync();
     }
 
-    public async Task<IReadOnlyCollection<Student>> FindByTeacherAsync(TeacherId teacherId)
+    public async Task<IReadOnlyCollection<Student>> FindActiveByTeacherAsync(TeacherId teacherId)
     {
         return await dbContext
                          .Students
-                         .Where(x => x.TeacherId == teacherId)
+                         .Where(x => x.IsActive && x.TeacherId == teacherId)
                          .ToListAsync();
     }
 
-    public async Task<IReadOnlyCollection<Student>> FindByCarAsync(CarId carId)
+    public async Task<IReadOnlyCollection<Student>> FindActiveByCarAsync(CarId carId)
     {
         return await dbContext
                          .Students
-                         .Where(x => x.CarId == carId)
+                         .Where(x => x.IsActive && x.CarId == carId)
                          .ToListAsync();
     }
 

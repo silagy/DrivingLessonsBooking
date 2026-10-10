@@ -25,7 +25,7 @@ public class DeleteCarInteractor
         var car = await repository.GetAsync(carId)
                   ?? throw new CarNotFoundException(carId);
 
-        var students = await studentRepository.FindByCarAsync(carId);
+        var students = await studentRepository.FindActiveByCarAsync(carId);
 
         car.Delete(students);
 

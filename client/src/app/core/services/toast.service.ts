@@ -7,6 +7,8 @@ import { ProblemDetails } from '../../shared/models/problem-details';
 import { isolateDirection } from '../../shared/text/isolate-direction';
 
 const UNEXPECTED_ERROR_KEY = 'general.unexpectedError';
+const MORE_PARAM = 'more';
+const MORE_KEY_SUFFIX = 'More';
 
 const GENERIC_ERROR_KEYS: Partial<Record<number, string>> = {
     [HttpStatusCode.Forbidden]: 'errors.forbidden',
@@ -61,9 +63,11 @@ export class ToastService {
 
         const problem = error.error as ProblemDetails | null;
         const ruleKey = problem?.code ? `errors.${problem.code}` : undefined;
+        const moreKey = ruleKey && problem?.params?.[MORE_PARAM] ? `${ruleKey}${MORE_KEY_SUFFIX}` : undefined;
+        const messageKey = [moreKey, ruleKey].find((key) => key !== undefined && this.hasTranslation(key));
 
-        if (ruleKey && this.hasTranslation(ruleKey)) {
-            return this.transloco.translate(ruleKey, isolated(problem?.params, isolatedParams));
+        if (messageKey) {
+            return this.transloco.translate(messageKey, isolated(problem?.params, isolatedParams));
         }
 
         return this.transloco.translate(GENERIC_ERROR_KEYS[error.status] ?? UNEXPECTED_ERROR_KEY);

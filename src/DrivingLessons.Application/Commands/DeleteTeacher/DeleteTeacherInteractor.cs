@@ -40,7 +40,7 @@ public class DeleteTeacherInteractor
             throw new TeacherMustNotHaveActiveUserException(teacherId);
         }
 
-        var students = await studentRepository.FindByTeacherAsync(teacherId);
+        var students = await studentRepository.FindActiveByTeacherAsync(teacherId);
 
         teacher.Delete(students);
 

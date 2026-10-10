@@ -7,9 +7,9 @@ public interface IStudentRepository
 {
     Task<IReadOnlyCollection<Student>> FindAllAsync();
 
-    Task<IReadOnlyCollection<Student>> FindByTeacherAsync(TeacherId teacherId);
+    Task<IReadOnlyCollection<Student>> FindActiveByTeacherAsync(TeacherId teacherId);
 
-    Task<IReadOnlyCollection<Student>> FindByCarAsync(CarId carId);
+    Task<IReadOnlyCollection<Student>> FindActiveByCarAsync(CarId carId);
 
     Task<Student?> GetAsync(StudentId id);
 

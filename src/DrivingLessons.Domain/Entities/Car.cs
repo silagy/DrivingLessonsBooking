@@ -104,10 +104,10 @@ public class Car : AggregateRoot<CarId>
 
     private void MustNotHaveActiveStudentsOf(Teacher teacher, IReadOnlyCollection<Student> students)
     {
-        var studentsOfTeacher = students.Where(x => x.TeacherId == teacher.Id);
-        var activeStudentNames = ActiveStudentNamesOn(studentsOfTeacher);
+        var studentsOfTeacherOnCar = students.Where(x => x.TeacherId == teacher.Id && x.CarId == Id);
+        var activeStudentNames = Student.ActiveNamesOf(studentsOfTeacherOnCar);
 
-        if (activeStudentNames.Count > 0)
+        if (activeStudentNames.Any())
         {
             throw new TeacherAssignmentMustNotHaveActiveStudentsException(
                 Id,
@@ -119,20 +119,12 @@ public class Car : AggregateRoot<CarId>
 
     private void MustNotHaveActiveStudents(IReadOnlyCollection<Student> students)
     {
-        var activeStudentNames = ActiveStudentNamesOn(students);
+        var studentsOnCar = students.Where(x => x.CarId == Id);
+        var activeStudentNames = Student.ActiveNamesOf(studentsOnCar);
 
-        if (activeStudentNames.Count > 0)
+        if (activeStudentNames.Any())
         {
             throw new CarMustNotHaveActiveStudentsException(Id, activeStudentNames);
         }
-    }
-
-    private List<StudentName> ActiveStudentNamesOn(IEnumerable<Student> students)
-    {
-        return students
-               .Where(x => x.IsActive && x.CarId == Id)
-               .Select(x => x.Name)
-               .OrderBy(x => x.Value, StringComparer.Ordinal)
-               .ToList();
     }
 }

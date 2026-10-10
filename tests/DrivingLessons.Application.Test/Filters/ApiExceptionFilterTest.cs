@@ -483,7 +483,32 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
-    public void Active_Students_Beyond_Three_Are_Counted_Not_Named()
+    public void Exactly_Three_Active_Students_Are_All_Named_With_No_More()
+    {
+        //given
+        var names = new[]
+        {
+            StudentName.Of("Avi Cohen"),
+            StudentName.Of("Dana Sasson"),
+            StudentName.Of("Lia Hadad")
+        };
+        var context = ContextFor(new TeacherMustNotHaveActiveStudentsException(TeacherId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string>
+        {
+            ["count"] = "3",
+            ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad"
+        });
+    }
+
+    [TestMethod]
+    public void Active_Students_Beyond_Three_Are_Counted_As_More()
     {
         //given
         var names = new[]
@@ -505,7 +530,8 @@ public class ApiExceptionFilterTest
         parameters.ShouldBe(new Dictionary<string, string>
         {
             ["count"] = "5",
-            ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad"
+            ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad",
+            ["more"] = "2"
         });
     }
 

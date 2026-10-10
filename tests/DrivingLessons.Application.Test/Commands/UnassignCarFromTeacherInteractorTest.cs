@@ -41,7 +41,7 @@ public class UnassignCarFromTeacherInteractorTest
         A.CallTo(() => carRepository.GetAsync(car.Id)).Returns(car);
         A.CallTo(() => teacherRepository.GetAsync(A<TeacherId>._)).Returns((Teacher?)null);
         A.CallTo(() => teacherRepository.GetAsync(teacher.Id)).Returns(teacher);
-        A.CallTo(() => studentRepository.FindByCarAsync(A<CarId>._)).Returns(Array.Empty<Student>());
+        A.CallTo(() => studentRepository.FindActiveByCarAsync(A<CarId>._)).Returns(Array.Empty<Student>());
     }
 
     [TestMethod]
@@ -59,7 +59,7 @@ public class UnassignCarFromTeacherInteractorTest
     public async Task Teacher_With_An_Active_Student_On_The_Car_Is_Not_Unassigned()
     {
         //given
-        A.CallTo(() => studentRepository.FindByCarAsync(car.Id)).Returns([StudentOn(isActive: true)]);
+        A.CallTo(() => studentRepository.FindActiveByCarAsync(car.Id)).Returns([StudentOn(isActive: true)]);
 
         //when
         var act = () => interactor.ExecuteAsync(car.Id.Value, teacher.Id.Value);
@@ -74,7 +74,7 @@ public class UnassignCarFromTeacherInteractorTest
     public async Task Unassigns_A_Teacher_With_Only_Inactive_Students()
     {
         //given
-        A.CallTo(() => studentRepository.FindByCarAsync(car.Id)).Returns([StudentOn(isActive: false)]);
+        A.CallTo(() => studentRepository.FindActiveByCarAsync(car.Id)).Returns([StudentOn(isActive: false)]);
 
         //when
         await interactor.ExecuteAsync(car.Id.Value, teacher.Id.Value);

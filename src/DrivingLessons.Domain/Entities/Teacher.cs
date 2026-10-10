@@ -62,13 +62,10 @@ public class Teacher : AggregateRoot<TeacherId>
 
     private void MustNotHaveActiveStudents(IReadOnlyCollection<Student> students)
     {
-        var activeStudentNames = students
-                                 .Where(x => x.IsActive && x.TeacherId == Id)
-                                 .Select(x => x.Name)
-                                 .OrderBy(x => x.Value, StringComparer.Ordinal)
-                                 .ToList();
+        var studentsOfTeacher = students.Where(x => x.TeacherId == Id);
+        var activeStudentNames = Student.ActiveNamesOf(studentsOfTeacher);
 
-        if (activeStudentNames.Count > 0)
+        if (activeStudentNames.Any())
         {
             throw new TeacherMustNotHaveActiveStudentsException(Id, activeStudentNames);
         }

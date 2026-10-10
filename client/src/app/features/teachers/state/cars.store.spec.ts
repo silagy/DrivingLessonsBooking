@@ -121,4 +121,63 @@ describe('CarsStore', () => {
         expect(assignTeacher).not.toHaveBeenCalled();
         expect(apiError).toHaveBeenCalledWith(refusal, ['teacher', 'names']);
     });
+
+    it('says the earlier changes were saved when a later unassign in the same Apply is refused', async () => {
+        //given
+        const apiError = vi.fn();
+        const success = vi.fn();
+        const refusal = conflict('teacherAssignmentMustNotHaveActiveStudents', {
+            count: '1',
+            names: 'Noa Mizrahi',
+            teacher: 'Ronit Avraham',
+        });
+        const unassignTeacher = vi.fn((_carId: string, teacherId: string) =>
+            teacherId === 'teacher-2' ? throwError(() => refusal) : of(undefined),
+        );
+        TestBed.configureTestingModule({
+            providers: [
+                provideZonelessChangeDetection(),
+                { provide: CarsApiService, useValue: { findCars: () => of([]), unassignTeacher } },
+                { provide: ToastService, useValue: { success, apiError } },
+            ],
+        });
+        const store = TestBed.inject(CarsStore);
+
+        //when
+        await store.applyAssignments('car-1', [], ['teacher-1', 'teacher-2']);
+
+        //then
+        expect(apiError).toHaveBeenCalledWith(refusal, ['teacher', 'names']);
+        expect(success).toHaveBeenCalledWith('teachers.assignmentsPartlyUpdated');
+        expect(success).not.toHaveBeenCalledWith('teachers.assignmentsUpdated');
+    });
+
+    it('says nothing was saved when the first change in an Apply is refused', async () => {
+        //given
+        const apiError = vi.fn();
+        const success = vi.fn();
+        const refusal = conflict('teacherAssignmentMustNotHaveActiveStudents', {
+            count: '1',
+            names: 'Noa Mizrahi',
+            teacher: 'Ronit Avraham',
+        });
+        TestBed.configureTestingModule({
+            providers: [
+                provideZonelessChangeDetection(),
+                {
+                    provide: CarsApiService,
+                    useValue: { findCars: () => of([]), unassignTeacher: () => throwError(() => refusal) },
+                },
+                { provide: ToastService, useValue: { success, apiError } },
+            ],
+        });
+        const store = TestBed.inject(CarsStore);
+
+        //when
+        await store.applyAssignments('car-1', [], ['teacher-1', 'teacher-2']);
+
+        //then
+        expect(apiError).toHaveBeenCalledWith(refusal, ['teacher', 'names']);
+        expect(success).not.toHaveBeenCalled();
+    });
 });

@@ -36,7 +36,7 @@ public class UnassignCarFromTeacherInteractor
         var teacher = await teacherRepository.GetAsync(resolvedTeacherId)
                       ?? throw new TeacherNotFoundException(resolvedTeacherId);
 
-        var students = await studentRepository.FindByCarAsync(carId);
+        var students = await studentRepository.FindActiveByCarAsync(carId);
 
         car.UnassignTeacher(teacher, students);
 

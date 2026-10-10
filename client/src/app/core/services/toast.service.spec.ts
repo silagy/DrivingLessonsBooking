@@ -24,6 +24,8 @@ const EN = {
         rosterFileMustContainRequiredColumns: 'The file is missing required columns: {{columns}}.',
         teacherAssignmentMustNotHaveActiveStudents:
             'Active Students of {{teacher}} learn on this Car ({{count}}): {{names}}.',
+        teacherAssignmentMustNotHaveActiveStudentsMore:
+            'Active Students of {{teacher}} learn on this Car ({{count}}): {{names}} and {{more}} more.',
     },
     general: {
         unexpectedError: 'Something went wrong. Please try again.',
@@ -294,6 +296,42 @@ describe('ToastService', () => {
 
             //then
             expect(shownSummary(add)).toBe('Active Students of Ronit learn on this Car (1): Noa.');
+        });
+    });
+
+    describe('apiError with unnamed extras', () => {
+        it('says how many more there are beyond the named ones', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'teacherAssignmentMustNotHaveActiveStudents',
+                params: { teacher: 'Ronit', count: '5', names: 'Avi, Dana, Lia', more: '2' },
+            });
+
+            //when
+            toast.apiError(error);
+
+            //then
+            expect(shownSummary(add)).toBe('Active Students of Ronit learn on this Car (5): Avi, Dana, Lia and 2 more.');
+        });
+
+        it('falls back to the plain rule message when no "more" variant exists', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'rosterFileMustContainRequiredColumns',
+                params: { columns: 'name', more: '1' },
+            });
+
+            //when
+            toast.apiError(error);
+
+            //then
+            expect(shownSummary(add)).toBe('The file is missing required columns: name.');
         });
     });
 });

@@ -33,7 +33,7 @@ public class DeleteCarInteractorTest
 
         A.CallTo(() => repository.GetAsync(A<CarId>._)).Returns((Car?)null);
         A.CallTo(() => repository.GetAsync(car.Id)).Returns(car);
-        A.CallTo(() => studentRepository.FindByCarAsync(A<CarId>._)).Returns(Array.Empty<Student>());
+        A.CallTo(() => studentRepository.FindActiveByCarAsync(A<CarId>._)).Returns(Array.Empty<Student>());
     }
 
     [TestMethod]
@@ -51,7 +51,7 @@ public class DeleteCarInteractorTest
     public async Task Car_With_An_Active_Student_Is_Not_Deleted()
     {
         //given
-        A.CallTo(() => studentRepository.FindByCarAsync(car.Id)).Returns([StudentOn(isActive: true)]);
+        A.CallTo(() => studentRepository.FindActiveByCarAsync(car.Id)).Returns([StudentOn(isActive: true)]);
 
         //when
         var act = () => interactor.ExecuteAsync(car.Id.Value);
@@ -66,7 +66,7 @@ public class DeleteCarInteractorTest
     public async Task Deletes_A_Car_With_Only_Inactive_Students()
     {
         //given
-        A.CallTo(() => studentRepository.FindByCarAsync(car.Id)).Returns([StudentOn(isActive: false)]);
+        A.CallTo(() => studentRepository.FindActiveByCarAsync(car.Id)).Returns([StudentOn(isActive: false)]);
 
         //when
         await interactor.ExecuteAsync(car.Id.Value);

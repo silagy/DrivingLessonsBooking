@@ -74,19 +74,26 @@ export class CarsStore {
         }
 
         this.mutating.set(true);
+        let appliedCount = 0;
 
         try {
             for (const teacherId of toUnassign) {
                 await firstValueFrom(this.api.unassignTeacher(carId, teacherId));
+                appliedCount++;
             }
 
             for (const teacherId of toAssign) {
                 await firstValueFrom(this.api.assignTeacher(carId, teacherId));
+                appliedCount++;
             }
 
             this.toast.success('teachers.assignmentsUpdated');
         } catch (error) {
             this.toast.apiError(error, ASSIGNMENT_PARAMS);
+
+            if (appliedCount > 0) {
+                this.toast.success('teachers.assignmentsPartlyUpdated');
+            }
         } finally {
             this.carsResource.reload();
             this.mutating.set(false);

@@ -34,7 +34,7 @@ public class DeleteTeacherInteractorTest
         A.CallTo(() => repository.GetAsync(A<TeacherId>._)).Returns((Teacher?)null);
         A.CallTo(() => repository.GetAsync(teacher.Id)).Returns(teacher);
         A.CallTo(() => userQueries.ActiveExistsLinkedToTeacherAsync(A<TeacherId>._)).Returns(false);
-        A.CallTo(() => studentRepository.FindByTeacherAsync(A<TeacherId>._)).Returns(Array.Empty<Student>());
+        A.CallTo(() => studentRepository.FindActiveByTeacherAsync(A<TeacherId>._)).Returns(Array.Empty<Student>());
     }
 
     [TestMethod]
@@ -81,21 +81,21 @@ public class DeleteTeacherInteractorTest
     {
         //given
         A.CallTo(() => userQueries.ActiveExistsLinkedToTeacherAsync(teacher.Id)).Returns(true);
-        A.CallTo(() => studentRepository.FindByTeacherAsync(teacher.Id)).Returns([StudentOf(teacher, isActive: true)]);
+        A.CallTo(() => studentRepository.FindActiveByTeacherAsync(teacher.Id)).Returns([StudentOf(teacher, isActive: true)]);
 
         //when
         var act = () => interactor.ExecuteAsync(teacher.Id.Value);
 
         //then
         await Should.ThrowAsync<TeacherMustNotHaveActiveUserException>(act);
-        A.CallTo(() => studentRepository.FindByTeacherAsync(A<TeacherId>._)).MustNotHaveHappened();
+        A.CallTo(() => studentRepository.FindActiveByTeacherAsync(A<TeacherId>._)).MustNotHaveHappened();
     }
 
     [TestMethod]
     public async Task Teacher_With_An_Active_Student_Is_Not_Deleted()
     {
         //given
-        A.CallTo(() => studentRepository.FindByTeacherAsync(teacher.Id)).Returns([StudentOf(teacher, isActive: true)]);
+        A.CallTo(() => studentRepository.FindActiveByTeacherAsync(teacher.Id)).Returns([StudentOf(teacher, isActive: true)]);
 
         //when
         var act = () => interactor.ExecuteAsync(teacher.Id.Value);
@@ -110,7 +110,7 @@ public class DeleteTeacherInteractorTest
     public async Task Deletes_A_Teacher_With_Only_Inactive_Students()
     {
         //given
-        A.CallTo(() => studentRepository.FindByTeacherAsync(teacher.Id)).Returns([StudentOf(teacher, isActive: false)]);
+        A.CallTo(() => studentRepository.FindActiveByTeacherAsync(teacher.Id)).Returns([StudentOf(teacher, isActive: false)]);
 
         //when
         await interactor.ExecuteAsync(teacher.Id.Value);

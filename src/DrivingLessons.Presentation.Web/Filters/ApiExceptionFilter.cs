@@ -14,6 +14,7 @@ public sealed class ApiExceptionFilter : IExceptionFilter
     private const string CodeExtension = "code";
     private const string ParamsExtension = "params";
     private const string ColumnSeparator = ", ";
+    private const string NameSeparator = ", ";
     private const int NamedStudentsLimit = 3;
 
     public void OnException(ExceptionContext context)
@@ -96,13 +97,21 @@ public sealed class ApiExceptionFilter : IExceptionFilter
         var namedStudents = activeStudentNames
                             .Take(NamedStudentsLimit)
                             .Select(x => x.Value);
-        var names = string.Join(ColumnSeparator, namedStudents);
-
-        return new Dictionary<string, string>
+        var names = string.Join(NameSeparator, namedStudents);
+        var parameters = new Dictionary<string, string>
         {
             ["count"] = activeStudentNames.Count.ToString(CultureInfo.InvariantCulture),
             ["names"] = names
         };
+
+        var unnamedCount = activeStudentNames.Count - NamedStudentsLimit;
+
+        if (unnamedCount > 0)
+        {
+            parameters["more"] = unnamedCount.ToString(CultureInfo.InvariantCulture);
+        }
+
+        return parameters;
     }
 
     private static string CodeOf(Exception exception)
