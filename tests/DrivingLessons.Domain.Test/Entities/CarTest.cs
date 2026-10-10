@@ -178,7 +178,7 @@ public class CarTest
         car.AssignTeacher(survivor);
 
         //when
-        car.UnassignTeacher(removed);
+        car.UnassignTeacher(removed, []);
 
         //then
         car.TeacherAssignments.ShouldNotContain(x => x.TeacherId == removed.Id);
@@ -192,7 +192,7 @@ public class CarTest
         var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
 
         //when
-        car.UnassignTeacher(teacher);
+        car.UnassignTeacher(teacher, []);
 
         //then
         car
@@ -210,7 +210,7 @@ public class CarTest
         var teacher = TeacherFakeBuilder.Build();
 
         //when
-        var act = () => car.UnassignTeacher(teacher);
+        var act = () => car.UnassignTeacher(teacher, []);
 
         //then
         Should.Throw<TeacherNotAssignedToCarException>(act);
@@ -221,10 +221,10 @@ public class CarTest
     {
         //given
         var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
-        car.UnassignTeacher(teacher);
+        car.UnassignTeacher(teacher, []);
 
         //when
-        var act = () => car.UnassignTeacher(teacher);
+        var act = () => car.UnassignTeacher(teacher, []);
 
         //then
         Should.Throw<TeacherNotAssignedToCarException>(act);
@@ -272,7 +272,7 @@ public class CarTest
         if (wasAssignedBefore)
         {
             car.AssignTeacher(teacher);
-            car.UnassignTeacher(teacher);
+            car.UnassignTeacher(teacher, []);
         }
 
         //when
@@ -289,7 +289,7 @@ public class CarTest
         var car = CarFakeBuilder.Build();
 
         //when
-        car.Delete();
+        car.Delete([]);
 
         //then
         car.IsDeleted.ShouldBeTrue();
@@ -302,7 +302,7 @@ public class CarTest
         var car = CarFakeBuilder.Build();
 
         //when
-        car.Delete();
+        car.Delete([]);
 
         //then
         car
@@ -317,12 +317,138 @@ public class CarTest
     {
         //given
         var car = CarFakeBuilder.Build();
-        car.Delete();
+        car.Delete([]);
 
         //when
-        var act = () => car.Delete();
+        var act = () => car.Delete([]);
 
         //then
         Should.Throw<CarAlreadyDeletedException>(act);
+    }
+
+    [TestMethod]
+    public void Unassign_Teacher__Must_Not_Have_Active_Students_Of_The_Teacher()
+    {
+        //given
+        var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
+
+        //when
+        var act = () => car.UnassignTeacher(teacher, [student]);
+
+        //then
+        var refusal = Should.Throw<TeacherAssignmentMustNotHaveActiveStudentsException>(act);
+        refusal.TeacherName.ShouldBe(teacher.Name);
+        refusal.ActiveStudentNames.ShouldBe([student.Name]);
+        car.IsAssignedTo(teacher).ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Unassign_Teacher_With_Only_Inactive_Students()
+    {
+        //given
+        var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).BuildInactive();
+
+        //when
+        car.UnassignTeacher(teacher, [student]);
+
+        //then
+        car.IsAssignedTo(teacher).ShouldBeFalse();
+    }
+
+    [TestMethod]
+    public void Unassign_Teacher_With_Active_Students_Of_Another_Teacher()
+    {
+        //given
+        var (car, removed) = CarFakeBuilder.Build().AssignFakeTeacher();
+        var other = TeacherFakeBuilder.Build();
+        car.AssignTeacher(other);
+        var studentOfOther = new StudentFakeBuilder().WithTeacher(other).WithCar(car).Build();
+
+        //when
+        car.UnassignTeacher(removed, [studentOfOther]);
+
+        //then
+        car.IsAssignedTo(removed).ShouldBeFalse();
+        car.IsAssignedTo(other).ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Unassign_Teacher__Teacher_Must_Be_Assigned_Before_Active_Students_Are_Checked()
+    {
+        //given
+        var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
+        var flagged = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
+        flagged.Deactivate();
+        car.UnassignTeacher(teacher, [flagged]);
+        flagged.Reactivate();
+
+        //when
+        var act = () => car.UnassignTeacher(teacher, [flagged]);
+
+        //then
+        Should.Throw<TeacherNotAssignedToCarException>(act);
+    }
+
+    [TestMethod]
+    public void Delete__Must_Not_Have_Active_Students()
+    {
+        //given
+        var car = CarFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithCar(car).Build();
+
+        //when
+        var act = () => car.Delete([student]);
+
+        //then
+        Should.Throw<CarMustNotHaveActiveStudentsException>(act);
+        car.IsDeleted.ShouldBeFalse();
+    }
+
+    [TestMethod]
+    public void Delete_With_Only_Inactive_Students()
+    {
+        //given
+        var car = CarFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithCar(car).BuildInactive();
+
+        //when
+        car.Delete([student]);
+
+        //then
+        car.IsDeleted.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Delete_Ignores_Students_On_Other_Cars()
+    {
+        //given
+        var car = CarFakeBuilder.Build();
+        var studentOnAnotherCar = new StudentFakeBuilder().Build();
+
+        //when
+        car.Delete([studentOnAnotherCar]);
+
+        //then
+        car.IsDeleted.ShouldBeTrue();
+    }
+
+    [TestMethod]
+    public void Delete__Refusal_Names_The_Active_Students_In_Order()
+    {
+        //given
+        var car = CarFakeBuilder.Build();
+        var first = new StudentFakeBuilder().WithCar(car).Build();
+        var second = new StudentFakeBuilder().WithCar(car).Build();
+        var inactive = new StudentFakeBuilder().WithCar(car).BuildInactive();
+        var expected = new[] { first.Name, second.Name }.OrderBy(x => x.Value, StringComparer.Ordinal).ToList();
+
+        //when
+        var act = () => car.Delete([second, inactive, first]);
+
+        //then
+        var refusal = Should.Throw<CarMustNotHaveActiveStudentsException>(act);
+        refusal.ActiveStudentNames.ShouldBe(expected);
     }
 }

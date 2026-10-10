@@ -11,12 +11,18 @@ public class DeleteTeacherInteractor
 {
     private readonly ITeacherRepository repository;
     private readonly IUserQueries userQueries;
+    private readonly IStudentRepository studentRepository;
     private readonly IUnitOfWork unitOfWork;
 
-    public DeleteTeacherInteractor(ITeacherRepository repository, IUserQueries userQueries, IUnitOfWork unitOfWork)
+    public DeleteTeacherInteractor(
+        ITeacherRepository repository,
+        IUserQueries userQueries,
+        IStudentRepository studentRepository,
+        IUnitOfWork unitOfWork)
     {
         this.repository = repository;
         this.userQueries = userQueries;
+        this.studentRepository = studentRepository;
         this.unitOfWork = unitOfWork;
     }
 
@@ -34,7 +40,9 @@ public class DeleteTeacherInteractor
             throw new TeacherMustNotHaveActiveUserException(teacherId);
         }
 
-        teacher.Delete();
+        var students = await studentRepository.FindByTeacherAsync(teacherId);
+
+        teacher.Delete(students);
 
         await unitOfWork.CommitAsync();
     }

@@ -19,6 +19,22 @@ public class StudentRepository : IStudentRepository
         return await dbContext.Students.ToListAsync();
     }
 
+    public async Task<IReadOnlyCollection<Student>> FindByTeacherAsync(TeacherId teacherId)
+    {
+        return await dbContext
+                         .Students
+                         .Where(x => x.TeacherId == teacherId)
+                         .ToListAsync();
+    }
+
+    public async Task<IReadOnlyCollection<Student>> FindByCarAsync(CarId carId)
+    {
+        return await dbContext
+                         .Students
+                         .Where(x => x.CarId == carId)
+                         .ToListAsync();
+    }
+
     public async Task<Student?> GetAsync(StudentId id)
     {
         return await dbContext

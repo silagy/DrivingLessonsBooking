@@ -59,10 +59,12 @@ public class Car : AggregateRoot<CarId>
         AddEvent(new CarAssignedToTeacher(Id, teacher.Id));
     }
 
-    public void UnassignTeacher(Teacher teacher)
+    public void UnassignTeacher(Teacher teacher, IReadOnlyCollection<Student> students)
     {
         var assignment = teacherAssignments.FirstOrDefault(x => x.TeacherId == teacher.Id)
                          ?? throw new TeacherNotAssignedToCarException(Id, teacher.Id);
+
+        MustNotHaveActiveStudentsOf(teacher, students);
 
         teacherAssignments.Remove(assignment);
 
@@ -74,9 +76,10 @@ public class Car : AggregateRoot<CarId>
         return teacherAssignments.Any(x => x.TeacherId == teacher.Id);
     }
 
-    public void Delete()
+    public void Delete(IReadOnlyCollection<Student> students)
     {
         MustNotBeDeleted();
+        MustNotHaveActiveStudents(students);
 
         IsDeleted = true;
 
@@ -97,5 +100,39 @@ public class Car : AggregateRoot<CarId>
         {
             throw new CarAlreadyDeletedException(Id);
         }
+    }
+
+    private void MustNotHaveActiveStudentsOf(Teacher teacher, IReadOnlyCollection<Student> students)
+    {
+        var studentsOfTeacher = students.Where(x => x.TeacherId == teacher.Id);
+        var activeStudentNames = ActiveStudentNamesOn(studentsOfTeacher);
+
+        if (activeStudentNames.Count > 0)
+        {
+            throw new TeacherAssignmentMustNotHaveActiveStudentsException(
+                Id,
+                teacher.Id,
+                teacher.Name,
+                activeStudentNames);
+        }
+    }
+
+    private void MustNotHaveActiveStudents(IReadOnlyCollection<Student> students)
+    {
+        var activeStudentNames = ActiveStudentNamesOn(students);
+
+        if (activeStudentNames.Count > 0)
+        {
+            throw new CarMustNotHaveActiveStudentsException(Id, activeStudentNames);
+        }
+    }
+
+    private List<StudentName> ActiveStudentNamesOn(IEnumerable<Student> students)
+    {
+        return students
+               .Where(x => x.IsActive && x.CarId == Id)
+               .Select(x => x.Name)
+               .OrderBy(x => x.Value, StringComparer.Ordinal)
+               .ToList();
     }
 }
