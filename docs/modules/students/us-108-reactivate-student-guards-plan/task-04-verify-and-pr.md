@@ -46,4 +46,4 @@ git push -u origin 108-reactivate-student-guards
 gh pr create --base 82-users-and-roles --title "Refuse reactivating a Student whose Teacher or Car was removed (#108)" --body-file <scratchpad>/pr-108.md
 ```
 
-Body: Closes #108. Summarise the three refusals and their codes, the guard order (Decision 3), the fix path (Decision 2), the reworded shared message (Decision 8), and the deleted-Teacher/Car markers on the Students screen (Decisions 11-13; ask the spec owner to confirm the marker, which has no design frame). List the smoke table results and the browser checks. End with the attribution line from the session's system reminder. Then bind the PR with the `ccd_pr` tools.
+Body: Closes #108. Summarise the three refusals and their codes, the guard order (Decision 3), the fix path (Decision 2), the reworded shared message (Decision 8), and the deleted-Teacher/Car markers on the Students screen (Decisions 11-13). List the smoke table results and the browser checks. End with the attribution line from the session's system reminder. Then bind the PR with the `ccd_pr` tools.
