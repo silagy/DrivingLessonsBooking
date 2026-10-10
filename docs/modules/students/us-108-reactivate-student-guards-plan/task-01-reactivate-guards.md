@@ -12,7 +12,7 @@ Part of [#108 plan](README.md). Read the README's Decisions and Global Constrain
 - Modify: `src\DrivingLessons.Application\Commands\ImportRoster\ImportRosterInteractor.cs` (~line 190)
 - Test: `tests\DrivingLessons.Domain.Test\Entities\StudentTest.cs`
 - Test: `tests\DrivingLessons.Application.Test\Commands\ReactivateStudentInteractorTest.cs`
-- Test: `tests\DrivingLessons.Domain.Test\Entities\CarTest.cs` (delete one test, Decision 14)
+- Test: `tests\DrivingLessons.Domain.Test\Entities\CarTest.cs` (rewrite one test's setup, Decision 14)
 
 **Interfaces:**
 - Consumes (#91): `Teacher.Delete(IReadOnlyCollection<Student>)`, `Car.Delete(IReadOnlyCollection<Student>)`, `Car.UnassignTeacher(Teacher, IReadOnlyCollection<Student>)`; these refuse only *active* Students, so an Inactive Student in the collection is fine.
@@ -500,9 +500,18 @@ public class ReactivateStudentInteractor
 
 Check the `TeacherNotFoundException` / `CarNotFoundException` constructors in `Application\Common\Exceptions\` and match them (both take the typed ID elsewhere). DI needs no change: interactors are resolved by constructor.
 
-- [ ] **Step 7: Delete the Car test whose setup task 1 makes unreachable**
+- [ ] **Step 7: Rewrite the Car test whose setup reactivates a flagged Student**
 
-In `CarTest.cs`, delete the whole `Unassign_Teacher__Teacher_Must_Be_Assigned_Before_Active_Students_Are_Checked` test (~line 378-393). Its setup is `flagged.Deactivate(); car.UnassignTeacher(teacher, [flagged]); flagged.Reactivate();`, which now throws `StudentCarMustBeAssignedToTeacherException`. Passing `(teacher, car)` would compile, but the test would still fail in its `//given`. See Decision 14 for why it's deleted instead of rewritten. Leave the other `Unassign_Teacher*` tests as they are.
+In `CarTest.cs`, `Unassign_Teacher__Teacher_Must_Be_Assigned_Before_Active_Students_Are_Checked` (~line 378-393) sets up with `flagged.Deactivate(); car.UnassignTeacher(teacher, [flagged]); flagged.Reactivate();`, which now throws `StudentCarMustBeAssignedToTeacherException` in its `//given`. Recreate the pre-rule state the way #95's `StudentTest`s do (Decision 14). Replace its `//given` with:
+
+```csharp
+        //given
+        var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
+        var flagged = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
+        car.UnassignTeacher(teacher, []);
+```
+
+Leave `//when` and `//then` unchanged.
 
 Then check that nothing else calls `Reactivate()`:
 
