@@ -560,7 +560,7 @@ public class ImportRosterInteractorTest
             null,
             null,
             null);
-        formerCar.UnassignTeacher(teacher);
+        formerCar.UnassignTeacher(teacher, []);
 
         return violator;
     }
