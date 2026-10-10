@@ -37,6 +37,8 @@ const OMER: Student = {
     carName: 'i20 Silver',
     carTransmission: Transmission.manual,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 

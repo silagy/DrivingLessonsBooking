@@ -35,6 +35,8 @@ const DANA: ItemForFindStudentsResponse = {
     carName: 'i20 Silver',
     carTransmission: Transmission.manual,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: false,
 };
 
@@ -49,6 +51,8 @@ const NOA: ItemForFindStudentsResponse = {
     carName: 'Corolla White',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 
@@ -63,6 +67,8 @@ const TAMAR: ItemForFindStudentsResponse = {
     carName: 'Picanto Red',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 
@@ -77,6 +83,8 @@ const YONI: ItemForFindStudentsResponse = {
     carName: 'Picanto Red',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: false,
 };
 
@@ -91,6 +99,8 @@ const SHAKED: ItemForFindStudentsResponse = {
     carName: 'Picanto Red',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 

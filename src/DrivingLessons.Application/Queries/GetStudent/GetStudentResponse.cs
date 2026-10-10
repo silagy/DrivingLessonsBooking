@@ -14,6 +14,8 @@ public class GetStudentResponse
     public string CarName { get; init; } = string.Empty;
     public Transmission CarTransmission { get; init; }
     public bool IsCarOfTeacher { get; init; }
+    public bool IsTeacherDeleted { get; init; }
+    public bool IsCarDeleted { get; init; }
     public string? Address { get; init; }
     public DateOnly? StartDate { get; init; }
     public string? LicenseType { get; init; }

@@ -163,7 +163,12 @@
     "flag": {
       "car": "Not this Teacher's Car",
       "tip": "This Car isn't one of {{teacher}}'s Cars. It was probably set before the rule existed. Fix it with Change Car.",
-      "tipInactive": "This Car isn't one of {{teacher}}'s Cars. To fix it with Change Car, mark the Student as active first."
+      "tipInactive": "This Car isn't one of {{teacher}}'s Cars. Assign it to {{teacher}} on Cars & teachers, then mark the Student as active."
+    },
+    "deletedFlag": {
+      "teacher": "Teacher deleted",
+      "car": "Car deleted",
+      "tip": "To reactivate the Student, import them again in the Roster with a current Teacher and Car."
     },
     "footer": "{{count}} Students",
     "footerOne": "1 Student",

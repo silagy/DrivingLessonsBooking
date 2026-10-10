@@ -11,6 +11,8 @@ export interface GetStudentResponse {
     carName: string;
     carTransmission: Transmission;
     isCarOfTeacher: boolean;
+    isTeacherDeleted: boolean;
+    isCarDeleted: boolean;
     address: string | null;
     startDate: string | null;
     licenseType: string | null;

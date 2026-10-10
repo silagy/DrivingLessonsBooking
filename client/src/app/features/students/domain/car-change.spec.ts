@@ -19,6 +19,8 @@ const NOA: Student = {
     carName: 'Corolla White',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 
