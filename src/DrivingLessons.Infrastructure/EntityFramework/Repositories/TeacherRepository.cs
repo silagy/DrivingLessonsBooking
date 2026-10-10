@@ -19,6 +19,14 @@ public class TeacherRepository : ITeacherRepository
         return await dbContext.Teachers.FindAsync(id);
     }
 
+    public async Task<Teacher?> GetIncludingDeletedAsync(TeacherId id)
+    {
+        return await dbContext
+                         .Teachers
+                         .IgnoreQueryFilters()
+                         .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<IReadOnlyCollection<Teacher>> FindActiveAsync()
     {
         return await dbContext.Teachers.ToListAsync();

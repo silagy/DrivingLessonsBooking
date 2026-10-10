@@ -187,7 +187,7 @@ public class ImportRosterInteractor
 
             if (!student.IsActive)
             {
-                student.Reactivate();
+                student.Reactivate(teacher, car);
             }
 
             var updatedEntry = RosterImportEntry.Of(nationalId, RosterEntryOutcome.Updated);

@@ -380,9 +380,7 @@ public class CarTest
         //given
         var (car, teacher) = CarFakeBuilder.Build().AssignFakeTeacher();
         var flagged = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
-        flagged.Deactivate();
-        car.UnassignTeacher(teacher, [flagged]);
-        flagged.Reactivate();
+        car.UnassignTeacher(teacher, []);
 
         //when
         var act = () => car.UnassignTeacher(teacher, [flagged]);

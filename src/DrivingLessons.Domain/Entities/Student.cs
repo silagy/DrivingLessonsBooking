@@ -146,9 +146,12 @@ public class Student : AggregateRoot<StudentId>
         AddEvent(new StudentDeactivated(Id));
     }
 
-    public void Reactivate()
+    public void Reactivate(Teacher teacher, Car car)
     {
         MustBeInactive();
+        TeacherMustNotBeDeleted(teacher);
+        CarMustNotBeDeleted(car);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         IsActive = true;
 
@@ -177,6 +180,22 @@ public class Student : AggregateRoot<StudentId>
         if (IsActive)
         {
             throw new StudentAlreadyActiveException(Id);
+        }
+    }
+
+    private void TeacherMustNotBeDeleted(Teacher teacher)
+    {
+        if (teacher.IsDeleted)
+        {
+            throw new StudentTeacherMustNotBeDeletedException(Id, teacher.Id);
+        }
+    }
+
+    private void CarMustNotBeDeleted(Car car)
+    {
+        if (car.IsDeleted)
+        {
+            throw new StudentCarMustNotBeDeletedException(Id, car.Id);
         }
     }
 
