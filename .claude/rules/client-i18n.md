@@ -13,7 +13,7 @@ Localization rules per requirements §8.4 and decision 14: **Hebrew and English,
 2. **Hebrew is a first-class layout** — every screen must be correct in RTL, not just readable
 3. **Logical CSS properties only** — `margin-inline-start`, never `margin-left`; `padding-inline-end`, never `padding-right`; `inset-inline-start`, never `left` (for layout positioning)
 4. **`en.json` and `he.json` ship together** — a key added to one file in a PR is added to both in the same PR
-5. **All API instants are UTC; all displayed instants are Asia/Jerusalem** — conversion happens only in `jerusalem-time.ts` functions that pin `timeZone: 'Asia/Jerusalem'`
+5. **All API instants are UTC; all displayed instants are Asia/Jerusalem** — conversion happens only in `shared\dates\jerusalem-time.ts` functions that pin `timeZone: 'Asia/Jerusalem'`
 6. **Slot windows are wall-clock labels, never timezone-converted** — Morning is 07:00–12:00 in Asia/Jerusalem by definition (§8.3)
 
 ## Setup
@@ -174,8 +174,8 @@ this.dialogService.open(PublishWeekDialog, {
 
 ## Dates, Times, and Timezone (§8.3)
 
-- **Instants** (window open/close, submission timestamps) arrive as UTC ISO 8601 strings and are displayed in **Asia/Jerusalem** — pure functions in the feature's `domain\jerusalem-time.ts` do the conversion using `Intl.DateTimeFormat` with `timeZone: 'Asia/Jerusalem'`; stores and pages call them with `LanguageService.locale()`
-- Admin-entered wall times (publish, extend, reopen dialogs) go back to the API as UTC through `jerusalemWallTimeToUtcIso` in `publications\domain\jerusalem-time.ts`, never through the browser's zone
+- **Instants** (window open/close, submission timestamps) arrive as UTC ISO 8601 strings and are displayed in **Asia/Jerusalem** — pure functions in `shared\dates\jerusalem-time.ts` do the conversion using `Intl.DateTimeFormat` with `timeZone: 'Asia/Jerusalem'`; stores and pages call them with `LanguageService.locale()`
+- Admin-entered wall times (publish, extend, reopen dialogs) go back to the API as UTC through `jerusalemWallTimeToUtcIso` in `shared\dates\jerusalem-time.ts`, never through the browser's zone
 - **Wall-clock definitions** (slot windows: Morning 07:00–12:00) are rendered as fixed local-time labels — they are never `Date` objects and never pass through UTC conversion; doing so shifts them across DST transitions, which is a bug
 - No timezone selection UI exists in v1 — Asia/Jerusalem is the single configured zone
 - Date formatting respects the active language locale (`he-IL` / `en-IL`); day names come from translation keys, not from `Date` formatting, so the grid wording matches the rest of the UI
@@ -207,6 +207,6 @@ readonly dataAsOf = computed<string>(() => {
 - **Never** add a key to `en.json` without its `he.json` mirror in the same change
 - **Never** store a `TranslocoService.translate()` result in a long-lived field or signal
 - **Never** convert slot window times through `Date`/UTC — they are wall-clock labels
-- **Never** format an instant without going through a `jerusalem-time.ts` function — `new Date(x).toLocaleString()` uses the browser zone and is wrong by construction
+- **Never** format an instant without going through a `shared\dates\jerusalem-time.ts` function — `new Date(x).toLocaleString()` uses the browser zone and is wrong by construction
 - **Never** concatenate translated fragments to build a sentence — use one key with `{{params}}`
 - **Never** ship a screen that has not been checked in Hebrew/RTL

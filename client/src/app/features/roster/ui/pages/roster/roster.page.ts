@@ -9,7 +9,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { LanguageService } from '../../../../../core/language.service';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
-import { formatInstantInJerusalem } from '../../../domain/jerusalem-time';
+import { formatInstantInJerusalem } from '../../../../../shared/dates/jerusalem-time';
 import { TeacherFilterOption } from '../../../domain/teacher-filter-option.model';
 import { RosterStore } from '../../../state/roster.store';
 import { FailedRowsPanelComponent } from '../../components/failed-rows-panel/failed-rows-panel.component';

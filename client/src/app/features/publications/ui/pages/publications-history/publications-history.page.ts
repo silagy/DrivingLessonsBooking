@@ -7,7 +7,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { PublicationStateTagComponent } from '../../../../../shared/components/publication-state-tag/publication-state-tag.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
-import { formatInstantInJerusalem } from '../../../domain/jerusalem-time';
+import { formatInstantInJerusalem } from '../../../../../shared/dates/jerusalem-time';
 import { weekRangeLabel } from '../../../domain/week-options';
 import { parseIsoDate } from '../../../../../shared/dates/parse-iso-date';
 import { LanguageService } from '../../../../../core/language.service';

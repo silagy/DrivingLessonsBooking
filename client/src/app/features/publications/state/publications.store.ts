@@ -8,7 +8,7 @@ import { SlotWindow } from '../../../shared/models/slot-window.enum';
 import { windowTimesOf } from '../../../shared/dates/window-times';
 import { AuthService } from '../../../core/auth.service';
 import { LanguageService } from '../../../core/language.service';
-import { formatInstantInJerusalem } from '../domain/jerusalem-time';
+import { formatInstantInJerusalem } from '../../../shared/dates/jerusalem-time';
 import { ClipboardService } from '../../../core/services/clipboard.service';
 import { FileDownloadService } from '../../../core/services/file-download.service';
 import { ToastService } from '../../../core/services/toast.service';

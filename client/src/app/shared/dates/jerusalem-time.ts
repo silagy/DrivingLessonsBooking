@@ -1,3 +1,4 @@
+const JERUSALEM_TIME_ZONE = 'Asia/Jerusalem';
 const MILLIS_PER_MINUTE = 60_000;
 
 export function jerusalemWallTimeToUtcIso(wallTime: Date): string {
@@ -16,7 +17,7 @@ export function jerusalemWallTimeToUtcIso(wallTime: Date): string {
 
 export function formatInstantInJerusalem(utcIso: string, locale: string): string {
     const formatter = new Intl.DateTimeFormat(locale, {
-        timeZone: 'Asia/Jerusalem',
+        timeZone: JERUSALEM_TIME_ZONE,
         dateStyle: 'medium',
         timeStyle: 'short',
     });
@@ -26,7 +27,7 @@ export function formatInstantInJerusalem(utcIso: string, locale: string): string
 
 export function formatWeekdayInstantInJerusalem(utcIso: string, locale: string): string {
     const formatter = new Intl.DateTimeFormat(locale, {
-        timeZone: 'Asia/Jerusalem',
+        timeZone: JERUSALEM_TIME_ZONE,
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -38,9 +39,23 @@ export function formatWeekdayInstantInJerusalem(utcIso: string, locale: string):
     return formatter.format(new Date(utcIso));
 }
 
+export function formatWindowInstant(utcIso: string, locale: string): string {
+    const formatter = new Intl.DateTimeFormat(locale, {
+        timeZone: JERUSALEM_TIME_ZONE,
+        weekday: 'long',
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+    });
+
+    return formatter.format(new Date(utcIso));
+}
+
 function jerusalemOffsetMinutes(instant: Date): number {
     const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Asia/Jerusalem',
+        timeZone: JERUSALEM_TIME_ZONE,
         hourCycle: 'h23',
         year: 'numeric',
         month: '2-digit',
