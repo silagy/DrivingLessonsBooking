@@ -1,3 +1,4 @@
+import { carMarkerOf } from './car-marker';
 import { StudentFilters } from './student-filters.model';
 import { StudentRow } from './student-row.model';
 import { StudentStatusFilter } from './student-status-filter.enum';
@@ -10,7 +11,7 @@ export function visibleStudents(
 ): StudentRow[] {
     const rows = students
         .filter((student) => matchesFilters(student, filters))
-        .map((student) => ({ ...student, isNew: newStudentIds.has(student.id) }));
+        .map((student) => ({ ...student, isNew: newStudentIds.has(student.id), carMarker: carMarkerOf(student) }));
 
     return [
         ...rows.filter((row) => row.isNew),

@@ -202,6 +202,13 @@
     white-space: nowrap;
 }
 
+.students__teacher-line {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3125rem;
+}
+
 .students__car {
     display: inline-flex;
     align-items: center;

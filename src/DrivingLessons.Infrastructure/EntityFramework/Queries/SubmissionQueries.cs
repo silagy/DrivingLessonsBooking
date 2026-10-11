@@ -51,7 +51,7 @@ public class SubmissionQueries : ISubmissionQueries
                         on submission.WeekScheduleId equals weekSchedule.Id
                     join student in dbContext.Students
                         on submission.StudentId equals student.Id
-                    join car in dbContext.Cars.IgnoreQueryFilters()
+                    join car in dbContext.Cars.IgnoreQueryFilters([QueryFilters.CarNotDeleted])
                         on student.CarId equals car.Id
                     from request in submission.SlotRequests
                     from slot in weekSchedule.Slots

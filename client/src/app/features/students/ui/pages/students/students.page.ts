@@ -17,11 +17,14 @@ import { TagModule } from 'primeng/tag';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { isolateDirection } from '../../../../../shared/text/isolate-direction';
+import { CarMarker } from '../../../domain/car-marker.enum';
+import { RemovedPart } from '../../../domain/removed-part.enum';
 import { StudentRow } from '../../../domain/student-row.model';
 import { StudentStatusFilter } from '../../../domain/student-status-filter.enum';
 import { TeacherOption } from '../../../domain/teacher-option.model';
 import { StudentsStore } from '../../../state/students.store';
 import { CarFlagComponent } from '../../components/car-flag/car-flag.component';
+import { DeletedFlagComponent } from '../../components/deleted-flag/deleted-flag.component';
 import { TransmissionTagComponent } from '../../components/transmission-tag/transmission-tag.component';
 import { AddStudentDialog } from '../../dialogs/add-student/add-student.dialog';
 import { AddStudentDialogData } from '../../dialogs/add-student/add-student-dialog-data';
@@ -62,6 +65,7 @@ interface StatusOption {
         TagModule,
         TransmissionTagComponent,
         CarFlagComponent,
+        DeletedFlagComponent,
     ],
     templateUrl: './students.page.html',
     styleUrl: './students.page.scss',
@@ -77,6 +81,8 @@ export class StudentsPage {
     private readonly transloco = inject(TranslocoService);
 
     protected readonly allTeachers = ALL_TEACHERS;
+    protected readonly carMarkers = CarMarker;
+    protected readonly removedParts = RemovedPart;
     protected readonly importRosterLink = ['/', AppRoutes.students, AppRoutes.rosterImport];
     protected readonly rowActions = signal<MenuItem[]>([]);
 

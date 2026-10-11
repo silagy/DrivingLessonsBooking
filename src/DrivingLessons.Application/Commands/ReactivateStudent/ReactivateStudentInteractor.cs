@@ -8,11 +8,19 @@ namespace DrivingLessons.Application.Commands.ReactivateStudent;
 public class ReactivateStudentInteractor
 {
     private readonly IStudentRepository repository;
+    private readonly ITeacherRepository teacherRepository;
+    private readonly ICarRepository carRepository;
     private readonly IUnitOfWork unitOfWork;
 
-    public ReactivateStudentInteractor(IStudentRepository repository, IUnitOfWork unitOfWork)
+    public ReactivateStudentInteractor(
+        IStudentRepository repository,
+        ITeacherRepository teacherRepository,
+        ICarRepository carRepository,
+        IUnitOfWork unitOfWork)
     {
         this.repository = repository;
+        this.teacherRepository = teacherRepository;
+        this.carRepository = carRepository;
         this.unitOfWork = unitOfWork;
     }
 
@@ -23,7 +31,13 @@ public class ReactivateStudentInteractor
         var student = await repository.GetAsync(studentId)
                       ?? throw new StudentNotFoundException(studentId);
 
-        student.Reactivate();
+        var teacher = await teacherRepository.GetIncludingDeletedAsync(student.TeacherId)
+                      ?? throw new TeacherNotFoundException(student.TeacherId);
+
+        var car = await carRepository.GetIncludingDeletedAsync(student.CarId)
+                  ?? throw new CarNotFoundException(student.CarId);
+
+        student.Reactivate(teacher, car);
 
         await unitOfWork.CommitAsync();
     }

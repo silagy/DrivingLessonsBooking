@@ -23,6 +23,7 @@ import { TeacherOption } from '../domain/teacher-option.model';
 const SINGLE_STUDENT_COUNT = 1;
 const EXISTING_STUDENT_NAME_PARAM = 'name';
 const ISOLATED_REFUSAL_PARAMS = [EXISTING_STUDENT_NAME_PARAM];
+const CAR_NOT_OF_TEACHER_CODE = 'studentCarMustBeAssignedToTeacher';
 const STALE_TOGGLE_CODES: ReadonlySet<string> = new Set([
     'studentAlreadyDeactivated',
     'studentAlreadyActive',
@@ -209,7 +210,7 @@ export class StudentsStore {
             });
             this.studentsResource.reload();
         } catch (error) {
-            this.toast.apiError(error);
+            this.reportReactivateFailure(error, student);
 
             if (isStaleToggle(error)) {
                 this.studentsResource.reload();
@@ -255,6 +256,18 @@ export class StudentsStore {
         } finally {
             this.mutating.set(false);
         }
+    }
+
+    private reportReactivateFailure(error: unknown, student: Student): void {
+        if (problemCodeOf(error) !== CAR_NOT_OF_TEACHER_CODE) {
+            this.toast.apiError(error);
+            return;
+        }
+
+        this.toast.error('students.reactivateCarNotOfTeacher', {
+            car: isolateDirection(student.carName),
+            teacher: isolateDirection(student.teacherName),
+        });
     }
 
     private refusalOf(error: unknown): StudentRefusal {

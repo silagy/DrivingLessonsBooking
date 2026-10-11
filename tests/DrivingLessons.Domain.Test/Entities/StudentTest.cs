@@ -656,10 +656,10 @@ public class StudentTest
     public void Reactivate()
     {
         //given
-        var student = new StudentFakeBuilder().BuildInactive();
+        var (student, teacher, car) = InactiveStudent();
 
         //when
-        student.Reactivate();
+        student.Reactivate(teacher, car);
 
         //then
         student.IsActive.ShouldBeTrue();
@@ -669,10 +669,10 @@ public class StudentTest
     public void Reactivate__Add_Event()
     {
         //given
-        var student = new StudentFakeBuilder().BuildInactive();
+        var (student, teacher, car) = InactiveStudent();
 
         //when
-        student.Reactivate();
+        student.Reactivate(teacher, car);
 
         //then
         student
@@ -686,12 +686,84 @@ public class StudentTest
     public void Reactivate__Must_Not_Be_Active()
     {
         //given
-        var student = new StudentFakeBuilder().Build();
+        var teacher = TeacherFakeBuilder.Build();
+        var car = CarFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
 
         //when
-        var act = () => student.Reactivate();
+        var act = () => student.Reactivate(teacher, car);
 
         //then
         Should.Throw<StudentAlreadyActiveException>(act);
+    }
+
+    [TestMethod]
+    public void Reactivate__Must_Not_Be_Active_Before_Teacher_Check()
+    {
+        //given
+        var teacher = TeacherFakeBuilder.Build();
+        var car = CarFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).Build();
+        teacher.Delete([]);
+
+        //when
+        var act = () => student.Reactivate(teacher, car);
+
+        //then
+        Should.Throw<StudentAlreadyActiveException>(act);
+    }
+
+    [TestMethod]
+    public void Reactivate__Teacher_Must_Not_Be_Deleted()
+    {
+        //given
+        var (student, teacher, car) = InactiveStudent();
+        teacher.Delete([student]);
+
+        //when
+        var act = () => student.Reactivate(teacher, car);
+
+        //then
+        Should.Throw<StudentTeacherMustNotBeDeletedException>(act);
+        student.IsActive.ShouldBeFalse();
+    }
+
+    [TestMethod]
+    public void Reactivate__Car_Must_Not_Be_Deleted()
+    {
+        //given
+        var (student, teacher, car) = InactiveStudent();
+        car.Delete([student]);
+
+        //when
+        var act = () => student.Reactivate(teacher, car);
+
+        //then
+        Should.Throw<StudentCarMustNotBeDeletedException>(act);
+        student.IsActive.ShouldBeFalse();
+    }
+
+    [TestMethod]
+    public void Reactivate__Car_Must_Be_Assigned_To_Teacher()
+    {
+        //given
+        var (student, teacher, car) = InactiveStudent();
+        car.UnassignTeacher(teacher, [student]);
+
+        //when
+        var act = () => student.Reactivate(teacher, car);
+
+        //then
+        Should.Throw<StudentCarMustBeAssignedToTeacherException>(act);
+        student.IsActive.ShouldBeFalse();
+    }
+
+    private static (Student Student, Teacher Teacher, Car Car) InactiveStudent()
+    {
+        var teacher = TeacherFakeBuilder.Build();
+        var car = CarFakeBuilder.Build();
+        var student = new StudentFakeBuilder().WithTeacher(teacher).WithCar(car).BuildInactive();
+
+        return (student, teacher, car);
     }
 }

@@ -27,6 +27,8 @@ const NOA: Student = {
     carName: 'Corolla White',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 
@@ -37,6 +39,8 @@ const ROI: Student = {
     teacherId: 'teacher-oren',
     teacherName: 'Oren Levi',
     isCarOfTeacher: false,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
 };
 
 const OMER: Student = {

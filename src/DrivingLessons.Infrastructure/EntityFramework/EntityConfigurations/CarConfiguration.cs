@@ -71,6 +71,6 @@ public class CarConfiguration : IEntityTypeConfiguration<Car>
             .Navigation(x => x.TeacherAssignments)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.HasQueryFilter(x => !x.IsDeleted);
+        builder.HasQueryFilter(QueryFilters.CarNotDeleted, x => !x.IsDeleted);
     }
 }

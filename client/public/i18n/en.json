@@ -163,7 +163,12 @@
     "flag": {
       "car": "Not this Teacher's Car",
       "tip": "This Car isn't one of {{teacher}}'s Cars. It was probably set before the rule existed. Fix it with Change Car.",
-      "tipInactive": "This Car isn't one of {{teacher}}'s Cars. To fix it with Change Car, mark the Student as active first."
+      "tipInactive": "This Car isn't one of {{teacher}}'s Cars. Assign it to {{teacher}} on Cars & teachers, then mark the Student as active."
+    },
+    "deletedFlag": {
+      "teacher": "Teacher deleted",
+      "car": "Car deleted",
+      "tip": "To reactivate the Student, import them again in the Roster with a current Teacher and Car."
     },
     "footer": "{{count}} Students",
     "footerOne": "1 Student",
@@ -202,6 +207,7 @@
     "deactivatedDetail": "{{name}} can't submit until reactivated.",
     "reactivated": "Student reactivated",
     "reactivatedDetail": "{{name}} can submit on the student form again.",
+    "reactivateCarNotOfTeacher": "{{car}} is no longer assigned to {{teacher}}. Assign it to {{teacher}} on Cars & teachers, then mark the Student as active.",
     "teacherChanged": "Teacher changed",
     "teacherChangedDetail": "{{name}}'s Teacher is now {{teacher}}, on {{car}}.",
     "carChanged": "Car changed",
@@ -661,7 +667,9 @@
     "studentAlreadyOnCar": "This is already this Student's Car. Refresh the screen.",
     "studentAlreadyDeactivated": "This Student is already inactive. The list has been refreshed.",
     "studentNameMustNotBeEmpty": "The student's name can't be empty.",
-    "studentCarMustBeAssignedToTeacher": "This Car is not assigned to this Teacher. Refresh and choose again.",
+    "studentCarMustBeAssignedToTeacher": "The Car is not assigned to the Student's Teacher. Assign it to the Teacher on Cars & teachers, or choose another Car.",
+    "studentTeacherMustNotBeDeleted": "This Student's Teacher was deleted. To reactivate the Student, import them again in the Roster with a current Teacher and Car.",
+    "studentCarMustNotBeDeleted": "This Student's Car was deleted. To reactivate the Student, import them again in the Roster with a current Teacher and Car.",
     "studentNationalIdAlreadyInUse": "A Student with this national ID already exists: {{name}}.",
     "studentNotFound": "No active student on the roster has this national ID.",
     "submissionAlreadyExists": "A list was already sent for this week.",

@@ -14,5 +14,7 @@ public class ItemForFindStudentsResponse
     public string CarName { get; init; } = string.Empty;
     public Transmission CarTransmission { get; init; }
     public bool IsCarOfTeacher { get; init; }
+    public bool IsTeacherDeleted { get; init; }
+    public bool IsCarDeleted { get; init; }
     public bool IsActive { get; init; }
 }

@@ -1,0 +1,12 @@
+@let tip = 'students.deletedFlag.tip' | transloco;
+<span
+  class="deleted-flag"
+  role="note"
+  tabindex="0"
+  [attr.aria-label]="tip"
+  [pTooltip]="tip"
+  tooltipPosition="bottom"
+  tooltipEvent="both">
+  <i class="pi pi-trash" aria-hidden="true"></i>
+  {{ labelKey() | transloco }}
+</span>

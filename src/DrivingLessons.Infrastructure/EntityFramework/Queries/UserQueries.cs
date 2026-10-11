@@ -18,7 +18,7 @@ public class UserQueries : IUserQueries
     public async Task<IReadOnlyCollection<ItemForFindUsersResponse>> FindAsync()
     {
         var query = from user in dbContext.Users
-                    join teacher in dbContext.Teachers.IgnoreQueryFilters()
+                    join teacher in dbContext.Teachers.IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])
                         on user.TeacherId equals teacher.Id into linkedTeachers
                     from linkedTeacher in linkedTeachers.DefaultIfEmpty()
                     orderby user.IsDeleted, user.Name, user.SignInEmail
@@ -45,7 +45,7 @@ public class UserQueries : IUserQueries
         var userId = UserId.Of(id);
 
         var query = from user in dbContext.Users
-                    join teacher in dbContext.Teachers.IgnoreQueryFilters()
+                    join teacher in dbContext.Teachers.IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])
                         on user.TeacherId equals teacher.Id into linkedTeachers
                     from linkedTeacher in linkedTeachers.DefaultIfEmpty()
                     where user.Id == userId

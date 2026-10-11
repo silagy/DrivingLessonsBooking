@@ -19,6 +19,14 @@ public class CarRepository : ICarRepository
         return await dbContext.Cars.FindAsync(id);
     }
 
+    public async Task<Car?> GetIncludingDeletedAsync(CarId id)
+    {
+        return await dbContext
+                         .Cars
+                         .IgnoreQueryFilters([QueryFilters.CarNotDeleted])
+                         .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<IReadOnlyCollection<Car>> FindActiveAsync()
     {
         return await dbContext.Cars.ToListAsync();

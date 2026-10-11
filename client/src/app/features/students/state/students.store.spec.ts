@@ -12,6 +12,7 @@ import { ItemForFindStudentsResponse } from '../data/item-for-find-students.resp
 import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
 import { StudentsApiService } from '../data/students-api.service';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
+import { CarMarker } from '../domain/car-marker.enum';
 import { StudentDetailsChange } from '../domain/student-details-change.model';
 import { StudentRefusalKind } from '../domain/student-refusal';
 import { NewStudent } from '../domain/new-student.model';
@@ -35,6 +36,8 @@ const DANA: ItemForFindStudentsResponse = {
     carName: 'i20 Silver',
     carTransmission: Transmission.manual,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: false,
 };
 
@@ -49,6 +52,8 @@ const NOA: ItemForFindStudentsResponse = {
     carName: 'Corolla White',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 
@@ -63,6 +68,8 @@ const TAMAR: ItemForFindStudentsResponse = {
     carName: 'Picanto Red',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 
@@ -77,6 +84,8 @@ const YONI: ItemForFindStudentsResponse = {
     carName: 'Picanto Red',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: false,
 };
 
@@ -91,6 +100,8 @@ const SHAKED: ItemForFindStudentsResponse = {
     carName: 'Picanto Red',
     carTransmission: Transmission.automatic,
     isCarOfTeacher: true,
+    isTeacherDeleted: false,
+    isCarDeleted: false,
     isActive: true,
 };
 
@@ -172,7 +183,7 @@ function createStore(overrides: Partial<ApiStubs> = {}) {
         findCars: () => of(CARS),
         ...overrides,
     };
-    const toast = { success: vi.fn(), apiError: vi.fn(), messageOf: vi.fn(() => 'translated refusal') };
+    const toast = { success: vi.fn(), error: vi.fn(), apiError: vi.fn(), messageOf: vi.fn(() => 'translated refusal') };
     const findCars = vi.fn(stubs.findCars);
     const api = {
         findStudents: vi.fn(stubs.findStudents),
@@ -231,6 +242,24 @@ describe('StudentsStore', () => {
 
         //then
         expect(idsOf(store.visibleStudents())).toEqual(['student-noa', 'student-tamar', 'student-dana', 'student-yoni']);
+    });
+
+    it('gives each row the Car marker the table shows', async () => {
+        //given
+        const carDeleted = { ...DANA, isCarOfTeacher: false, isCarDeleted: true };
+        const carNotOfTeacher = { ...YONI, isCarOfTeacher: false };
+        const { store } = createStore({ findStudents: () => of([NOA, carDeleted, carNotOfTeacher]) });
+        await stable();
+
+        //when
+        store.selectStatus(StudentStatusFilter.all);
+
+        //then
+        expect(store.visibleStudents().map((row) => [row.id, row.carMarker])).toEqual([
+            [NOA.id, null],
+            [DANA.id, CarMarker.deleted],
+            [YONI.id, CarMarker.notOfTeacher],
+        ]);
     });
 
     it('shows only the Inactive Students', async () => {
@@ -640,6 +669,45 @@ describe('StudentsStore', () => {
         expect(toast.apiError).toHaveBeenCalledWith(failure);
         expect(api.findStudents).toHaveBeenCalledTimes(1);
     });
+
+    it('explains in its own words that the Car must be assigned back to the Teacher before reactivating', async () => {
+        //given
+        const failure = problem(HTTP_CONFLICT, 'studentCarMustBeAssignedToTeacher');
+        const { store, toast, api } = createStore({ reactivateStudent: () => throwError(() => failure) });
+        await stable();
+
+        //when
+        await store.reactivate(DANA);
+        await stable();
+
+        //then
+        expect(toast.error).toHaveBeenCalledWith('students.reactivateCarNotOfTeacher', {
+            car: isolateDirection('i20 Silver'),
+            teacher: isolateDirection('Ronit Avraham'),
+        });
+        expect(toast.apiError).not.toHaveBeenCalled();
+        expect(api.findStudents).toHaveBeenCalledTimes(1);
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it.each(['studentTeacherMustNotBeDeleted', 'studentCarMustNotBeDeleted'])(
+        'explains a %s Reactivate refusal without reloading',
+        async (code) => {
+            //given
+            const failure = problem(HTTP_CONFLICT, code);
+            const { store, toast, api } = createStore({ reactivateStudent: () => throwError(() => failure) });
+            await stable();
+
+            //when
+            await store.reactivate(DANA);
+            await stable();
+
+            //then
+            expect(toast.apiError).toHaveBeenCalledWith(failure);
+            expect(api.findStudents).toHaveBeenCalledTimes(1);
+            expect(store.isMutating()).toBe(false);
+        },
+    );
 
     it('changes the Teacher, names the Student, Teacher and Car in the confirmation and reloads', async () => {
         //given
