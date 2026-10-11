@@ -8,6 +8,7 @@ Per-task breakdown of bug [#106](https://github.com/silagy/DrivingLessonsBooking
 
 **Architecture:** CSS only, in `admin-shell.component.scss`. No template, TypeScript or translation change.
 - **At ≤ 992px the bar becomes two rows.** Row 1 holds the logo at inline-start and the language toggle plus user button at inline-end. Row 2 holds the nav, across the full width (`flex-wrap: wrap`; the nav gets `order: 1; flex-basis: 100%`). The 992px breakpoint is the repo's one mobile/desktop breakpoint.
+- **As built (after review):** the two-row breakpoint is `max-width: 1279px` and the email cap is `9rem`; there is no 993-1199px fallback. Measured reasons: a single row still clipped 1-2 links at 993 and 1024px even with the email hidden, and clipped Users at 1200px in Hebrew with a 60-character email at both the 12rem and the 9rem caps. A single row first fits every link, in both languages and with a long email, at 1280px.
 - **At every width:**
   - The sign-in email in the user button is capped (`max-inline-size: 12rem`, with an ellipsis). A long email can no longer widen the bar, and the full email stays in the user menu's header.
   - The nav can shrink (`min-inline-size: 0`) and scrolls inside the bar with a thin visible scrollbar (`overflow-x: auto`). If its links ever don't fit, the nav scrolls, never the page.
@@ -35,9 +36,9 @@ Per-task breakdown of bug [#106](https://github.com/silagy/DrivingLessonsBooking
 | # | Decision |
 |---|----------|
 | 1 | **Two rows at ≤ 992px, rather than collapsing the nav into a menu.** Two rows keep every link one tap away, need no TypeScript, and keep the active-link underline. At 768px the nav row has about 736px; the 7 links need roughly 540px in Hebrew and 600px in English. A hamburger menu would hide the screens behind a second click, and #106 lists it only as one possibility. |
-| 2 | **The breakpoint is 992px**, the repo's single mobile/desktop breakpoint (`client-primeng.md`). Task 1 adds one more media query only if measurement shows the single-row bar still overflows at 993-1024px (decision 4). |
-| 3 | **The email stays visible in the user button, capped at 12rem with an ellipsis.** A short email (the dev `admin@local.dev`) shows in full. A long one can't widen the bar. The full email is always in the user menu's header, and the button keeps its `aria-label` ("תפריט משתמש"). |
-| 4 | **The fallback is measured, not guessed.** Estimating label widths is unreliable, so task 1 measures the nav at 993, 1024 and 1100px in both languages. If the nav overflows at 993 or 1024px in either language, task 1 adds `@media screen and (min-width: 993px) and (max-width: 1199px) { .shell__email { display: none; } }` and measures again. Otherwise there is no extra breakpoint. |
+| 2 | ~~**The breakpoint is 992px**, the repo's single mobile/desktop breakpoint (`client-primeng.md`). Task 1 adds one more media query only if measurement shows the single-row bar still overflows at 993-1024px (decision 4).~~ **Superseded:** the two-row breakpoint is 1279px, measured (see Architecture, "As built"). |
+| 3 | ~~**The email stays visible in the user button, capped at 12rem with an ellipsis.** A short email (the dev `admin@local.dev`) shows in full. A long one can't widen the bar. The full email is always in the user menu's header, and the button keeps its `aria-label` ("תפריט משתמש").~~ **Superseded:** the cap is 9rem; 12rem let a long email clip the nav at 1200px. |
+| 4 | ~~**The fallback is measured, not guessed.** Estimating label widths is unreliable, so task 1 measures the nav at 993, 1024 and 1100px in both languages. If the nav overflows at 993 or 1024px in either language, task 1 adds `@media screen and (min-width: 993px) and (max-width: 1199px) { .shell__email { display: none; } }` and measures again. Otherwise there is no extra breakpoint.~~ **Superseded:** no fallback; the measured ladder ended at the 1279px two-row breakpoint plus the 9rem cap. |
 | 5 | **The nav keeps a visible thin scrollbar when it overflows** (`scrollbar-width: thin`), never `none`. It is a safety net that should not trigger at ≥ 768px after decisions 1 and 4. If it ever does, a mouse user can still see that there is more and reach it. Keyboard focus scrolls a link into view by itself. |
 | 6 | **`overflow-x` is the one non-logical property**, and it's allowed: it names an axis, not a side, so it mirrors correctly in RTL. The logical `overflow-inline` isn't supported in Chromium. Every spacing, inset and sizing property in the change is logical (`padding-inline`, `padding-block-start`, `block-size`, `max-inline-size`, `min-inline-size`). |
 | 7 | **`.shell__main` padding stays as it is.** #106 confirms the page content already fits at 768px; this fix is the bar only. |
@@ -75,7 +76,7 @@ Dev servers: `preview_start {name: "api"}` (port 5080) and `preview_start {name:
 
 | File | Change | Task |
 |------|--------|------|
-| `client\src\app\features\admin-shell\admin-shell.component.scss` | Email cap, nav shrink/scroll, `@media (max-width: 992px)` two-row bar, conditional 993-1199px rule | 1 |
+| `client\src\app\features\admin-shell\admin-shell.component.scss` | Email cap (9rem), nav shrink/scroll with a focus-visible offset, `@media (max-width: 1279px)` two-row bar | 1 |
 
 ## Execution Order
 
