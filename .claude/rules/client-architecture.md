@@ -59,7 +59,7 @@ client\
     │   │   ├── components\            week-grid, week-grid-legend, publication-state-tag, locked-field, dialog-refusal
     │   │   ├── config\
     │   │   │   └── app-routes.ts      AppRoutes constants
-    │   │   ├── dates\                 ISO date parsing, slot window times
+    │   │   ├── dates\                 ISO date parsing, slot window times, Asia/Jerusalem instants
     │   │   ├── dialogs\               confirm dialog, shared dialog-form styles
     │   │   ├── language-toggle\
     │   │   ├── models\                cross-feature models and enums (problem-details, Role, slot and publication states)
