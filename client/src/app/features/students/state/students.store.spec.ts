@@ -12,6 +12,7 @@ import { ItemForFindStudentsResponse } from '../data/item-for-find-students.resp
 import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
 import { StudentsApiService } from '../data/students-api.service';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
+import { CarMarker } from '../domain/car-marker.enum';
 import { StudentDetailsChange } from '../domain/student-details-change.model';
 import { StudentRefusalKind } from '../domain/student-refusal';
 import { NewStudent } from '../domain/new-student.model';
@@ -241,6 +242,24 @@ describe('StudentsStore', () => {
 
         //then
         expect(idsOf(store.visibleStudents())).toEqual(['student-noa', 'student-tamar', 'student-dana', 'student-yoni']);
+    });
+
+    it('gives each row the Car marker the table shows', async () => {
+        //given
+        const carDeleted = { ...DANA, isCarOfTeacher: false, isCarDeleted: true };
+        const carNotOfTeacher = { ...YONI, isCarOfTeacher: false };
+        const { store } = createStore({ findStudents: () => of([NOA, carDeleted, carNotOfTeacher]) });
+        await stable();
+
+        //when
+        store.selectStatus(StudentStatusFilter.all);
+
+        //then
+        expect(store.visibleStudents().map((row) => [row.id, row.carMarker])).toEqual([
+            [NOA.id, null],
+            [DANA.id, CarMarker.deleted],
+            [YONI.id, CarMarker.notOfTeacher],
+        ]);
     });
 
     it('shows only the Inactive Students', async () => {

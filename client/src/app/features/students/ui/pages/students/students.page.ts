@@ -17,6 +17,7 @@ import { TagModule } from 'primeng/tag';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { isolateDirection } from '../../../../../shared/text/isolate-direction';
+import { CarMarker } from '../../../domain/car-marker.enum';
 import { RemovedPart } from '../../../domain/removed-part.enum';
 import { StudentRow } from '../../../domain/student-row.model';
 import { StudentStatusFilter } from '../../../domain/student-status-filter.enum';
@@ -80,6 +81,7 @@ export class StudentsPage {
     private readonly transloco = inject(TranslocoService);
 
     protected readonly allTeachers = ALL_TEACHERS;
+    protected readonly carMarkers = CarMarker;
     protected readonly removedParts = RemovedPart;
     protected readonly importRosterLink = ['/', AppRoutes.students, AppRoutes.rosterImport];
     protected readonly rowActions = signal<MenuItem[]>([]);

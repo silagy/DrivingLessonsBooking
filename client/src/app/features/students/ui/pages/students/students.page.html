@@ -169,10 +169,13 @@
                   {{ row.carName }}
                   <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
                 </span>
-                @if (row.isCarDeleted) {
-                  <app-deleted-flag [part]="removedParts.car" />
-                } @else if (!row.isCarOfTeacher && !row.isTeacherDeleted) {
-                  <app-car-flag [teacherName]="row.teacherName" [isActive]="row.isActive" />
+                @switch (row.carMarker) {
+                  @case (carMarkers.deleted) {
+                    <app-deleted-flag [part]="removedParts.car" />
+                  }
+                  @case (carMarkers.notOfTeacher) {
+                    <app-car-flag [teacherName]="row.teacherName" [isActive]="row.isActive" />
+                  }
                 }
               </div>
             </td>
@@ -182,10 +185,13 @@
                   {{ row.carName }}
                   <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
                 </span>
-                @if (row.isCarDeleted) {
-                  <app-deleted-flag [part]="removedParts.car" />
-                } @else if (!row.isCarOfTeacher && !row.isTeacherDeleted) {
-                  <app-car-flag [teacherName]="row.teacherName" [isActive]="row.isActive" />
+                @switch (row.carMarker) {
+                  @case (carMarkers.deleted) {
+                    <app-deleted-flag [part]="removedParts.car" />
+                  }
+                  @case (carMarkers.notOfTeacher) {
+                    <app-car-flag [teacherName]="row.teacherName" [isActive]="row.isActive" />
+                  }
                 }
               </div>
             </td>
