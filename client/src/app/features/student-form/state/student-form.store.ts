@@ -9,7 +9,7 @@ import { IdentifyStudentResponse } from '../data/identify-student.response';
 import { isWindowClosedProblem } from '../data/problem-types';
 import { SubmissionsApiService } from '../data/submissions-api.service';
 import { IdentifyStatus } from '../domain/identify-status.enum';
-import { formatWindowInstant } from '../domain/jerusalem-time';
+import { formatWindowInstant } from '../../../shared/dates/jerusalem-time';
 import { loadedSubmissionOf } from '../domain/loaded-submission';
 import { nameInitials } from '../domain/name-initials';
 import { isCompleteNationalId, isNationalIdCandidate } from '../domain/national-id-input';
