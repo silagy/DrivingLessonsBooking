@@ -52,4 +52,4 @@ A Student an Administrator has deactivated; cannot identify on the student form 
 _Avoid_: Deleted student, Archived
 
 **Roster**:
-A bulk file of Students that adds new Students and updates existing ones by national ID; it never deactivates a Student, and a row whose Car isn't one of its Teacher's Cars is rejected.
+A bulk file of Students that adds new Students and updates existing ones by national ID; it never deactivates a Student, it reactivates an Inactive Student who appears in it, and a row whose Car isn't one of its Teacher's Cars is rejected.

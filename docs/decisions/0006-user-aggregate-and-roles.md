@@ -14,7 +14,7 @@ Spec [#82](https://github.com/silagy/DrivingLessonsBooking/issues/82) brings all
 **A User is a domain aggregate** (`DrivingLessons.Domain\Entities\User.cs`), introduced in [#84](https://github.com/silagy/DrivingLessonsBooking/issues/84) and replacing the `AdminUser` record and the `admin_users` table.
 
 - **State:** name, sign-in email (the `Email` value object, so it is trimmed and lower-cased and a unique index makes it unique case-insensitively), password hash, Role, optional linked `TeacherId`, a security stamp, and a deleted flag.
-- **Operations:** `Create`, `ChangeDetails`, `ChangeRole`, `SetTemporaryPassword`, `ChangePassword`, `Delete`, `Restore`. Each is non-idempotent: it refuses with a domain exception when the User is already in the target state, and raises a past-tense event (`UserCreated`, `UserDetailsChanged`, `UserRoleChanged`, `UserTemporaryPasswordSet`, `UserPasswordChanged`, `UserDeleted`, `UserRestored`).
+- **Operations:** `Create`, `ChangeDetails`, `ChangeRole`, `SetTemporaryPassword`, `ChangePassword`, `Delete`, `Restore`. `Delete`, `Restore` and `ChangeRole` refuse with a domain exception when the User is already in the target state, every operation but `Create` and `Restore` refuses a Deleted User, and each raises a past-tense event (`UserCreated`, `UserDetailsChanged`, `UserRoleChanged`, `UserTemporaryPasswordSet`, `UserPasswordChanged`, `UserDeleted`, `UserRestored`).
 
 **Exactly one Role per User, and only two Roles:**
 
@@ -28,7 +28,7 @@ There are no other Roles, no per-permission configuration, and no User holds sev
 **Where each rule lives.**
 
 - *In the aggregate* (rules about one User): a Teacher Role needs a link; changing to the current Role is refused; a Deleted User can't be changed, deleted again or restored while active.
-- *In interactors, through repositories and query ports* (rules that span Users or aggregates): the sign-in email is unique; a Teacher has at most one User and must not be deleted; no one deletes themselves or changes their own Role; the last active Administrator is never deleted or demoted; changing your own password requires the current one; a Teacher can't be deleted while an active User is linked to it.
+- *In interactors, through repositories and query ports* (rules that span Users or aggregates): the sign-in email is unique; a Teacher has at most one User; a User is created, and restored, only while their linked Teacher isn't deleted; no one deletes themselves or changes their own Role; the last active Administrator is never deleted or demoted; changing your own password requires the current one; a Teacher can't be deleted while an active User is linked to it.
 
 **Passwords stay out of the domain.** The application port `IPasswordHasher` (implemented by `IdentityPasswordHasher` in Infrastructure, over ASP.NET Core's `PasswordHasher`) hashes and verifies. The aggregate receives a `PasswordHash` and never sees plaintext. `Password` and `TemporaryPassword` value objects only validate input at the application boundary.
 

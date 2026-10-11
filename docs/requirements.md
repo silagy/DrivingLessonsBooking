@@ -35,7 +35,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Self-service "forgot password", password emails and invitation links; forcing a password change after a Temporary Password
 - More than two Roles, per-permission configuration, or a User holding several Roles
 - Teachers creating Week Schedules or running the Publication lifecycle (publish, open, close, reopen)
-- Student logins: students identify by national ID only
+- Sign-in for students: students identify by national ID only
 - An audit log of User administration beyond domain events
 - Payments, billing, multi-school tenancy
 - Configurable slot windows (hardcoded in v1)
@@ -74,7 +74,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 | Saturday | Does not exist in the grid |
  
 - Slot windows are **hardcoded** in v1.
-- Each slot has a state: `Open` (default) or `Unavailable` (admin-marked).
+- Each slot has a state: `Open` (default) or `Unavailable` (marked by an Administrator, or by the teacher's Teacher-role User).
 - A new week **always starts fully open**. No copying from prior weeks in v1.
 ### 5.4 Publication
 - Belongs to one **calendar week** and covers **all teachers** for that week. It aggregates the per-teacher Week Schedules (5.3) prepared for the week.
@@ -98,7 +98,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 
 ### 5.5.1 Student Roster (CSV import)
 - The admin uploads a CSV; each row is one student. Columns map to: full name, national ID (identifier), phone, assigned car, assigned teacher, address, notes, start date, license type (transmission), and admin-only bookkeeping fields.
-- Re-uploading **upserts by national ID**: existing students are updated and new rows are added. Students absent from the new file are **left unchanged**: an import never deactivates a student, so students added or edited by hand survive the next import.
+- Re-uploading **upserts by national ID**: existing students are updated and new rows are added. Students absent from the new file are **left unchanged**: an import never deactivates a student, so students added or edited by hand survive the next import. A student in the file who is an **Inactive Student** is reactivated.
 - The assigned teacher and car strings in the CSV must resolve to existing Teacher/Car records; unresolved rows are reported as errors and skipped.
 - A row whose car is **not assigned to the row's teacher** is rejected and reported ("car is not assigned to this teacher"); the rest of the file still imports. Students who already break this rule are left as they are unless a consistent row updates them.
 - A national ID corrected by hand must also be corrected in the roster at its source: a later file still carrying the old ID creates a second student under the old ID (accepted, no guard).
@@ -120,7 +120,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - The teacher link is set when the User is created and never changes. A teacher has at most one User
 - Administrators add a User with a **Temporary Password**, edit name and sign-in email, change Role, set a new Temporary Password, delete and restore. A Teacher-role User can be promoted to Administrator and keeps their teacher link; an Administrator can be demoted to the Teacher Role only when linked to a teacher
 - No one can delete themselves or change their own Role, and the last active Administrator can never be deleted or demoted
-- A **Deleted User** can't sign in and is signed out on their next request. Deleting a User leaves their teacher, Week Schedules and Publications untouched, and a Deleted User can be restored
+- A **Deleted User** can't sign in and is signed out on their next request. Deleting a User leaves their teacher, Week Schedules and Publications untouched, and a Deleted User can be restored unless their teacher has since been deleted
 - A Role change, a new Temporary Password or a password change also takes effect on the User's next request
 - Every User can change their own password by entering their current one
 - An operation already in its target state is rejected (deleting a Deleted User, restoring an active one, giving a User the Role they already have)
@@ -145,7 +145,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - At end time, the link becomes read-only for students and the Excel is **automatically emailed** to the teacher's contact email.
 - The admin may extend the deadline before close, or reopen after close.
 - **Versioning rule:** every window close event fires the email. The email subject carries an incrementing version number (e.g., "בקשות לשבוע 25 - משה כהן - גרסה 2"; the email is Hebrew, see decision #22) so the teacher always knows whether a previously received file is stale.
-- The Excel is also available for **on-demand download** from the admin UI at any time, including mid-window.
+- The Excel is also available for **on-demand download** in the app (Administrators, and the teacher's Teacher-role User) at any time, including mid-window.
 ### 6.5 Teacher-role User
 1. Sign in and land on the teacher's own Week Schedules.
 2. Mark the teacher's own slots Open or Unavailable for a week the Administrator created.
@@ -217,7 +217,7 @@ One row per slot request, sorted by day, then slot, then student rank:
  
 ### Delivery
 - **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4)
-- **On-demand:** download button in the admin UI, available at any time
+- **On-demand:** download button in the app, available at any time
 ## 10. Non-Functional Requirements
  
 - Student form must be fully usable on mobile browsers (primary distribution channel is WhatsApp)

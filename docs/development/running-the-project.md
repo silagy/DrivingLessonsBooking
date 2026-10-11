@@ -207,7 +207,7 @@ npm test
 | Docker shows old behavior after a code change | The image wasn't rebuilt | `docker compose up -d --build` |
 | `'ng' is not recognized` on `npm start` | `client\node_modules` is missing or only partly installed | Run `npm ci` in `client\`, then `npm start` |
 | `npm ci` fails with `EPERM ... esbuild.exe` | A running `ng serve` (or an old one left over) is holding the file | Stop every `ng serve` (`Ctrl+C`, or end the `node` / `esbuild` processes in Task Manager), then run `npm ci` again |
-| Can't sign in as the Administrator, or changed `ADMIN_PASSWORD` / `Admin:Password` and nothing happened | Configuration only creates the first Administrator on an empty database; it never changes an existing password | [Reset the Administrator from configuration](#reset-the-administrator-from-configuration) (below) |
+| Can't sign in as the Administrator, or changed `ADMIN_PASSWORD` / `Admin:Password` and nothing happened | Configuration only creates the first Administrator on an empty database; it never changes an existing password | Ask another Administrator to set a Temporary Password on the Users screen. If no Administrator can sign in, [reset the Administrator from configuration](#reset-the-administrator-from-configuration) (below) |
 
 To make the database password match the current `POSTGRES_PASSWORD` in `.env` without losing data, run this from **bash** (Git Bash or WSL). PowerShell breaks the quoting:
 
@@ -220,7 +220,7 @@ The first line makes sure the container has the current `.env` value. Inside the
 
 ### Reset the Administrator from configuration
 
-Until Users can change or reset passwords in the app, this is the way to recover a forgotten Administrator password or apply a new one from configuration. It deletes every User, so the next start re-creates the Administrator from `ADMIN_EMAIL` / `ADMIN_PASSWORD` (Setup A) or `Admin:Email` / `Admin:Password` in `appsettings.Development.json` (Setup B). Nothing else references Users yet, so no other data is touched. Once Teacher-role Users exist, they would have to be re-created.
+Use this only when no Administrator can sign in. Otherwise another Administrator sets a Temporary Password for the User on the Users screen, and any signed-in User can change their own password. This reset deletes every User, Teacher-role Users included, so the next start re-creates the Administrator from `ADMIN_EMAIL` / `ADMIN_PASSWORD` (Setup A) or `Admin:Email` / `Admin:Password` in `appsettings.Development.json` (Setup B); re-create the other Users afterwards. No other table references Users, so no other data is touched.
 
 1. Set the email and password you want in `.env` (Setup A) or `appsettings.Development.json` (Setup B).
 2. Delete the Users:
