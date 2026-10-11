@@ -164,6 +164,7 @@ The grid (admin preparation, admin dashboard, student slot picking) is **one sha
 - Student form: mobile-first, ~375px design width, 40px minimum touch targets, single-column flow
 - Admin: desktop-first; compact 32px inputs above the desktop breakpoint
 - One breakpoint convention: `992px` separates mobile/desktop; sizing overrides live in one place in `@layer app`, not per component
+- `992px` is the sizing breakpoint. A component may add its own **layout** breakpoint when measured content needs one; write down why in its plan: e.g. the admin shell's two-row bar at `max-width: 1279px` (#106: a single row clipped nav links below 1280px)
 
 ```scss
 @layer app {
