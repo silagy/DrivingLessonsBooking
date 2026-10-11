@@ -48,7 +48,7 @@
 }
 
 .students__filter--status {
-    inline-size: 18.75rem;
+    min-inline-size: 18.75rem;
 }
 
 .students__filter--search {
@@ -75,7 +75,7 @@
     border-radius: 999px;
 
     .p-togglebutton {
-        flex: 1;
+        flex: 1 0 auto;
         justify-content: center;
         border-radius: 999px;
         border: 1px solid transparent;
@@ -86,6 +86,7 @@
     .p-togglebutton-content {
         background: transparent;
         box-shadow: none;
+        white-space: nowrap;
     }
 
     .p-togglebutton-checked {
@@ -328,18 +329,20 @@
 
     .students__filters {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+        grid-template-columns: minmax(0, 1fr);
         gap: 0.75rem;
         margin-block-start: 1.125rem;
     }
 
-    .students__filter--teacher,
-    .students__filter--status {
+    .students__filter--teacher {
         inline-size: auto;
     }
 
+    .students__filter--status {
+        min-inline-size: 0;
+    }
+
     .students__filter--search {
-        grid-column: 1 / -1;
         inline-size: auto;
         margin-inline-start: 0;
     }
