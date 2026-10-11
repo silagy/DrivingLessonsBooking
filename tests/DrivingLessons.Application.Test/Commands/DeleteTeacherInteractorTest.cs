@@ -18,6 +18,7 @@ public class DeleteTeacherInteractorTest
     private IUserQueries userQueries = null!;
     private IStudentRepository studentRepository = null!;
     private IUnitOfWork unitOfWork = null!;
+    private ITeacherAndCarLocks locks = null!;
     private DeleteTeacherInteractor interactor = null!;
     private Teacher teacher = null!;
 
@@ -28,7 +29,8 @@ public class DeleteTeacherInteractorTest
         userQueries = A.Fake<IUserQueries>();
         studentRepository = A.Fake<IStudentRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new DeleteTeacherInteractor(repository, userQueries, studentRepository, unitOfWork);
+        locks = A.Fake<ITeacherAndCarLocks>();
+        interactor = new DeleteTeacherInteractor(repository, userQueries, studentRepository, locks, unitOfWork);
         teacher = Teacher.Create(TeacherName.Of("Dana Levi"), Email.Of("dana@school.example"));
 
         A.CallTo(() => repository.GetAsync(A<TeacherId>._)).Returns((Teacher?)null);
@@ -129,6 +131,21 @@ public class DeleteTeacherInteractorTest
         //then
         await Should.ThrowAsync<TeacherNotFoundException>(act);
         A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Locks_The_Teacher_Before_Reading_It_Or_Its_Students()
+    {
+        //when
+        await interactor.ExecuteAsync(teacher.Id.Value);
+
+        //then
+        A.CallTo(() => locks.LockAsync(
+                A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { teacher.Id }),
+                A<IReadOnlyCollection<CarId>>.That.IsEmpty()))
+            .MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => repository.GetAsync(teacher.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => studentRepository.FindActiveByTeacherAsync(teacher.Id)).MustHaveHappened());
     }
 
     private static Student StudentOf(Teacher teacher, bool isActive)
