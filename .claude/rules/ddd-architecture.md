@@ -548,6 +548,8 @@ Response DTOs expose raw `Guid`s (`x.Id.Value`) — typed IDs stop at the applic
 
 `IUnitOfWork` (defined in Application) exposes `CommitAsync()`. The DbContext implements it. One commit per interactor — a single transaction even when two aggregates change together.
 
+**Cross-aggregate guards lock first.** A command that allows or refuses a change based on another aggregate's rows (a Teacher's or Car's active Students, a Car's Teacher assignments) calls `ITeacherAndCarLocks.LockAsync(teacherIds, carIds)` once, before it reads them, or `LockAllAsync()` when it can only resolve them by reading (the Roster import). The interactor test pins the order with FakeItEasy's `.Then(...)`. See [ADR 0007](../../docs/decisions/0007-locking-for-the-active-student-guards.md).
+
 ## Infrastructure Layer
 
 ### DbContext
@@ -714,5 +716,3 @@ These patterns exist in larger systems but are **out of scope here** — do not 
 - Batch-update command envelopes — each operation is its own endpoint and interactor
 - A separate ReadModel project — response DTOs live in Application
 - ETag / If-Match on the API: concurrent admin writes are settled on the server instead, by row locks on Teacher and Car and an `xmin` token on Student ([ADR 0007](../../docs/decisions/0007-locking-for-the-active-student-guards.md)); concurrent student submissions are protected by the DB transaction
-
-**Cross-aggregate guards lock first.** A command that allows or refuses a change based on another aggregate's rows (a Teacher's or Car's active Students, a Car's Teacher assignments) calls `ITeacherAndCarLocks.LockAsync(teacherIds, carIds)` once, before it reads them, or `LockAllAsync()` when it can only resolve them by reading (the Roster import). The interactor test pins the order with FakeItEasy's `.Then(...)`. See [ADR 0007](../../docs/decisions/0007-locking-for-the-active-student-guards.md).

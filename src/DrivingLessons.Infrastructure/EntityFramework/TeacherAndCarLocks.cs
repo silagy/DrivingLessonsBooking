@@ -17,12 +17,13 @@ public class TeacherAndCarLocks : ITeacherAndCarLocks
     {
         await BeginTransactionIfNoneAsync();
 
+        var database = context.Database;
         var teacherKeys = teacherIds.Select(x => x.Value).ToArray();
         var carKeys = carIds.Select(x => x.Value).ToArray();
 
-        await context.Database.ExecuteSqlAsync(
+        await database.ExecuteSqlAsync(
             $"SELECT id FROM teachers WHERE id = ANY({teacherKeys}) ORDER BY id FOR UPDATE");
-        await context.Database.ExecuteSqlAsync(
+        await database.ExecuteSqlAsync(
             $"SELECT id FROM cars WHERE id = ANY({carKeys}) ORDER BY id FOR UPDATE");
     }
 
@@ -30,17 +31,21 @@ public class TeacherAndCarLocks : ITeacherAndCarLocks
     {
         await BeginTransactionIfNoneAsync();
 
-        await context.Database.ExecuteSqlAsync($"SELECT id FROM teachers ORDER BY id FOR UPDATE");
-        await context.Database.ExecuteSqlAsync($"SELECT id FROM cars ORDER BY id FOR UPDATE");
+        var database = context.Database;
+
+        await database.ExecuteSqlAsync($"SELECT id FROM teachers ORDER BY id FOR UPDATE");
+        await database.ExecuteSqlAsync($"SELECT id FROM cars ORDER BY id FOR UPDATE");
     }
 
     private async Task BeginTransactionIfNoneAsync()
     {
-        if (context.Database.CurrentTransaction is not null)
+        var database = context.Database;
+
+        if (database.CurrentTransaction is not null)
         {
             return;
         }
 
-        await context.Database.BeginTransactionAsync();
+        await database.BeginTransactionAsync();
     }
 }

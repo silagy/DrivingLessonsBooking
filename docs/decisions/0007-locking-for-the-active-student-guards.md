@@ -15,7 +15,7 @@ It takes two Administrators acting within the same moment, so it is rare, but th
 
 ## Decision
 
-**Row locks on the Teacher and Car rows, taken before the check.** An application port, `ITeacherAndCarLocks`, opens a transaction and runs `SELECT ... FOR UPDATE` on the Teacher and Car rows a command depends on: Teachers first, then Cars, each ordered by id. Each of these commands calls it once, before it reads the Teacher, the Car or their Students:
+**Row locks on the Teacher and Car rows, taken before the check.** An application port, `ITeacherAndCarLocks`, opens a transaction and runs `SELECT ... FOR UPDATE` on the Teacher and Car rows a command depends on: Teachers first, then Cars, each ordered by id. Each of these commands calls it once, before it reads the Teacher, the Car or their Students (Change Teacher, Change Car and Reactivate read the Student first to learn which rows to lock; a change to that Student in between is caught by the token below):
 
 | Command | Locks |
 |---|---|
@@ -45,8 +45,9 @@ The second of two conflicting requests waits for the first to commit, then reads
 ## Consequences
 
 - Every interactor that checks an active-Student rule against another aggregate's rows takes `ITeacherAndCarLocks` and calls it before reading. A new command of that kind must do the same; `ddd-architecture.md` says so.
-- A Roster import briefly blocks Teacher and Car removals and Student changes for its duration. At one school's size this is a fraction of a second.
+- A Roster import holds every Teacher and Car lock for its duration. That briefly blocks the locking commands (Delete Teacher, Delete Car, Unassign, Add Student, Change Teacher, Change Car, Reactivate) and any edit of a Teacher or Car row. Change Details and Deactivate don't wait: if they change a Student the import also updates, the later of the two gets 409 `concurrentChange`. At one school's size an import takes a fraction of a second.
 - Any change to a Student, including Change Details and Deactivate, now fails with 409 `concurrentChange` if another request changed that Student after it was read.
 - The mapping of EF's concurrency failure to 409 `concurrentChange` lives in `CommitAsync` and applies to every command: an `UPDATE` or `DELETE` that finds its row changed or gone answers 409 instead of 500. Today only Student carries a token.
-- Verified by interactor tests that pin "lock before read" and by a Postgres smoke that queues real requests behind a held lock (#109 task 6). There is no automated concurrency test, because there is no database test project.
+- Verified by interactor tests that pin "lock before read" and by a Postgres smoke that queues real requests behind a held lock (issue #109). There is no automated concurrency test, because there is no database test project.
 - Still open: two Add Student requests with the same national ID at once fail on the unique index rather than with `studentNationalIdAlreadyInUse`. That's a different invariant, outside #109.
+- Still open: the sibling guard "a Teacher with an active User can't be deleted" (#85) still checks, then commits. Create User, Restore User and Change User Role don't take the Teacher lock, so one of them racing Delete Teacher could leave an active Teacher-role User on a deleted Teacher. The fix is the same one-line `LockAsync([teacherId], [])` in those interactors; it's outside #109's acceptance criteria.
