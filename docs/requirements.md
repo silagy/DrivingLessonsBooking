@@ -3,7 +3,7 @@
 **Version:** 1.5
 **Date:** 11 October 2026
 **Status:** Approved scope for v1
-**Changelog:** v1.5 - Users and Roles (spec #82): people sign in as **Users**, each with exactly one **Role**, Administrator or Teacher; a Teacher-role User sees only their own teacher's Week Schedules and Publications and marks that teacher's slots, and Administrators manage Users (decision #24, see [ADR 0006](decisions/0006-user-aggregate-and-roles.md)). Administrators also manage students by hand: add, edit, **Change Teacher**, **Change Car**, deactivate and reactivate; a teacher or car can't be removed while active students depend on it (decision #25). v1.4 - the roster is no longer the single source of truth: an import adds and updates students but never deactivates anyone, and a row whose car is not assigned to its teacher is rejected and reported while the rest imports; a student's car is always one of their teacher's cars (see decision #23, the ADR 0003 amendment and issue #92). v1.3 — Car remodeled as its own aggregate: a **shared school pool** of cars, each assignable to any number of teachers (many-to-many); a teacher may have zero cars (the last-car rule is dropped); cars are soft-deleted like teachers (see decision #21). v1.2 — teacher car limit removed: a teacher owns **one or more** cars (was 1–2); the minimum-one rule binds as "the last car can never be removed" (see decision #20). v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
+**Changelog:** v1.5 - Users and Roles (spec #82): people sign in as **Users**, each with exactly one **Role**, Administrator or Teacher; a Teacher-role User sees only their own teacher's Week Schedules and Publications and marks that teacher's slots, and Administrators manage Users (decision #24, see [ADR 0006](decisions/0006-user-aggregate-and-roles.md)). Administrators also manage students by hand: add, edit, **Change Teacher**, **Change Car**, deactivate and reactivate; a teacher or car can't be deleted while active students depend on it (decision #25). v1.4 - the roster is no longer the single source of truth: an import adds and updates students but never deactivates anyone, and a row whose car is not assigned to its teacher is rejected and reported while the rest imports; a student's car is always one of their teacher's cars (see decision #23, the ADR 0003 amendment and issue #92). v1.3 — Car remodeled as its own aggregate: a **shared school pool** of cars, each assignable to any number of teachers (many-to-many); a teacher may have zero cars (the last-car rule is dropped); cars are soft-deleted like teachers (see decision #21). v1.2 — teacher car limit removed: a teacher owns **one or more** cars (was 1–2); the minimum-one rule binds as "the last car can never be removed" (see decision #20). v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
 **Scope discipline:** This document is technology-agnostic. A separate technology document (latest .NET, latest Angular, PrimeNG, signal-based patterns) will govern implementation.
  
 ---
@@ -78,7 +78,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - A new week **always starts fully open**. No copying from prior weeks in v1.
 ### 5.4 Publication
 - Belongs to one **calendar week** and covers **all teachers** for that week. It aggregates the per-teacher Week Schedules (5.3) prepared for the week.
-- Generates a **single, unguessable link** scoped to the week (no longer per teacher). A student opening the link identifies by national ID; their roster record resolves which teacher's grid they see.
+- Generates a **single, unguessable link** scoped to the week (no longer per teacher). A student opening the link identifies by national ID; their student record resolves which teacher's grid they see.
 - Carries one **submission window**: start datetime and end datetime (Asia/Jerusalem timezone), applying to all teachers at once.
 - States: `Draft` → `Published (window not yet open)` → `Open` → `Closed`
 - Admin may **extend** the end time or **reopen** a closed window at any time; these act on the whole week.
@@ -138,7 +138,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 1. For each teacher, select the target week and view the fully open grid.
 2. Toggle individual slots to `Unavailable` per teacher. A teacher with a Teacher-role User may do this for their own grid (see 6.5); creating the Week Schedules and publishing stay with the Administrator.
 3. Publish the week **once**: set the submission window start and end datetimes. The system generates **one** shareable link covering all teachers.
-4. Distribute the single link (outside the system, e.g., WhatsApp). Every teacher's students use the same link; the roster routes each student to the right grid.
+4. Distribute the single link (outside the system, e.g., WhatsApp). Every teacher's students use the same link; each student's record routes them to the right grid.
 ### 6.3 During the window
 - **Dashboard:** the summary grid (day × slot) shows the current request count per slot at any point during the window. Data reflects the state at page load; the admin refreshes the page to see new submissions. No push/auto-refresh requirement.
 ### 6.4 Window close and reopen
@@ -206,9 +206,9 @@ One row per slot request, sorted by day, then slot, then student rank:
 |---|---|
 | Day | Sunday-Friday |
 | Slot | Morning / Noon / Afternoon / Evening |
-| Student name | Full name (from roster) |
+| Student name | Full name (from the student's record) |
 | National ID | Identifier |
-| Phone | Contact number (from roster) |
+| Phone | Contact number (from the student's record) |
 | Transmission | Automatic / Manual |
 | Session type | Single / Double |
 | Rank | Position in the student's preference order |
@@ -244,9 +244,9 @@ One row per slot request, sorted by day, then slot, then student rank:
 | 14 | Hebrew + English toggle, RTL-first | Bilingual user base |
 | 15 | Slot windows hardcoded in v1 | Configurability is a v2 concern |
 | 16 | **Single school-wide weekly link** (one Publication per week), replacing per-teacher links | The roster routes each student to their teacher; one link is simpler to publish and distribute (see ADR 0003) |
-| 17 | **National ID is the student identifier**, validated against an admin-uploaded roster (CSV); no self-registration | Customer supplies the student list as data; ID is the school's natural key (see ADR 0003) |
+| 17 | **National ID is the student identifier**, validated against an admin-uploaded roster (CSV); no self-registration (amended by #25: or added by an Administrator) | Customer supplies the student list as data; ID is the school's natural key (see ADR 0003) |
 | 18 | **Transmission and teacher come from the roster**, not the form (amended by #25: or from an Administrator's change) | The CSV already assigns each student a teacher and car; asking would be redundant (see ADR 0003) |
-| 19 | **Unknown ID is rejected** ("contact your school"); ~~new students added by re-uploading the roster~~ new students are added through the roster or by an Administrator (amended by #25) | Roster is authoritative; removes self-service onboarding (see ADR 0003) |
+| 19 | **Unknown ID is rejected** ("contact your school"); ~~new students added by re-uploading the roster~~ new students are added through the roster or by an Administrator (amended by #25) | ~~Roster is authoritative;~~ removes self-service onboarding; students still can't add themselves (see ADR 0003 and its amendment) |
 | 20 | ~~No maximum on cars per teacher (was 1–2); minimum one binds as "the last car can never be removed" and a teacher may exist carless until their first car is added~~ **superseded by #21** | Fleet size is the school's business, not a system rule; the minimum only matters once car removal exists |
 | 21 | **Car is its own aggregate — a shared school pool**: one car may be assigned to any number of teachers (many-to-many), a teacher may have zero cars (the last-car rule is dropped), and cars soft-delete like teachers | One physical car is shared between teachers in practice; modeling Car as owned by a single teacher was a modeling error |
 | 22 | **The teacher's Excel email is Hebrew**: subject "בקשות לשבוע N - {teacher} - גרסה K", a right-to-left body, and the attachment named after the subject | Teachers read Hebrew and the workbook is already Hebrew (Excel roadmap decision 1); the version in the attachment's name keeps a saved file identifiable after it leaves the inbox |
