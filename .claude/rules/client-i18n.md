@@ -82,7 +82,7 @@ export class LanguageService {
 - `locale()` (`he-IL` / `en-IL`) is the locale passed to date formatters
 - PrimeNG's built-in strings (calendar day names, aria labels) come from `core\primeng-translations.ts` and switch with the language
 - PrimeNG direction follows `document.documentElement.dir` — see `client-primeng.md`
-- The document title is the translated `shell.title` key and follows the language
+- The document title is the translated `brand.appName` key (the product name) and follows the language; `index.html` carries the Hebrew name for first paint
 
 ## Translation Files
 
