@@ -627,6 +627,7 @@
   },
   "errors": {
     "conflict": "This change conflicts with the latest data. Refresh the page and try again.",
+    "concurrentChange": "Someone else changed this at the same moment. Refresh the page and try again.",
     "forbidden": "You don't have permission to do that.",
     "notFound": "This item no longer exists. Refresh the page.",
     "addressMustNotBeEmpty": "The address can't be empty.",

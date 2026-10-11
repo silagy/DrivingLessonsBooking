@@ -30,6 +30,7 @@ public static class DependencyInjection
             o.UseNpgsql(configuration.GetConnectionString("Default")));
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DrivingLessonsDbContext>());
+        services.AddScoped<ITeacherAndCarLocks, TeacherAndCarLocks>();
 
         services.AddOptions<AdminOptions>()
             .Bind(configuration.GetSection(AdminOptions.SectionName))

@@ -17,6 +17,7 @@ public class ChangeStudentTeacherInteractorTest
     private ITeacherRepository teacherRepository = null!;
     private ICarRepository carRepository = null!;
     private IUnitOfWork unitOfWork = null!;
+    private ITeacherAndCarLocks locks = null!;
     private ChangeStudentTeacherInteractor interactor = null!;
     private Teacher ronit = null!;
     private Teacher yael = null!;
@@ -31,7 +32,13 @@ public class ChangeStudentTeacherInteractorTest
         teacherRepository = A.Fake<ITeacherRepository>();
         carRepository = A.Fake<ICarRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new ChangeStudentTeacherInteractor(repository, teacherRepository, carRepository, unitOfWork);
+        locks = A.Fake<ITeacherAndCarLocks>();
+        interactor = new ChangeStudentTeacherInteractor(
+            repository,
+            teacherRepository,
+            carRepository,
+            locks,
+            unitOfWork);
 
         ronit = Teacher.Create(TeacherName.Of("רונית אברהם"), Email.Of("ronit@school.example"));
         yael = Teacher.Create(TeacherName.Of("יעל כרמי"), Email.Of("yael@school.example"));
@@ -58,6 +65,24 @@ public class ChangeStudentTeacherInteractorTest
         A.CallTo(() => carRepository.GetAsync(A<CarId>._)).Returns((Car?)null);
         A.CallTo(() => carRepository.GetAsync(corolla.Id)).Returns(corolla);
         A.CallTo(() => carRepository.GetAsync(i20.Id)).Returns(i20);
+    }
+
+    [TestMethod]
+    public async Task Locks_The_New_Teacher_And_Car_Before_Reading_Them()
+    {
+        //given
+        var request = new ChangeStudentTeacherRequest(yael.Id.Value, i20.Id.Value);
+
+        //when
+        await interactor.ExecuteAsync(noa.Id.Value, request);
+
+        //then
+        A.CallTo(() => locks.LockAsync(
+                A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { yael.Id }),
+                A<IReadOnlyCollection<CarId>>.That.IsSameSequenceAs(new[] { i20.Id })))
+            .MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => teacherRepository.GetAsync(yael.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => carRepository.GetAsync(i20.Id)).MustHaveHappened());
     }
 
     [TestMethod]

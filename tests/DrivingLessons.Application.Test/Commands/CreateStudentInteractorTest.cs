@@ -24,6 +24,7 @@ public class CreateStudentInteractorTest
     private ITeacherRepository teacherRepository = null!;
     private ICarRepository carRepository = null!;
     private IUnitOfWork unitOfWork = null!;
+    private ITeacherAndCarLocks locks = null!;
     private CreateStudentInteractor interactor = null!;
     private Teacher teacher = null!;
     private Car car = null!;
@@ -36,7 +37,8 @@ public class CreateStudentInteractorTest
         teacherRepository = A.Fake<ITeacherRepository>();
         carRepository = A.Fake<ICarRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new CreateStudentInteractor(repository, teacherRepository, carRepository, unitOfWork);
+        locks = A.Fake<ITeacherAndCarLocks>();
+        interactor = new CreateStudentInteractor(repository, teacherRepository, carRepository, locks, unitOfWork);
         teacher = Teacher.Create(TeacherName.Of("יעל כרמי"), Email.Of("yael@school.example"));
         car = Car.Create(CarName.Of("פיקנטו אדומה"), CarType.Of("פיקנטו"), Transmission.Automatic);
         car.AssignTeacher(teacher);
@@ -238,6 +240,24 @@ public class CreateStudentInteractorTest
         await Should.ThrowAsync<StudentCarMustBeAssignedToTeacherException>(act);
         A.CallTo(() => repository.Add(A<Student>._)).MustNotHaveHappened();
         A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Locks_The_Teacher_And_Car_Before_Reading_Them()
+    {
+        //given
+        var request = RequestFor(NationalIdValue, teacher.Id.Value, car.Id.Value);
+
+        //when
+        await interactor.ExecuteAsync(request);
+
+        //then
+        A.CallTo(() => locks.LockAsync(
+                A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { teacher.Id }),
+                A<IReadOnlyCollection<CarId>>.That.IsSameSequenceAs(new[] { car.Id })))
+            .MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => teacherRepository.GetAsync(teacher.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => carRepository.GetAsync(car.Id)).MustHaveHappened());
     }
 
     private static CreateStudentRequest RequestFor(string nationalId, Guid teacherId, Guid carId)

@@ -17,6 +17,7 @@ public class ReactivateStudentInteractorTest
     private ITeacherRepository teacherRepository = null!;
     private ICarRepository carRepository = null!;
     private IUnitOfWork unitOfWork = null!;
+    private ITeacherAndCarLocks locks = null!;
     private ReactivateStudentInteractor interactor = null!;
     private Teacher ronit = null!;
     private Car i20 = null!;
@@ -29,7 +30,8 @@ public class ReactivateStudentInteractorTest
         teacherRepository = A.Fake<ITeacherRepository>();
         carRepository = A.Fake<ICarRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new ReactivateStudentInteractor(repository, teacherRepository, carRepository, unitOfWork);
+        locks = A.Fake<ITeacherAndCarLocks>();
+        interactor = new ReactivateStudentInteractor(repository, teacherRepository, carRepository, locks, unitOfWork);
 
         ronit = Teacher.Create(TeacherName.Of("רונית אברהם"), Email.Of("ronit@school.example"));
         i20 = Car.Create(CarName.Of("i20 כסופה"), CarType.Of("i20"), Transmission.Manual);
@@ -42,6 +44,22 @@ public class ReactivateStudentInteractorTest
         A.CallTo(() => teacherRepository.GetIncludingDeletedAsync(ronit.Id)).Returns(ronit);
         A.CallTo(() => carRepository.GetIncludingDeletedAsync(A<CarId>._)).Returns((Car?)null);
         A.CallTo(() => carRepository.GetIncludingDeletedAsync(i20.Id)).Returns(i20);
+    }
+
+    [TestMethod]
+    public async Task Locks_The_Students_Teacher_And_Car_Before_Reading_Them()
+    {
+        //when
+        await interactor.ExecuteAsync(dana.Id.Value);
+
+        //then
+        A.CallTo(() => repository.GetAsync(dana.Id)).MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => locks.LockAsync(
+                    A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { ronit.Id }),
+                    A<IReadOnlyCollection<CarId>>.That.IsSameSequenceAs(new[] { i20.Id })))
+                .MustHaveHappenedOnceExactly())
+            .Then(A.CallTo(() => teacherRepository.GetIncludingDeletedAsync(ronit.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => carRepository.GetIncludingDeletedAsync(i20.Id)).MustHaveHappened());
     }
 
     [TestMethod]

@@ -19,6 +19,7 @@ public class ImportRosterInteractorTest
     private ITeacherRepository teacherRepository = null!;
     private ICarRepository carRepository = null!;
     private IUnitOfWork unitOfWork = null!;
+    private ITeacherAndCarLocks locks = null!;
     private ImportRosterInteractor interactor = null!;
     private Teacher teacher = null!;
     private Car car = null!;
@@ -35,12 +36,14 @@ public class ImportRosterInteractorTest
         teacherRepository = A.Fake<ITeacherRepository>();
         carRepository = A.Fake<ICarRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
+        locks = A.Fake<ITeacherAndCarLocks>();
         interactor = new ImportRosterInteractor(
             parser,
             studentRepository,
             rosterImportRepository,
             teacherRepository,
             carRepository,
+            locks,
             unitOfWork,
             TimeProvider.System);
 
@@ -63,6 +66,22 @@ public class ImportRosterInteractorTest
             .Invokes(call => persistedImport = call.GetArgument<RosterImport>(0));
 
         StudentsAre();
+    }
+
+    [TestMethod]
+    public async Task Locks_Every_Teacher_And_Car_Before_Reading_Them()
+    {
+        //given
+        RowsAre(Row(2, "דנה כהן", "123456782"));
+
+        //when
+        await interactor.ExecuteAsync(Request());
+
+        //then
+        A.CallTo(() => locks.LockAllAsync()).MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => teacherRepository.FindActiveAsync()).MustHaveHappened())
+            .Then(A.CallTo(() => carRepository.FindActiveAsync()).MustHaveHappened())
+            .Then(A.CallTo(() => studentRepository.FindAllAsync()).MustHaveHappened());
     }
 
     [TestMethod]

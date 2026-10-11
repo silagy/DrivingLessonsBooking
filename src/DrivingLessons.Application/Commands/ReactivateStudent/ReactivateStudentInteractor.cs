@@ -10,17 +10,20 @@ public class ReactivateStudentInteractor
     private readonly IStudentRepository repository;
     private readonly ITeacherRepository teacherRepository;
     private readonly ICarRepository carRepository;
+    private readonly ITeacherAndCarLocks locks;
     private readonly IUnitOfWork unitOfWork;
 
     public ReactivateStudentInteractor(
         IStudentRepository repository,
         ITeacherRepository teacherRepository,
         ICarRepository carRepository,
+        ITeacherAndCarLocks locks,
         IUnitOfWork unitOfWork)
     {
         this.repository = repository;
         this.teacherRepository = teacherRepository;
         this.carRepository = carRepository;
+        this.locks = locks;
         this.unitOfWork = unitOfWork;
     }
 
@@ -30,6 +33,8 @@ public class ReactivateStudentInteractor
 
         var student = await repository.GetAsync(studentId)
                       ?? throw new StudentNotFoundException(studentId);
+
+        await locks.LockAsync([student.TeacherId], [student.CarId]);
 
         var teacher = await teacherRepository.GetIncludingDeletedAsync(student.TeacherId)
                       ?? throw new TeacherNotFoundException(student.TeacherId);

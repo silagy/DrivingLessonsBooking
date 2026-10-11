@@ -17,6 +17,7 @@ public class UnassignCarFromTeacherInteractorTest
     private ITeacherRepository teacherRepository = null!;
     private IStudentRepository studentRepository = null!;
     private IUnitOfWork unitOfWork = null!;
+    private ITeacherAndCarLocks locks = null!;
     private UnassignCarFromTeacherInteractor interactor = null!;
     private Teacher teacher = null!;
     private Car car = null!;
@@ -28,10 +29,12 @@ public class UnassignCarFromTeacherInteractorTest
         teacherRepository = A.Fake<ITeacherRepository>();
         studentRepository = A.Fake<IStudentRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
+        locks = A.Fake<ITeacherAndCarLocks>();
         interactor = new UnassignCarFromTeacherInteractor(
             carRepository,
             teacherRepository,
             studentRepository,
+            locks,
             unitOfWork);
         teacher = Teacher.Create(TeacherName.Of("Ronit Avraham"), Email.Of("ronit@school.example"));
         car = Car.Create(CarName.Of("Corolla White"), CarType.Of("Corolla"), Transmission.Automatic);
@@ -104,6 +107,22 @@ public class UnassignCarFromTeacherInteractorTest
         //then
         await Should.ThrowAsync<TeacherNotFoundException>(act);
         A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Locks_The_Teacher_And_Car_Before_Reading_Them()
+    {
+        //when
+        await interactor.ExecuteAsync(car.Id.Value, teacher.Id.Value);
+
+        //then
+        A.CallTo(() => locks.LockAsync(
+                A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { teacher.Id }),
+                A<IReadOnlyCollection<CarId>>.That.IsSameSequenceAs(new[] { car.Id })))
+            .MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => carRepository.GetAsync(car.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => teacherRepository.GetAsync(teacher.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => studentRepository.FindActiveByCarAsync(car.Id)).MustHaveHappened());
     }
 
     private Student StudentOn(bool isActive)

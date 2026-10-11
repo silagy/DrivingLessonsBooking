@@ -75,6 +75,21 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Concurrent_Change_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new ConcurrentChangeException(new InvalidOperationException()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "concurrentChange");
+    }
+
+    [TestMethod]
     public void Student_Car_Not_Of_Teacher_Is_A_Conflict_With_Its_Rule_As_Code()
     {
         //given

@@ -16,6 +16,7 @@ public class DeleteCarInteractorTest
     private ICarRepository repository = null!;
     private IStudentRepository studentRepository = null!;
     private IUnitOfWork unitOfWork = null!;
+    private ITeacherAndCarLocks locks = null!;
     private DeleteCarInteractor interactor = null!;
     private Teacher teacher = null!;
     private Car car = null!;
@@ -26,7 +27,8 @@ public class DeleteCarInteractorTest
         repository = A.Fake<ICarRepository>();
         studentRepository = A.Fake<IStudentRepository>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new DeleteCarInteractor(repository, studentRepository, unitOfWork);
+        locks = A.Fake<ITeacherAndCarLocks>();
+        interactor = new DeleteCarInteractor(repository, studentRepository, locks, unitOfWork);
         teacher = Teacher.Create(TeacherName.Of("Ronit Avraham"), Email.Of("ronit@school.example"));
         car = Car.Create(CarName.Of("Corolla White"), CarType.Of("Corolla"), Transmission.Automatic);
         car.AssignTeacher(teacher);
@@ -85,6 +87,21 @@ public class DeleteCarInteractorTest
         //then
         await Should.ThrowAsync<CarNotFoundException>(act);
         A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Locks_The_Car_Before_Reading_It_Or_Its_Students()
+    {
+        //when
+        await interactor.ExecuteAsync(car.Id.Value);
+
+        //then
+        A.CallTo(() => locks.LockAsync(
+                A<IReadOnlyCollection<TeacherId>>.That.IsEmpty(),
+                A<IReadOnlyCollection<CarId>>.That.IsSameSequenceAs(new[] { car.Id })))
+            .MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => repository.GetAsync(car.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => studentRepository.FindActiveByCarAsync(car.Id)).MustHaveHappened());
     }
 
     private Student StudentOn(bool isActive)

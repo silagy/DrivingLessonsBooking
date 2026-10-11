@@ -200,7 +200,7 @@ export interface ProblemDetails {
 
 `ToastService.apiError` shows `errors.{code}` (interpolating `params`) when that key exists, otherwise `errors.notFound` (404) / `errors.conflict` (409), otherwise `general.unexpectedError`. It **never** shows `detail` — that is English, developer-facing text (see `api-guidelines.md` "Rule Codes").
 
-409 means the user's view was stale (e.g., publishing an already-published Publication) — surface a translated message and refresh the affected state. There is **no ETag/If-Match handling** — the backend deliberately omits optimistic locking.
+409 means the user's view was stale (e.g., publishing an already-published Publication) — surface a translated message and refresh the affected state. There is **no ETag/If-Match handling**: the server settles concurrent admin writes itself ([ADR 0007](../../docs/decisions/0007-locking-for-the-active-student-guards.md)), and a request that lost a race gets the rule it now breaks or `concurrentChange` (shown like any other 409), or a 404 if its Teacher or Car was deleted meanwhile.
 
 ## Routing
 

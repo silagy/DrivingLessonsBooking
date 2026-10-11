@@ -22,6 +22,7 @@ public class ImportRosterInteractor
     private readonly IRosterImportRepository rosterImportRepository;
     private readonly ITeacherRepository teacherRepository;
     private readonly ICarRepository carRepository;
+    private readonly ITeacherAndCarLocks locks;
     private readonly IUnitOfWork unitOfWork;
     private readonly TimeProvider timeProvider;
 
@@ -31,6 +32,7 @@ public class ImportRosterInteractor
         IRosterImportRepository rosterImportRepository,
         ITeacherRepository teacherRepository,
         ICarRepository carRepository,
+        ITeacherAndCarLocks locks,
         IUnitOfWork unitOfWork,
         TimeProvider timeProvider)
     {
@@ -39,6 +41,7 @@ public class ImportRosterInteractor
         this.rosterImportRepository = rosterImportRepository;
         this.teacherRepository = teacherRepository;
         this.carRepository = carRepository;
+        this.locks = locks;
         this.unitOfWork = unitOfWork;
         this.timeProvider = timeProvider;
     }
@@ -46,6 +49,8 @@ public class ImportRosterInteractor
     public async Task<ImportRosterResponse> ExecuteAsync(ImportRosterRequest request)
     {
         var rows = parser.Parse(request.Content);
+
+        await locks.LockAllAsync();
 
         var activeTeachers = await teacherRepository.FindActiveAsync();
         var teachersByName = activeTeachers.ToDictionary(x => x.Name);
