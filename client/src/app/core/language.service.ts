@@ -10,7 +10,7 @@ export type AppLanguage = 'he' | 'en';
 export type AppLocale = 'he-IL' | 'en-IL';
 
 const STORAGE_KEY = 'app_lang';
-const DOCUMENT_TITLE_KEY = 'shell.title';
+const DOCUMENT_TITLE_KEY = 'brand.appName';
 
 const LOCALES: Record<AppLanguage, AppLocale> = {
   he: 'he-IL',
