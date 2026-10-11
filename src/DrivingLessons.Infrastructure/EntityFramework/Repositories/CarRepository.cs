@@ -23,7 +23,7 @@ public class CarRepository : ICarRepository
     {
         return await dbContext
                          .Cars
-                         .IgnoreQueryFilters()
+                         .IgnoreQueryFilters([QueryFilters.CarNotDeleted])
                          .FirstOrDefaultAsync(x => x.Id == id);
     }
 

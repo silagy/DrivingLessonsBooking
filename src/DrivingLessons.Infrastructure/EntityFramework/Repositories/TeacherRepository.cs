@@ -23,7 +23,7 @@ public class TeacherRepository : ITeacherRepository
     {
         return await dbContext
                          .Teachers
-                         .IgnoreQueryFilters()
+                         .IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])
                          .FirstOrDefaultAsync(x => x.Id == id);
     }
 

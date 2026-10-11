@@ -27,9 +27,9 @@ public class StudentQueries : IStudentQueries
         }
 
         var query = from student in students
-                    join teacher in dbContext.Teachers.IgnoreQueryFilters()
+                    join teacher in dbContext.Teachers.IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])
                         on student.TeacherId equals teacher.Id
-                    join car in dbContext.Cars.IgnoreQueryFilters()
+                    join car in dbContext.Cars.IgnoreQueryFilters([QueryFilters.CarNotDeleted])
                         on student.CarId equals car.Id
                     orderby teacher.Name, student.Name
                     select new ItemForFindStudentsResponse
@@ -57,9 +57,9 @@ public class StudentQueries : IStudentQueries
         var studentId = StudentId.Of(id);
 
         var query = from student in dbContext.Students
-                    join teacher in dbContext.Teachers.IgnoreQueryFilters()
+                    join teacher in dbContext.Teachers.IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])
                         on student.TeacherId equals teacher.Id
-                    join car in dbContext.Cars.IgnoreQueryFilters()
+                    join car in dbContext.Cars.IgnoreQueryFilters([QueryFilters.CarNotDeleted])
                         on student.CarId equals car.Id
                     where student.Id == studentId
                     select new GetStudentResponse
