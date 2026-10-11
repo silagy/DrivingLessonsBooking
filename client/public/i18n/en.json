@@ -1,6 +1,7 @@
 {
   "brand": {
-    "appName": "WeekDrive"
+    "appName": "Slotline",
+    "tagline": "Weekly lesson demand, in one link"
   },
   "auth": {
     "title": "Sign in",
@@ -13,7 +14,6 @@
     "footnote": "One admin account - the school owner. Students never sign in."
   },
   "shell": {
-    "title": "Driving Lessons Planner",
     "logout": "Sign out",
     "userMenu": "User menu",
     "changeMyPassword": "Change my password",

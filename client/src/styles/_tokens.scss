@@ -20,6 +20,8 @@
   );
 
   --app-on-accent: var(--p-surface-0);
+  --app-brand: var(--p-sky-500);
+  --app-wordmark-tracking: -0.025em;
   --app-steel-light: var(--p-steel-100);
   --app-whale: var(--p-whale-500);
 
@@ -36,4 +38,5 @@
 
 :root[lang='he'] {
   --app-caps-tracking: 0;
+  --app-wordmark-tracking: 0;
 }

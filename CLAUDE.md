@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Weekly demand-collection system for a driving school (see [README.md](README.md) and [docs/requirements.md](docs/requirements.md)).
+**Slotline** (סלוטליין) - weekly demand-collection system for a driving school (see [README.md](README.md) and [docs/requirements.md](docs/requirements.md)). The logo is Option A, Lane tile, from the Claude Design file `Slotline Logo Options.html`; the client draws it in `client\src\app\shared\brand-logo\`.
 
 **Stack**: latest .NET, ASP.NET Core Web API, EF Core, PostgreSQL. Frontend: latest Angular + PrimeNG, lives in this repo under `client\`.
 **Architecture**: modular monolith, DDD, Onion Architecture. Single deployable — Angular is served from `Presentation.Web\wwwroot`.

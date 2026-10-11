@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <style>
+    .lane { stroke: #0057FF; }
+    @media (prefers-color-scheme: dark) { .lane { stroke: #FFFFFF; } }
+  </style>
+  <rect class="lane" x="2" y="2" width="36" height="36" rx="10" fill="none" stroke-width="3"/>
+  <path class="lane" d="M20 9v5M20 17.5v5M20 26v5" fill="none" stroke-width="3" stroke-linecap="round"/>
+</svg>
