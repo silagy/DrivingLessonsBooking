@@ -85,6 +85,8 @@ Also pinned: a client faking `X-Forwarded-For` cannot dodge the limit (Caddy ove
 
 **Start the long-lead items on day one, before task 1** (they block only task 8): the human partner registers the domain in Route 53, creates the SES domain identity in `eu-central-1`, and submits the SES production-access request — runbook §1 and §4 (written in task 6; the exact console clicks are also in task 8 Steps 1–2, readable now).
 
+**The human partner's overview** of the whole path (AWS account → long-lead items → these tasks → first deploy → routine releases) is [docs/operations/deploying-to-production.md](../../../operations/deploying-to-production.md).
+
 ## How to Run a Task
 
 1. Confirm you are on branch `74-production-deployment` (task 8: on `main` after the PR merged, then a results branch) and all earlier tasks are committed.

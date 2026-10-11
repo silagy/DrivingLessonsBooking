@@ -1,6 +1,6 @@
 # AWS Account Setup
 
-A step-by-step guide to opening a new AWS account and making it safe to use **before** anything is deployed. Once this is done, continue with the production setup in the deployment plan ([#74](https://github.com/silagy/DrivingLessonsBooking/issues/74), `docs/modules/deployment/us-74-production-deployment-plan/`, task 8), which registers the domain and creates the server.
+A step-by-step guide to opening a new AWS account and making it safe to use **before** anything is deployed. Once this is done, continue with the production setup in the deployment plan ([#74](https://github.com/silagy/DrivingLessonsBooking/issues/74), `docs/modules/deployment/us-74-production-deployment-plan/`, task 8), which registers the domain and creates the server. The overview of the whole path to production is [deploying-to-production.md](deploying-to-production.md).
 
 Time: about 45 minutes of clicking, plus up to 24 hours for AWS to activate the account. Console labels move around occasionally; if a button is named slightly differently, use the search bar at the top of the console.
 

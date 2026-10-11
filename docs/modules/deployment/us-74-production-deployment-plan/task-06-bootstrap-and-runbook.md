@@ -122,7 +122,7 @@ Create `docs/operations/runbook.md` with exactly this content (placeholders in a
 ````markdown
 # Production Runbook
 
-How the production system is set up, released, backed up and restored. Hosting per [ADR 0002](../decisions/0002-hosting-aws-lightsail.md), email per [ADR 0005](../decisions/0005-email-over-ses-smtp.md). Region for everything: **Frankfurt, `eu-central-1`**.
+How the production system is set up, released, backed up and restored. Hosting per [ADR 0002](../decisions/0002-hosting-aws-lightsail.md), email per [ADR 0005](../decisions/0005-email-over-ses-smtp.md). Region for everything: **Frankfurt, `eu-central-1`**. For the order of the whole path to production, start at [deploying-to-production.md](deploying-to-production.md).
 
 | Thing | Where |
 |---|---|
