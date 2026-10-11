@@ -207,6 +207,7 @@
     "deactivatedDetail": "{{name}} לא יוכל/תוכל להגיש עד לסימון מחדש כפעיל/ה.",
     "reactivated": "התלמיד סומן כפעיל",
     "reactivatedDetail": "{{name}} יכול/ה להגיש שוב בטופס התלמידים.",
+    "reactivateCarNotOfTeacher": "הרכב {{car}} כבר לא משויך למורה {{teacher}}. יש לשייך אותו למורה {{teacher}} במסך רכבים ומורים, ואז לסמן את התלמיד כפעיל.",
     "teacherChanged": "המורה הוחלף",
     "teacherChangedDetail": "המורה של {{name}}: {{teacher}}, על {{car}}.",
     "carChanged": "הרכב הוחלף",

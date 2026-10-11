@@ -52,6 +52,10 @@ export class ToastService {
         });
     }
 
+    error(key: string, params?: Record<string, string>): void {
+        this.messages.add({ severity: 'error', summary: this.transloco.translate(key, params) });
+    }
+
     apiError(error: unknown, isolatedParams: readonly string[] = []): void {
         this.messages.add({ severity: 'error', summary: this.messageOf(error, isolatedParams) });
     }

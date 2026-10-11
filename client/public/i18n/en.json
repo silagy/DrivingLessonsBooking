@@ -207,6 +207,7 @@
     "deactivatedDetail": "{{name}} can't submit until reactivated.",
     "reactivated": "Student reactivated",
     "reactivatedDetail": "{{name}} can submit on the student form again.",
+    "reactivateCarNotOfTeacher": "{{car}} is no longer assigned to {{teacher}}. Assign it to {{teacher}} on Cars & teachers, then mark the Student as active.",
     "teacherChanged": "Teacher changed",
     "teacherChangedDetail": "{{name}}'s Teacher is now {{teacher}}, on {{car}}.",
     "carChanged": "Car changed",

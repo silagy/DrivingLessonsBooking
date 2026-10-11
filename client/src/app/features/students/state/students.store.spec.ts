@@ -183,7 +183,7 @@ function createStore(overrides: Partial<ApiStubs> = {}) {
         findCars: () => of(CARS),
         ...overrides,
     };
-    const toast = { success: vi.fn(), apiError: vi.fn(), messageOf: vi.fn(() => 'translated refusal') };
+    const toast = { success: vi.fn(), error: vi.fn(), apiError: vi.fn(), messageOf: vi.fn(() => 'translated refusal') };
     const findCars = vi.fn(stubs.findCars);
     const api = {
         findStudents: vi.fn(stubs.findStudents),
@@ -670,7 +670,27 @@ describe('StudentsStore', () => {
         expect(api.findStudents).toHaveBeenCalledTimes(1);
     });
 
-    it.each(['studentTeacherMustNotBeDeleted', 'studentCarMustNotBeDeleted', 'studentCarMustBeAssignedToTeacher'])(
+    it('explains in its own words that the Car must be assigned back to the Teacher before reactivating', async () => {
+        //given
+        const failure = problem(HTTP_CONFLICT, 'studentCarMustBeAssignedToTeacher');
+        const { store, toast, api } = createStore({ reactivateStudent: () => throwError(() => failure) });
+        await stable();
+
+        //when
+        await store.reactivate(DANA);
+        await stable();
+
+        //then
+        expect(toast.error).toHaveBeenCalledWith('students.reactivateCarNotOfTeacher', {
+            car: isolateDirection('i20 Silver'),
+            teacher: isolateDirection('Ronit Avraham'),
+        });
+        expect(toast.apiError).not.toHaveBeenCalled();
+        expect(api.findStudents).toHaveBeenCalledTimes(1);
+        expect(store.isMutating()).toBe(false);
+    });
+
+    it.each(['studentTeacherMustNotBeDeleted', 'studentCarMustNotBeDeleted'])(
         'explains a %s Reactivate refusal without reloading',
         async (code) => {
             //given

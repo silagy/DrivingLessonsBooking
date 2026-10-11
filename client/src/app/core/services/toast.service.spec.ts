@@ -221,6 +221,26 @@ describe('ToastService', () => {
         });
     });
 
+    describe('error', () => {
+        it('shows a screen\'s own refusal message with its values filled in', () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            toast.error('errors.teacherAssignmentMustNotHaveActiveStudents', {
+                teacher: 'Yael Carmi',
+                count: '1',
+                names: 'Noa Levi',
+            });
+
+            //then
+            expect(add).toHaveBeenCalledWith({
+                severity: 'error',
+                summary: 'Active Students of Yael Carmi learn on this Car (1): Noa Levi.',
+            });
+        });
+    });
+
     describe('messageOf', () => {
         it('gives the same translated rule message without showing a toast', () => {
             //given
