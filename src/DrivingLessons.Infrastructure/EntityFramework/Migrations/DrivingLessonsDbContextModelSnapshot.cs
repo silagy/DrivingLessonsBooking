@@ -158,6 +158,12 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("teacher_id");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NationalId")
