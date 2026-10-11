@@ -1,9 +1,9 @@
 # Requirements Document: Weekly Demand Collection System for Driving Lessons
  
-**Version:** 1.4
-**Date:** 13 July 2026
+**Version:** 1.5
+**Date:** 11 October 2026
 **Status:** Approved scope for v1
-**Changelog:** v1.4 - the roster is no longer the single source of truth: an import adds and updates students but never deactivates anyone, and a row whose car is not assigned to its teacher is rejected and reported while the rest imports; a student's car is always one of their teacher's cars (see decision #23, the ADR 0003 amendment and issue #92). v1.3 — Car remodeled as its own aggregate: a **shared school pool** of cars, each assignable to any number of teachers (many-to-many); a teacher may have zero cars (the last-car rule is dropped); cars are soft-deleted like teachers (see decision #21). v1.2 — teacher car limit removed: a teacher owns **one or more** cars (was 1–2); the minimum-one rule binds as "the last car can never be removed" (see decision #20). v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
+**Changelog:** v1.5 - Users and Roles (spec #82): people sign in as **Users**, each with exactly one **Role**, Administrator or Teacher; a Teacher-role User sees only their own teacher's Week Schedules and Publications and marks that teacher's slots, and Administrators manage Users (decision #24, see [ADR 0006](decisions/0006-user-aggregate-and-roles.md)). v1.4 - the roster is no longer the single source of truth: an import adds and updates students but never deactivates anyone, and a row whose car is not assigned to its teacher is rejected and reported while the rest imports; a student's car is always one of their teacher's cars (see decision #23, the ADR 0003 amendment and issue #92). v1.3 — Car remodeled as its own aggregate: a **shared school pool** of cars, each assignable to any number of teachers (many-to-many); a teacher may have zero cars (the last-car rule is dropped); cars are soft-deleted like teachers (see decision #21). v1.2 — teacher car limit removed: a teacher owns **one or more** cars (was 1–2); the minimum-one rule binds as "the last car can never be removed" (see decision #20). v1.1 — student identity moved from email to national ID via an admin-uploaded roster (CSV); per-teacher links replaced by a single school-wide weekly link with ID-based routing; transmission question, teacher-confirmation/mismatch flow, and self-service onboarding removed. See [ADR 0003](decisions/0003-roster-csv-and-weekly-link-model.md).
 **Scope discipline:** This document is technology-agnostic. A separate technology document (latest .NET, latest Angular, PrimeNG, signal-based patterns) will govern implementation.
  
 ---
@@ -23,6 +23,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 ### In scope (v1)
 - Admin upload of the student roster as a CSV (national-ID-identified; binds each student to a teacher and car)
 - Admin preparation of weekly availability grids, per teacher, published once per week as a single school-wide link
+- Sign-in for **Users** holding one of two **Roles**: Administrator (everything) or Teacher (their own teacher's Week Schedules and Publications); Administrators add, edit, delete and restore Users, and every User changes their own password
 - Student-facing submission flow via the shared weekly link, identified by national ID
 - Live admin dashboard during the submission window
 - Excel generation (on-demand download and automatic email at window close)
@@ -30,7 +31,11 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 ### Out of scope (v1)
 - Actual booking / assignment of students to slots. The Excel file is the end of this system's responsibility.
 - Notifying students of their final schedule
-- Logins for teachers (teachers are data entities only)
+- Self-service "forgot password", password emails and invitation links; forcing a password change after a Temporary Password
+- More than two Roles, per-permission configuration, or a User holding several Roles
+- Teachers creating Week Schedules or running the Publication lifecycle (publish, open, close, reopen)
+- Student logins: students identify by national ID only
+- An audit log of User administration beyond domain events
 - Payments, billing, multi-school tenancy
 - Configurable slot windows (hardcoded in v1)
 - Student self-registration: students are known only through the uploaded roster; there is no self-service onboarding
@@ -39,8 +44,8 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
  
 | Persona | Description | Authentication |
 |---|---|---|
-| **Administrator** | The school owner. Also a teacher. Performs all planning for all teachers. Uploads and maintains the student roster. | Email + password login |
-| **Teacher** | A data entity. May be assigned cars from the shared pool. Receives the resulting Excel. No login in v1. The single weekly link covers all teachers; the student's roster record routes them to the right teacher's grid. | None |
+| **Administrator** | A User with the Administrator Role. The school owner, who also teaches, is the first; more can be added. Performs all planning for all teachers, manages Users, students and the roster. May be linked to a teacher to work with that teacher's own schedule. | Email + password sign-in (see 5.8) |
+| **Teacher** | A teacher record: may be assigned cars from the shared pool and receives the resulting Excel. A teacher may have one User with the **Teacher Role**, which sees only that teacher's Week Schedules and Publications and marks that teacher's slots Open or Unavailable. The single weekly link covers all teachers; the student's record routes them to the right teacher's grid. | Email + password sign-in for the teacher's User, if they have one; none otherwise |
 | **Student** | Receives the single weekly link (typically via WhatsApp). Submits weekly session preferences. Must already exist in the uploaded roster. | National ID identification, validated against the roster, no password (see 8.2) |
  
 ## 5. Domain Model
@@ -100,16 +105,30 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Rank: position in the student's ordered list
 **Ranking model decision:** There are no distinct "primary" and "alternative" request types. The model is one ranked preference list plus a target count. A student who wants 2 sessions and picks 5 slots has submitted ranks 1-5 against a target of 2. The teacher interprets rank against target during booking.
  
+### 5.8 User
+- A person who can sign in: name, sign-in email (unique, case-insensitive), password, and exactly one **Role**
+- **Administrator**: can do everything. May be linked to one teacher (the owner who also teaches), and then also works with that teacher's schedule like any teacher
+- **Teacher Role**: always linked to exactly one teacher. Sees only that teacher's Week Schedules and Publications (with their submissions, share link and Excel download) and marks that teacher's slots Open or Unavailable under the same rules as the Administrator. Cannot create Week Schedules or publish, open, close or reopen a Publication
+- The teacher link is set when the User is created and never changes. A teacher has at most one User
+- Administrators add a User with a **Temporary Password**, edit name and sign-in email, change Role, set a new Temporary Password, delete and restore. A Teacher-role User can be promoted to Administrator and keeps their teacher link; an Administrator can be demoted to the Teacher Role only when linked to a teacher
+- No one can delete themselves or change their own Role, and the last active Administrator can never be deleted or demoted
+- A **Deleted User** can't sign in and is signed out on their next request. Deleting a User leaves their teacher, Week Schedules and Publications untouched, and a Deleted User can be restored
+- A Role change, a new Temporary Password or a password change also takes effect on the User's next request
+- Every User can change their own password by entering their current one
+- An operation already in its target state is rejected (deleting a Deleted User, restoring an active one, giving a User the Role they already have)
+- On a fresh installation, the configured email and password create the first Administrator when no Users exist; later restarts leave Users untouched
+
 ## 6. Administrator Flows
  
 ### 6.1 Setup (one-time / rare)
-1. Log in.
+1. Sign in. On a fresh installation, the first Administrator comes from the configured email and password (see 5.8).
 2. Create teachers.
 3. Create cars in the shared pool (setting transmission per car) and assign each car to its teachers.
-4. Upload the student roster (CSV). Re-upload at any time to add students or update assignments; upsert is by national ID (see 5.5.1).
+4. Add Users: a Teacher-role User for each teacher who reports their own availability, and further Administrators if needed (see 5.8).
+5. Upload the student roster (CSV). Re-upload at any time to add students or update assignments; upsert is by national ID (see 5.5.1).
 ### 6.2 Weekly preparation
 1. For each teacher, select the target week and view the fully open grid.
-2. Toggle individual slots to `Unavailable` per teacher.
+2. Toggle individual slots to `Unavailable` per teacher. A teacher with a Teacher-role User may do this for their own grid (see 6.5); creating the Week Schedules and publishing stay with the Administrator.
 3. Publish the week **once**: set the submission window start and end datetimes. The system generates **one** shareable link covering all teachers.
 4. Distribute the single link (outside the system, e.g., WhatsApp). Every teacher's students use the same link; the roster routes each student to the right grid.
 ### 6.3 During the window
@@ -119,6 +138,11 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - The admin may extend the deadline before close, or reopen after close.
 - **Versioning rule:** every window close event fires the email. The email subject carries an incrementing version number (e.g., "בקשות לשבוע 25 - משה כהן - גרסה 2"; the email is Hebrew, see decision #22) so the teacher always knows whether a previously received file is stale.
 - The Excel is also available for **on-demand download** from the admin UI at any time, including mid-window.
+### 6.5 Teacher-role User
+1. Sign in and land on the teacher's own Week Schedules.
+2. Mark the teacher's own slots Open or Unavailable for a week the Administrator created.
+3. See the teacher's own Publications with their state, submissions, share link and Excel download.
+4. Teachers & Cars, Students, Roster and Users are not shown, and reaching another teacher's data, even by typing a URL, is refused.
 ## 7. Student Flow
  
 1. Student opens the single weekly link on a mobile or desktop browser.
@@ -148,6 +172,7 @@ A `Double` session counts as **one request** in summary counts, by explicit deci
 ### 8.2 Identity and abuse posture
 - National-ID identification, no passwords, no magic links in v1. Submission requires the ID to exist in the roster, so random walk-ins cannot submit. Accepted risk: anyone holding the link who knows a roster member's national ID can impersonate that student. National IDs are semi-guessable (9 digits with a check digit), and because the link is now **school-wide**, the blast radius is the **whole school's** weekly preference lists rather than one teacher's. The mitigation remains that the teacher knows his students and reviews the Excel; this mitigation is weaker at school scale and is flagged for revisit if abuse appears.
 - Re-entering the same national ID **loads the existing submission for editing**. This is mandatory: without self-service editing, correction requests return to WhatsApp and recreate the manual workload this system exists to eliminate.
+- Users (Administrators and Teacher-role Users) sign in with email and password; this is separate from student identification. Revoking access (deleting a User, changing their Role, setting a new password) takes effect on the User's next request, not when their session expires.
 ### 8.3 Timezone
 - **Instants** (submission window open/close, submission timestamps, audit fields) are stored in **UTC** and presented in Asia/Jerusalem. This is the future-proofing for eventual multi-school generalization.
 - **Wall-clock definitions** (slot windows such as Morning 07:00-12:00) are stored as **local time plus a named timezone (Asia/Jerusalem)**, not UTC. A slot is a recurring local-time concept; converting it to UTC would shift it by an hour across DST transitions, which is a bug, not a simplification.
@@ -194,7 +219,7 @@ One row per slot request, sorted by day, then slot, then student rank:
  
 | # | Decision | Rationale |
 |---|---|---|
-| 1 | Admin = owner-teacher, single login, no teacher logins | v1 reality: one person plans for everyone |
+| 1 | ~~Admin = owner-teacher, single login, no teacher logins~~ **superseded by #24** | v1 reality: one person plans for everyone |
 | 2 | Single school, architecture should not block later generalization | May generalize later |
 | 3 | Scheduling scoped per **teacher**, not per car (still holds). ~~Link scoped per teacher~~ **superseded by #16** | Teacher may operate multiple cars; the link is now school-wide (see #16) |
 | 4 | One ranked list + target count, no primary/alternative types | Simpler model, rank carries the same information |
@@ -217,12 +242,13 @@ One row per slot request, sorted by day, then slot, then student rank:
 | 21 | **Car is its own aggregate — a shared school pool**: one car may be assigned to any number of teachers (many-to-many), a teacher may have zero cars (the last-car rule is dropped), and cars soft-delete like teachers | One physical car is shared between teachers in practice; modeling Car as owned by a single teacher was a modeling error |
 | 22 | **The teacher's Excel email is Hebrew**: subject "בקשות לשבוע N - {teacher} - גרסה K", a right-to-left body, and the attachment named after the subject | Teachers read Hebrew and the workbook is already Hebrew (Excel roadmap decision 1); the version in the attachment's name keeps a saved file identifiable after it leaves the inbox |
 | 23 | **The roster adds and updates but never deactivates, and a student's car must be one of their teacher's cars**; a roster row that breaks the rule is rejected and reported while the rest of the file imports | Students added or edited by hand must survive the next import; the car fixes the student's transmission, so it must be a car their teacher actually teaches on (see the ADR 0003 amendment, issue #92) |
+| 24 | **Users with exactly one of two Roles**: Administrator (everything) or Teacher (only the linked teacher's Week Schedules and Publications, marking that teacher's slots). A Teacher-role User is linked to exactly one teacher, the link never changes, a teacher has at most one User, and the last active Administrator can never be deleted or demoted | Teachers report their own availability instead of the owner doing it for everyone; two fixed Roles cover one school without a permissions model (see [ADR 0006](decisions/0006-user-aggregate-and-roles.md), spec #82) |
  
 ## 12. Explicitly Deferred (v2 candidates)
  
 - Copy previous week's unavailability as a starting point
 - Configurable slot windows and session lengths
-- Teacher logins and per-teacher self-service
+- Self-service password reset (forgot password, password emails, invitation links) and forcing a new password after a Temporary Password
 - Magic-link email verification
 - Booking/assignment module consuming the ranked requests
 - Student notification of final schedule
