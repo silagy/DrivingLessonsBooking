@@ -110,8 +110,8 @@ Current component names only: `Select` (not Dropdown), `DatePicker` (not Calenda
 - Labels always translated
 
 ```html
-<p-button [label]="'Publications.publish' | translate" (onClick)="onPublish()" />
-<p-button [label]="'General.cancel' | translate" severity="secondary" />
+<p-button [label]="'publications.publish' | transloco" (onClick)="onPublish()" />
+<p-button [label]="'general.cancel' | transloco" severity="secondary" />
 ```
 
 ### Dialogs — always DynamicDialog
@@ -121,7 +121,7 @@ All modals open through `DialogService`; dialogs are dumb (see `client-state.md`
 ```typescript
 openExtendDeadline(publication: Publication): void {
     const ref = this.dialogService.open(ExtendDeadlineDialog, {
-        header: this.translate.instant('Publications.extendDeadline'),
+        header: this.transloco.translate('publications.extendWindow'),
         width: '32rem',
         data: { publication },
         dismissableMask: true,

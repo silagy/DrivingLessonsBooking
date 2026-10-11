@@ -118,8 +118,8 @@ features\publications\
 | Component (dumb) | `features\{feature}\ui\components\{name}\{name}.component.ts` | `SlotCountCellComponent` |
 | Shared component | `shared\components\{name}\{name}.component.ts` | `WeekGridComponent` |
 | Dialog | `features\{feature}\ui\dialogs\{name}\{name}.dialog.ts` | `PublishWeekDialog` |
-| Guard | `core\auth\{name}.guard.ts` | `authGuard` |
-| Interceptor | `core\http\{name}.interceptor.ts` | `apiErrorInterceptor` |
+| Guard | `core\{name}.guard.ts` (related guards share `core\{name}.guards.ts`) | `authGuard`, `administratorGuard` |
+| Interceptor | `core\{name}.interceptor.ts` | `authInterceptor` |
 | Route constants | `shared\config\app-routes.ts` | `AppRoutes` |
 
 ### Where to Put Code?
