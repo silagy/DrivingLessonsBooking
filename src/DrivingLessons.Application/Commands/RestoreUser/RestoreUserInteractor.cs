@@ -11,15 +11,18 @@ public class RestoreUserInteractor
 {
     private readonly IUserRepository repository;
     private readonly ITeacherRepository teacherRepository;
+    private readonly ITeacherAndCarLocks locks;
     private readonly IUnitOfWork unitOfWork;
 
     public RestoreUserInteractor(
         IUserRepository repository,
         ITeacherRepository teacherRepository,
+        ITeacherAndCarLocks locks,
         IUnitOfWork unitOfWork)
     {
         this.repository = repository;
         this.teacherRepository = teacherRepository;
+        this.locks = locks;
         this.unitOfWork = unitOfWork;
     }
 
@@ -45,6 +48,8 @@ public class RestoreUserInteractor
         {
             return;
         }
+
+        await locks.LockAsync([teacherId], []);
 
         var teacher = await teacherRepository.GetAsync(teacherId);
 
