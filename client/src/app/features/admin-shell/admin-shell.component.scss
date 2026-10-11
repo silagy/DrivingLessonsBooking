@@ -55,6 +55,10 @@
   border-radius: 3px 3px 0 0;
 }
 
+.shell__nav-link:focus-visible {
+  outline-offset: -2px;
+}
+
 .shell__actions {
   margin-inline-start: auto;
   display: flex;
@@ -163,8 +167,7 @@
 }
 
 .shell__email {
-  display: inline-block;
-  max-inline-size: 12rem;
+  max-inline-size: 9rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -177,7 +180,7 @@
   padding: 1.625rem 2.25rem 2.25rem;
 }
 
-@media screen and (max-width: 992px) {
+@media screen and (max-width: 1279px) {
   .shell__bar {
     block-size: auto;
     flex-wrap: wrap;
@@ -192,11 +195,5 @@
     flex-basis: 100%;
     block-size: 2.75rem;
     gap: 1.25rem;
-  }
-}
-
-@media screen and (min-width: 993px) and (max-width: 1199px) {
-  .shell__email {
-    display: none;
   }
 }
