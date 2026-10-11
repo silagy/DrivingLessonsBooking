@@ -1,4 +1,6 @@
 using DrivingLessons.Application.Queries.GetWeekSchedule;
+using DrivingLessons.Presentation.Web.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +9,7 @@ namespace DrivingLessons.Presentation.Web.Controllers.WeekSchedule;
 [ApiController]
 [Route("api/week-schedules")]
 [Tags("Week Schedules")]
+[Authorize(Policy = AuthorizationPolicies.TeacherOrAdministrator)]
 public class WeekScheduleQueryController : ControllerBase
 {
     [HttpGet("by-teacher-and-week")]

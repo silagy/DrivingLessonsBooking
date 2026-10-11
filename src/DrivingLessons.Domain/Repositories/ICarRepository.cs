@@ -7,6 +7,8 @@ public interface ICarRepository
 {
     Task<Car?> GetAsync(CarId id);
 
+    Task<Car?> GetIncludingDeletedAsync(CarId id);
+
     Task<IReadOnlyCollection<Car>> FindActiveAsync();
 
     void Add(Car car);

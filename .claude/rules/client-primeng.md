@@ -110,8 +110,8 @@ Current component names only: `Select` (not Dropdown), `DatePicker` (not Calenda
 - Labels always translated
 
 ```html
-<p-button [label]="'Publications.publish' | translate" (onClick)="onPublish()" />
-<p-button [label]="'General.cancel' | translate" severity="secondary" />
+<p-button [label]="'publications.publish' | transloco" (onClick)="onPublish()" />
+<p-button [label]="'general.cancel' | transloco" severity="secondary" />
 ```
 
 ### Dialogs — always DynamicDialog
@@ -121,7 +121,7 @@ All modals open through `DialogService`; dialogs are dumb (see `client-state.md`
 ```typescript
 openExtendDeadline(publication: Publication): void {
     const ref = this.dialogService.open(ExtendDeadlineDialog, {
-        header: this.translate.instant('Publications.extendDeadline'),
+        header: this.transloco.translate('publications.extendWindow'),
         width: '32rem',
         data: { publication },
         dismissableMask: true,
@@ -164,6 +164,7 @@ The grid (admin preparation, admin dashboard, student slot picking) is **one sha
 - Student form: mobile-first, ~375px design width, 40px minimum touch targets, single-column flow
 - Admin: desktop-first; compact 32px inputs above the desktop breakpoint
 - One breakpoint convention: `992px` separates mobile/desktop; sizing overrides live in one place in `@layer app`, not per component
+- `992px` is the sizing breakpoint. A component may add its own **layout** breakpoint when measured content needs one; write down why in its plan: e.g. the admin shell's two-row bar at `max-width: 1279px` (#106: a single row clipped nav links below 1280px)
 
 ```scss
 @layer app {

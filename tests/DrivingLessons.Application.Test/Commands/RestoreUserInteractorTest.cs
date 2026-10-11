@@ -15,6 +15,7 @@ public class RestoreUserInteractorTest
 {
     private IUserRepository repository = null!;
     private ITeacherRepository teacherRepository = null!;
+    private ITeacherAndCarLocks locks = null!;
     private IUnitOfWork unitOfWork = null!;
     private RestoreUserInteractor interactor = null!;
     private Teacher teacher = null!;
@@ -26,8 +27,9 @@ public class RestoreUserInteractorTest
     {
         repository = A.Fake<IUserRepository>();
         teacherRepository = A.Fake<ITeacherRepository>();
+        locks = A.Fake<ITeacherAndCarLocks>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new RestoreUserInteractor(repository, teacherRepository, unitOfWork);
+        interactor = new RestoreUserInteractor(repository, teacherRepository, locks, unitOfWork);
 
         teacher = Teacher.Create(TeacherName.Of("Dana Levi"), Email.Of("dana@school.example"));
         administrator = UserOf("ronit@school.example", Role.Administrator, null);
@@ -103,6 +105,20 @@ public class RestoreUserInteractorTest
         //then
         await Should.ThrowAsync<UserNotFoundException>(act);
         A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Locks_The_Linked_Teacher_Before_Reading_It()
+    {
+        //when
+        await interactor.ExecuteAsync(teacherUser.Id.Value);
+
+        //then
+        A.CallTo(() => locks.LockAsync(
+                A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { teacher.Id }),
+                A<IReadOnlyCollection<CarId>>.That.IsEmpty()))
+            .MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => teacherRepository.GetAsync(teacher.Id)).MustHaveHappened());
     }
 
     private static User UserOf(string signInEmail, Role role, Teacher? linkedTeacher)

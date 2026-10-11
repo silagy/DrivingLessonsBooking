@@ -23,6 +23,7 @@ public class CreateUserInteractorTest
     private IUserQueries queries = null!;
     private ITeacherRepository teacherRepository = null!;
     private IPasswordHasher passwordHasher = null!;
+    private ITeacherAndCarLocks locks = null!;
     private IUnitOfWork unitOfWork = null!;
     private CreateUserInteractor interactor = null!;
     private Teacher teacher = null!;
@@ -36,8 +37,9 @@ public class CreateUserInteractorTest
         queries = A.Fake<IUserQueries>();
         teacherRepository = A.Fake<ITeacherRepository>();
         passwordHasher = A.Fake<IPasswordHasher>();
+        locks = A.Fake<ITeacherAndCarLocks>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new CreateUserInteractor(repository, queries, teacherRepository, passwordHasher, unitOfWork);
+        interactor = new CreateUserInteractor(repository, queries, teacherRepository, passwordHasher, locks, unitOfWork);
         teacher = Teacher.Create(TeacherName.Of("Dana Levi"), Email.Of("dana.teaches@school.example"));
         hashed = PasswordHash.Of("hashed-temporary-password");
         added = null;
@@ -173,6 +175,24 @@ public class CreateUserInteractorTest
         //then
         await Should.ThrowAsync<TeacherNotFoundException>(act);
         A.CallTo(() => repository.Add(A<User>._)).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Locks_The_Teacher_Before_Reading_It_Or_Its_Linked_Users()
+    {
+        //given
+        var request = new CreateUserRequest(UserNameValue, SignInEmail, Role.Teacher, teacher.Id.Value, Password);
+
+        //when
+        await interactor.ExecuteAsync(request);
+
+        //then
+        A.CallTo(() => locks.LockAsync(
+                A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { teacher.Id }),
+                A<IReadOnlyCollection<CarId>>.That.IsEmpty()))
+            .MustHaveHappenedOnceExactly()
+            .Then(A.CallTo(() => teacherRepository.GetAsync(teacher.Id)).MustHaveHappened())
+            .Then(A.CallTo(() => queries.ExistsLinkedToTeacherAsync(teacher.Id)).MustHaveHappened());
     }
 
     [TestMethod]

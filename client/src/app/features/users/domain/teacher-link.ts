@@ -1,5 +1,5 @@
 import { LinkableTeacher } from './linkable-teacher.model';
-import { Role } from './role.enum';
+import { Role } from '../../../shared/models/role.enum';
 import { TeacherOption } from './teacher-option.model';
 import { User } from './user.model';
 

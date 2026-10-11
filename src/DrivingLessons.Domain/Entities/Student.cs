@@ -58,6 +58,8 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
+        MustBeCarOfTeacher(car, teacher.Id);
+
         const bool isActive = true;
         var id = StudentId.New();
 
@@ -83,6 +85,8 @@ public class Student : AggregateRoot<StudentId>
         LessonsStartDate? startDate,
         LicenseType? licenseType)
     {
+        MustBeCarOfTeacher(car, teacher.Id);
+
         Name = name;
         Phone = phone;
         TeacherId = teacher.Id;
@@ -94,6 +98,45 @@ public class Student : AggregateRoot<StudentId>
         AddEvent(new StudentUpdatedFromRoster(Id, teacher.Id, car.Id));
     }
 
+    public void ChangeDetails(
+        NationalId nationalId,
+        StudentName name,
+        PhoneNumber phone,
+        Address? address,
+        LessonsStartDate? startDate,
+        LicenseType? licenseType)
+    {
+        NationalId = nationalId;
+        Name = name;
+        Phone = phone;
+        Address = address;
+        StartDate = startDate;
+        LicenseType = licenseType;
+
+        AddEvent(new StudentDetailsChanged(Id, nationalId, name));
+    }
+
+    public void ChangeTeacher(Teacher teacher, Car car)
+    {
+        MustNotBeWithTeacher(teacher);
+        MustBeCarOfTeacher(car, teacher.Id);
+
+        TeacherId = teacher.Id;
+        CarId = car.Id;
+
+        AddEvent(new StudentTeacherChanged(Id, teacher.Id, car.Id));
+    }
+
+    public void ChangeCar(Car car)
+    {
+        MustNotBeOnCar(car);
+        MustBeCarOfTeacher(car, TeacherId);
+
+        CarId = car.Id;
+
+        AddEvent(new StudentCarChanged(Id, car.Id));
+    }
+
     public void Deactivate()
     {
         MustBeActive();
@@ -103,13 +146,25 @@ public class Student : AggregateRoot<StudentId>
         AddEvent(new StudentDeactivated(Id));
     }
 
-    public void Reactivate()
+    public void Reactivate(Teacher teacher, Car car)
     {
         MustBeInactive();
+        TeacherMustNotBeDeleted(teacher);
+        CarMustNotBeDeleted(car);
+        MustBeCarOfTeacher(car, teacher.Id);
 
         IsActive = true;
 
         AddEvent(new StudentReactivated(Id));
+    }
+
+    internal static List<StudentName> ActiveNamesOf(IEnumerable<Student> students)
+    {
+        return students
+               .Where(x => x.IsActive)
+               .Select(x => x.Name)
+               .OrderBy(x => x.Value, StringComparer.Ordinal)
+               .ToList();
     }
 
     private void MustBeActive()
@@ -125,6 +180,46 @@ public class Student : AggregateRoot<StudentId>
         if (IsActive)
         {
             throw new StudentAlreadyActiveException(Id);
+        }
+    }
+
+    private void TeacherMustNotBeDeleted(Teacher teacher)
+    {
+        if (teacher.IsDeleted)
+        {
+            throw new StudentTeacherMustNotBeDeletedException(Id, teacher.Id);
+        }
+    }
+
+    private void CarMustNotBeDeleted(Car car)
+    {
+        if (car.IsDeleted)
+        {
+            throw new StudentCarMustNotBeDeletedException(Id, car.Id);
+        }
+    }
+
+    private void MustNotBeWithTeacher(Teacher teacher)
+    {
+        if (teacher.Id == TeacherId)
+        {
+            throw new StudentAlreadyWithTeacherException(Id, teacher.Id);
+        }
+    }
+
+    private void MustNotBeOnCar(Car car)
+    {
+        if (car.Id == CarId)
+        {
+            throw new StudentAlreadyOnCarException(Id, car.Id);
+        }
+    }
+
+    private static void MustBeCarOfTeacher(Car car, TeacherId teacherId)
+    {
+        if (!car.IsAssignedTo(teacherId))
+        {
+            throw new StudentCarMustBeAssignedToTeacherException(car.Id, teacherId);
         }
     }
 }

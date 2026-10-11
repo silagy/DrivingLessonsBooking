@@ -6,7 +6,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ClipboardService } from '../../../../../core/services/clipboard.service';
 import { ToastService } from '../../../../../core/services/toast.service';
-import { jerusalemWallTimeToUtcIso } from '../../../domain/jerusalem-time';
+import { jerusalemWallTimeToUtcIso } from '../../../../../shared/dates/jerusalem-time';
 import { ShareLinkBoxComponent } from '../../components/share-link-box/share-link-box.component';
 
 export interface PublishWeekDialogData {

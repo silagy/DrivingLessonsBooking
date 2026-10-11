@@ -22,6 +22,7 @@ public class ImportRosterInteractor
     private readonly IRosterImportRepository rosterImportRepository;
     private readonly ITeacherRepository teacherRepository;
     private readonly ICarRepository carRepository;
+    private readonly ITeacherAndCarLocks locks;
     private readonly IUnitOfWork unitOfWork;
     private readonly TimeProvider timeProvider;
 
@@ -31,6 +32,7 @@ public class ImportRosterInteractor
         IRosterImportRepository rosterImportRepository,
         ITeacherRepository teacherRepository,
         ICarRepository carRepository,
+        ITeacherAndCarLocks locks,
         IUnitOfWork unitOfWork,
         TimeProvider timeProvider)
     {
@@ -39,6 +41,7 @@ public class ImportRosterInteractor
         this.rosterImportRepository = rosterImportRepository;
         this.teacherRepository = teacherRepository;
         this.carRepository = carRepository;
+        this.locks = locks;
         this.unitOfWork = unitOfWork;
         this.timeProvider = timeProvider;
     }
@@ -46,6 +49,8 @@ public class ImportRosterInteractor
     public async Task<ImportRosterResponse> ExecuteAsync(ImportRosterRequest request)
     {
         var rows = parser.Parse(request.Content);
+
+        await locks.LockAllAsync();
 
         var activeTeachers = await teacherRepository.FindActiveAsync();
         var teachersByName = activeTeachers.ToDictionary(x => x.Name);
@@ -73,8 +78,6 @@ public class ImportRosterInteractor
             failures.Add(failure);
         }
 
-        DeactivateAbsentees(existingStudents, seenIds, entries);
-
         var fileName = RosterFileName.Of(request.FileName);
         var importedAtUtc = timeProvider.GetUtcNow().UtcDateTime;
         var rosterImport = RosterImport.Create(fileName, importedAtUtc, entries, failures);
@@ -87,7 +90,6 @@ public class ImportRosterInteractor
             rosterImport.Id.Value,
             rosterImport.AddedCount,
             rosterImport.UpdatedCount,
-            rosterImport.DeactivatedCount,
             rosterImport.FailedCount);
     }
 
@@ -156,6 +158,11 @@ public class ImportRosterInteractor
             return RosterRowFailureReason.UnknownCar;
         }
 
+        if (!car.IsAssignedTo(teacher))
+        {
+            return RosterRowFailureReason.CarNotAssignedToTeacher;
+        }
+
         LessonsStartDate? startDate = null;
 
         if (row.StartDate is not null)
@@ -185,7 +192,7 @@ public class ImportRosterInteractor
 
             if (!student.IsActive)
             {
-                student.Reactivate();
+                student.Reactivate(teacher, car);
             }
 
             var updatedEntry = RosterImportEntry.Of(nationalId, RosterEntryOutcome.Updated);
@@ -201,22 +208,6 @@ public class ImportRosterInteractor
         entries.Add(addedEntry);
 
         return null;
-    }
-
-    private static void DeactivateAbsentees(
-        IReadOnlyCollection<Student> existingStudents,
-        HashSet<NationalId> seenIds,
-        List<RosterImportEntry> entries)
-    {
-        var absentees = existingStudents.Where(x => x.IsActive && !seenIds.Contains(x.NationalId));
-
-        foreach (var student in absentees)
-        {
-            student.Deactivate();
-
-            var entry = RosterImportEntry.Of(student.NationalId, RosterEntryOutcome.Deactivated);
-            entries.Add(entry);
-        }
     }
 
     private static bool TryParseStartDate(string value, out DateOnly result)

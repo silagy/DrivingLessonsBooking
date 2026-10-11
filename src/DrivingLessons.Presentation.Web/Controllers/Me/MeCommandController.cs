@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using DrivingLessons.Application.Commands.ChangeMyPassword;
+using DrivingLessons.Presentation.Web.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace DrivingLessons.Presentation.Web.Controllers.Me;
 [ApiController]
 [Route("api/me")]
 [Tags("Me")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.TeacherOrAdministrator)]
 public class MeCommandController : ControllerBase
 {
     [HttpPut("password")]

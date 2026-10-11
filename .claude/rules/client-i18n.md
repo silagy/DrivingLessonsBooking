@@ -13,73 +13,81 @@ Localization rules per requirements §8.4 and decision 14: **Hebrew and English,
 2. **Hebrew is a first-class layout** — every screen must be correct in RTL, not just readable
 3. **Logical CSS properties only** — `margin-inline-start`, never `margin-left`; `padding-inline-end`, never `padding-right`; `inset-inline-start`, never `left` (for layout positioning)
 4. **`en.json` and `he.json` ship together** — a key added to one file in a PR is added to both in the same PR
-5. **All API instants are UTC; all displayed instants are Asia/Jerusalem** — conversion happens in exactly one shared service
+5. **All API instants are UTC; all displayed instants are Asia/Jerusalem** — conversion happens only in `shared\dates\jerusalem-time.ts` functions that pin `timeZone: 'Asia/Jerusalem'`
 6. **Slot windows are wall-clock labels, never timezone-converted** — Morning is 07:00–12:00 in Asia/Jerusalem by definition (§8.3)
 
 ## Setup
 
-ngx-translate with HTTP loader, default language, and a mandatory missing-key handler:
+Transloco, registered in `app.config.ts`, with an HTTP loader (`app\transloco-loader.ts`) that fetches `public\i18n\{lang}.json` from `/i18n/`:
 
 ```typescript
-provideTranslateService({
-    defaultLanguage: 'en',
-    loader: {
-        provide: TranslateLoader,
-        useFactory: (http: HttpClient) => new TranslateHttpLoader(http, './assets/i18n/', '.json'),
-        deps: [HttpClient],
+provideTransloco({
+    config: {
+        availableLangs: ['he', 'en'],
+        defaultLang: 'he',
+        fallbackLang: 'en',
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
     },
-    missingTranslationHandler: {
-        provide: MissingTranslationHandler,
-        useClass: AppMissingTranslationHandler,
-    },
-})
+    loader: TranslocoHttpLoader,
+}),
 ```
 
 ```typescript
-export class AppMissingTranslationHandler implements MissingTranslationHandler {
-    handle(params: MissingTranslationHandlerParams): string {
-        console.warn(`[i18n] Missing translation key: ${params.key}`);
-        return params.key;
+@Injectable({ providedIn: 'root' })
+export class TranslocoHttpLoader implements TranslocoLoader {
+    private readonly http = inject(HttpClient);
+
+    getTranslation(lang: string) {
+        return this.http.get<Translation>(`/i18n/${lang}.json`);
     }
 }
 ```
 
+- There is no custom missing-key handler: Transloco's default warns about a missing key outside prod mode and renders the key itself
+
 ## LanguageService
 
-One service owns language selection, persistence, and document direction. Initialized via `provideAppInitializer` before first render:
+One service (`core\language.service.ts`) owns language selection, persistence, document direction, and PrimeNG's own strings. The root `App` component injects it, so it is live from startup:
 
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
-    private readonly translate = inject(TranslateService);
+    private readonly transloco = inject(TranslocoService);
+    private readonly primeng = inject(PrimeNG);
 
-    readonly supportedLanguages = ['he', 'en'] as const;
-    readonly currentLanguage = signal<AppLanguage>('he');
-    readonly isRtl = computed(() => this.currentLanguage() === 'he');
+    readonly lang = signal<AppLanguage>(localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'he');
+    readonly locale = computed<AppLocale>(() => LOCALES[this.lang()]);
+    readonly isRtl = computed(() => this.lang() === 'he');
 
-    init(): void {
-        const saved = localStorage.getItem('app.language') as AppLanguage | null;
-        this.use(saved ?? 'he');
+    constructor() {
+        effect(() => {
+            const lang = this.lang();
+            localStorage.setItem(STORAGE_KEY, lang);
+            this.transloco.setActiveLang(lang);
+            this.applyPrimeNgTranslation(PRIMENG_TRANSLATIONS[lang]);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = this.isRtl() ? 'rtl' : 'ltr';
+        });
     }
 
-    use(language: AppLanguage): void {
-        this.translate.use(language);
-        this.currentLanguage.set(language);
-        localStorage.setItem('app.language', language);
-        document.documentElement.lang = language;
-        document.documentElement.dir = this.isRtl() ? 'rtl' : 'ltr';
+    toggle(): void {
+        this.lang.update((l) => (l === 'he' ? 'en' : 'he'));
     }
 }
 ```
 
 - Default language is **Hebrew** — the primary user base; English is the toggle
-- The toggle is visible on **both** surfaces (admin shell and student form header)
+- The toggle (`shared\language-toggle\`) is visible on **both** surfaces (admin shell and student form header)
+- `locale()` (`he-IL` / `en-IL`) is the locale passed to date formatters
+- PrimeNG's built-in strings (calendar day names, aria labels) come from `core\primeng-translations.ts` and switch with the language
 - PrimeNG direction follows `document.documentElement.dir` — see `client-primeng.md`
+- The document title is the translated `shell.title` key and follows the language
 
 ## Translation Files
 
 ```
-client\src\assets\i18n\
+client\public\i18n\
 ├── en.json
 └── he.json        every key mirrored — same structure, same parameters
 ```
@@ -88,37 +96,36 @@ Nested JSON, feature-scoped namespaces, requirements terminology:
 
 ```json
 {
-    "General": {
+    "general": {
         "save": "Save",
         "cancel": "Cancel",
-        "refresh": "Refresh",
-        "dataAsOf": "Data as of {{time}}"
+        "refresh": "Refresh"
     },
-    "FormErrors": {
+    "formErrors": {
         "required": "This field is required",
         "emailInvalid": "Enter a valid email address"
     },
-    "Publications": {
-        "publish": "Publish",
-        "extendDeadline": "Extend deadline",
-        "windowClosed": "The submission window closed on {{closedAt}}",
-        "State": {
+    "publications": {
+        "title": "Publications",
+        "extendWindow": "Extend deadline",
+        "dataAsOf": "Data as of {{time}}",
+        "state": {
             "draft": "Draft",
             "published": "Published",
             "open": "Open",
             "closed": "Closed"
         }
     },
-    "StudentForm": {
-        "submittingForTeacher": "You are submitting availability for {{teacherName}}",
-        "notMyTeacher": "This is not my teacher",
-        "targetCountQuestion": "How many lessons do you want this week?"
+    "studentForm": {
+        "weekTeacherCaption": "Week {{weekNumber}} · {{weekRange}} · {{teacherName}}"
     },
-    "Slots": {
-        "morning": "Morning",
-        "noon": "Noon",
-        "afternoon": "Afternoon",
-        "evening": "Evening"
+    "weekGrid": {
+        "windows": {
+            "morning": "Morning",
+            "noon": "Noon",
+            "afternoon": "Afternoon",
+            "evening": "Evening"
+        }
     }
 }
 ```
@@ -127,29 +134,29 @@ Nested JSON, feature-scoped namespaces, requirements terminology:
 
 | Rule | Example |
 |------|---------|
-| Top-level namespace = feature or shared concern, PascalCase | `Publications`, `StudentForm`, `General`, `FormErrors` |
-| Leaf keys camelCase | `extendDeadline`, `notMyTeacher` |
-| Enum display values under a PascalCase subgroup keyed by the enum's camelCase values | `Publications.State.draft` |
+| Top-level namespace = feature or shared concern, camelCase | `publications`, `studentForm`, `general`, `formErrors` |
+| Leaf keys camelCase | `extendWindow`, `dataAsOf` |
+| Enum display values under a camelCase subgroup keyed by the enum's camelCase values | `publications.state.draft` |
 | Interpolation params in double braces, camelCase | `{{teacherName}}`, `{{closedAt}}` |
-| Key names describe meaning, not the English wording | `StudentForm.windowClosedMessage`, not `StudentForm.sorryTheWindowHasClosed` |
-| Generic strings live in `General` / `FormErrors` once | `General.cancel` everywhere |
+| Key names describe meaning, not the English wording | `studentForm.windowClosedMessage`, not `studentForm.sorryTheWindowHasClosed` |
+| Generic strings live in `general` / `formErrors` once | `general.cancel` everywhere |
 
-Dynamic keys are built from enum values, never free text: `'Publications.State.' + publication.state`.
+Dynamic keys are built from enum values, never free text: `'publications.state.' + publication.state`.
 
 ## Consuming Translations
 
-- **Templates: the `translate` pipe** — reactive, updates on language switch. Default for everything.
+- **Templates: the `transloco` pipe** (import `TranslocoPipe`) — reactive, updates on language switch. Default for everything.
 
 ```html
-<h2>{{ 'Publications.title' | translate }}</h2>
-<p>{{ 'StudentForm.submittingForTeacher' | translate: { teacherName: teacher().name } }}</p>
+<h2>{{ 'publications.title' | transloco }}</h2>
+<p>{{ 'publications.dataAsOf' | transloco: { time: dataAsOf() } }}</p>
 ```
 
-- **TypeScript: `translate.instant()`** — only for point-in-time strings resolved at the moment of use: dialog headers, toast messages. Never store an `instant()` result in long-lived state — it goes stale on language switch.
+- **TypeScript: `TranslocoService.translate()`** — only for point-in-time strings resolved at the moment of use: dialog headers, toast messages. Never store a `translate()` result in long-lived state — it goes stale on language switch. Toasts go through `ToastService`, which translates keys for you.
 
 ```typescript
 this.dialogService.open(PublishWeekDialog, {
-    header: this.translate.instant('Publications.publish'),
+    header: this.transloco.translate('publications.publish'),
 });
 ```
 
@@ -167,23 +174,30 @@ this.dialogService.open(PublishWeekDialog, {
 
 ## Dates, Times, and Timezone (§8.3)
 
-- **Instants** (window open/close, submission timestamps) arrive as UTC ISO 8601 strings and are displayed in **Asia/Jerusalem** — one shared `JerusalemDateService` (in `core\services\`) owns the conversion using `Intl.DateTimeFormat` with `timeZone: 'Asia/Jerusalem'`; expose it as pipes for templates
+- **Instants** (window open/close, submission timestamps) arrive as UTC ISO 8601 strings and are displayed in **Asia/Jerusalem** — pure functions in `shared\dates\jerusalem-time.ts` do the conversion using `Intl.DateTimeFormat` with `timeZone: 'Asia/Jerusalem'`; stores and pages call them with `LanguageService.locale()`
+- Admin-entered wall times (publish, extend, reopen dialogs) go back to the API as UTC through `jerusalemWallTimeToUtcIso` in `shared\dates\jerusalem-time.ts`, never through the browser's zone
 - **Wall-clock definitions** (slot windows: Morning 07:00–12:00) are rendered as fixed local-time labels — they are never `Date` objects and never pass through UTC conversion; doing so shifts them across DST transitions, which is a bug
 - No timezone selection UI exists in v1 — Asia/Jerusalem is the single configured zone
 - Date formatting respects the active language locale (`he-IL` / `en-IL`); day names come from translation keys, not from `Date` formatting, so the grid wording matches the rest of the UI
 
 ```typescript
-@Injectable({ providedIn: 'root' })
-export class JerusalemDateService {
-    private readonly language = inject(LanguageService);
+export function formatInstantInJerusalem(utcIso: string, locale: string): string {
+    const formatter = new Intl.DateTimeFormat(locale, {
+        timeZone: 'Asia/Jerusalem',
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    });
 
-    formatInstant(utcIso: string, options: Intl.DateTimeFormatOptions): string {
-        const locale = this.language.currentLanguage() === 'he' ? 'he-IL' : 'en-IL';
-        const formatter = new Intl.DateTimeFormat(locale, { ...options, timeZone: 'Asia/Jerusalem' });
-
-        return formatter.format(new Date(utcIso));
-    }
+    return formatter.format(new Date(utcIso));
 }
+```
+
+```typescript
+readonly dataAsOf = computed<string>(() => {
+    const loadedAt = this.loadedAtState();
+
+    return loadedAt ? formatInstantInJerusalem(loadedAt, this.language.locale()) : '';
+});
 ```
 
 ## Anti-Patterns
@@ -191,8 +205,8 @@ export class JerusalemDateService {
 - **Never** hardcode a user-visible string in a template, component, store, or toast
 - **Never** use physical CSS properties (`margin-left`, `right:`) for layout spacing or positioning
 - **Never** add a key to `en.json` without its `he.json` mirror in the same change
-- **Never** store an `instant()` result in a long-lived field or signal
+- **Never** store a `TranslocoService.translate()` result in a long-lived field or signal
 - **Never** convert slot window times through `Date`/UTC — they are wall-clock labels
-- **Never** format an instant without going through `JerusalemDateService` — `new Date(x).toLocaleString()` uses the browser zone and is wrong by construction
+- **Never** format an instant without going through a `shared\dates\jerusalem-time.ts` function — `new Date(x).toLocaleString()` uses the browser zone and is wrong by construction
 - **Never** concatenate translated fragments to build a sentence — use one key with `{{params}}`
 - **Never** ship a screen that has not been checked in Hebrew/RTL

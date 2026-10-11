@@ -3,18 +3,29 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
+import { isolateDirection } from '../../shared/text/isolate-direction';
 import { ToastService } from './toast.service';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
+const HTTP_FORBIDDEN = 403;
 const HTTP_SERVER_ERROR = 500;
 
 const EN = {
+    access: {
+        refusedTitle: 'You don\'t have access to that page',
+        refusedDetail: 'We\'ve taken you to your Week Schedule.',
+    },
     errors: {
         carNameMustNotBeEmpty: 'Enter the car\'s name.',
         conflict: 'This change conflicts with the latest data. Refresh the page and try again.',
+        forbidden: 'You don\'t have permission to do that.',
         notFound: 'This item no longer exists. Refresh the page.',
         rosterFileMustContainRequiredColumns: 'The file is missing required columns: {{columns}}.',
+        teacherAssignmentMustNotHaveActiveStudents:
+            'Active Students of {{teacher}} learn on this Car ({{count}}): {{names}}.',
+        teacherAssignmentMustNotHaveActiveStudentsMore:
+            'Active Students of {{teacher}} learn on this Car ({{count}}): {{names}} and {{more}} more.',
     },
     general: {
         unexpectedError: 'Something went wrong. Please try again.',
@@ -25,14 +36,14 @@ const EN = {
     },
 };
 
-function setUp() {
+function setUp(preloadLangs = true) {
     const add = vi.fn();
     TestBed.configureTestingModule({
         imports: [
             TranslocoTestingModule.forRoot({
                 langs: { en: EN },
                 translocoConfig: { availableLangs: ['en'], defaultLang: 'en' },
-                preloadLangs: true,
+                preloadLangs,
             }),
         ],
         providers: [provideZonelessChangeDetection(), { provide: MessageService, useValue: { add } }],
@@ -50,6 +61,34 @@ function shownSummary(add: ReturnType<typeof vi.fn>): string {
 }
 
 describe('ToastService', () => {
+    describe('info', () => {
+        it('shows an info toast with a title and a detail', async () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            await toast.info('access.refusedTitle', { key: 'access.refusedDetail' });
+
+            //then
+            expect(add).toHaveBeenCalledWith({
+                severity: 'info',
+                summary: 'You don\'t have access to that page',
+                detail: 'We\'ve taken you to your Week Schedule.',
+            });
+        });
+
+        it('waits for the translations before showing the info toast', async () => {
+            //given
+            const { toast, add } = setUp(false);
+
+            //when
+            await toast.info('access.refusedTitle', { key: 'access.refusedDetail' });
+
+            //then
+            expect(shownSummary(add)).toBe('You don\'t have access to that page');
+        });
+    });
+
     describe('apiError', () => {
         it('names the broken rule in the active language', () => {
             //given
@@ -141,6 +180,17 @@ describe('ToastService', () => {
             //then
             expect(shownSummary(add)).toBe('Something went wrong. Please try again.');
         });
+
+        it('says the User may not do that when the server refuses with 403', () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            toast.apiError(new HttpErrorResponse({ status: HTTP_FORBIDDEN }));
+
+            //then
+            expect(shownSummary(add)).toBe('You don\'t have permission to do that.');
+        });
     });
 
     describe('success', () => {
@@ -171,6 +221,26 @@ describe('ToastService', () => {
         });
     });
 
+    describe('error', () => {
+        it('shows a screen\'s own refusal message with its values filled in', () => {
+            //given
+            const { toast, add } = setUp();
+
+            //when
+            toast.error('errors.teacherAssignmentMustNotHaveActiveStudents', {
+                teacher: 'Yael Carmi',
+                count: '1',
+                names: 'Noa Levi',
+            });
+
+            //then
+            expect(add).toHaveBeenCalledWith({
+                severity: 'error',
+                summary: 'Active Students of Yael Carmi learn on this Car (1): Noa Levi.',
+            });
+        });
+    });
+
     describe('messageOf', () => {
         it('gives the same translated rule message without showing a toast', () => {
             //given
@@ -187,6 +257,101 @@ describe('ToastService', () => {
             //then
             expect(message).toBe('Enter the car\'s name.');
             expect(add).not.toHaveBeenCalled();
+        });
+
+        it('isolates the direction of only the params it is asked to', () => {
+            //given
+            const { toast } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'rosterFileMustContainRequiredColumns',
+                params: { columns: 'name' },
+            });
+
+            //when
+            const plain = toast.messageOf(error);
+            const isolatedMessage = toast.messageOf(error, ['columns']);
+
+            //then
+            expect(plain).toBe('The file is missing required columns: name.');
+            expect(isolatedMessage).toBe(`The file is missing required columns: ${isolateDirection('name')}.`);
+        });
+    });
+
+    describe('apiError with isolated params', () => {
+        it('isolates the names in a refusal toast', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'teacherAssignmentMustNotHaveActiveStudents',
+                params: { teacher: 'רונית אברהם', count: '2', names: 'נועה מזרחי, עומר שלו' },
+            });
+
+            //when
+            toast.apiError(error, ['teacher', 'names']);
+
+            //then
+            expect(add.mock.calls[0][0].severity).toBe('error');
+            expect(shownSummary(add)).toBe(
+                `Active Students of ${isolateDirection('רונית אברהם')} learn on this Car (2): ` +
+                    `${isolateDirection('נועה מזרחי, עומר שלו')}.`,
+            );
+        });
+
+        it('leaves the params as they are when none are named', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'teacherAssignmentMustNotHaveActiveStudents',
+                params: { teacher: 'Ronit', count: '1', names: 'Noa' },
+            });
+
+            //when
+            toast.apiError(error);
+
+            //then
+            expect(shownSummary(add)).toBe('Active Students of Ronit learn on this Car (1): Noa.');
+        });
+    });
+
+    describe('apiError with unnamed extras', () => {
+        it('says how many more there are beyond the named ones', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'teacherAssignmentMustNotHaveActiveStudents',
+                params: { teacher: 'Ronit', count: '5', names: 'Avi, Dana, Lia', more: '2' },
+            });
+
+            //when
+            toast.apiError(error);
+
+            //then
+            expect(shownSummary(add)).toBe('Active Students of Ronit learn on this Car (5): Avi, Dana, Lia and 2 more.');
+        });
+
+        it('falls back to the plain rule message when no "more" variant exists', () => {
+            //given
+            const { toast, add } = setUp();
+            const error = problem(HTTP_CONFLICT, {
+                status: HTTP_CONFLICT,
+                title: 'Conflict',
+                code: 'rosterFileMustContainRequiredColumns',
+                params: { columns: 'name', more: '1' },
+            });
+
+            //when
+            toast.apiError(error);
+
+            //then
+            expect(shownSummary(add)).toBe('The file is missing required columns: name.');
         });
     });
 });

@@ -75,6 +75,173 @@ public class ApiExceptionFilterTest
     }
 
     [TestMethod]
+    public void Concurrent_Change_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new ConcurrentChangeException(new InvalidOperationException()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "concurrentChange");
+    }
+
+    [TestMethod]
+    public void Student_Car_Not_Of_Teacher_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentCarMustBeAssignedToTeacherException(CarId.New(), TeacherId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentCarMustBeAssignedToTeacher");
+    }
+
+    [TestMethod]
+    public void Student_Teacher_Deleted_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentTeacherMustNotBeDeletedException(StudentId.New(), TeacherId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentTeacherMustNotBeDeleted");
+        problem.Extensions.ShouldNotContainKey("params");
+    }
+
+    [TestMethod]
+    public void Student_Car_Deleted_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentCarMustNotBeDeletedException(StudentId.New(), CarId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentCarMustNotBeDeleted");
+        problem.Extensions.ShouldNotContainKey("params");
+    }
+
+    [TestMethod]
+    public void Student_Already_Deactivated_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyDeactivatedException(StudentId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyDeactivated");
+    }
+
+    [TestMethod]
+    public void Student_Already_Active_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyActiveException(StudentId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyActive");
+    }
+
+    [TestMethod]
+    public void Student_Already_With_Teacher_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyWithTeacherException(StudentId.New(), TeacherId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyWithTeacher");
+    }
+
+    [TestMethod]
+    public void Student_Already_On_Car_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentAlreadyOnCarException(StudentId.New(), CarId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentAlreadyOnCar");
+    }
+
+    [TestMethod]
+    public void Student_Not_Found_By_Id_Is_A_Not_Found_With_Its_Code()
+    {
+        //given
+        var context = ContextFor(new StudentNotFoundException(StudentId.New()));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status404NotFound);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentNotFound");
+    }
+
+    [TestMethod]
+    public void Inactive_Student_Submitting_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new SubmissionStudentMustBeActiveException());
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "submissionStudentMustBeActive");
+    }
+
+    [TestMethod]
+    public void National_Id_In_Use_Is_A_Conflict_With_Its_Rule_As_Code()
+    {
+        //given
+        var context = ContextFor(new StudentNationalIdAlreadyInUseException(StudentName.Of("נועה מזרחי")));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "studentNationalIdAlreadyInUse");
+    }
+
+    [TestMethod]
     public void Blank_Temporary_Password_Is_A_Conflict_With_Its_Rule_As_Code()
     {
         //given
@@ -323,8 +490,126 @@ public class ApiExceptionFilterTest
         new ApiExceptionFilter().OnException(context);
 
         //then
-        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
         parameters.ShouldBe(new Dictionary<string, string> { ["columns"] = "טלפון, מורה" });
+    }
+
+    [TestMethod]
+    public void Teacher_With_Active_Students_Is_A_Conflict_Naming_Them()
+    {
+        //given
+        var names = new[] { StudentName.Of("Avi Cohen"), StudentName.Of("Noa Mizrahi") };
+        var context = ContextFor(new TeacherMustNotHaveActiveStudentsException(TeacherId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Type.ShouldBeNull();
+        problem.Extensions.ShouldContainKeyAndValue("code", "teacherMustNotHaveActiveStudents");
+        var parameters = problem.Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "2", ["names"] = "Avi Cohen, Noa Mizrahi" });
+    }
+
+    [TestMethod]
+    public void Car_With_Active_Students_Is_A_Conflict_Naming_Them()
+    {
+        //given
+        var names = new[] { StudentName.Of("נועה מזרחי") };
+        var context = ContextFor(new CarMustNotHaveActiveStudentsException(CarId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "carMustNotHaveActiveStudents");
+        var parameters = problem.Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["count"] = "1", ["names"] = "נועה מזרחי" });
+    }
+
+    [TestMethod]
+    public void Teacher_Assignment_With_Active_Students_Is_A_Conflict_Naming_The_Teacher_And_Them()
+    {
+        //given
+        var names = new[] { StudentName.Of("Noa Mizrahi") };
+        var context = ContextFor(new TeacherAssignmentMustNotHaveActiveStudentsException(
+            CarId.New(),
+            TeacherId.New(),
+            TeacherName.Of("Ronit Avraham"),
+            names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var problem = ProblemOf(context);
+        problem.Status.ShouldBe(StatusCodes.Status409Conflict);
+        problem.Extensions.ShouldContainKeyAndValue("code", "teacherAssignmentMustNotHaveActiveStudents");
+        var parameters = problem.Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string>
+        {
+            ["count"] = "1",
+            ["names"] = "Noa Mizrahi",
+            ["teacher"] = "Ronit Avraham"
+        });
+    }
+
+    [TestMethod]
+    public void Exactly_Three_Active_Students_Are_All_Named_With_No_More()
+    {
+        //given
+        var names = new[]
+        {
+            StudentName.Of("Avi Cohen"),
+            StudentName.Of("Dana Sasson"),
+            StudentName.Of("Lia Hadad")
+        };
+        var context = ContextFor(new TeacherMustNotHaveActiveStudentsException(TeacherId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string>
+        {
+            ["count"] = "3",
+            ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad"
+        });
+    }
+
+    [TestMethod]
+    public void Active_Students_Beyond_Three_Are_Counted_As_More()
+    {
+        //given
+        var names = new[]
+        {
+            StudentName.Of("Avi Cohen"),
+            StudentName.Of("Dana Sasson"),
+            StudentName.Of("Lia Hadad"),
+            StudentName.Of("Noa Mizrahi"),
+            StudentName.Of("Omer Shalev")
+        };
+        var context = ContextFor(new CarMustNotHaveActiveStudentsException(CarId.New(), names));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string>
+        {
+            ["count"] = "5",
+            ["names"] = "Avi Cohen, Dana Sasson, Lia Hadad",
+            ["more"] = "2"
+        });
     }
 
     [TestMethod]
@@ -338,8 +623,37 @@ public class ApiExceptionFilterTest
         new ApiExceptionFilter().OnException(context);
 
         //then
-        var parameters = ProblemOf(context).Extensions["params"].ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
         parameters.ShouldBe(new Dictionary<string, string> { ["maxLength"] = "200" });
+    }
+
+    [TestMethod]
+    public void National_Id_In_Use_Names_The_Existing_Student_In_Params()
+    {
+        //given
+        var context = ContextFor(new StudentNationalIdAlreadyInUseException(StudentName.Of("נועה מזרחי")));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        var parameters = ProblemOf(context).Extensions["params"]
+            .ShouldBeAssignableTo<IReadOnlyDictionary<string, string>>();
+        parameters.ShouldBe(new Dictionary<string, string> { ["name"] = "נועה מזרחי" });
+    }
+
+    [TestMethod]
+    public void National_Id_In_Use_Keeps_The_Name_Out_Of_Its_Detail()
+    {
+        //given
+        var context = ContextFor(new StudentNationalIdAlreadyInUseException(StudentName.Of("נועה מזרחי")));
+
+        //when
+        new ApiExceptionFilter().OnException(context);
+
+        //then
+        ProblemOf(context).Detail.ShouldBe("Another Student already has this national ID.");
     }
 
     [TestMethod]

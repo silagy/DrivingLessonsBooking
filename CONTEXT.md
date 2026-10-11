@@ -40,7 +40,7 @@ A learner identified by national ID, belonging to exactly one Teacher and learni
 _Avoid_: Pupil, Trainee
 
 **Change Teacher**:
-Moving a Student to another Teacher together with one of that Teacher's Cars.
+Giving a Student another Teacher together with one of that Teacher's Cars. The Student's existing Submissions stay with the Publication they were made to.
 _Avoid_: Assign, Transfer, Reassign, Move
 
 **Change Car**:
@@ -52,4 +52,4 @@ A Student an Administrator has deactivated; cannot identify on the student form 
 _Avoid_: Deleted student, Archived
 
 **Roster**:
-A bulk file of Students that adds new Students and updates existing ones; it never deactivates a Student.
+A bulk file of Students that adds new Students and updates existing ones by national ID; it never deactivates a Student, it reactivates an Inactive Student who appears in it, and a row whose Car isn't one of its Teacher's Cars is rejected.

@@ -52,3 +52,21 @@
     font-size: 0.8rem;
     color: var(--app-text-secondary);
 }
+
+.identify__inactive {
+    --p-message-secondary-background: var(--app-bg-muted);
+    --p-message-secondary-border-color: var(--app-steel-light);
+    --p-message-secondary-color: var(--app-text-secondary);
+}
+
+.identify__inactive-title {
+    display: block;
+    color: var(--app-whale);
+}
+
+.identify__locked {
+    margin: 0.5rem 0 0;
+    font-size: 0.7rem;
+    color: var(--app-text-muted);
+    text-align: center;
+}

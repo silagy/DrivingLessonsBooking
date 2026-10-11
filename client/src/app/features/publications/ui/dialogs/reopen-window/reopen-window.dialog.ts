@@ -4,7 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import { jerusalemWallTimeToUtcIso } from '../../../domain/jerusalem-time';
+import { jerusalemWallTimeToUtcIso } from '../../../../../shared/dates/jerusalem-time';
 import { WindowEndResult } from '../extend-window/extend-window.dialog';
 
 @Component({

@@ -11,7 +11,7 @@ import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { isolateDirection } from '../../../../../shared/text/isolate-direction';
 import { ChangeUserDetailsRequest } from '../../../data/change-user-details.request';
 import { ChangeUserRoleRequest } from '../../../data/change-user-role.request';
-import { Role } from '../../../domain/role.enum';
+import { Role } from '../../../../../shared/models/role.enum';
 import { User } from '../../../domain/user.model';
 import { UsersStore } from '../../../state/users.store';
 import { AddUserDialog, AddUserDialogData, AddUserResult } from '../../dialogs/add-user/add-user.dialog';

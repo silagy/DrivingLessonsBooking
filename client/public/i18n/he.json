@@ -17,12 +17,16 @@
     "logout": "התנתקות",
     "userMenu": "תפריט משתמש",
     "changeMyPassword": "שינוי הסיסמה שלי",
+    "roles": {
+      "administrator": "מנהל מערכת",
+      "teacher": "מורה"
+    },
     "languageToggle": "English",
     "language": "שפה",
     "nav": {
       "dashboard": "לוח בקרה",
       "teachers": "רכבים ומורים",
-      "roster": "תלמידים",
+      "students": "תלמידים",
       "weeklyPrep": "הכנת שבוע",
       "publications": "פרסומים",
       "history": "היסטוריה",
@@ -61,6 +65,7 @@
     "assigned": "משויך",
     "shared": "משותף",
     "assignmentsUpdated": "שיוכי המורים עודכנו",
+    "assignmentsPartlyUpdated": "חלק מהשינויים בשיוכים נשמרו לפני שהשמירה נעצרה. הרשימה רועננה.",
     "created": "המורה נוצר",
     "detailsChanged": "פרטי המורה עודכנו",
     "deleted": "המורה נמחק",
@@ -75,15 +80,15 @@
     "carsEmptySubtitle": "הוסיפו את הרכב הראשון כדי לבנות את המאגר המשותף."
   },
   "roster": {
-    "title": "רשימת תלמידים",
-    "subtitle": "העלו את קובץ ה-CSV של בית הספר כדי לסנכרן תלמידים, מורים ורכבים.",
+    "title": "ייבוא רשימת תלמידים",
+    "subtitle": "קובץ CSV מוסיף תלמידים חדשים ומעדכן תלמידים קיימים לפי תעודת זהות. הוא אף פעם לא משבית תלמיד.",
+    "back": "חזרה לתלמידים",
     "uploadCsv": "העלאת קובץ CSV",
     "processed": "נקלט",
     "rowsSummary": "{{rows}} שורות · {{time}}",
     "stats": {
       "added": "נוספו",
       "updated": "עודכנו",
-      "deactivated": "הושבתו (חסרים בקובץ)",
       "failed": "שורות שנכשלו"
     },
     "table": {
@@ -115,11 +120,154 @@
       "missingCar": "רכב חסר",
       "unknownTeacher": "מורה לא קיים במערכת",
       "unknownCar": "רכב לא קיים במערכת",
-      "invalidStartDate": "תאריך התחלה לא תקין"
+      "invalidStartDate": "תאריך התחלה לא תקין",
+      "carNotAssignedToTeacher": "הרכב לא משויך למורה הזה"
     },
     "imported": "הרשימה יובאה",
     "loadFailed": "טעינת רשימת התלמידים נכשלה.",
     "empty": "אין תלמידים עדיין. העלו את קובץ ה-CSV של בית הספר כדי לבנות את הרשימה."
+  },
+  "students": {
+    "title": "תלמידים",
+    "subtitle": "תלמידים הם מי שמגישים בקשות שבועיות. הרשימה כוללת תלמידים מרשימת התלמידים ותלמידים שנוספו ידנית.",
+    "importRoster": "ייבוא רשימת תלמידים",
+    "filters": {
+      "teacher": "מורה",
+      "allTeachers": "כל המורים",
+      "status": "מצב",
+      "active": "פעילים",
+      "inactive": "לא פעילים",
+      "all": "הכול",
+      "search": "חיפוש",
+      "searchPlaceholder": "שם או תעודת זהות"
+    },
+    "table": {
+      "name": "שם",
+      "nationalId": "תעודת זהות",
+      "phone": "טלפון",
+      "teacher": "מורה",
+      "car": "רכב",
+      "status": "סטטוס",
+      "student": "תלמיד",
+      "teacherAndCar": "מורה ורכב"
+    },
+    "status": {
+      "active": "פעיל",
+      "inactive": "לא פעיל"
+    },
+    "transmissions": {
+      "automatic": "אוטומט",
+      "manual": "ידני"
+    },
+    "new": "חדש",
+    "flag": {
+      "car": "לא רכב של המורה",
+      "tip": "הרכב הזה אינו אחד מהרכבים של {{teacher}}. כנראה נקבע לפני שהכלל נכנס לתוקף. אפשר לתקן ב\"החלפת רכב\".",
+      "tipInactive": "הרכב הזה אינו אחד מהרכבים של {{teacher}}. יש לשייך אותו למורה {{teacher}} במסך רכבים ומורים, ואז לסמן את התלמיד כפעיל."
+    },
+    "deletedFlag": {
+      "teacher": "המורה נמחק",
+      "car": "הרכב נמחק",
+      "tip": "כדי לסמן את התלמיד כפעיל, יש לייבא אותו שוב ברשימת התלמידים עם מורה ורכב קיימים."
+    },
+    "footer": "{{count}} תלמידים",
+    "footerOne": "תלמיד אחד",
+    "loading": "טוען תלמידים...",
+    "loadFailed": "לא הצלחנו לטעון את התלמידים.",
+    "retry": "ניסיון חוזר",
+    "emptyTitle": "עדיין אין תלמידים",
+    "emptyHint": "הוסיפו תלמיד ידנית, או ייבאו את רשימת התלמידים מקובץ.",
+    "noMatchTitle": "אין תלמידים שמתאימים לסינון",
+    "noMatchHint": "נסו מורה אחר או מצב אחר.",
+    "clearFilters": "ניקוי הסינון",
+    "addStudent": "הוספת תלמיד",
+    "added": "התלמיד נוסף",
+    "addedDetail": "{{name}} נוסף/ה לרשימה של {{teacher}}.",
+    "actions": {
+      "editDetails": "עריכת פרטים",
+      "changeTeacher": "החלפת מורה",
+      "changeCar": "החלפת רכב",
+      "fix": "תיקון",
+      "menu": "פעולות",
+      "menuFor": "פעולות - {{name}}",
+      "deactivate": "סימון כלא פעיל",
+      "reactivate": "סימון כפעיל"
+    },
+    "who": {
+      "teacher": "מורה:",
+      "car": "רכב:"
+    },
+    "deactivate": {
+      "title": "לסמן את {{name}} כלא פעיל/ה?",
+      "cannotSubmit": "עד לסימון מחדש כפעיל/ה, לא תהיה אפשרות להגיש בטופס התלמידים.",
+      "submissionsStay": "ההגשות הקודמות נשמרות.",
+      "rosterReactivates": "קובץ רשימת תלמידים שעדיין כולל אותם יסמן אותם שוב כפעילים."
+    },
+    "deactivated": "התלמיד סומן כלא פעיל",
+    "deactivatedDetail": "{{name}} לא יוכל/תוכל להגיש עד לסימון מחדש כפעיל/ה.",
+    "reactivated": "התלמיד סומן כפעיל",
+    "reactivatedDetail": "{{name}} יכול/ה להגיש שוב בטופס התלמידים.",
+    "reactivateCarNotOfTeacher": "הרכב {{car}} כבר לא משויך למורה {{teacher}}. יש לשייך אותו למורה {{teacher}} במסך רכבים ומורים, ואז לסמן את התלמיד כפעיל.",
+    "teacherChanged": "המורה הוחלף",
+    "teacherChangedDetail": "המורה של {{name}}: {{teacher}}, על {{car}}.",
+    "carChanged": "הרכב הוחלף",
+    "carChangedDetail": "{{name}} ילמד/תלמד על {{car}}.",
+    "edit": {
+      "title": "עריכת פרטים",
+      "nationalIdNote": "השינוי כאן לא משנה את קובץ רשימת התלמידים. קובץ מאוחר יותר עם תעודת הזהות הישנה יוסיף תלמיד שני, ולכן צריך לתקן גם את הקובץ.",
+      "nationalIdUsed": "תעודת הזהות הזו שייכת לתלמיד אחר: {{name}}.",
+      "teacherAndCar": "מורה ורכב",
+      "teacherAndCarHint": "לשינוי: \"החלפת מורה\" או \"החלפת רכב\" בתפריט השורה."
+    },
+    "changeTeacher": {
+      "title": "החלפת מורה",
+      "newTeacher": "מורה חדש",
+      "current": "(נוכחי)",
+      "currentCar": "(הרכב הנוכחי)",
+      "carKept": "גם {{teacher}} מלמד/ת על הרכב הנוכחי, ולכן הוא נבחר.",
+      "note": "הגשות קיימות נשארות בשבוע שבו נעשו. מההזדהות הבאה, התלמיד יראה את השבוע של המורה החדש.",
+      "save": "החלפת מורה",
+      "sameTeacher": "{{teacher}} כבר המורה של התלמיד הזה. יש לרענן את המסך.",
+      "carNotOfTeacher": "הרכב הזה לא משויך ל{{teacher}}. יש לרענן ולבחור שוב."
+    },
+    "changeCar": {
+      "title": "החלפת רכב",
+      "current": "(נוכחי)",
+      "newCar": "רכב חדש",
+      "hint": "מוצגים רק הרכבים של {{teacher}}.",
+      "none": "ל{{teacher}} אין רכבים אחרים.",
+      "noneHint": "אפשר לשייך עוד רכב למורה במסך רכבים ומורים.",
+      "flagTitle": "הרכב הנוכחי אינו אחד מהרכבים של {{teacher}}",
+      "flagBody": "{{car}} נקבע לפני שהכלל נכנס לתוקף. יש לבחור אחד מהרכבים של {{teacher}}.",
+      "save": "החלפת רכב",
+      "sameCar": "זה כבר הרכב של התלמיד הזה. יש לרענן את המסך.",
+      "carGone": "הרכב הזה כבר לא משויך ל{{teacher}}. יש לרענן ולבחור שוב."
+    },
+    "detailsSaved": "הפרטים נשמרו",
+    "add": {
+      "title": "הוספת תלמיד",
+      "nationalId": "תעודת זהות",
+      "nationalIdHint": "9 ספרות, כולל ספרת ביקורת",
+      "nationalIdInvalid": "תעודת הזהות לא תקינה. יש לבדוק שיש 9 ספרות ושספרת הביקורת נכונה.",
+      "fullName": "שם מלא",
+      "phone": "טלפון",
+      "teacher": "מורה",
+      "teacherPlaceholder": "בחירת מורה",
+      "noCarsOption": "אין רכבים",
+      "car": "רכב",
+      "carPlaceholderLocked": "יש לבחור מורה קודם",
+      "carPlaceholder": "בחירת רכב",
+      "carScoped": "מוצגים רק הרכבים של {{teacher}}.",
+      "carOnly": "זה הרכב היחיד של {{teacher}}, ולכן הוא נבחר.",
+      "noCars": "למורה הזה עדיין אין רכבים. יש לשייך רכב במסך רכבים ומורים.",
+      "noCarsLink": "מעבר לרכבים ומורים",
+      "optionalGroup": "אופציונלי",
+      "address": "כתובת",
+      "startDate": "תאריך התחלה",
+      "datePlaceholder": "dd/mm/yyyy",
+      "licenseType": "סוג רישיון",
+      "licenseTypePlaceholder": "לדוגמה B"
+    }
   },
   "dashboard": {
     "title": "לוח בקרה",
@@ -131,7 +279,9 @@
     "teacher": "מורה",
     "week": "שבוע",
     "selectTeacher": "בחרו מורה",
+    "me": "(אני)",
     "selectTeacherPrompt": "בחרו מורה ושבוע כדי להכין את הרשת.",
+    "notCreatedYet": "מנהל המערכת עדיין לא הכין את השבוע הזה.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
     "publishWeek": "פרסום שבוע...",
@@ -165,6 +315,7 @@
     "teacher": "מורה",
     "week": "שבוע",
     "selectTeacher": "בחרו מורה",
+    "me": "(אני)",
     "state": {
       "draft": "טיוטה",
       "published": "פורסם",
@@ -217,6 +368,8 @@
       "totalPicks": "סה״כ בחירות",
       "lastSubmission": "הגשה אחרונה",
       "draftPrompt": "השבוע הוכן אך טרם פורסם. פרסמו אותו כדי לפתוח את חלון ההגשות וליצור את הקישור.",
+      "draftPromptTeacher": "השבוע הוכן אך טרם פורסם. מנהל המערכת יפרסם אותו ויפתח את חלון ההגשות.",
+      "onlyYours": "רק הפרסומים שלך: מה שהתלמידים ביקשו ממך בכל שבוע.",
       "publishedNotice": "ההגשות ייפתחו אוטומטית ב־{{opensAt}}.",
       "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה.",
       "weekTitle": "- שבוע {{weekNumber}}",
@@ -366,6 +519,9 @@
       "foundBody": "בואו נאסוף את הזמינות שלכם לשבוע {{weekNumber}} אצל {{teacherName}}.",
       "notOnRosterTitle": "אינכם מופיעים אצלנו.",
       "notOnRosterBody": "תעודת הזהות הזו לא מופיעה ברשימת התלמידים של בית הספר, ולכן אין מה להגיש. פנו לבית הספר כדי שיוסיפו אתכם.",
+      "inactiveTitle": "ההרשמה שלכם לא פעילה.",
+      "inactiveBody": "לכן אי אפשר להגיש בקשות השבוע. כדי לחזור לשיעורים, פנו לבית הספר.",
+      "inactiveLocked": "אפשר להמשיך רק עם הרשמה פעילה",
       "invalidId": "זה לא נראה כמו מספר תעודת זהות תקין. בדקו את הספרות ונסו שוב.",
       "failed": "לא הצלחנו לבדוק את תעודת הזהות כרגע. בדקו את החיבור ונסו שוב.",
       "welcomeBackTitle": "ברוכים השבים, {{studentName}}.",
@@ -455,10 +611,15 @@
       "hint": "אם בית הספר יפתח את החלון מחדש, הקישור יעבוד שוב."
     }
   },
+  "access": {
+    "refusedTitle": "אין לך גישה לדף הזה",
+    "refusedDetail": "הועברת למערכת השבועית שלך."
+  },
   "general": {
     "refusedTitle": "הפעולה לא בוצעה",
     "save": "שמירה",
     "cancel": "ביטול",
+    "close": "סגירה",
     "delete": "מחיקה",
     "refresh": "רענון",
     "apply": "החלה",
@@ -466,9 +627,13 @@
   },
   "errors": {
     "conflict": "השינוי מתנגש בנתונים העדכניים. רעננו את הדף ונסו שוב.",
+    "concurrentChange": "מישהו אחר שינה את הפרטים האלה באותו רגע. רעננו את הדף ונסו שוב.",
+    "forbidden": "אין לך הרשאה לבצע את הפעולה הזו.",
     "notFound": "הפריט הזה כבר לא קיים. רעננו את הדף.",
     "addressMustNotBeEmpty": "הכתובת לא יכולה להיות ריקה.",
     "carAlreadyDeleted": "הרכב הזה כבר נמחק. רעננו את הדף.",
+    "carMustNotHaveActiveStudents": "תלמידים פעילים לומדים על הרכב הזה ({{count}}): {{names}}. יש להחליף להם רכב במסך התלמידים, ואז למחוק.",
+    "carMustNotHaveActiveStudentsMore": "תלמידים פעילים לומדים על הרכב הזה ({{count}}): {{names}} ועוד {{more}}. יש להחליף להם רכב במסך התלמידים, ואז למחוק.",
     "carNameMustNotBeEmpty": "הזינו את שם הרכב.",
     "carNotFound": "הרכב הזה כבר לא קיים. רעננו את הדף.",
     "carTypeMustNotBeEmpty": "הזינו את סוג הרכב.",
@@ -498,9 +663,15 @@
     "slotMustBeUnavailable": "המשבצת הזו כבר פתוחה. רעננו את הדף.",
     "slotNotFound": "המשבצת הזו כבר לא קיימת. רעננו את הדף.",
     "slotNotInWeekSchedule": "המשבצת הזו אינה חלק מהשבוע. רעננו את הדף.",
-    "studentAlreadyActive": "התלמיד הזה כבר פעיל.",
-    "studentAlreadyDeactivated": "התלמיד הזה כבר לא פעיל.",
+    "studentAlreadyActive": "התלמיד הזה כבר פעיל. הרשימה רועננה.",
+    "studentAlreadyWithTeacher": "זה כבר המורה של התלמיד הזה. יש לרענן את המסך.",
+    "studentAlreadyOnCar": "זה כבר הרכב של התלמיד הזה. יש לרענן את המסך.",
+    "studentAlreadyDeactivated": "התלמיד הזה כבר לא פעיל. הרשימה רועננה.",
     "studentNameMustNotBeEmpty": "שם התלמיד לא יכול להיות ריק.",
+    "studentCarMustBeAssignedToTeacher": "הרכב לא משויך למורה של התלמיד. אפשר לשייך אותו למורה במסך רכבים ומורים, או לבחור רכב אחר.",
+    "studentTeacherMustNotBeDeleted": "המורה של התלמיד נמחק. כדי לסמן את התלמיד כפעיל, יש לייבא אותו שוב ברשימת התלמידים עם מורה ורכב קיימים.",
+    "studentCarMustNotBeDeleted": "הרכב של התלמיד נמחק. כדי לסמן את התלמיד כפעיל, יש לייבא אותו שוב ברשימת התלמידים עם מורה ורכב קיימים.",
+    "studentNationalIdAlreadyInUse": "כבר קיים תלמיד עם תעודת הזהות הזו: {{name}}.",
     "studentNotFound": "אין ברשימה תלמיד פעיל עם תעודת הזהות הזו.",
     "submissionAlreadyExists": "כבר נשלחה רשימה לשבוע הזה.",
     "submissionMustBeForPublicationAndStudent": "הרשימה הזו שייכת לשבוע אחר או לתלמיד אחר.",
@@ -517,6 +688,10 @@
     "teacherAlreadyAssignedToCar": "המורה כבר משויך לרכב הזה. רעננו את הדף.",
     "teacherAlreadyDeleted": "המורה הזה כבר נמחק. רעננו את הדף.",
     "teacherAlreadyLinkedToUser": "למורה הזה כבר יש משתמש.",
+    "teacherAssignmentMustNotHaveActiveStudents": "תלמידים פעילים של {{teacher}} לומדים על הרכב הזה ({{count}}): {{names}}. יש להחליף להם רכב במסך התלמידים, ואז להסיר את השיוך.",
+    "teacherAssignmentMustNotHaveActiveStudentsMore": "תלמידים פעילים של {{teacher}} לומדים על הרכב הזה ({{count}}): {{names}} ועוד {{more}}. יש להחליף להם רכב במסך התלמידים, ואז להסיר את השיוך.",
+    "teacherMustNotHaveActiveStudents": "למורה הזה יש תלמידים פעילים ({{count}}): {{names}}. יש להחליף להם מורה במסך התלמידים, ואז למחוק.",
+    "teacherMustNotHaveActiveStudentsMore": "למורה הזה יש תלמידים פעילים ({{count}}): {{names}} ועוד {{more}}. יש להחליף להם מורה במסך התלמידים, ואז למחוק.",
     "teacherMustNotHaveActiveUser": "למורה הזה יש משתמש פעיל, ולכן אי אפשר למחוק אותו.",
     "teacherNameMustNotBeEmpty": "הזינו את שם המורה.",
     "teacherNotAssignedToCar": "המורה לא משויך לרכב הזה. רעננו את הדף.",

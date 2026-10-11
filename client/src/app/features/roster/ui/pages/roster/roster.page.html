@@ -1,4 +1,8 @@
 <div class="roster">
+    <a class="roster__back" [routerLink]="studentsLink">
+        <i class="pi pi-chevron-left roster__back-icon" aria-hidden="true"></i>
+        {{ 'roster.back' | transloco }}
+    </a>
     <header class="roster__header">
         <div>
             <h2 class="roster__title">{{ 'roster.title' | transloco }}</h2>
@@ -44,10 +48,6 @@
                     [value]="latestImport.updated"
                     [label]="'roster.stats.updated' | transloco"
                     tone="info" />
-                <app-roster-stat-tile
-                    [value]="latestImport.deactivated"
-                    [label]="'roster.stats.deactivated' | transloco"
-                    tone="neutral" />
                 <app-roster-stat-tile
                     [value]="latestImport.failed"
                     [label]="'roster.stats.failed' | transloco"

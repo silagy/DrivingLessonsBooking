@@ -12,7 +12,6 @@ using DrivingLessons.Infrastructure.Options;
 using DrivingLessons.Infrastructure.EntityFramework;
 using DrivingLessons.Presentation.Web.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -55,13 +54,7 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    options.AddPolicy(
-        AuthorizationPolicies.Administrator,
-        policy => policy.RequireRole(AuthClaims.AdministratorRole));
-});
+builder.Services.AddAuthorization(AuthorizationPolicies.Configure);
 
 var app = builder.Build();
 

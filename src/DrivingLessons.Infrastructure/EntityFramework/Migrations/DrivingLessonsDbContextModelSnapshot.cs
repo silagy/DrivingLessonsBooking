@@ -91,10 +91,6 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("added_count");
 
-                    b.Property<int>("DeactivatedCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("deactivated_count");
-
                     b.Property<int>("FailedCount")
                         .HasColumnType("integer")
                         .HasColumnName("failed_count");
@@ -161,6 +157,12 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.Property<Guid>("TeacherId")
                         .HasColumnType("uuid")
                         .HasColumnName("teacher_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

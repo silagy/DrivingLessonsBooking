@@ -9,7 +9,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { isolateDirection } from '../../../../../shared/text/isolate-direction';
 import { ChangeUserRoleRequest } from '../../../data/change-user-role.request';
 import { otherRole, roleChangeNoteKey } from '../../../domain/role-change';
-import { Role } from '../../../domain/role.enum';
+import { Role } from '../../../../../shared/models/role.enum';
 import { DialogRefusalComponent } from '../../../../../shared/components/dialog-refusal/dialog-refusal.component';
 import { UserWhoCardComponent } from '../../components/user-who-card/user-who-card.component';
 import { UserDialogData } from '../user-dialog-data';

@@ -1,0 +1,22 @@
+.deleted-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    padding-block-end: 1px;
+    border-block-end: 1px dotted var(--p-surface-400);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--p-surface-600);
+    white-space: nowrap;
+    cursor: help;
+}
+
+.deleted-flag:focus-visible {
+    outline: 2px solid var(--p-sky-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.deleted-flag .pi {
+    font-size: 0.875rem;
+}

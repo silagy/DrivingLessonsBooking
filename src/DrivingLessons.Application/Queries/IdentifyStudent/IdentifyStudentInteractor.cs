@@ -1,4 +1,5 @@
 using DrivingLessons.Application.Common.Exceptions;
+using DrivingLessons.Domain.Exceptions;
 using DrivingLessons.Domain.Values;
 
 namespace DrivingLessons.Application.Queries.IdentifyStudent;
@@ -21,9 +22,25 @@ public class IdentifyStudentInteractor
 
         var nationalId = NationalId.Of(request.NationalId);
 
-        var student = await studentQueries.GetActiveByNationalIdAsync(nationalId, publication.WeekStart)
-                      ?? throw new StudentNotFoundException();
+        var student = await studentQueries.GetActiveByNationalIdAsync(nationalId, publication.WeekStart);
 
-        return student;
+        if (student is not null)
+        {
+            return student;
+        }
+
+        await StudentMustNotBeInactiveAsync(nationalId);
+
+        throw new StudentNotFoundException();
+    }
+
+    private async Task StudentMustNotBeInactiveAsync(NationalId nationalId)
+    {
+        var isInactive = await studentQueries.IsInactiveAsync(nationalId);
+
+        if (isInactive)
+        {
+            throw new SubmissionStudentMustBeActiveException();
+        }
     }
 }

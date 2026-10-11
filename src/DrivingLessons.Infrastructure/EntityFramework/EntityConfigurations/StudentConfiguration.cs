@@ -65,5 +65,11 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         builder
             .Property(x => x.IsActive)
             .HasColumnName("is_active");
+
+        builder
+            .Property<uint>("Version")
+            .HasColumnName("xmin")
+            .HasColumnType("xid")
+            .IsRowVersion();
     }
 }

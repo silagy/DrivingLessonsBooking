@@ -2,6 +2,8 @@ using DrivingLessons.Application.Queries.DownloadPublicationExcel;
 using DrivingLessons.Application.Queries.FindPublicationHistory;
 using DrivingLessons.Application.Queries.GetPublication;
 using DrivingLessons.Application.Queries.GetPublicationDashboard;
+using DrivingLessons.Presentation.Web.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +12,7 @@ namespace DrivingLessons.Presentation.Web.Controllers.Publication;
 [ApiController]
 [Route("api/publications")]
 [Tags("Publications")]
+[Authorize(Policy = AuthorizationPolicies.TeacherOrAdministrator)]
 public class PublicationQueryController : ControllerBase
 {
     [HttpGet("by-week")]

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -7,7 +8,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { LanguageService } from '../../../../../core/language.service';
-import { formatInstantInJerusalem } from '../../../domain/jerusalem-time';
+import { AppRoutes } from '../../../../../shared/config/app-routes';
+import { formatInstantInJerusalem } from '../../../../../shared/dates/jerusalem-time';
 import { TeacherFilterOption } from '../../../domain/teacher-filter-option.model';
 import { RosterStore } from '../../../state/roster.store';
 import { FailedRowsPanelComponent } from '../../components/failed-rows-panel/failed-rows-panel.component';
@@ -21,6 +23,7 @@ const ALL_TEACHERS = 'all';
     selector: 'app-roster-page',
     imports: [
         FormsModule,
+        RouterLink,
         TranslocoPipe,
         ButtonModule,
         ProgressSpinnerModule,
@@ -41,6 +44,7 @@ export class RosterPage {
     private readonly language = inject(LanguageService);
 
     protected readonly allTeachers = ALL_TEACHERS;
+    protected readonly studentsLink = ['/', AppRoutes.students];
 
     protected readonly filterOptions = computed<TeacherFilterOption[]>(() => [
         { id: ALL_TEACHERS, name: '' },
@@ -52,7 +56,7 @@ export class RosterPage {
     protected readonly processedRows = computed(() => {
         const latest = this.store.latestImport();
 
-        return latest ? latest.added + latest.updated + latest.deactivated + latest.failed : 0;
+        return latest ? latest.added + latest.updated + latest.failed : 0;
     });
 
     protected readonly importedAtLabel = computed(() => {

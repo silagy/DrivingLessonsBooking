@@ -50,6 +50,7 @@ public class ReviseSubmissionInteractorTest
 
         teacher = Teacher.Create(TeacherName.Of("Teacher Cohen"), Email.Of("cohen@school.test"));
         var car = Car.Create(CarName.Of("Corolla White"), CarType.Of("Corolla"), Transmission.Automatic);
+        car.AssignTeacher(teacher);
         student = Student.Create(
             NationalId.Of(RosterNationalId),
             StudentName.Of("Test Student"),

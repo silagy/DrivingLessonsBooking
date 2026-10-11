@@ -24,34 +24,52 @@ Rules for the Angular workspace in `client\`. The client is one of two halves of
 
 ```
 client\
+├── public\
+│   └── i18n\                          en.json, he.json
 └── src\
     ├── app\
-    │   ├── app.config.ts              providers: router, http + interceptors, PrimeNG theme, i18n, initializers
-    │   ├── app.routes.ts              root routes — lazy loadChildren per feature
-    │   ├── app.component.ts           root shell: router-outlet + toast outlet
+    │   ├── app.config.ts              providers: router, http + auth interceptor, PrimeNG theme, Transloco
+    │   ├── app.routes.ts              root routes — login, student-form, admin-shell (lazy)
+    │   ├── app.ts                     root shell: router-outlet + toast outlet
+    │   ├── transloco-loader.ts        loads public\i18n\{lang}.json
     │   │
     │   ├── core\                      app-wide singletons — never feature-specific
-    │   │   ├── auth\                  admin auth service, authGuard, auth interceptor
-    │   │   ├── http\                  problem-details.ts, apiErrorInterceptor
-    │   │   ├── layout\                admin shell: topbar, navigation
-    │   │   └── services\              language.service.ts, jerusalem-date.service.ts, toast.service.ts
+    │   │   ├── auth.service.ts        sign-in, stored token, signed-in User's Role
+    │   │   ├── auth.guard.ts          authGuard
+    │   │   ├── auth.interceptor.ts    bearer token, 401 handling
+    │   │   ├── role.guards.ts         administratorGuard, homeGuard (#89)
+    │   │   ├── language.service.ts    active language, RTL
+    │   │   ├── primeng-translations.ts  PrimeNG locale strings
+    │   │   ├── services\              toast.service.ts, clipboard.service.ts, file-download.service.ts
+    │   │   └── signed-in-user\        SignedInUserStore over api/me: name, linked Teacher name (#90)
     │   │
     │   ├── features\                  one folder per bounded context, lazy-loaded
+    │   │   ├── admin-shell\           signed-in shell: topbar, navigation, dashboard, change my password; admin.routes.ts
+    │   │   ├── auth\                  login page
     │   │   ├── teachers\              admin: teachers & cars setup
     │   │   ├── week-schedules\        admin: weekly grid preparation, slot toggling
     │   │   ├── publications\          admin: publish, dashboard, history, Excel download
+    │   │   ├── users\                 admin: Users & Roles — create, edit, Role, temporary password, delete/restore
+    │   │   ├── students\              admin: Student management — create, edit, teacher/car, deactivate/reactivate
+    │   │   ├── roster\                admin: roster import
     │   │   └── student-form\          student: anonymous submission flow (by link token)
     │   │
-    │   └── shared\                    feature-agnostic only — never imports from features\
-    │       ├── components\            week-grid, status-tag, empty-state, ...
-    │       ├── models\                cross-feature models (problem-details, paging)
-    │       ├── pipes\
-    │       └── config\
-    │           └── app-routes.ts      AppRoutes constants
+    │   ├── shared\                    feature-agnostic only — never imports from features\
+    │   │   ├── brand-logo\
+    │   │   ├── components\            week-grid, week-grid-legend, publication-state-tag, locked-field, dialog-refusal
+    │   │   ├── config\
+    │   │   │   └── app-routes.ts      AppRoutes constants
+    │   │   ├── dates\                 ISO date parsing, slot window times, Asia/Jerusalem instants
+    │   │   ├── dialogs\               confirm dialog, shared dialog-form styles
+    │   │   ├── language-toggle\
+    │   │   ├── models\                cross-feature models and enums (problem-details, Role, slot and publication states)
+    │   │   ├── pipes\                 initials, isolate-direction
+    │   │   └── text\                  initials, direction isolation
+    │   │
+    │   └── theme\                     app-preset.ts — PrimeNG theme preset
     │
-    ├── assets\
-    │   └── i18n\                      en.json, he.json
-    └── styles\                        theming + global SCSS (see client-primeng.md)
+    ├── styles\                        theming + global SCSS (see client-primeng.md)
+    └── testing\                       test-only type declarations
 ```
 
 ### Feature Internal Layout
@@ -100,8 +118,8 @@ features\publications\
 | Component (dumb) | `features\{feature}\ui\components\{name}\{name}.component.ts` | `SlotCountCellComponent` |
 | Shared component | `shared\components\{name}\{name}.component.ts` | `WeekGridComponent` |
 | Dialog | `features\{feature}\ui\dialogs\{name}\{name}.dialog.ts` | `PublishWeekDialog` |
-| Guard | `core\auth\{name}.guard.ts` | `authGuard` |
-| Interceptor | `core\http\{name}.interceptor.ts` | `apiErrorInterceptor` |
+| Guard | `core\{name}.guard.ts` (related guards share `core\{name}.guards.ts`) | `authGuard`, `administratorGuard` |
+| Interceptor | `core\{name}.interceptor.ts` | `authInterceptor` |
 | Route constants | `shared\config\app-routes.ts` | `AppRoutes` |
 
 ### Where to Put Code?
@@ -199,7 +217,7 @@ export interface ProblemDetails {
 
 `ToastService.apiError` shows `errors.{code}` (interpolating `params`) when that key exists, otherwise `errors.notFound` (404) / `errors.conflict` (409), otherwise `general.unexpectedError`. It **never** shows `detail` — that is English, developer-facing text (see `api-guidelines.md` "Rule Codes").
 
-409 means the user's view was stale (e.g., publishing an already-published Publication) — surface a translated message and refresh the affected state. There is **no ETag/If-Match handling** — the backend deliberately omits optimistic locking.
+409 means the user's view was stale (e.g., publishing an already-published Publication) — surface a translated message and refresh the affected state. There is **no ETag/If-Match handling**: the server settles concurrent admin writes itself ([ADR 0007](../../docs/decisions/0007-locking-for-the-active-student-guards.md)), and a request that lost a race gets the rule it now breaks or `concurrentChange` (shown like any other 409), or a 404 if its Teacher or Car was deleted meanwhile.
 
 ## Routing
 
@@ -219,6 +237,7 @@ export const AppRoutes = {
 - Features are lazy: `loadChildren: () => import('./features/publications/publications.routes')`
 - Feature routes files **default-export** a `Routes` array
 - Admin routes are guarded by `authGuard` (functional, `inject()`); the student form route is anonymous — the unguessable link token is the access control, mirroring the backend's `[AllowAnonymous]` posture
+- Role checks live in `core\role.guards.ts` (#89): Administrator-only feature routes add `canMatch: [administratorGuard]` (a Teacher-role User is sent to Weekly prep with an info toast, and never downloads the chunk); the dashboard uses `canActivate: [homeGuard]` with `pathMatch: 'full'` (a Teacher-role User lands on Weekly prep silently). They are UX only — the server's policies are the security boundary
 - The student route is short (`/s/{token}`) because it travels through WhatsApp
 - Enable `withComponentInputBinding()` — route params bind to page `input()`s
 

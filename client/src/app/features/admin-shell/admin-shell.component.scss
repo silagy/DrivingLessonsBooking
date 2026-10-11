@@ -11,7 +11,7 @@
 }
 
 .shell__bar {
-  height: 3.875rem;
+  block-size: 3.875rem;
   background: var(--app-bg-card);
   border-block-end: 1px solid var(--app-border);
   display: flex;
@@ -24,6 +24,9 @@
   display: flex;
   gap: 1.625rem;
   align-self: stretch;
+  min-inline-size: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .shell__nav-link {
@@ -33,6 +36,8 @@
   font-size: 0.9rem;
   color: var(--app-text-secondary);
   text-decoration: none;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .shell__nav-link--active {
@@ -48,6 +53,10 @@
   height: 3px;
   background: var(--app-grad-sky);
   border-radius: 3px 3px 0 0;
+}
+
+.shell__nav-link:focus-visible {
+  outline-offset: -2px;
 }
 
 .shell__actions {
@@ -91,7 +100,7 @@
 
 .shell-user-menu__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
   padding: 0.75rem 0.75rem 0.875rem;
   margin-block-end: 0.25rem;
@@ -101,6 +110,37 @@
 .shell-user-menu__email {
   font-size: 0.8125rem;
   color: var(--app-text-secondary);
+}
+
+.shell-user-menu__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.375rem;
+  min-inline-size: 0;
+}
+
+.shell-user-menu__role {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.shell-user-menu__role--administrator {
+  background: var(--p-sky-50);
+  color: var(--p-sky-700);
+  border-color: var(--p-sky-100);
+}
+
+.shell-user-menu__role--teacher {
+  background: var(--p-ocean-50);
+  color: var(--p-ocean-700);
+  border-color: var(--p-ocean-100);
 }
 
 ::ng-deep .p-menu.shell-user-menu {
@@ -127,6 +167,10 @@
 }
 
 .shell__email {
+  max-inline-size: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 0.8rem;
   color: var(--app-text-secondary);
 }
@@ -134,4 +178,22 @@
 .shell__main {
   flex: 1;
   padding: 1.625rem 2.25rem 2.25rem;
+}
+
+@media screen and (max-width: 1279px) {
+  .shell__bar {
+    block-size: auto;
+    flex-wrap: wrap;
+    column-gap: 1rem;
+    row-gap: 0;
+    padding-inline: 1rem;
+    padding-block-start: 0.75rem;
+  }
+
+  .shell__nav {
+    order: 1;
+    flex-basis: 100%;
+    block-size: 2.75rem;
+    gap: 1.25rem;
+  }
 }

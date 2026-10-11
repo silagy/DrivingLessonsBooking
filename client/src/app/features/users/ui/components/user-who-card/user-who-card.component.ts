@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TagModule } from 'primeng/tag';
 import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
-import { Role } from '../../../domain/role.enum';
+import { Role } from '../../../../../shared/models/role.enum';
 import { User } from '../../../domain/user.model';
 
 @Component({

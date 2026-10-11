@@ -64,6 +64,14 @@
                         </span>
                     </p-message>
                 }
+                @case (statuses.inactive) {
+                    <p-message severity="secondary" icon="pi pi-pause-circle" class="identify__inactive">
+                        <span>
+                            <strong class="identify__inactive-title">{{ 'studentForm.identify.inactiveTitle' | transloco }}</strong>
+                            {{ 'studentForm.identify.inactiveBody' | transloco }}
+                        </span>
+                    </p-message>
+                }
                 @case (statuses.invalidId) {
                     <p-message severity="error" class="identify__invalid">
                         {{ 'studentForm.identify.invalidId' | transloco }}
@@ -79,6 +87,9 @@
 
         <div wizardFooter>
             <p-button type="submit" fluid [label]="continueKey() | transloco" [disabled]="!canSubmit()" />
+            @if (status() === statuses.inactive) {
+                <p class="identify__locked">{{ 'studentForm.identify.inactiveLocked' | transloco }}</p>
+            }
         </div>
     </app-wizard-step>
 </form>

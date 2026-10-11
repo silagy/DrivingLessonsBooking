@@ -11,7 +11,7 @@ import { WeekGridComponent } from '../../../../../shared/components/week-grid/we
 import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
 import { PublicationStateTagComponent } from '../../../../../shared/components/publication-state-tag/publication-state-tag.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
-import { formatInstantInJerusalem, formatWeekdayInstantInJerusalem } from '../../../domain/jerusalem-time';
+import { formatInstantInJerusalem, formatWeekdayInstantInJerusalem } from '../../../../../shared/dates/jerusalem-time';
 import { LanguageService } from '../../../../../core/language.service';
 import { PublicationsStore } from '../../../state/publications.store';
 import { SlotCountCellComponent } from '../../components/slot-count-cell/slot-count-cell.component';
@@ -120,7 +120,11 @@ export class PublicationsDashboardPage {
         });
 
         effect(() => {
-            if (this.publish() === PUBLISH_FLAG && this.store.state() === PublicationState.draft) {
+            if (
+                this.publish() === PUBLISH_FLAG &&
+                this.store.canManageLifecycle() &&
+                this.store.state() === PublicationState.draft
+            ) {
                 this.onPublish();
             }
         });

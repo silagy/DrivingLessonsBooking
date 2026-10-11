@@ -3,6 +3,7 @@ using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.GetPublicationByLink;
 using DrivingLessons.Application.Queries.IdentifyStudent;
 using DrivingLessons.Domain.Common;
+using DrivingLessons.Domain.Exceptions;
 using DrivingLessons.Domain.Values;
 using FakeItEasy;
 using Shouldly;
@@ -68,6 +69,33 @@ public class IdentifyStudentInteractorTest
     }
 
     [TestMethod]
+    public async Task Identifies_With_The_Teacher_The_Student_Has_Now()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+        var afterChangeTeacher = new IdentifyStudentResponse
+        {
+            StudentName = "Test Student",
+            TeacherName = "Teacher Carmi",
+            CarName = "i20 Silver",
+            Transmission = Transmission.Manual
+        };
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns(afterChangeTeacher);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var response = await interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        response.TeacherName.ShouldBe("Teacher Carmi");
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [TestMethod]
     public async Task Publication_Must_Exist_For_The_Link()
     {
         //given
@@ -103,6 +131,63 @@ public class IdentifyStudentInteractorTest
 
         //then
         await Should.ThrowAsync<StudentNotFoundException>(act);
+    }
+
+    [TestMethod]
+    public async Task Inactive_Student_Is_Told_To_Contact_The_School()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns((IdentifyStudentResponse?)null);
+        A.CallTo(() => studentQueries.IsInactiveAsync(nationalId)).Returns(true);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var act = () => interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        await Should.ThrowAsync<SubmissionStudentMustBeActiveException>(act);
+    }
+
+    [TestMethod]
+    public async Task Unknown_National_Id_Is_Still_Not_Found()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns((IdentifyStudentResponse?)null);
+        A.CallTo(() => studentQueries.IsInactiveAsync(nationalId)).Returns(false);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        var act = () => interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        await Should.ThrowAsync<StudentNotFoundException>(act);
+    }
+
+    [TestMethod]
+    public async Task Active_Student_Is_Found_Without_The_Inactive_Lookup()
+    {
+        //given
+        var nationalId = NationalId.Of(RosterNationalId);
+        var student = new IdentifyStudentResponse { StudentName = "Test Student" };
+
+        A.CallTo(() => studentQueries.GetActiveByNationalIdAsync(nationalId, weekStart))
+            .Returns(student);
+
+        var request = new IdentifyStudentRequest(RosterNationalId);
+
+        //when
+        await interactor.ExecuteAsync(linkToken, request);
+
+        //then
+        A.CallTo(() => studentQueries.IsInactiveAsync(A<NationalId>._)).MustNotHaveHappened();
     }
 
     [TestMethod]

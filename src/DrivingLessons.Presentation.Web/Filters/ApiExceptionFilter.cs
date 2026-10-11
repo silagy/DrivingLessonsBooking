@@ -3,6 +3,7 @@ using System.Text.Json;
 using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Domain.Common;
 using DrivingLessons.Domain.Exceptions;
+using DrivingLessons.Domain.Values;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -13,6 +14,8 @@ public sealed class ApiExceptionFilter : IExceptionFilter
     private const string CodeExtension = "code";
     private const string ParamsExtension = "params";
     private const string ColumnSeparator = ", ";
+    private const string NameSeparator = ", ";
+    private const int NamedStudentsLimit = 3;
 
     public void OnException(ExceptionContext context)
     {
@@ -21,6 +24,7 @@ public sealed class ApiExceptionFilter : IExceptionFilter
         {
             AuthenticationFailedException => (StatusCodes.Status401Unauthorized, "Unauthorized", null, null),
             NotFoundException => (StatusCodes.Status404NotFound, "Not Found", null, code),
+            ConcurrentChangeException => (StatusCodes.Status409Conflict, "Conflict", null, code),
             SubmissionWindowMustBeOpenException =>
                 (StatusCodes.Status409Conflict, "Conflict", ProblemTypes.SubmissionWindowClosed, code),
             DomainException => (StatusCodes.Status409Conflict, "Conflict", null, code),
@@ -69,8 +73,46 @@ public sealed class ApiExceptionFilter : IExceptionFilter
             {
                 ["maxLength"] = tooLong.MaxLength.ToString(CultureInfo.InvariantCulture)
             },
+            StudentNationalIdAlreadyInUseException inUse => new Dictionary<string, string>
+            {
+                ["name"] = inUse.ExistingStudentName.Value
+            },
+            TeacherMustNotHaveActiveStudentsException teacher => ActiveStudentsParams(teacher.ActiveStudentNames),
+            CarMustNotHaveActiveStudentsException car => ActiveStudentsParams(car.ActiveStudentNames),
+            TeacherAssignmentMustNotHaveActiveStudentsException assignment => AssignmentParams(assignment),
             _ => null
         };
+    }
+
+    private static Dictionary<string, string> AssignmentParams(
+        TeacherAssignmentMustNotHaveActiveStudentsException assignment)
+    {
+        var parameters = ActiveStudentsParams(assignment.ActiveStudentNames);
+        parameters["teacher"] = assignment.TeacherName.Value;
+
+        return parameters;
+    }
+
+    private static Dictionary<string, string> ActiveStudentsParams(IReadOnlyList<StudentName> activeStudentNames)
+    {
+        var namedStudents = activeStudentNames
+                            .Take(NamedStudentsLimit)
+                            .Select(x => x.Value);
+        var names = string.Join(NameSeparator, namedStudents);
+        var parameters = new Dictionary<string, string>
+        {
+            ["count"] = activeStudentNames.Count.ToString(CultureInfo.InvariantCulture),
+            ["names"] = names
+        };
+
+        var unnamedCount = activeStudentNames.Count - NamedStudentsLimit;
+
+        if (unnamedCount > 0)
+        {
+            parameters["more"] = unnamedCount.ToString(CultureInfo.InvariantCulture);
+        }
+
+        return parameters;
     }
 
     private static string CodeOf(Exception exception)

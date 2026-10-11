@@ -17,12 +17,16 @@
     "logout": "Sign out",
     "userMenu": "User menu",
     "changeMyPassword": "Change my password",
+    "roles": {
+      "administrator": "Administrator",
+      "teacher": "Teacher"
+    },
     "languageToggle": "עברית",
     "language": "Language",
     "nav": {
       "dashboard": "Dashboard",
       "teachers": "Cars & teachers",
-      "roster": "Roster",
+      "students": "Students",
       "weeklyPrep": "Weekly prep",
       "publications": "Publications",
       "history": "History",
@@ -61,6 +65,7 @@
     "assigned": "assigned",
     "shared": "Shared",
     "assignmentsUpdated": "Teacher assignments updated",
+    "assignmentsPartlyUpdated": "Some assignment changes were saved before the save stopped. The list has been refreshed.",
     "created": "Teacher created",
     "detailsChanged": "Teacher details updated",
     "deleted": "Teacher deleted",
@@ -75,15 +80,15 @@
     "carsEmptySubtitle": "Add the first car to build the shared pool."
   },
   "roster": {
-    "title": "Student roster",
-    "subtitle": "Upload the school's CSV to sync students, their teachers, and cars.",
+    "title": "Import Roster",
+    "subtitle": "A CSV file adds new Students and updates existing ones by national ID. It never deactivates anyone.",
+    "back": "Back to Students",
     "uploadCsv": "Upload CSV",
     "processed": "Processed",
     "rowsSummary": "{{rows}} rows · {{time}}",
     "stats": {
       "added": "Added",
       "updated": "Updated",
-      "deactivated": "Deactivated (missing from file)",
       "failed": "Failed rows"
     },
     "table": {
@@ -115,11 +120,154 @@
       "missingCar": "Missing car",
       "unknownTeacher": "Teacher not found in the system",
       "unknownCar": "Car not found in the system",
-      "invalidStartDate": "Invalid start date"
+      "invalidStartDate": "Invalid start date",
+      "carNotAssignedToTeacher": "Car is not assigned to this Teacher"
     },
     "imported": "Roster imported",
     "loadFailed": "Failed to load the roster.",
     "empty": "No students yet. Upload the school's CSV to build the roster."
+  },
+  "students": {
+    "title": "Students",
+    "subtitle": "Students are the people who submit weekly requests. This list includes Students from the Roster and Students added by hand.",
+    "importRoster": "Import Roster",
+    "filters": {
+      "teacher": "Teacher",
+      "allTeachers": "All Teachers",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "all": "All",
+      "search": "Search",
+      "searchPlaceholder": "Name or national ID"
+    },
+    "table": {
+      "name": "Name",
+      "nationalId": "National ID",
+      "phone": "Phone",
+      "teacher": "Teacher",
+      "car": "Car",
+      "status": "Status",
+      "student": "Student",
+      "teacherAndCar": "Teacher and Car"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "transmissions": {
+      "automatic": "Automatic",
+      "manual": "Manual"
+    },
+    "new": "New",
+    "flag": {
+      "car": "Not this Teacher's Car",
+      "tip": "This Car isn't one of {{teacher}}'s Cars. It was probably set before the rule existed. Fix it with Change Car.",
+      "tipInactive": "This Car isn't one of {{teacher}}'s Cars. Assign it to {{teacher}} on Cars & teachers, then mark the Student as active."
+    },
+    "deletedFlag": {
+      "teacher": "Teacher deleted",
+      "car": "Car deleted",
+      "tip": "To reactivate the Student, import them again in the Roster with a current Teacher and Car."
+    },
+    "footer": "{{count}} Students",
+    "footerOne": "1 Student",
+    "loading": "Loading Students...",
+    "loadFailed": "We couldn't load the Students.",
+    "retry": "Try again",
+    "emptyTitle": "No Students yet",
+    "emptyHint": "Add a Student by hand, or import the Roster file.",
+    "noMatchTitle": "No Students match these filters",
+    "noMatchHint": "Try another Teacher or status.",
+    "clearFilters": "Clear filters",
+    "addStudent": "Add Student",
+    "added": "Student added",
+    "addedDetail": "{{name}} is now on {{teacher}}'s list.",
+    "actions": {
+      "editDetails": "Edit details",
+      "changeTeacher": "Change Teacher",
+      "changeCar": "Change Car",
+      "fix": "Fix",
+      "menu": "Actions",
+      "menuFor": "Actions - {{name}}",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate"
+    },
+    "who": {
+      "teacher": "Teacher:",
+      "car": "Car:"
+    },
+    "deactivate": {
+      "title": "Deactivate {{name}}?",
+      "cannotSubmit": "Until reactivated, they can't submit on the student form.",
+      "submissionsStay": "Their past Submissions stay.",
+      "rosterReactivates": "A Roster file that still lists them will reactivate them."
+    },
+    "deactivated": "Student deactivated",
+    "deactivatedDetail": "{{name}} can't submit until reactivated.",
+    "reactivated": "Student reactivated",
+    "reactivatedDetail": "{{name}} can submit on the student form again.",
+    "reactivateCarNotOfTeacher": "{{car}} is no longer assigned to {{teacher}}. Assign it to {{teacher}} on Cars & teachers, then mark the Student as active.",
+    "teacherChanged": "Teacher changed",
+    "teacherChangedDetail": "{{name}}'s Teacher is now {{teacher}}, on {{car}}.",
+    "carChanged": "Car changed",
+    "carChangedDetail": "{{name}} now learns on {{car}}.",
+    "edit": {
+      "title": "Edit details",
+      "nationalIdNote": "Changing it here doesn't change the Roster file. A later Roster file with the old ID would add a second Student, so correct the file too.",
+      "nationalIdUsed": "This national ID belongs to another Student: {{name}}.",
+      "teacherAndCar": "Teacher and Car",
+      "teacherAndCarHint": "To change them, use Change Teacher or Change Car in the row menu."
+    },
+    "changeTeacher": {
+      "title": "Change Teacher",
+      "newTeacher": "New Teacher",
+      "current": "(current)",
+      "currentCar": "(current Car)",
+      "carKept": "{{teacher}} also teaches on the current Car, so it's selected.",
+      "note": "Existing Submissions stay with the week they were made in. From their next identification, the Student sees the new Teacher's week.",
+      "save": "Change Teacher",
+      "sameTeacher": "{{teacher}} is already this Student's Teacher. Refresh the screen.",
+      "carNotOfTeacher": "This Car isn't assigned to {{teacher}}. Refresh and choose again."
+    },
+    "changeCar": {
+      "title": "Change Car",
+      "current": "(current)",
+      "newCar": "New Car",
+      "hint": "Only {{teacher}}'s Cars are listed.",
+      "none": "{{teacher}} has no other Cars.",
+      "noneHint": "You can assign another Car to this Teacher in Cars & teachers.",
+      "flagTitle": "The current Car isn't one of {{teacher}}'s Cars",
+      "flagBody": "{{car}} was set before the rule existed. Choose one of {{teacher}}'s Cars.",
+      "save": "Change Car",
+      "sameCar": "This is already this Student's Car. Refresh the screen.",
+      "carGone": "This Car is no longer assigned to {{teacher}}. Refresh and choose again."
+    },
+    "detailsSaved": "Details saved",
+    "add": {
+      "title": "Add Student",
+      "nationalId": "National ID",
+      "nationalIdHint": "9 digits, including the check digit",
+      "nationalIdInvalid": "This national ID isn't valid. Check it has 9 digits and the check digit is right.",
+      "fullName": "Full name",
+      "phone": "Phone",
+      "teacher": "Teacher",
+      "teacherPlaceholder": "Choose a Teacher",
+      "noCarsOption": "No Cars",
+      "car": "Car",
+      "carPlaceholderLocked": "Choose a Teacher first",
+      "carPlaceholder": "Choose a Car",
+      "carScoped": "Only {{teacher}}'s Cars are listed.",
+      "carOnly": "{{teacher}}'s only Car, so it's selected.",
+      "noCars": "This Teacher has no Cars yet. Assign one in Cars & teachers.",
+      "noCarsLink": "Go to Cars & teachers",
+      "optionalGroup": "Optional",
+      "address": "Address",
+      "startDate": "Start date",
+      "datePlaceholder": "dd/mm/yyyy",
+      "licenseType": "License type",
+      "licenseTypePlaceholder": "e.g. B"
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -131,7 +279,9 @@
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
+    "me": "(me)",
     "selectTeacherPrompt": "Select a teacher and week to prepare the grid.",
+    "notCreatedYet": "The Administrator hasn't prepared this week yet.",
     "cellOpen": "Open",
     "cellUnavailable": "Unavailable",
     "publishWeek": "Publish week...",
@@ -165,6 +315,7 @@
     "teacher": "Teacher",
     "week": "Week",
     "selectTeacher": "Select a teacher",
+    "me": "(me)",
     "state": {
       "draft": "Draft",
       "published": "Published",
@@ -217,6 +368,8 @@
       "totalPicks": "total picks",
       "lastSubmission": "last submission",
       "draftPrompt": "This week is prepared but not published. Publish it to open the submission window and generate the link.",
+      "draftPromptTeacher": "This week is prepared but not published yet. The Administrator publishes it to open the submission window.",
+      "onlyYours": "Only your Publications: what Students requested from you each week.",
       "publishedNotice": "Submissions open automatically at {{opensAt}}.",
       "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher.",
       "weekTitle": "- Week {{weekNumber}}",
@@ -366,6 +519,9 @@
       "foundBody": "Let's collect your availability for week {{weekNumber}} with {{teacherName}}.",
       "notOnRosterTitle": "We don't have you on file.",
       "notOnRosterBody": "This ID isn't on the school's roster, so there's nothing to submit. Please contact your school to be added.",
+      "inactiveTitle": "Your registration isn't active.",
+      "inactiveBody": "So you can't submit requests this week. To get back to lessons, contact the school.",
+      "inactiveLocked": "You can continue only with an active registration",
       "invalidId": "This doesn't look like a valid national ID. Check the digits and try again.",
       "failed": "We couldn't check your ID right now. Check your connection and try again.",
       "welcomeBackTitle": "Welcome back, {{studentName}}.",
@@ -455,10 +611,15 @@
       "hint": "If the school reopens the window, this link will work again."
     }
   },
+  "access": {
+    "refusedTitle": "You don't have access to that page",
+    "refusedDetail": "We've taken you to your Week Schedule."
+  },
   "general": {
     "refusedTitle": "That didn't go through",
     "save": "Save",
     "cancel": "Cancel",
+    "close": "Close",
     "delete": "Delete",
     "refresh": "Refresh",
     "apply": "Apply",
@@ -466,9 +627,13 @@
   },
   "errors": {
     "conflict": "This change conflicts with the latest data. Refresh the page and try again.",
+    "concurrentChange": "Someone else changed this at the same moment. Refresh the page and try again.",
+    "forbidden": "You don't have permission to do that.",
     "notFound": "This item no longer exists. Refresh the page.",
     "addressMustNotBeEmpty": "The address can't be empty.",
     "carAlreadyDeleted": "This car was already deleted. Refresh the page.",
+    "carMustNotHaveActiveStudents": "Active Students learn on this Car ({{count}}): {{names}}. Change their Car on the Students screen, then delete.",
+    "carMustNotHaveActiveStudentsMore": "Active Students learn on this Car ({{count}}): {{names}} and {{more}} more. Change their Car on the Students screen, then delete.",
     "carNameMustNotBeEmpty": "Enter the car's name.",
     "carNotFound": "This car no longer exists. Refresh the page.",
     "carTypeMustNotBeEmpty": "Enter the car's type.",
@@ -498,9 +663,15 @@
     "slotMustBeUnavailable": "This slot is already open. Refresh the page.",
     "slotNotFound": "This slot no longer exists. Refresh the page.",
     "slotNotInWeekSchedule": "This slot isn't part of the week. Refresh the page.",
-    "studentAlreadyActive": "This student is already active.",
-    "studentAlreadyDeactivated": "This student is already inactive.",
+    "studentAlreadyActive": "This Student is already active. The list has been refreshed.",
+    "studentAlreadyWithTeacher": "This is already this Student's Teacher. Refresh the screen.",
+    "studentAlreadyOnCar": "This is already this Student's Car. Refresh the screen.",
+    "studentAlreadyDeactivated": "This Student is already inactive. The list has been refreshed.",
     "studentNameMustNotBeEmpty": "The student's name can't be empty.",
+    "studentCarMustBeAssignedToTeacher": "The Car is not assigned to the Student's Teacher. Assign it to the Teacher on Cars & teachers, or choose another Car.",
+    "studentTeacherMustNotBeDeleted": "This Student's Teacher was deleted. To reactivate the Student, import them again in the Roster with a current Teacher and Car.",
+    "studentCarMustNotBeDeleted": "This Student's Car was deleted. To reactivate the Student, import them again in the Roster with a current Teacher and Car.",
+    "studentNationalIdAlreadyInUse": "A Student with this national ID already exists: {{name}}.",
     "studentNotFound": "No active student on the roster has this national ID.",
     "submissionAlreadyExists": "A list was already sent for this week.",
     "submissionMustBeForPublicationAndStudent": "This list belongs to another week or student.",
@@ -517,6 +688,10 @@
     "teacherAlreadyAssignedToCar": "This teacher is already assigned to the car. Refresh the page.",
     "teacherAlreadyDeleted": "This teacher was already deleted. Refresh the page.",
     "teacherAlreadyLinkedToUser": "This Teacher already has a User.",
+    "teacherAssignmentMustNotHaveActiveStudents": "Active Students of {{teacher}} learn on this Car ({{count}}): {{names}}. Change their Car on the Students screen, then unassign.",
+    "teacherAssignmentMustNotHaveActiveStudentsMore": "Active Students of {{teacher}} learn on this Car ({{count}}): {{names}} and {{more}} more. Change their Car on the Students screen, then unassign.",
+    "teacherMustNotHaveActiveStudents": "This Teacher still has active Students ({{count}}): {{names}}. Change their Teacher on the Students screen, then delete.",
+    "teacherMustNotHaveActiveStudentsMore": "This Teacher still has active Students ({{count}}): {{names}} and {{more}} more. Change their Teacher on the Students screen, then delete.",
     "teacherMustNotHaveActiveUser": "This teacher still has an active User, so they can't be deleted.",
     "teacherNameMustNotBeEmpty": "Enter the teacher's name.",
     "teacherNotAssignedToCar": "This teacher isn't assigned to the car. Refresh the page.",

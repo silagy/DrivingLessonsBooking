@@ -8,4 +8,5 @@ export enum RosterRowFailureReason {
     unknownTeacher = 'unknownTeacher',
     unknownCar = 'unknownCar',
     invalidStartDate = 'invalidStartDate',
+    carNotAssignedToTeacher = 'carNotAssignedToTeacher',
 }

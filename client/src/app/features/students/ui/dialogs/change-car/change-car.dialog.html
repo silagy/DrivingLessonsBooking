@@ -1,0 +1,83 @@
+@let refusedNow = refusal();
+@let isSameCar = refusedNow?.kind === refusalKinds.sameCar;
+@let isStaleCar = refusedNow?.kind === refusalKinds.staleCar;
+@let refusalText = isSameCar
+  ? ('students.changeCar.sameCar' | transloco)
+  : isStaleCar
+    ? ('students.changeCar.carGone' | transloco: { teacher: teacherName })
+    : refusedNow?.message;
+@let canChoose = carChange().hasOtherCars;
+
+<form (ngSubmit)="submit()" class="dialog-form">
+  @if (refusedNow) {
+    <app-dialog-refusal [message]="refusalText ?? ''">
+      @if (isSameCar || isStaleCar) {
+        <button type="button" class="change-car__refresh" (click)="onRefresh()">
+          <i class="pi pi-refresh" aria-hidden="true"></i>
+          {{ 'general.refresh' | transloco }}
+        </button>
+      }
+    </app-dialog-refusal>
+  }
+
+  <app-student-who-card [student]="student" />
+
+  @if (!student.isCarOfTeacher) {
+    <p-message severity="error">
+      <span class="change-car__message change-car__flag">
+        <strong>{{ 'students.changeCar.flagTitle' | transloco: { teacher: teacherName } }}</strong>
+        <span>{{ 'students.changeCar.flagBody' | transloco: { car: currentCarName, teacher: teacherName } }}</span>
+      </span>
+    </p-message>
+  }
+
+  @if (canChoose) {
+    <div class="change-car__group" role="radiogroup" aria-labelledby="change-car-label">
+      <span class="change-car__label" id="change-car-label">{{ 'students.changeCar.newCar' | transloco }}</span>
+      @for (choice of carChange().choices; track choice.id) {
+        <label
+          class="change-car__card"
+          [for]="'change-car-' + choice.id"
+          [class.change-car__card--selected]="selectedCarId() === choice.id"
+          [class.change-car__card--current]="choice.isCurrent">
+          <p-radiobutton
+            name="carId"
+            [inputId]="'change-car-' + choice.id"
+            [value]="choice.id"
+            [ngModel]="selectedCarId()"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="selectCar($event)"
+            [disabled]="choice.isCurrent" />
+          <i class="pi pi-car change-car__icon" aria-hidden="true"></i>
+          <span class="change-car__name">{{ choice.name }}</span>
+          <app-transmission-tag [transmission]="choice.transmission" [muted]="choice.isCurrent" />
+          @if (choice.isCurrent) {
+            <small class="change-car__current">{{ 'students.changeCar.current' | transloco }}</small>
+          }
+        </label>
+      }
+      <small class="field__hint">{{ 'students.changeCar.hint' | transloco: { teacher: teacherName } }}</small>
+    </div>
+  } @else {
+    <p-message severity="info">
+      <span class="change-car__message change-car__none">
+        <strong>{{ 'students.changeCar.none' | transloco: { teacher: teacherName } }}</strong>
+        <span>{{ 'students.changeCar.noneHint' | transloco }}</span>
+        <a class="change-car__link" [routerLink]="carsAndTeachersLink" (click)="close()">{{ 'students.add.noCarsLink' | transloco }}</a>
+      </span>
+    </p-message>
+  }
+
+  <div class="dialog-form__actions">
+    @if (canChoose) {
+      <p-button [label]="'general.cancel' | transloco" severity="secondary" type="button" text (onClick)="close()" />
+      <p-button
+        [label]="'students.changeCar.save' | transloco"
+        type="submit"
+        [disabled]="!canSave()"
+        [loading]="isSaving()" />
+    } @else {
+      <p-button [label]="'general.close' | transloco" severity="secondary" type="button" [outlined]="true" (onClick)="close()" />
+    }
+  </div>
+</form>

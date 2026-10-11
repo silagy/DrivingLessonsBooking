@@ -7,6 +7,5 @@ public record RosterImportCreated(
     RosterImportId RosterImportId,
     int AddedCount,
     int UpdatedCount,
-    int DeactivatedCount,
     int FailedCount,
     DateTime ImportedAtUtc) : IDomainEvent;

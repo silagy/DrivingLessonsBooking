@@ -13,7 +13,6 @@ public class RosterImport : AggregateRoot<RosterImportId>
     public DateTime ImportedAtUtc { get; private set; }
     public int AddedCount { get; private set; }
     public int UpdatedCount { get; private set; }
-    public int DeactivatedCount { get; private set; }
     public int FailedCount { get; private set; }
 
     public IReadOnlyCollection<RosterImportEntry> Entries => entries.AsReadOnly();
@@ -37,14 +36,12 @@ public class RosterImport : AggregateRoot<RosterImportId>
         this.failures.AddRange(failures);
         AddedCount = entries.Count(x => x.Outcome is RosterEntryOutcome.Added);
         UpdatedCount = entries.Count(x => x.Outcome is RosterEntryOutcome.Updated);
-        DeactivatedCount = entries.Count(x => x.Outcome is RosterEntryOutcome.Deactivated);
         FailedCount = failures.Count;
 
         var createdEvent = new RosterImportCreated(
             id,
             AddedCount,
             UpdatedCount,
-            DeactivatedCount,
             FailedCount,
             importedAtUtc);
         AddEvent(createdEvent);

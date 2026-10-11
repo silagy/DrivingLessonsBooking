@@ -561,8 +561,7 @@ public class SubmissionTest
         var scenario = SubmissionFakeBuilder.BuildScenario();
         var submission = SubmissionFakeBuilder.Build(scenario);
         var student = scenario.Student;
-        var newTeacher = TeacherFakeBuilder.Build();
-        var newCar = CarFakeBuilder.Build();
+        var (newCar, newTeacher) = CarFakeBuilder.Build().AssignFakeTeacher();
         student.UpdateFromRoster(
             student.Name,
             student.Phone,

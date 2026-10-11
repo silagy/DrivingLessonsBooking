@@ -19,11 +19,41 @@ public class StudentRepository : IStudentRepository
         return await dbContext.Students.ToListAsync();
     }
 
+    public async Task<IReadOnlyCollection<Student>> FindActiveByTeacherAsync(TeacherId teacherId)
+    {
+        return await dbContext
+                         .Students
+                         .Where(x => x.IsActive && x.TeacherId == teacherId)
+                         .ToListAsync();
+    }
+
+    public async Task<IReadOnlyCollection<Student>> FindActiveByCarAsync(CarId carId)
+    {
+        return await dbContext
+                         .Students
+                         .Where(x => x.IsActive && x.CarId == carId)
+                         .ToListAsync();
+    }
+
+    public async Task<Student?> GetAsync(StudentId id)
+    {
+        return await dbContext
+                         .Students
+                         .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task<Student?> GetActiveByNationalIdAsync(NationalId nationalId)
     {
         return await dbContext
                          .Students
                          .FirstOrDefaultAsync(x => x.NationalId == nationalId && x.IsActive);
+    }
+
+    public async Task<Student?> GetByNationalIdAsync(NationalId nationalId)
+    {
+        return await dbContext
+                         .Students
+                         .FirstOrDefaultAsync(x => x.NationalId == nationalId);
     }
 
     public void Add(Student student)

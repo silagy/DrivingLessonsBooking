@@ -196,9 +196,9 @@ Every 404 and 409 body carries a machine-readable `code` extension: the exceptio
 - **Every new `{Entity}{Rule}Exception` or `{Entity}NotFoundException` needs an `errors.{code}` key in both `client\public\i18n\en.json` and `he.json` in the same PR** — without one the user gets the generic `errors.conflict` / `errors.notFound` message instead of the rule
 - A rule whose message needs values exposes them as read-only properties on its exception, and the filter maps them into a `params` extension of strings (`"params": { "columns": "טלפון, מורה" }`); the client interpolates them into `errors.{code}` (`"The file is missing required columns: {{columns}}."`). Today: `RosterFileMustContainRequiredColumnsException` → `columns`, `SlotConstraintMustNotExceedMaxLengthException` → `maxLength`
 
-## Auth Slice Exception (US-01)
+## Auth Controller Exception
 
-The admin sign-in slice (`docs/modules/auth/us-01-admin-sign-in-plan.md`) is deliberately **pre-aggregate infrastructure** — no domain aggregate, and its code style deviates from these rules in places (constructor injection, `Handle(...)` naming). That deviation is accepted **for that slice only**. Every aggregate endpoint (Teacher, WeekSchedule, Publication, Student, Submission) follows these rules: `ExecuteAsync`, `[FromServices]` injection, CQRS controller split, no comments.
+`AuthController` (`POST /api/auth/login`) predates these rules: it takes `LoginInteractor` by constructor injection and is not split into command and query controllers. That deviation is accepted **for that controller only**. Sign-in itself goes through the `User` aggregate and `LoginInteractor.ExecuteAsync` ([ADR 0006](../../docs/decisions/0006-user-aggregate-and-roles.md)). Every other endpoint, Users and Me included, follows these rules: `ExecuteAsync`, `[FromServices]` injection, CQRS controller split, no comments.
 
 ## Swagger
 
@@ -250,9 +250,15 @@ Interactors are registered as themselves (scoped) — no interfaces for interact
 ## Auth
 
 - Admin endpoints require the authenticated admin policy (email + password login per requirements)
-- Administrator-only controllers carry `[Authorize(Policy = AuthorizationPolicies.Administrator)]` (`Presentation.Web\Auth\AuthorizationPolicies.cs`). The policy requires the token's `role` claim to be `administrator`; JWT bearer runs with `MapInboundClaims = false` and `RoleClaimType = "role"`. Until #89 makes it the default policy, every new admin-only controller adds the attribute itself (first used by `api/users`, #85)
+- Two policies live in `Presentation.Web\Auth\AuthorizationPolicies.cs`: `Administrator` (token `role` claim is `administrator`) and `TeacherOrAdministrator` (`administrator` or `teacher`). JWT bearer runs with `MapInboundClaims = false` and `RoleClaimType = "role"`
+- `Administrator` is both the fallback policy (no attribute) and the default policy (bare `[Authorize]`): every endpoint is Administrator-only unless it opts in (#89). Opt in with `[Authorize(Policy = AuthorizationPolicies.TeacherOrAdministrator)]` only for screens a Teacher-role User uses: Week Schedule queries, mark Slot Open / Unavailable, Publication queries (including the dashboard and Excel download) and `api/me`
+- Never stack a class-level and an action-level policy: ASP.NET requires both. `ControllerAuthorizationTest` pins the endpoint-to-policy matrix; update its lists when an endpoint opts in or out
+- Teacher scoping (#90): a Teacher-role User reaches only the data of their linked Teacher. Every Teacher-reachable interactor takes `ICurrentUser` and calls `currentUser.MayReach(teacherId)` (`Application\Auth\CurrentUserExtension.cs`). When the Teacher id is an input, the check runs before anything is loaded; when only the aggregate knows its Teacher (the Slot commands), it runs right after the load and before any change or commit
+- A refusal throws the entity's existing not-found exception (`WeekScheduleNotFoundException`, `PublicationNotFoundException`), so the API answers 404, never 403, and never reveals that another Teacher's data exists
+- Lists that span Teachers (History) filter in the query by an optional Teacher id: the interactor passes the linked Teacher id for a Teacher and null for an Administrator. Administrators bypass scoping, linked to a Teacher or not
+- `GET api/me` returns the signed-in User (`GetUserResponse`, including `TeacherName`); the token has no Teacher name
 - Student-facing endpoints (`by-link/{token}`) are anonymous by design — the unguessable token is the access control
-- Apply `[AllowAnonymous]` explicitly on the student controllers; everything else requires authorization by default (`MapControllers().RequireAuthorization()`)
+- Apply `[AllowAnonymous]` explicitly on the student controllers and the login action
 
 ## Naming Conventions
 

@@ -32,6 +32,6 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
             .Property(x => x.IsDeleted)
             .HasColumnName("is_deleted");
 
-        builder.HasQueryFilter(x => !x.IsDeleted);
+        builder.HasQueryFilter(QueryFilters.TeacherNotDeleted, x => !x.IsDeleted);
     }
 }
