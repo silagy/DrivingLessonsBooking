@@ -26,7 +26,7 @@
         (onClick)="onUserMenu($event)">
         <span class="shell__avatar" aria-hidden="true">{{ initials() }}</span>
         @if (auth.email(); as email) {
-          <bdi class="shell__email" dir="ltr">{{ email }}</bdi>
+          <bdi class="shell__email" dir="ltr" [attr.title]="email">{{ email }}</bdi>
         }
         <i class="pi pi-chevron-down shell__chevron" [class.shell__chevron--open]="isUserMenuOpen()" aria-hidden="true"></i>
       </p-button>
