@@ -42,7 +42,7 @@ export class PublicationsStore {
         this.publicationsResource.hasValue() ? this.publicationsResource.value() : []
     );
     readonly isLoading = this.publicationsResource.isLoading;
-    readonly loadError = computed(() => (this.publicationsResource.error() ? 'Publications.loadFailed' : null));
+    readonly loadError = computed(() => (this.publicationsResource.error() ? 'publications.loadFailed' : null));
     readonly isMutating = this.mutating.asReadonly();
 
     readonly openPublications = computed(() =>
@@ -55,15 +55,15 @@ export class PublicationsStore {
     }
 
     async publish(publicationId: string): Promise<void> {
-        await this.executeCommand(() => this.api.publishPublication(publicationId), 'Publications.published');
+        await this.executeCommand(() => this.api.publishPublication(publicationId), 'publications.published');
     }
 
     async close(publicationId: string): Promise<void> {
-        await this.executeCommand(() => this.api.closePublication(publicationId), 'Publications.closed');
+        await this.executeCommand(() => this.api.closePublication(publicationId), 'publications.closed');
     }
 
     async reopen(publicationId: string, request: ReopenPublicationRequest): Promise<void> {
-        await this.executeCommand(() => this.api.reopenPublication(publicationId, request), 'Publications.reopened');
+        await this.executeCommand(() => this.api.reopenPublication(publicationId, request), 'publications.reopened');
     }
 
     private async executeCommand(command: () => Observable<void>, successKey: string): Promise<void> {
@@ -232,7 +232,7 @@ Dialogs are structurally dumb: data in via `DynamicDialogConfig.data`, result ou
 } @else if (store.loadError(); as errorKey) {
     <app-error-state [messageKey]="errorKey" />
 } @else if (store.isEmpty()) {
-    <app-empty-state titleKey="Publications.emptyTitle" />
+    <app-empty-state titleKey="publications.emptyTitle" />
 } @else {
     @for (publication of store.publications(); track publication.id) {
         <app-publication-row [publication]="publication" (extend)="onExtendDeadline(publication)" />
