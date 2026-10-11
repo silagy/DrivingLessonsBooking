@@ -196,9 +196,9 @@ Every 404 and 409 body carries a machine-readable `code` extension: the exceptio
 - **Every new `{Entity}{Rule}Exception` or `{Entity}NotFoundException` needs an `errors.{code}` key in both `client\public\i18n\en.json` and `he.json` in the same PR** — without one the user gets the generic `errors.conflict` / `errors.notFound` message instead of the rule
 - A rule whose message needs values exposes them as read-only properties on its exception, and the filter maps them into a `params` extension of strings (`"params": { "columns": "טלפון, מורה" }`); the client interpolates them into `errors.{code}` (`"The file is missing required columns: {{columns}}."`). Today: `RosterFileMustContainRequiredColumnsException` → `columns`, `SlotConstraintMustNotExceedMaxLengthException` → `maxLength`
 
-## Auth Slice Exception (US-01)
+## Auth Controller Exception
 
-The admin sign-in slice (`docs/modules/auth/us-01-admin-sign-in-plan.md`) is deliberately **pre-aggregate infrastructure** — no domain aggregate, and its code style deviates from these rules in places (constructor injection, `Handle(...)` naming). That deviation is accepted **for that slice only**. Every aggregate endpoint (Teacher, WeekSchedule, Publication, Student, Submission) follows these rules: `ExecuteAsync`, `[FromServices]` injection, CQRS controller split, no comments.
+`AuthController` (`POST /api/auth/login`) predates these rules: it takes `LoginInteractor` by constructor injection and is not split into command and query controllers. That deviation is accepted **for that controller only**. Sign-in itself goes through the `User` aggregate and `LoginInteractor.ExecuteAsync` ([ADR 0006](../../docs/decisions/0006-user-aggregate-and-roles.md)). Every other endpoint, Users and Me included, follows these rules: `ExecuteAsync`, `[FromServices]` injection, CQRS controller split, no comments.
 
 ## Swagger
 

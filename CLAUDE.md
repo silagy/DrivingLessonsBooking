@@ -21,6 +21,7 @@ Weekly demand-collection system for a driving school (see [README.md](README.md)
 | Client templates / styles / PrimeNG | `.claude/rules/client-primeng.md` (auto-loaded) |
 | User-visible strings, dates, RTL | `.claude/rules/client-i18n.md` (auto-loaded) |
 | Product behavior questions | `docs/requirements.md` |
+| Domain terms and words to avoid | `CONTEXT.md` |
 | Stack, repo layout, deployment | `docs/tech-stack.md` + `docs/decisions/` |
 
 Backend rules govern `src\` and `tests\`; client rules govern `client\`. The client consumes the API contract defined by `api-guidelines.md` — it never redefines it.
@@ -34,7 +35,7 @@ Backend rules govern `src\` and `tests\`; client rules govern `client\`. The cli
 5. **Test through aggregate roots only** — never instantiate or test child entities directly
 6. **Repositories return null; interactors throw `{Entity}NotFoundException`**
 7. **Controllers contain zero logic** — delegate to an interactor injected via `[FromServices]`
-8. **Use requirements terminology** — entity, state, and flow names come from `docs/requirements.md` (Publication, Week Schedule, Slot, Submission, Slot Request). Never invent alternative names
+8. **Use requirements terminology** — entity, state, and flow names come from `docs/requirements.md` and the `CONTEXT.md` glossary (Publication, Week Schedule, Slot, Submission, Slot Request, User, Role, Change Teacher, Change Car, Inactive Student). Never invent alternative names
 9. **Prefer new domain events over modifying existing ones**
 10. **Client state is signals only** — no NgRx, no Subject-held state; stores expose readonly signals, components never subscribe
 11. **No hardcoded user-visible strings; Hebrew is RTL-first** — every string is a translation key, every layout mirror-correct
@@ -109,12 +110,12 @@ Domain.Test       → Domain
 
 Core aggregates (full model in `docs/requirements.md` §5):
 
-- **User** — a person who can sign in; exactly one Role (`Administrator` | `Teacher`); a Teacher-Role User is linked to exactly one Teacher; sign-in email unique case-insensitively; soft-deleted; replaces the infrastructure admin record (#84)
-- **Teacher** — no longer owns cars (decision #21); scheduling is per teacher, not per car
+- **User** — a person who can sign in; exactly one Role (`Administrator` | `Teacher`); a Teacher-Role User is linked to exactly one Teacher, fixed at creation, and reaches only that Teacher's Week Schedules and Publications; sign-in email unique case-insensitively; soft-deleted (Deleted User) and restorable; a security stamp signs the User out on their next request after delete, Role or password change ([ADR 0006](docs/decisions/0006-user-aggregate-and-roles.md))
+- **Teacher** — no longer owns cars (decision #21); scheduling is per teacher, not per car; soft-deleted, refused while an active User or active Students depend on it
 - **Car** — shared pool aggregate; assigned to any number of teachers (many-to-many via TeacherAssignment); soft-deleted; transmission per car
 - **WeekSchedule** — per teacher per week; grid of Slots (`Open`/`Unavailable`), Sunday–Friday, short Friday
-- **Publication** — per week schedule; state machine `Draft → Published → Open → Closed`, reopenable; carries the unguessable link token and submission window; every close increments the Excel version
-- **Student** — identified by email; remembers profile and default teacher
+- **Publication** — per week, school-wide (aggregates that week's Week Schedules, one link for every teacher); state machine `Draft → Published → Open → Closed`, reopenable; carries the unguessable link token and submission window; every close increments the Excel version
+- **Student** — identified by national ID; added by the Roster or by an Administrator; belongs to one Teacher and learns on one of that Teacher's Cars (decision #23); Change Teacher / Change Car; deactivated (Inactive Student), never deleted
 - **Submission** — per student per publication; target session count + ranked SlotRequests, editable until close
 
 Timezone rules (requirements §8.3): instants in UTC, slot windows as local time + Asia/Jerusalem.
