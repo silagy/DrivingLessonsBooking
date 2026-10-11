@@ -18,7 +18,6 @@ public class ChangeUserRoleInteractorTest
     private IUserRepository repository = null!;
     private IUserQueries queries = null!;
     private ICurrentUser currentUser = null!;
-    private ITeacherAndCarLocks locks = null!;
     private IUnitOfWork unitOfWork = null!;
     private ChangeUserRoleInteractor interactor = null!;
     private User signedInAdministrator = null!;
@@ -34,9 +33,8 @@ public class ChangeUserRoleInteractorTest
         repository = A.Fake<IUserRepository>();
         queries = A.Fake<IUserQueries>();
         currentUser = A.Fake<ICurrentUser>();
-        locks = A.Fake<ITeacherAndCarLocks>();
         unitOfWork = A.Fake<IUnitOfWork>();
-        interactor = new ChangeUserRoleInteractor(repository, queries, currentUser, locks, unitOfWork);
+        interactor = new ChangeUserRoleInteractor(repository, queries, currentUser, unitOfWork);
 
         signedInAdministrator = UserOf("owner@school.example", Role.Administrator, null);
         ronitTeacher = Teacher.Create(TeacherName.Of("Ronit Avraham"), Email.Of("ronit@school.example"));
@@ -189,24 +187,6 @@ public class ChangeUserRoleInteractorTest
         //then
         await Should.ThrowAsync<UserNotFoundException>(act);
         A.CallTo(() => unitOfWork.CommitAsync()).MustNotHaveHappened();
-    }
-
-    [TestMethod]
-    public async Task Locks_The_Linked_Teacher_Before_Changing_The_Role()
-    {
-        //given
-        var request = new ChangeUserRoleRequest(Role.Teacher);
-
-        //when
-        await interactor.ExecuteAsync(linkedAdministrator.Id.Value, request);
-
-        //then
-        A.CallTo(() => locks.LockAsync(
-                A<IReadOnlyCollection<TeacherId>>.That.IsSameSequenceAs(new[] { ronitTeacher.Id }),
-                A<IReadOnlyCollection<CarId>>.That.IsEmpty()))
-            .MustHaveHappenedOnceExactly()
-            .Then(A.CallTo(() => queries.CountActiveAdministratorsAsync()).MustHaveHappened())
-            .Then(A.CallTo(() => unitOfWork.CommitAsync()).MustHaveHappened());
     }
 
     private static User UserOf(string signInEmail, Role role, Teacher? linkedTeacher)

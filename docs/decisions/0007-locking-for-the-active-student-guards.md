@@ -25,7 +25,6 @@ It takes two Administrators acting within the same moment, so it is rare, but th
 | Add Student, Change Teacher | the new Teacher and Car |
 | Change Car, Reactivate | the Student's Teacher and the (new) Car |
 | Roster import | every Teacher and Car (`LockAllAsync`), since it resolves them by name |
-| Create User, Restore User, Change User Role | the linked Teacher, if any, so Delete Teacher's "no active User" check (#85) can't interleave |
 
 The second of two conflicting requests waits for the first to commit, then reads the committed state. The existing rule refuses it with its usual translated message, for example `teacherMustNotHaveActiveStudents`, `teacherAssignmentMustNotHaveActiveStudents` or `studentCarMustBeAssignedToTeacher`. A request whose Teacher or Car was deleted meanwhile gets the same 404 (`teacherNotFound`, `carNotFound`) it would get a second later. `CommitAsync` commits the transaction; a refused command never commits, and the transaction rolls back when the request's `DbContext` is disposed.
 
