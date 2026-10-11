@@ -25,6 +25,7 @@ It takes two Administrators acting within the same moment, so it is rare, but th
 | Add Student, Change Teacher | the new Teacher and Car |
 | Change Car, Reactivate | the Student's Teacher and the (new) Car |
 | Roster import | every Teacher and Car (`LockAllAsync`), since it resolves them by name |
+| Create User, Restore User, Change User Role | the linked Teacher, if any, so Delete Teacher's "no active User" check (#85) can't interleave |
 
 The second of two conflicting requests waits for the first to commit, then reads the committed state. The existing rule refuses it with its usual translated message, for example `teacherMustNotHaveActiveStudents`, `teacherAssignmentMustNotHaveActiveStudents` or `studentCarMustBeAssignedToTeacher`. A request whose Teacher or Car was deleted meanwhile gets the same 404 (`teacherNotFound`, `carNotFound`) it would get a second later. `CommitAsync` commits the transaction; a refused command never commits, and the transaction rolls back when the request's `DbContext` is disposed.
 
@@ -50,4 +51,3 @@ The second of two conflicting requests waits for the first to commit, then reads
 - The mapping of EF's concurrency failure to 409 `concurrentChange` lives in `CommitAsync` and applies to every command: an `UPDATE` or `DELETE` that finds its row changed or gone answers 409 instead of 500. Today only Student carries a token.
 - Verified by interactor tests that pin "lock before read" and by a Postgres smoke that queues real requests behind a held lock (issue #109). There is no automated concurrency test, because there is no database test project.
 - Still open: two Add Student requests with the same national ID at once fail on the unique index rather than with `studentNationalIdAlreadyInUse`. That's a different invariant, outside #109.
-- Still open: the sibling guard "a Teacher with an active User can't be deleted" (#85) still checks, then commits. Create User, Restore User and Change User Role don't take the Teacher lock, so one of them racing Delete Teacher could leave an active Teacher-role User on a deleted Teacher. The fix is the same one-line `LockAsync([teacherId], [])` in those interactors; it's outside #109's acceptance criteria.

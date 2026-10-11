@@ -16,17 +16,20 @@ public class ChangeUserRoleInteractor
     private readonly IUserRepository repository;
     private readonly IUserQueries queries;
     private readonly ICurrentUser currentUser;
+    private readonly ITeacherAndCarLocks locks;
     private readonly IUnitOfWork unitOfWork;
 
     public ChangeUserRoleInteractor(
         IUserRepository repository,
         IUserQueries queries,
         ICurrentUser currentUser,
+        ITeacherAndCarLocks locks,
         IUnitOfWork unitOfWork)
     {
         this.repository = repository;
         this.queries = queries;
         this.currentUser = currentUser;
+        this.locks = locks;
         this.unitOfWork = unitOfWork;
     }
 
@@ -37,6 +40,8 @@ public class ChangeUserRoleInteractor
         var user = await repository.GetAsync(userId)
                    ?? throw new UserNotFoundException(userId);
 
+        await LockLinkedTeacherAsync(user);
+
         MustNotBeCurrentUser(userId);
 
         await MustNotDemoteLastActiveAdministratorAsync(user, request.Role);
@@ -44,6 +49,18 @@ public class ChangeUserRoleInteractor
         user.ChangeRole(request.Role);
 
         await unitOfWork.CommitAsync();
+    }
+
+    private async Task LockLinkedTeacherAsync(User user)
+    {
+        var teacherId = user.TeacherId;
+
+        if (teacherId is null)
+        {
+            return;
+        }
+
+        await locks.LockAsync([teacherId], []);
     }
 
     private void MustNotBeCurrentUser(UserId userId)

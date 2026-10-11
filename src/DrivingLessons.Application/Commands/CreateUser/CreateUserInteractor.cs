@@ -15,6 +15,7 @@ public class CreateUserInteractor
     private readonly IUserQueries queries;
     private readonly ITeacherRepository teacherRepository;
     private readonly IPasswordHasher passwordHasher;
+    private readonly ITeacherAndCarLocks locks;
     private readonly IUnitOfWork unitOfWork;
 
     public CreateUserInteractor(
@@ -22,12 +23,14 @@ public class CreateUserInteractor
         IUserQueries queries,
         ITeacherRepository teacherRepository,
         IPasswordHasher passwordHasher,
+        ITeacherAndCarLocks locks,
         IUnitOfWork unitOfWork)
     {
         this.repository = repository;
         this.queries = queries;
         this.teacherRepository = teacherRepository;
         this.passwordHasher = passwordHasher;
+        this.locks = locks;
         this.unitOfWork = unitOfWork;
     }
 
@@ -69,6 +72,8 @@ public class CreateUserInteractor
         }
 
         var teacherId = TeacherId.Of(id.Value);
+
+        await locks.LockAsync([teacherId], []);
 
         var teacher = await teacherRepository.GetAsync(teacherId)
                       ?? throw new TeacherNotFoundException(teacherId);
