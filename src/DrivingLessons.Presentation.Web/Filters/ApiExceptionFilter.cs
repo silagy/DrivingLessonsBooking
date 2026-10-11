@@ -24,6 +24,7 @@ public sealed class ApiExceptionFilter : IExceptionFilter
         {
             AuthenticationFailedException => (StatusCodes.Status401Unauthorized, "Unauthorized", null, null),
             NotFoundException => (StatusCodes.Status404NotFound, "Not Found", null, code),
+            ConcurrentChangeException => (StatusCodes.Status409Conflict, "Conflict", null, code),
             SubmissionWindowMustBeOpenException =>
                 (StatusCodes.Status409Conflict, "Conflict", ProblemTypes.SubmissionWindowClosed, code),
             DomainException => (StatusCodes.Status409Conflict, "Conflict", null, code),

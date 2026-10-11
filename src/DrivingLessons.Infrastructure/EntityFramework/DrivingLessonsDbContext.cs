@@ -1,4 +1,5 @@
 using DrivingLessons.Application.Common;
+using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Domain.Common;
 using DrivingLessons.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,27 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
     }
 
     public async Task CommitAsync()
+    {
+        try
+        {
+            await SaveAndDispatchAsync();
+        }
+        catch (DbUpdateConcurrencyException exception)
+        {
+            throw new ConcurrentChangeException(exception);
+        }
+
+        var transaction = Database.CurrentTransaction;
+
+        if (transaction is null)
+        {
+            return;
+        }
+
+        await transaction.CommitAsync();
+    }
+
+    private async Task SaveAndDispatchAsync()
     {
         const int maxCycles = 10;
 
