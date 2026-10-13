@@ -93,23 +93,31 @@ Do this in the **management account** (AWS Settings → **Projects** → **Manag
 Activation leaves an organization policy (a service control policy, SCP) whose `RegionFloor` statement denies every region except `us-east-1`, `us-west-2` and the region your project was created in (Stockholm `eu-north-1` for Israel). Until you add Frankfurt to it, creating anything in Frankfurt fails with **AccessDenied**, even though the region selector now offers it.
 
 1. Open the management account console (AWS Settings → **Projects** → **Centrally manage your organization**) and search **AWS Organizations**. AWS Settings may also offer a shortcut: **Manage this organization** → **Manage policies**.
-2. **Policies** → **Service control policies**. Open each policy until you find the one with a statement `"Sid": "RegionFloor"`.
-3. **Edit policy**. In that statement's `aws:RequestedRegion` list, add `"eu-central-1"` next to the existing entries. Leave the other entries and statements as they are.
+2. **Policies** → **Service control policies** → **AdvancedModeRegionRestrictionSecurityControlPolicy** → **Edit policy**.
+3. Scroll to the **last** statement, `"Sid": "RegionFloor"`. Its condition is `StringNotEquals` with a **list** of regions. Add `"eu-central-1"` to that list.
 4. **Save changes**.
 
-The result should look like this (the other regions are whatever AWS put there):
+`RegionFloor` should end up like this (the other regions are whatever AWS put there):
 
 ```json
-"aws:RequestedRegion" : [
-  "unspecified",
-  "us-east-1",
-  "eu-north-1",
-  "us-west-2",
-  "eu-central-1"
-]
+"Condition": {
+  "StringNotEquals": {
+    "aws:RequestedRegion": [
+      "eu-north-1",
+      "unspecified",
+      "us-east-1",
+      "us-west-2",
+      "eu-central-1"
+    ]
+  }
+}
 ```
 
-You may leave `eu-north-1` in: nothing will be created there, and the budget would show it if something were.
+**Change nothing else.** The two statements above it, `UsEast1Partitional` and `UsWest2Partitional`, also mention regions but do the opposite job: each is a `StringEquals` on a single region (`"us-east-1"`, `"us-west-2"`) that limits that region to global services. Adding Frankfurt there, or turning them into a list, blocks Frankfurt or opens us-east-1 to everything.
+
+**Check it:** in the project account (section 7), switch to Frankfurt, open **Lightsail** and start creating an instance. If you reach the plan picker without an AccessDenied message, it works; cancel without creating anything.
+
+You may leave `eu-north-1` in: nothing will be created there, and the budget would show it if something were. The `BudgetsSpendLimit...` policies in the same list belong to the old spend limit; they should have no targets (open one → **Targets**). If one is still attached to your project, detach it, or it can block new resources.
 
 ## 7. Work in the project account, in Frankfurt
 
