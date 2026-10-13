@@ -14,7 +14,7 @@
 
 - [ ] **Step 0: An AWS account that is safe to use (human)**
 
-Follow [docs/operations/aws-account-setup.md](../../../operations/aws-account-setup.md): the account, root MFA, the `monthly-limit` budget, your everyday admin user with MFA, region Frankfurt. Every later step signs in as that admin user, never as root.
+Follow [docs/operations/aws-account-setup.md](../../../operations/aws-account-setup.md): the account with advanced features active, MFA on the root user and your Builder ID, the `monthly-limit` budget, Frankfurt allowed by the organization's `RegionFloor` policy and selected. Every later step works in the project account in Frankfurt, signed in with your Builder ID, never as root and never in the management account.
 
 - [ ] **Step 1: Long-lead items (human — ideally already started on day one)**
 

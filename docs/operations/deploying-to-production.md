@@ -18,7 +18,7 @@ Don't put the local `docker-compose.yml` on a server as a shortcut. It has no HT
 
 | Phase | What happens | Who | Steps | Time |
 |---|---|---|---|---|
-| 0. AWS account | Account, root MFA, budget, your admin user, region Frankfurt | You | [aws-account-setup.md](aws-account-setup.md) | ~45 min, then up to 24 h for activation |
+| 0. AWS account | Account, advanced features, MFA, budget, Frankfurt allowed and selected | You | [aws-account-setup.md](aws-account-setup.md) | ~1 h, then up to 24 h for activation |
 | 1. Long-lead items | Register the domain, start SES verification, request SES production access | You | runbook §1.1 and §1.4 steps 1-3 | Minutes of work, then hours to a day of waiting |
 | 2. Build the pipeline | Tasks 1-7 in code, one PR | Claude builds, you review and merge | Plan tasks 1-7 | Several sessions |
 | 3. Provision | Server, DNS, bootstrap, backup bucket, secrets, GitHub environment | You, Claude checks | Plan task 8 steps 2-3 (runbook §1.2, 1.3, 1.5-1.7) | 1-2 h |
@@ -29,7 +29,7 @@ Phases 0 and 1 don't depend on any code. **Start them first**, and run phase 2 w
 
 ## Phase 0: AWS account
 
-Follow [aws-account-setup.md](aws-account-setup.md) to the end, including its checklist in section 8. From then on you always sign in as your admin user with MFA, never as root.
+Follow [aws-account-setup.md](aws-account-setup.md) to the end, including its checklist in section 9. From then on you work in the project account in Frankfurt, signed in with your Builder ID and MFA, never as root and never in the management account.
 
 ## Phase 1: Long-lead items
 
@@ -40,7 +40,7 @@ These have waiting time, so do them as soon as the account is active. The exact 
 3. **DMARC record**: a `_dmarc` TXT record in the hosted zone.
 4. **SES production access**: SES → Account dashboard → Request production access. AWS reviews it within about 24 hours. Until it's approved, SES only delivers to addresses you have verified.
 
-If a brand-new account is refused for domain registration or SES production access, open a free case in Support Center → Account and billing (see aws-account-setup.md §10).
+If a brand-new account is refused for domain registration or SES production access, open a free case in Support Center → Account and billing (see aws-account-setup.md §11).
 
 ## Phase 2: Build the pipeline (tasks 1-7)
 
