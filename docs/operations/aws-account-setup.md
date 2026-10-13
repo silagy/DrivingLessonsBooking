@@ -115,7 +115,7 @@ Activation leaves an organization policy (a service control policy, SCP) whose `
 
 **Change nothing else.** The two statements above it, `UsEast1Partitional` and `UsWest2Partitional`, also mention regions but do the opposite job: each is a `StringEquals` on a single region (`"us-east-1"`, `"us-west-2"`) that limits that region to global services. Adding Frankfurt there, or turning them into a list, blocks Frankfurt or opens us-east-1 to everything.
 
-**Check it:** in the project account (section 7), switch to Frankfurt, open **Lightsail** and start creating an instance. If you reach the plan picker without an AccessDenied message, it works; cancel without creating anything.
+**Check it:** in the project account (section 7), switch to Frankfurt, open **Lightsail** → **Create instance**. If it shows "You are creating this instance in Frankfurt" and the list of images, it works; leave the page without creating anything. SCP changes can take a minute or two to apply.
 
 You may leave `eu-north-1` in: nothing will be created there, and the budget would show it if something were. The `BudgetsSpendLimit...` policies in the same list belong to the old spend limit; they should have no targets (open one → **Targets**). If one is still attached to your project, detach it, or it can block new resources.
 
@@ -173,7 +173,7 @@ The organization itself, the management account and IAM Identity Center cost not
 
 Continue with task 8 of the deployment plan, Steps 1-3, **in the project account**: register the domain, start SES verification and the production-access request (these take time, so start them first), then create the Lightsail instance. Things that sometimes catch new accounts:
 
-- **AccessDenied when creating something in Frankfurt.** Frankfurt is missing from `RegionFloor` (section 6), or you're in the management account instead of the project account.
+- **AccessDenied in Frankfurt**, for example Lightsail's "There might be a problem with your access" page, whose error details read `not authorized to perform: lightsail:GetRegions on resource: arn:aws:lightsail:eu-central-1:... with an explicit deny in a service control policy`. Even read-only calls fail. `eu-central-1` is missing from the `RegionFloor` statement (section 6): open the policy and check the **last** statement, not the first. Also check you're in the project account, not the management account.
 - **Domain registration or the SES production-access request is refused or "pending"** on a brand-new account. Open a case in **Support Center** → **Account and billing** (free with Basic support) and ask for the account to be verified for Route 53 registration / SES production use.
 - **Lightsail says the account is not yet activated.** Wait for the activation email from step 2, or check **Billing** → **Payment methods** in the management account to see whether the card was declined.
 
