@@ -122,9 +122,10 @@ You may leave `eu-north-1` in: nothing will be created there, and the budget wou
 ## 7. Work in the project account, in Frankfurt
 
 1. Sign in at **https://settings.aws.com** with your Builder ID → **Projects** → your project's row → **AWS Console**. Check the account name in the top-right menu before creating anything: it must be the project, not the management account.
-2. Top-right region menu → **Europe (Frankfurt) eu-central-1**. The console remembers it.
-3. Some services ignore the region, which is expected: **IAM**, **Route 53** (domains and DNS) and **Billing** always show "Global".
-4. **Lightsail** has its own region picker inside its console. Choose Frankfurt there too.
+2. Top-right region menu → **Europe (Frankfurt) eu-central-1**. If the menu lists only a few regions and Frankfurt is under **Restricted Regions**, the console's own list of visible regions still matches the old project: gear icon (⚙) → **Unified Settings** → **Account settings** → **Visible Regions** → **Edit** → add Frankfurt → **Save**. This setting only changes what the menu shows; section 6 is what actually allows Frankfurt.
+3. Gear icon → **Unified Settings** → **User settings** → **Localization and default Region** → **Edit** → **Default Region**: **Europe (Frankfurt) eu-central-1** → **Save**. Otherwise every sign-in starts in the region the project was created in.
+4. Some services ignore the region, which is expected: **IAM**, **Route 53** (domains and DNS) and **Billing** always show "Global".
+5. **Lightsail** has its own region picker inside its console. Choose Frankfurt there too.
 
 Save the project account ID (top-right menu) in your password manager; the runbook's backup bucket and IAM user live in this account.
 
