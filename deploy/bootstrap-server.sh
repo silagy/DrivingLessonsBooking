@@ -61,8 +61,9 @@ chmod 600 "/home/$DEPLOY_USER/.ssh/authorized_keys"
 
 echo "== ssh: keys only"
 printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin no\n' > "$SSHD_DROP_IN"
+install -d -m 755 /run/sshd
 sshd -t
-systemctl reload ssh
+systemctl try-reload-or-restart ssh
 
 echo "== directories"
 install -d -m 750 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$APP_DIR" "$BACKUP_DIR"
