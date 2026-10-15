@@ -507,5 +507,9 @@ function submitFailureOf(error: unknown): SubmitStatus {
         return SubmitStatus.notFound;
     }
 
+    if (isStatus(error, HTTP_TOO_MANY_REQUESTS)) {
+        return SubmitStatus.tooManyAttempts;
+    }
+
     return SubmitStatus.failed;
 }

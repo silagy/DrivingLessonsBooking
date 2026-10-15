@@ -4,4 +4,5 @@ export enum SubmitStatus {
     rejected = 'rejected',
     notFound = 'notFound',
     failed = 'failed',
+    tooManyAttempts = 'tooManyAttempts',
 }

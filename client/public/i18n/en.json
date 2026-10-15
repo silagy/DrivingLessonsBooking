@@ -596,7 +596,8 @@
       "errors": {
         "rejected": "We couldn't save your list - something changed since you opened the form, for example a slot is no longer available.",
         "notFound": "We couldn't find your roster details or this week's slots anymore. Please contact your school.",
-        "failed": "We couldn't send your list. Check your connection and try again."
+        "failed": "We couldn't send your list. Check your connection and try again.",
+        "tooManyAttempts": "Too many attempts from this network. Wait a minute and send your list again."
       }
     },
     "submitted": {

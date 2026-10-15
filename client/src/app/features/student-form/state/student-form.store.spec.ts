@@ -10,6 +10,8 @@ import { SlotWindow } from '../../../shared/models/slot-window.enum';
 import { IdentifyStudentResponse, SlotForIdentifyStudentResponse } from '../data/identify-student.response';
 import { SubmissionsApiService } from '../data/submissions-api.service';
 import { IdentifyStatus } from '../domain/identify-status.enum';
+import { SessionType } from '../domain/session-type.enum';
+import { SubmitStatus } from '../domain/submit-status.enum';
 import { Transmission } from '../domain/transmission.enum';
 import { StudentFormStore } from './student-form.store';
 
@@ -34,7 +36,12 @@ const ROSTER_STUDENT: IdentifyStudentResponse = {
     slots: SLOTS,
 };
 
-async function storeAfterIdentify(identifyStudent: () => Observable<IdentifyStudentResponse>): Promise<StudentFormStore> {
+const SUBMIT_ACCEPTED = (): Observable<void> => of(undefined);
+
+async function storeAfterIdentify(
+    identifyStudent: () => Observable<IdentifyStudentResponse>,
+    createSubmission: () => Observable<void>,
+): Promise<StudentFormStore> {
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
@@ -52,6 +59,7 @@ async function storeAfterIdentify(identifyStudent: () => Observable<IdentifyStud
                             windowEndUtc: '2026-11-13T12:00:00Z',
                         }),
                     identifyStudent,
+                    createSubmission,
                 },
             },
         ],
@@ -65,7 +73,16 @@ async function storeAfterIdentify(identifyStudent: () => Observable<IdentifyStud
 }
 
 function identifiedStore(): Promise<StudentFormStore> {
-    return storeAfterIdentify(() => of(ROSTER_STUDENT));
+    return storeAfterIdentify(() => of(ROSTER_STUDENT), SUBMIT_ACCEPTED);
+}
+
+async function storeRateLimitedOnSubmit(): Promise<StudentFormStore> {
+    const rateLimited = new HttpErrorResponse({ status: HttpStatusCode.TooManyRequests });
+    const store = await storeAfterIdentify(() => of(ROSTER_STUDENT), () => throwError(() => rateLimited));
+    store.openPick('sunday-noon');
+    store.savePick({ sessionType: SessionType.single, constraint: null });
+
+    return store;
 }
 
 describe('StudentFormStore', () => {
@@ -75,7 +92,7 @@ describe('StudentFormStore', () => {
             const rateLimited = new HttpErrorResponse({ status: HttpStatusCode.TooManyRequests });
 
             //when
-            const store = await storeAfterIdentify(() => throwError(() => rateLimited));
+            const store = await storeAfterIdentify(() => throwError(() => rateLimited), SUBMIT_ACCEPTED);
 
             //then
             expect(store.identifyStatus()).toBe(IdentifyStatus.tooManyAttempts);
@@ -86,10 +103,34 @@ describe('StudentFormStore', () => {
             const missing = new HttpErrorResponse({ status: HttpStatusCode.NotFound });
 
             //when
-            const store = await storeAfterIdentify(() => throwError(() => missing));
+            const store = await storeAfterIdentify(() => throwError(() => missing), SUBMIT_ACCEPTED);
 
             //then
             expect(store.identifyStatus()).toBe(IdentifyStatus.notOnRoster);
+        });
+    });
+
+    describe('submitStatus', () => {
+        it('maps a 429 on send to tooManyAttempts', async () => {
+            //given
+            const store = await storeRateLimitedOnSubmit();
+
+            //when
+            await store.submit();
+
+            //then
+            expect(store.submitStatus()).toBe(SubmitStatus.tooManyAttempts);
+        });
+
+        it('lets the student send again after a 429', async () => {
+            //given
+            const store = await storeRateLimitedOnSubmit();
+
+            //when
+            await store.submit();
+
+            //then
+            expect(store.canSubmit()).toBe(true);
         });
     });
 
