@@ -2,9 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using DrivingLessons.Application.Commands.CreateSubmission;
 using DrivingLessons.Application.Commands.ReviseSubmission;
 using DrivingLessons.Application.Queries.IdentifyStudent;
+using DrivingLessons.Presentation.Web.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace DrivingLessons.Presentation.Web.Controllers.Submission;
 
@@ -15,11 +17,13 @@ namespace DrivingLessons.Presentation.Web.Controllers.Submission;
 public class SubmissionCommandController : ControllerBase
 {
     [HttpPost("by-link/{token}/identify")]
+    [EnableRateLimiting(RateLimitPolicies.StudentIdentify)]
     [EndpointSummary("Identifies a roster student by national ID and returns their teacher, car and the teacher's week grid")]
     [ProducesResponseType(typeof(IdentifyStudentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<IdentifyStudentResponse> IdentifyAsync(
         [FromServices] IdentifyStudentInteractor interactor,
         [FromRoute] string token,
