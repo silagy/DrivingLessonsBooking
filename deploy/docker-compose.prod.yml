@@ -1,0 +1,40 @@
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: "3"
+
+services:
+  postgres:
+    restart: unless-stopped
+    logging: *logging
+
+  app:
+    build: !reset null
+    image: ghcr.io/silagy/drivinglessonsbooking:${APP_TAG:?APP_TAG is written to release.env by the deploy}
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN must be set in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL must be set in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
