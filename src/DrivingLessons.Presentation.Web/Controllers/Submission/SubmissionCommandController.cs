@@ -33,11 +33,13 @@ public class SubmissionCommandController : ControllerBase
     }
 
     [HttpPost("by-link/{token}")]
+    [EnableRateLimiting(RateLimitPolicies.StudentIdentify)]
     [EndpointSummary("Creates the student's submission for the week; fails if one already exists")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> CreateAsync(
         [FromServices] CreateSubmissionInteractor interactor,
         [FromRoute] string token,
@@ -49,11 +51,13 @@ public class SubmissionCommandController : ControllerBase
     }
 
     [HttpPut("by-link/{token}")]
+    [EnableRateLimiting(RateLimitPolicies.StudentIdentify)]
     [EndpointSummary("Replaces the student's submission for the week; fails if there is none yet")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ReviseAsync(
         [FromServices] ReviseSubmissionInteractor interactor,
         [FromRoute] string token,
