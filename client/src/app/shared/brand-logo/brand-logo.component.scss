@@ -8,31 +8,44 @@
   align-items: center;
   gap: 0.5rem;
   min-inline-size: 0;
-  color: var(--app-brand);
 }
 
 .brand__mark {
   flex: none;
-  inline-size: 1.75rem;
-  block-size: 1.75rem;
+  inline-size: 2rem;
+  block-size: 2rem;
+}
+
+.brand__calendar {
+  fill: var(--app-brand);
 }
 
 .brand__page {
-  fill: currentColor;
+  fill: var(--app-on-accent);
 }
 
 .brand__rings {
   fill: none;
-  stroke: currentColor;
+  stroke: var(--app-brand-deep);
 }
 
-.brand__hole {
-  fill: var(--app-on-accent);
-}
-
-.brand__lane {
+.brand__check {
   fill: none;
-  stroke: var(--app-on-accent);
+  stroke: var(--app-brand);
+}
+
+.brand__halo,
+.brand__window {
+  fill: var(--brand-logo-backdrop, var(--app-bg-card));
+}
+
+.brand__disc {
+  fill: var(--app-brand-deep);
+}
+
+.brand__hub {
+  fill: none;
+  stroke: var(--app-brand-soft);
 }
 
 .brand__word {
@@ -43,13 +56,14 @@
 }
 
 .brand__name {
-  font-family: var(--app-font-display);
-  font-weight: 700;
+  font-family: var(--app-font-wordmark);
+  font-weight: 800;
+  font-style: var(--app-wordmark-style);
   font-size: 1.2rem;
   line-height: 1;
   letter-spacing: var(--app-wordmark-tracking);
   white-space: nowrap;
-  color: var(--app-ink);
+  color: var(--app-brand-deep);
 }
 
 .brand__accent {
@@ -69,8 +83,8 @@
 }
 
 .brand--lockup .brand__mark {
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
+  inline-size: 2.625rem;
+  block-size: 2.625rem;
 }
 
 .brand--lockup .brand__name {

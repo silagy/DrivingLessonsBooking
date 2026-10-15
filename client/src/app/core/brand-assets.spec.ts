@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47];
 
@@ -65,5 +65,26 @@ describe('brand assets', () => {
 
         //then
         expect(names).toEqual([['DriveCal', 'DriveCal'], ['דרייבקל', 'דרייבקל']]);
+    });
+
+    it('self-hosts rubik for the hebrew wordmark only', () => {
+        //when
+        const styles = readFileSync('src/styles/_global.scss', 'utf8');
+        const face = styles.split('@font-face').find(block => block.includes("font-family: 'Rubik'")) ?? '';
+
+        //then
+        expect(face).toContain('@fontsource-variable/rubik/files/rubik-hebrew-wght-normal.woff2');
+        expect(face).toContain('unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;');
+        expect(existsSync('node_modules/@fontsource-variable/rubik/files/rubik-hebrew-wght-normal.woff2')).toBe(true);
+    });
+
+    it('sets the wordmark italic in english and upright in hebrew', () => {
+        //when
+        const [root, hebrew] = readFileSync('src/styles/_tokens.scss', 'utf8').split(":root[lang='he']");
+
+        //then
+        expect(root).toContain("--app-font-wordmark: 'Rubik',");
+        expect(root).toContain('--app-wordmark-style: italic;');
+        expect(hebrew).toContain('--app-wordmark-style: normal;');
     });
 });

@@ -21,7 +21,11 @@
 
   --app-on-accent: var(--p-surface-0);
   --app-brand: var(--p-sky-500);
-  --app-wordmark-tracking: -0.025em;
+  --app-brand-deep: var(--p-sky-700);
+  --app-brand-soft: var(--p-sky-300);
+  --app-font-wordmark: 'Rubik', 'Helvetica Now Display', 'Helvetica Neue', Arial, 'Liberation Sans', sans-serif;
+  --app-wordmark-style: italic;
+  --app-wordmark-tracking: -0.02em;
   --app-steel-light: var(--p-steel-100);
   --app-whale: var(--p-whale-500);
 
@@ -38,5 +42,6 @@
 
 :root[lang='he'] {
   --app-caps-tracking: 0;
-  --app-wordmark-tracking: 0;
+  --app-wordmark-style: normal;
+  --app-wordmark-tracking: -0.01em;
 }

@@ -33,7 +33,7 @@ function attributes(element: Element | null | undefined, names: string[]): (stri
 }
 
 describe('BrandLogoComponent', () => {
-    it('draws the solid calendar mark, hidden from assistive technology', async () => {
+    it('draws the calendar with a checked day, hidden from assistive technology', async () => {
         //given
         const logo = await renderLogo();
 
@@ -42,14 +42,45 @@ describe('BrandLogoComponent', () => {
 
         //then
         expect(attributes(mark, ['viewBox', 'aria-hidden'])).toEqual(['0 0 40 40', 'true']);
+        expect(attributes(mark?.querySelector('rect.brand__calendar'), ['x', 'y', 'width', 'height', 'rx']))
+            .toEqual(['13', '5', '25', '24', '5']);
         expect(attributes(mark?.querySelector('rect.brand__page'), ['x', 'y', 'width', 'height', 'rx']))
-            .toEqual(['1', '5.5', '38', '33.5', '10']);
+            .toEqual(['15.5', '11', '20', '15.5', '2.5']);
         expect(attributes(mark?.querySelector('path.brand__rings'), ['d', 'stroke-width', 'stroke-linecap']))
-            .toEqual(['M12.5 1.8v7M27.5 1.8v7', '3.4', 'round']);
-        expect(Array.from(mark?.querySelectorAll('circle.brand__hole') ?? [], hole => attributes(hole, ['cx', 'cy', 'r'])))
-            .toEqual([['12.5', '9.5', '1.6'], ['27.5', '9.5', '1.6']]);
-        expect(attributes(mark?.querySelector('path.brand__lane'), ['d', 'stroke-width', 'stroke-linecap']))
-            .toEqual(['M20 15.5v4M20 23.5v4M20 31.5v3', '3.2', 'round']);
+            .toEqual(['M19.5 2.6v4.8M25.5 2.6v4.8M31.5 2.6v4.8', '2.4', 'round']);
+        expect(attributes(mark?.querySelector('path.brand__check'), ['d', 'stroke-width', 'stroke-linecap', 'stroke-linejoin']))
+            .toEqual(['M26.6 17.6l2.4 2.4 4.2-4.6', '2.3', 'round', 'round']);
+        expect(attributes(mark?.querySelector('circle.brand__halo'), ['cx', 'cy', 'r'])).toEqual(['15', '25.5', '14.2']);
+    });
+
+    it('draws the steering wheel in its own 40-unit box', async () => {
+        //given
+        const logo = await renderLogo();
+
+        //when
+        const wheel = logo.querySelector('svg.brand__mark svg.brand__wheel');
+
+        //then
+        expect(attributes(wheel, ['x', 'y', 'width', 'height', 'viewBox'])).toEqual(['2', '12.5', '26', '26', '0 0 40 40']);
+        expect(attributes(wheel?.querySelector('circle.brand__disc'), ['cx', 'cy', 'r'])).toEqual(['20', '20', '19']);
+        expect(Array.from(wheel?.querySelectorAll('path.brand__window') ?? [], window => window.getAttribute('d'))).toEqual([
+            'M6.06 16A14.5 14.5 0 0 1 33.94 16C29 16.5 25 12 20 12S11 16.5 6.06 16Z',
+            'M5.9 23.5C10 23.5 14 25.5 15.5 30L16 34A14.5 14.5 0 0 1 5.9 23.5Z',
+            'M34.1 23.5C30 23.5 26 25.5 24.5 30L24 34A14.5 14.5 0 0 0 34.1 23.5Z',
+        ]);
+        expect(attributes(wheel?.querySelector('circle.brand__hub'), ['cx', 'cy', 'r', 'stroke-width']))
+            .toEqual(['20', '21.5', '4.6', '2.2']);
+    });
+
+    it('paints the halo between the calendar and the wheel', async () => {
+        //given
+        const logo = await renderLogo();
+
+        //when
+        const parts = Array.from(logo.querySelector('svg.brand__mark')?.children ?? [], part => part.getAttribute('class'));
+
+        //then
+        expect(parts).toEqual(['brand__calendar', 'brand__page', 'brand__rings', 'brand__check', 'brand__halo', 'brand__wheel']);
     });
 
     it('leaves every color of the mark to the stylesheet', async () => {
