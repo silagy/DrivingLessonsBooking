@@ -1,8 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
   <style>
-    .lane { stroke: #0057FF; }
-    @media (prefers-color-scheme: dark) { .lane { stroke: #FFFFFF; } }
+    .page { fill: #0057FF; }
+    .rings { fill: none; stroke: #0057FF; }
+    .hole { fill: #FFFFFF; }
+    .lane { fill: none; stroke: #FFFFFF; }
+    @media (prefers-color-scheme: dark) {
+      .page { fill: #FFFFFF; }
+      .rings { stroke: #FFFFFF; }
+      .hole { fill: #0057FF; }
+      .lane { stroke: #0057FF; }
+    }
   </style>
-  <rect class="lane" x="2" y="2" width="36" height="36" rx="10" fill="none" stroke-width="3"/>
-  <path class="lane" d="M20 9v5M20 17.5v5M20 26v5" fill="none" stroke-width="3" stroke-linecap="round"/>
+  <rect class="page" x="1" y="5.5" width="38" height="33.5" rx="10"/>
+  <path class="rings" d="M12.5 1.8v7M27.5 1.8v7" stroke-width="3.4" stroke-linecap="round"/>
+  <circle class="hole" cx="12.5" cy="9.5" r="1.6"/>
+  <circle class="hole" cx="27.5" cy="9.5" r="1.6"/>
+  <path class="lane" d="M20 15.5v4M20 23.5v4M20 31.5v3" stroke-width="3.2" stroke-linecap="round"/>
 </svg>

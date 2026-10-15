@@ -5,8 +5,8 @@ import { PrimeNG } from 'primeng/config';
 import { LanguageService } from './language.service';
 
 const TRANSLATIONS = {
-    en: { brand: { appName: 'Slotline' } },
-    he: { brand: { appName: 'סלוטליין' } },
+    en: { brand: { appName: 'DriveCal' } },
+    he: { brand: { appName: 'דרייבקל' } },
 };
 
 function withSavedLanguage(saved: string | null): void {
@@ -82,7 +82,7 @@ describe('LanguageService', () => {
 
         //then
         expect([language.locale(), language.isRtl(), document.documentElement.dir]).toEqual(['en-IL', false, 'ltr']);
-        expect(document.title).toBe('Slotline');
+        expect(document.title).toBe('DriveCal');
         expect(primeNgLabels().aria?.close).toBe('Close');
     });
 
@@ -137,6 +137,6 @@ describe('LanguageService', () => {
         switchTo(language, 'en');
 
         //then
-        expect([hebrewTitle, document.title]).toEqual(['סלוטליין', 'Slotline']);
+        expect([hebrewTitle, document.title]).toEqual(['דרייבקל', 'DriveCal']);
     });
 });
