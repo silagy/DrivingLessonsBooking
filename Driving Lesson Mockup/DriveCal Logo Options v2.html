@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="design_doc_mode" content="canvas">
+<title>DriveCal - Logo options v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@700;800&family=Heebo:wght@800;900&family=Assistant:wght@800&family=Noto+Sans+Hebrew:wght@800&display=swap">
+<link rel="stylesheet" href="_ds/comply365-design-system-c08fa187-8d1c-4b7b-9020-5ede0ce63bf0/colors_and_type.css">
+<style>
+:root{--sky:#0057FF;--skyL:#7BAEFF;--navy:#003293;--ink:#121418;--g3:#52555C;--g4:#9FA9BB;--g5:#E6E8F6;--g6:#F5F6FF;--f:'Helvetica Now Display','Helvetica Neue',Arial,sans-serif;--disc:#003293;--win:#fff;--he:'Rubik'}
+a{color:var(--sky)}a:hover{color:#003293}
+.frame{position:absolute;top:0;width:760px;background:#fff;border-radius:14px;box-shadow:0 1px 2px rgba(18,20,24,.06),0 2px 8px rgba(18,20,24,.06);font-family:var(--f);color:var(--ink);overflow:hidden}
+.head{padding:26px 32px 0;display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-weight:800;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g4)}
+.head h2{margin:0;font-weight:500;font-size:22px}
+.head p{margin:0;font-size:14px;line-height:1.5;color:var(--g3);text-wrap:pretty}
+.hero{margin:22px 32px 0;height:220px;border:1px solid var(--g5);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.lock{display:flex;align-items:center;gap:18px}
+.lock svg{flex:none}
+.word{display:flex;flex-direction:column;gap:6px}
+.name{font-weight:800;font-style:italic;font-size:52px;letter-spacing:-.02em;line-height:1;color:var(--navy)}
+.name b{font-weight:800;color:var(--sky)}
+.tag{font-size:15px;color:var(--g3)}
+.row{margin:14px 32px 0;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}
+.cell{border:1px solid var(--g5);border-radius:10px;height:130px;display:flex;align-items:center;justify-content:center;gap:22px}
+.cell.dark{background:var(--ink);border-color:var(--ink);--disc:#fff;--win:#121418}
+.dark .name{color:#fff}.dark .name b{color:var(--skyL)}
+.he .name{font-family:var(--he),var(--f);font-weight:800;font-style:normal;font-size:36px;letter-spacing:-.01em}
+.he .tag{font-size:12.5px}
+.sm .name{font-size:30px}
+.sizes{margin:14px 32px 30px;display:flex;align-items:flex-end;gap:28px;padding:18px 22px;background:var(--g6);border-radius:10px}
+.sizes figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px}
+.sizes figcaption{font-size:11px;color:var(--g4);font-variant-numeric:tabular-nums}
+.sizes .lbl{margin-inline-start:auto;font-size:12px;color:var(--g3);align-self:center;max-width:220px;text-align:end;line-height:1.4}
+.badge{position:relative;flex:none;display:flex;align-items:center;justify-content:center}
+.badge svg{position:absolute;inset:0}
+.badge .bw{position:relative;font-weight:800;font-style:italic;letter-spacing:-.02em;line-height:1;color:#fff;white-space:nowrap}
+.badge .bw b{color:var(--skyL);font-weight:800}
+.badge .bw.he{font-family:var(--he),var(--f);font-style:normal;letter-spacing:-.01em}
+.fonts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:22px 32px 30px}
+.fcell{border:1px solid var(--g5);border-radius:10px;padding:18px 22px;display:flex;flex-direction:column;gap:12px}
+.fcell.pick{border-color:var(--sky);box-shadow:0 0 0 1px var(--sky)}
+.fcell .nm{font-size:44px;font-weight:800;line-height:1.1;color:var(--navy)}.fcell .nm b{color:var(--sky);font-weight:800}
+.fcell .meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--g3)}.fcell .meta span:first-child{font-weight:600;color:var(--ink)}
+.dark .badge .bw{color:var(--navy)}.dark .badge .bw b{color:var(--sky)}
+.app{border-radius:22%;background:#fff;box-shadow:0 1px 2px rgba(18,20,24,.08),0 4px 14px rgba(18,20,24,.1);display:flex;align-items:center;justify-content:center;flex:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+<defs>
+<symbol id="wheel" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="var(--disc)"></circle><path d="M6.06 16A14.5 14.5 0 0 1 33.94 16C29 16.5 25 12 20 12S11 16.5 6.06 16Z" fill="var(--win)"></path><path d="M5.9 23.5C10 23.5 14 25.5 15.5 30L16 34A14.5 14.5 0 0 1 5.9 23.5Z" fill="var(--win)"></path><path d="M34.1 23.5C30 23.5 26 25.5 24.5 30L24 34A14.5 14.5 0 0 0 34.1 23.5Z" fill="var(--win)"></path><circle cx="20" cy="21.5" r="4.6" fill="none" stroke="#7BAEFF" stroke-width="2.2"></circle></symbol>
+<symbol id="badge" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="var(--disc)"></circle><path d="M6.06 14.5A14.5 14.5 0 0 1 33.94 14.5C29 15 25 11 20 11S11 15 6.06 14.5Z" fill="var(--win)"></path><path d="M6.3 25C10 25 13.5 27 15 31L15.6 33.8A14.5 14.5 0 0 1 6.3 25Z" fill="var(--win)"></path><path d="M33.7 25C30 25 26.5 27 25 31L24.4 33.8A14.5 14.5 0 0 0 33.7 25Z" fill="var(--win)"></path><path d="M14.6 16.6A6.4 6.4 0 0 1 25.4 16.6M25.4 24.4A6.4 6.4 0 0 1 14.6 24.4" fill="none" stroke="#7BAEFF" stroke-width="1.4" stroke-linecap="round"></path></symbol>
+<symbol id="cal" viewBox="0 0 40 40"><rect x="13" y="5" width="25" height="24" rx="5" fill="#0057FF"></rect><rect x="15.5" y="11" width="20" height="15.5" rx="2.5" fill="#fff"></rect><path d="M19.5 2.6v4.8M25.5 2.6v4.8M31.5 2.6v4.8" stroke="#003293" stroke-width="2.4" stroke-linecap="round"></path><path d="M26.6 17.6l2.4 2.4 4.2-4.6" fill="none" stroke="#0057FF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="15" cy="25.5" r="14.2" fill="var(--halo,#fff)"></circle><use href="#wheel" x="2" y="12.5" width="26" height="26"></use></symbol>
+</defs>
+</svg>
+
+<section class="frame" style="left:0" data-screen-label="Option D">
+<div class="head"><div class="eyebrow">Option D · Steering wheel</div><h2>The wheel on its own</h2><p>The customer's steering wheel, redrawn flat in navy with a light blue hub ring, and the bold italic wordmark next to it. It's the simplest of the three and holds up at every size.</p></div>
+<div class="hero"><div class="lock"><svg width="76" height="76"><use href="#wheel"></use></svg><div class="word"><div class="name">Drive<b>Cal</b></div><div class="tag">Weekly lesson demand, in one link</div></div></div></div>
+<div class="row">
+<div class="cell he" dir="rtl"><div class="lock" style="gap:12px"><svg width="48" height="48"><use href="#wheel"></use></svg><div class="word"><div class="name">דרייב<b>קל</b></div><div class="tag">ביקוש שבועי לשיעורים, בקישור אחד</div></div></div></div>
+<div class="cell dark sm"><div class="lock" style="gap:12px"><svg width="44" height="44"><use href="#wheel"></use></svg><div class="name">Drive<b>Cal</b></div></div></div>
+</div>
+<div class="sizes"><figure><svg width="64" height="64"><use href="#wheel"></use></svg><figcaption>64</figcaption></figure><figure><svg width="32" height="32"><use href="#wheel"></use></svg><figcaption>32</figcaption></figure><figure><svg width="16" height="16"><use href="#wheel"></use></svg><figcaption>16</figcaption></figure><div class="lbl">Clear at favicon size</div></div>
+</section>
+
+<section class="frame" style="left:800px" data-screen-label="Option E">
+<div class="head"><div class="eyebrow">Option E · Wheel and calendar</div><h2>Driving meets the week</h2><p>The customer's app icon, simplified: a calendar with a checked day behind the steering wheel. It keeps the idea of the first image with fewer parts, so it still reads small.</p></div>
+<div class="hero"><div class="lock"><svg width="84" height="84"><use href="#cal"></use></svg><div class="word"><div class="name">Drive<b>Cal</b></div><div class="tag">Weekly lesson demand, in one link</div></div></div></div>
+<div class="row">
+<div class="cell he" dir="rtl"><div class="lock" style="gap:12px"><svg width="54" height="54"><use href="#cal"></use></svg><div class="word"><div class="name">דרייב<b>קל</b></div><div class="tag">ביקוש שבועי לשיעורים, בקישור אחד</div></div></div></div>
+<div class="cell dark sm" style="--halo:#121418"><div class="lock" style="gap:12px"><svg width="48" height="48"><use href="#cal"></use></svg><div class="name">Drive<b>Cal</b></div></div></div>
+</div>
+<div class="sizes"><figure><div class="app" style="width:64px;height:64px"><svg width="50" height="50"><use href="#cal"></use></svg></div><figcaption>App icon 64</figcaption></figure><figure><svg width="32" height="32"><use href="#cal"></use></svg><figcaption>32</figcaption></figure><figure><svg width="16" height="16"><use href="#wheel"></use></svg><figcaption>16 (wheel only)</figcaption></figure><div class="lbl">Under 24px, use the wheel on its own</div></div>
+</section>
+
+<section class="frame" style="left:1600px" data-screen-label="Option F">
+<div class="head"><div class="eyebrow">Option F · Badge</div><h2>The name inside the wheel</h2><p>The customer's second image, cleaned up: the wordmark sits across the hub between two light blue arcs. Best for the app icon, the sign-in screen and print; the plain wheel from D covers small sizes.</p></div>
+<div class="hero"><div class="badge" style="width:180px;height:180px"><svg width="180" height="180"><use href="#badge"></use></svg><div class="bw" style="font-size:34px">Drive<b>Cal</b></div></div></div>
+<div class="row">
+<div class="cell he" dir="rtl"><div class="badge" style="width:110px;height:110px"><svg width="110" height="110"><use href="#badge"></use></svg><div class="bw he" style="font-size:20px">דרייב<b>קל</b></div></div></div>
+<div class="cell dark"><div class="badge" style="width:110px;height:110px"><svg width="110" height="110"><use href="#badge"></use></svg><div class="bw" style="font-size:21px">Drive<b>Cal</b></div></div></div>
+</div>
+<div class="sizes"><figure><div class="app" style="width:64px;height:64px"><div class="badge" style="width:54px;height:54px"><svg width="54" height="54"><use href="#badge"></use></svg><div class="bw" style="font-size:10px">Drive<b>Cal</b></div></div></div><figcaption>App icon 64</figcaption></figure><figure><svg width="32" height="32"><use href="#wheel"></use></svg><figcaption>32 (wheel)</figcaption></figure><figure><svg width="16" height="16"><use href="#wheel"></use></svg><figcaption>16 (wheel)</figcaption></figure><div class="lbl">Wordmark is unreadable under 64px, so small sizes use the wheel</div></div>
+</section>
+<section class="frame" style="left:2400px" data-screen-label="Hebrew font">
+<div class="head"><div class="eyebrow">Hebrew wordmark · font</div><h2>Four Hebrew fonts, side by side</h2><p>Rubik is now in use: its rounded, heavy letters match the weight of the wheel and sit well next to the bold italic English. Pick another and I'll switch all three options.</p></div>
+<div class="fonts">
+<div class="fcell pick" dir="rtl"><div class="nm" style="font-family:'Rubik';font-weight:800">דרייב<b>קל</b></div><div class="meta" dir="ltr"><span>Rubik 800 · in use</span><span>Rounded, friendly, strong</span></div></div>
+<div class="fcell" dir="rtl"><div class="nm" style="font-family:'Heebo';font-weight:900">דרייב<b>קל</b></div><div class="meta" dir="ltr"><span>Heebo 900</span><span>Geometric, closest to the English</span></div></div>
+<div class="fcell" dir="rtl"><div class="nm" style="font-family:'Assistant';font-weight:800">דרייב<b>קל</b></div><div class="meta" dir="ltr"><span>Assistant 800</span><span>Narrower, lighter feel</span></div></div>
+<div class="fcell" dir="rtl"><div class="nm" style="font-family:'Noto Sans Hebrew';font-weight:800">דרייב<b>קל</b></div><div class="meta" dir="ltr"><span>Noto Sans Hebrew 800</span><span>Product UI font, neutral</span></div></div>
+</div>
+</section>
+</body>
+</html>

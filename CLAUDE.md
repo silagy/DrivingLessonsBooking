@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**DriveCal** (דרייבקל) - weekly demand-collection system for a driving school (see [README.md](README.md) and [docs/requirements.md](docs/requirements.md)). The logo is Option B, Solid calendar, from the Claude Design file `DriveCal Logo Options.html` (a copy is in `Driving Lesson Mockup\`); the client draws it in `client\src\app\shared\brand-logo\`.
+**DriveCal** (דרייבקל) - weekly demand-collection system for a driving school (see [README.md](README.md) and [docs/requirements.md](docs/requirements.md)). The logo is Option E, Wheel and calendar, from the Claude Design file `DriveCal Logo Options v2.html` (a copy is in `Driving Lesson Mockup\`); the client draws it in `client\src\app\shared\brand-logo\`, and the favicon is its steering wheel alone.
 
 **Stack**: latest .NET, ASP.NET Core Web API, EF Core, PostgreSQL. Frontend: latest Angular + PrimeNG, lives in this repo under `client\`.
 **Architecture**: modular monolith, DDD, Onion Architecture. Single deployable — Angular is served from `Presentation.Web\wwwroot`.
