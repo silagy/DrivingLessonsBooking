@@ -17,6 +17,24 @@
   block-size: 1.75rem;
 }
 
+.brand__page {
+  fill: currentColor;
+}
+
+.brand__rings {
+  fill: none;
+  stroke: currentColor;
+}
+
+.brand__hole {
+  fill: var(--app-on-accent);
+}
+
+.brand__lane {
+  fill: none;
+  stroke: var(--app-on-accent);
+}
+
 .brand__word {
   display: flex;
   flex-direction: column;
@@ -31,6 +49,11 @@
   line-height: 1;
   letter-spacing: var(--app-wordmark-tracking);
   white-space: nowrap;
+  color: var(--app-ink);
+}
+
+.brand__accent {
+  color: var(--app-brand);
 }
 
 .brand__tagline {

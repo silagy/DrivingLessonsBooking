@@ -1,6 +1,8 @@
 {
   "brand": {
-    "appName": "Slotline",
+    "appName": "DriveCal",
+    "nameLead": "Drive",
+    "nameAccent": "Cal",
     "tagline": "Weekly lesson demand, in one link"
   },
   "auth": {

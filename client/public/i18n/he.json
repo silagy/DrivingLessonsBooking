@@ -1,6 +1,8 @@
 {
   "brand": {
-    "appName": "סלוטליין",
+    "appName": "דרייבקל",
+    "nameLead": "דרייב",
+    "nameAccent": "קל",
     "tagline": "ביקוש שבועי לשיעורים, בקישור אחד"
   },
   "auth": {

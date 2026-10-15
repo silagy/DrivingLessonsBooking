@@ -13,13 +13,17 @@ function icoImages(icon: Uint8Array): { size: number; head: number[] }[] {
     });
 }
 
+function brandKeys(lang: string): { appName: string; nameLead: string; nameAccent: string } {
+    return JSON.parse(readFileSync(`public/i18n/${lang}.json`, 'utf8')).brand;
+}
+
 describe('brand assets', () => {
-    it('names the browser tab Slotline in Hebrew before the app starts', () => {
+    it('names the browser tab DriveCal in Hebrew before the app starts', () => {
         //when
         const page = readFileSync('src/index.html', 'utf8');
 
         //then
-        expect(page).toContain('<title>סלוטליין</title>');
+        expect(page).toContain('<title>דרייבקל</title>');
     });
 
     it('links the svg favicon with an ico fallback', () => {
@@ -31,14 +35,19 @@ describe('brand assets', () => {
         expect(page).toContain('<link rel="icon" href="favicon.svg" type="image/svg+xml">');
     });
 
-    it('draws the lane tile in the svg favicon', () => {
+    it('draws the solid calendar in the svg favicon, reversed on dark tab bars', () => {
         //when
         const icon = readFileSync('public/favicon.svg', 'utf8');
 
         //then
         expect(icon).toContain('viewBox="0 0 40 40"');
-        expect(icon).toContain('rx="10"');
-        expect(icon).toContain('d="M20 9v5M20 17.5v5M20 26v5"');
+        expect(icon).toContain('x="1" y="5.5" width="38" height="33.5" rx="10"');
+        expect(icon).toContain('d="M12.5 1.8v7M27.5 1.8v7"');
+        expect(icon).toContain('cx="12.5" cy="9.5" r="1.6"');
+        expect(icon).toContain('cx="27.5" cy="9.5" r="1.6"');
+        expect(icon).toContain('d="M20 15.5v4M20 23.5v4M20 31.5v3"');
+        expect(icon).toContain('@media (prefers-color-scheme: dark)');
+        expect(icon).not.toContain('M20 9v5');
     });
 
     it('ships an ico fallback that embeds png renders', () => {
@@ -48,5 +57,13 @@ describe('brand assets', () => {
         //then
         expect(images.map(image => image.size)).toEqual([32, 48, 256]);
         expect(images.every(image => image.head.join() === PNG_SIGNATURE.join())).toBe(true);
+    });
+
+    it('spells the wordmark halves into the product name in both languages', () => {
+        //when
+        const names = ['en', 'he'].map(brandKeys).map(brand => [brand.appName, brand.nameLead + brand.nameAccent]);
+
+        //then
+        expect(names).toEqual([['DriveCal', 'DriveCal'], ['דרייבקל', 'דרייבקל']]);
     });
 });
