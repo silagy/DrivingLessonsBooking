@@ -124,13 +124,13 @@ crontab -l
 
 ## 2. Releasing
 
-GitHub → Actions → **Deploy** → Run workflow → `ref` = `main` (or any commit sha). The run tests, builds `ghcr.io/silagy/drivinglessonsbooking:<sha>`, copies the compose files and scripts to `/opt/drivinglessons`, writes `release.env`, pulls, restarts, and waits up to 3 minutes for `https://<domain>/api/health`. A red run means production may be on the new image but unhealthy: roll back.
+GitHub → Actions → **Deploy** → Run workflow → `ref` = `main` (or any branch, tag or commit sha, short or full). The run first resolves `ref` to one full sha, so the commit it tests is the commit it ships, then tests, builds `ghcr.io/silagy/drivinglessonsbooking:<sha>`, copies the compose files and scripts to `/opt/drivinglessons`, writes `release.env`, pulls, restarts, and waits up to 3 minutes for `https://<domain>/api/health` to answer `Healthy`. A red run means production may be on the new image but unhealthy: roll back.
 
 Avoid releasing while a submission window is open unless the change is needed for it.
 
 ## 3. Rolling back
 
-You need the previous good **full** 40-character sha: the `Healthy on <sha>` line of an earlier successful Deploy run, or `git log --format=%H`. A short sha fails at checkout.
+You need the previous good sha: the `Healthy on <sha>` line of an earlier successful Deploy run, or `cat release.env` before you change it. The fast path below needs the **full** 40-character sha (it is the image tag); Deploy also accepts a short one.
 
 **Fast path (about a minute, use it when the site is down):** the image of every sha ever deployed is still in GHCR, so the server can switch back without GitHub building anything.
 
@@ -158,6 +158,23 @@ cat release.env                         # running version
 curl -s https://<domain>/api/health
 df -h / && free -h
 ```
+
+### Refreshing Caddy and Postgres
+
+Deploy pulls only the app image, so a release never restarts the database or the proxy. Their images (`caddy:2`, `postgres:17`) get security fixes only when you pull them. Once a month, outside a submission window:
+
+```bash
+ssh deploy@<static-ip>
+cd /opt/drivinglessons
+./pg-backup.sh                          # a fresh backup first
+./dl-compose.sh pull postgres caddy
+./dl-compose.sh up -d                   # recreates only what changed (a few seconds down)
+./dl-compose.sh ps                      # all three Up, postgres healthy
+curl -s https://<domain>/api/health     # Healthy
+docker image prune -f                   # drop the old image layers
+```
+
+`postgres:17` stays on major version 17, so the data files need no upgrade. Moving to a new major version is a dump and restore (section 6), never a tag change.
 
 ## 5. Reboots and restarts
 
