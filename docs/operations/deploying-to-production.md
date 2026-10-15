@@ -3,7 +3,7 @@
 The whole path from "nothing in AWS" to the app live at `https://<domain>`, and then how every release after that works. This guide is the map. The exact console clicks and commands live in three places, and each step below links to the right one:
 
 - [aws-account-setup.md](aws-account-setup.md): opening and securing the AWS account.
-- [runbook.md](runbook.md): domain, server, email, backups, secrets, releases, rollback, restore. (Written in task 6 of the plan.)
+- [runbook.md](runbook.md): domain, server, email, backups, secrets, releases, rollback, restore.
 - The deployment plan for [#74](https://github.com/silagy/DrivingLessonsBooking/issues/74): [docs/modules/deployment/us-74-production-deployment-plan/](../modules/deployment/us-74-production-deployment-plan/README.md), tasks 1-8.
 
 Placeholders: `<domain>`, `<static-ip>` and `<bucket>` are filled in during setup. Real secrets are never written in the repo, in GitHub issues or in a chat with Claude.
@@ -33,9 +33,9 @@ Follow [aws-account-setup.md](aws-account-setup.md) to the end, including its ch
 
 ## Phase 1: Long-lead items
 
-These have waiting time, so do them as soon as the account is active. The exact steps are in runbook §1.1 and §1.4. They're also readable now in plan task 8 step 1 and task 6 step 3, before the runbook file exists.
+These have waiting time, so do them as soon as the account is active. The exact steps are in runbook §1.1 and §1.4.
 
-1. **Domain**: Route 53 → Registered domains → Register domain. This also creates the DNS hosted zone. Wait for the "registration succeeded" email.
+1. **Domain**: Route 53 → Registered domains → Register domain, which also creates the DNS hosted zone. For a TLD Route 53 doesn't sell (such as `.co.il`), buy it at a registrar for that TLD, create a public hosted zone in Route 53 and set the registrar's name servers to the zone's four NS values.
 2. **SES email identity**: SES in Frankfurt → Identities → Create identity → Domain `<domain>`, with Easy DKIM and the custom MAIL FROM domain `mail.<domain>`, and publish the DNS records to Route 53.
 3. **DMARC record**: a `_dmarc` TXT record in the hosted zone.
 4. **SES production access**: SES → Account dashboard → Request production access. AWS reviews it within about 24 hours. Until it's approved, SES only delivers to addresses you have verified.

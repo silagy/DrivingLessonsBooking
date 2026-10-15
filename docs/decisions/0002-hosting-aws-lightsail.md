@@ -2,6 +2,7 @@
 
 **Status:** Accepted
 **Date:** 12 June 2026
+**Reaffirmed:** 2 October 2026 ([#74](https://github.com/silagy/DrivingLessonsBooking/issues/74)): Hetzner, Render/Railway and Azure re-evaluated before go-live; Lightsail kept. Region Frankfurt; image registry GHCR; see [the runbook](../operations/runbook.md).
 
 ## Context
 
