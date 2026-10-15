@@ -1,6 +1,6 @@
 # Driving Lessons Booking
  
-**Slotline** (סלוטליין in Hebrew) is a weekly demand collection system for a driving school. It replaces a ~3-hour manual WhatsApp-to-Excel ritual with a self-service flow: the admin publishes a weekly availability grid per teacher, students submit ranked session preferences through a shareable link, and the system produces the Excel file the teacher uses for booking.
+**DriveCal** (דרייבקל in Hebrew) is a weekly demand collection system for a driving school. It replaces a ~3-hour manual WhatsApp-to-Excel ritual with a self-service flow: the admin publishes a weekly availability grid per teacher, students submit ranked session preferences through a shareable link, and the system produces the Excel file the teacher uses for booking.
  
 ## The problem
  
