@@ -12,6 +12,7 @@
     "submit": "Sign in",
     "invalidCredentials": "Incorrect email or password",
     "tooManyAttempts": "Too many sign-in attempts. Wait a minute and try again.",
+    "signInFailed": "We couldn't sign you in. Check your connection and try again.",
     "footnote": "One admin account - the school owner. Students never sign in."
   },
   "shell": {
