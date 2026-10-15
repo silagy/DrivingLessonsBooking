@@ -5,5 +5,6 @@ export enum IdentifyStatus {
     notOnRoster = 'notOnRoster',
     inactive = 'inactive',
     invalidId = 'invalidId',
+    tooManyAttempts = 'tooManyAttempts',
     failed = 'failed',
 }

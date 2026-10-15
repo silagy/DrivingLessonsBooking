@@ -30,6 +30,7 @@ import { ProblemDetails } from '../../../shared/models/problem-details';
 
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
+const HTTP_TOO_MANY_REQUESTS = 429;
 const EMPTY_WEEK_PARAMS = { weekNumber: 0, weekRange: '' };
 const SINGLE_PICK = 1;
 const SUBMITTED_BODY_ONE = 'studentForm.submitted.bodyOne';
@@ -62,7 +63,13 @@ interface IdentifyLookup {
 
 type IdentifyResult =
     | { status: IdentifyStatus.found; student: IdentifyStudentResponse }
-    | { status: IdentifyStatus.notOnRoster | IdentifyStatus.inactive | IdentifyStatus.invalidId };
+    | {
+          status:
+              | IdentifyStatus.notOnRoster
+              | IdentifyStatus.inactive
+              | IdentifyStatus.invalidId
+              | IdentifyStatus.tooManyAttempts;
+      };
 
 @Injectable()
 export class StudentFormStore {
@@ -466,6 +473,10 @@ export class StudentFormStore {
                     : IdentifyStatus.invalidId;
 
                 return { status };
+            }
+
+            if (isStatus(error, HTTP_TOO_MANY_REQUESTS)) {
+                return { status: IdentifyStatus.tooManyAttempts };
             }
 
             throw error;

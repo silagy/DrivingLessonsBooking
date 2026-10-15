@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { AuthService } from '../../core/auth.service';
+import { signInErrorKeyOf } from './sign-in-error';
 import { BrandLogoComponent } from '../../shared/brand-logo/brand-logo.component';
 import { LanguageToggleComponent } from '../../shared/language-toggle/language-toggle.component';
 
@@ -31,7 +32,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
 
   protected readonly loading = signal(false);
-  protected readonly error = signal(false);
+  protected readonly errorKey = signal<string | null>(null);
 
   protected readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -43,14 +44,14 @@ export class LoginComponent {
       return;
     }
     this.loading.set(true);
-    this.error.set(false);
+    this.errorKey.set(null);
 
     const { email, password } = this.form.getRawValue();
     this.auth.login(email, password).subscribe({
       next: () => void this.router.navigate(['/']),
-      error: () => {
+      error: (error: unknown) => {
         this.loading.set(false);
-        this.error.set(true);
+        this.errorKey.set(signInErrorKeyOf(error));
       },
     });
   }

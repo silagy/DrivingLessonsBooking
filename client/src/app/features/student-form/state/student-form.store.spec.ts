@@ -1,13 +1,15 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { ApplicationRef, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { LanguageService } from '../../../core/language.service';
 import { DayOfWeek } from '../../../shared/models/day-of-week.enum';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
 import { SlotState } from '../../../shared/models/slot-state.enum';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
-import { SlotForIdentifyStudentResponse } from '../data/identify-student.response';
+import { IdentifyStudentResponse, SlotForIdentifyStudentResponse } from '../data/identify-student.response';
 import { SubmissionsApiService } from '../data/submissions-api.service';
+import { IdentifyStatus } from '../domain/identify-status.enum';
 import { Transmission } from '../domain/transmission.enum';
 import { StudentFormStore } from './student-form.store';
 
@@ -23,7 +25,16 @@ const SLOTS = [
     slotOf(DayOfWeek.sunday, SlotWindow.noon, SlotState.open),
 ];
 
-async function identifiedStore(): Promise<StudentFormStore> {
+const ROSTER_STUDENT: IdentifyStudentResponse = {
+    studentName: 'Test Student',
+    teacherName: 'Teacher Cohen',
+    carName: 'Corolla White',
+    transmission: Transmission.automatic,
+    submission: null,
+    slots: SLOTS,
+};
+
+async function storeAfterIdentify(identifyStudent: () => Observable<IdentifyStudentResponse>): Promise<StudentFormStore> {
     TestBed.configureTestingModule({
         providers: [
             provideZonelessChangeDetection(),
@@ -40,15 +51,7 @@ async function identifiedStore(): Promise<StudentFormStore> {
                             windowStartUtc: '2026-11-11T16:00:00Z',
                             windowEndUtc: '2026-11-13T12:00:00Z',
                         }),
-                    identifyStudent: () =>
-                        of({
-                            studentName: 'Test Student',
-                            teacherName: 'Teacher Cohen',
-                            carName: 'Corolla White',
-                            transmission: Transmission.automatic,
-                            submission: null,
-                            slots: SLOTS,
-                        }),
+                    identifyStudent,
                 },
             },
         ],
@@ -61,7 +64,35 @@ async function identifiedStore(): Promise<StudentFormStore> {
     return store;
 }
 
+function identifiedStore(): Promise<StudentFormStore> {
+    return storeAfterIdentify(() => of(ROSTER_STUDENT));
+}
+
 describe('StudentFormStore', () => {
+    describe('identifyStatus', () => {
+        it('maps a 429 to tooManyAttempts', async () => {
+            //given
+            const rateLimited = new HttpErrorResponse({ status: HttpStatusCode.TooManyRequests });
+
+            //when
+            const store = await storeAfterIdentify(() => throwError(() => rateLimited));
+
+            //then
+            expect(store.identifyStatus()).toBe(IdentifyStatus.tooManyAttempts);
+        });
+
+        it('still reports a roster miss as notOnRoster', async () => {
+            //given
+            const missing = new HttpErrorResponse({ status: HttpStatusCode.NotFound });
+
+            //when
+            const store = await storeAfterIdentify(() => throwError(() => missing));
+
+            //then
+            expect(store.identifyStatus()).toBe(IdentifyStatus.notOnRoster);
+        });
+    });
+
     describe('openPick', () => {
         it('opens the sheet for an open slot', async () => {
             //given
