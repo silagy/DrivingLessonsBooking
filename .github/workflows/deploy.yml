@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Branch, tag or commit sha to deploy (a previous sha rolls back)
+        description: Branch, tag or commit sha (short or full) to deploy; a previous sha rolls back
         required: true
         default: main
 
@@ -19,29 +19,47 @@ env:
   IMAGE: ghcr.io/silagy/drivinglessonsbooking
 
 jobs:
+  resolve:
+    name: Resolve commit
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve the ref to one full commit sha
+        id: sha
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          sha=$(git rev-parse --verify --quiet "origin/$REF^{commit}" \
+                || git rev-parse --verify --quiet "$REF^{commit}") || {
+            echo "Cannot resolve '$REF' to a commit of this repository (branch, tag or sha)." >&2
+            exit 1
+          }
+          echo "Deploying $REF = $sha"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
   test:
     name: Test
+    needs: resolve
     uses: ./.github/workflows/ci.yml
     with:
-      ref: ${{ inputs.ref }}
+      ref: ${{ needs.resolve.outputs.sha }}
 
   image:
     name: Build and push image
-    needs: test
+    needs: [resolve, test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    outputs:
-      tag: ${{ steps.sha.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
-
-      - name: Resolve commit sha
-        id: sha
-        run: echo "tag=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          ref: ${{ needs.resolve.outputs.sha }}
 
       - uses: docker/setup-buildx-action@v3
 
@@ -55,20 +73,20 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.IMAGE }}:${{ steps.sha.outputs.tag }}
+          tags: ${{ env.IMAGE }}:${{ needs.resolve.outputs.sha }}
           labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
     name: Deploy to production
-    needs: image
+    needs: [resolve, image]
     runs-on: ubuntu-latest
     environment:
       name: production
       url: https://${{ vars.DEPLOY_DOMAIN }}
     env:
-      APP_TAG: ${{ needs.image.outputs.tag }}
+      APP_TAG: ${{ needs.resolve.outputs.sha }}
       DOMAIN: ${{ vars.DEPLOY_DOMAIN }}
       TARGET: deploy@${{ secrets.DEPLOY_HOST }}
       SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -76,7 +94,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.image.outputs.tag }}
+          ref: ${{ needs.resolve.outputs.sha }}
 
       - name: Prepare SSH
         run: |
@@ -101,9 +119,10 @@ jobs:
 
       - name: Wait for health
         run: |
-          for _ in $(seq 1 36); do
-            if curl -fsS --max-time 5 "https://$DOMAIN/api/health"; then
-              echo
+          deadline=$((SECONDS + 180))
+          while (( SECONDS < deadline )); do
+            body=$(curl -fsS --max-time 5 "https://$DOMAIN/api/health" || true)
+            if [[ "$body" == "Healthy" ]]; then
               echo "Healthy on $APP_TAG"
               exit 0
             fi
