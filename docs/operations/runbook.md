@@ -112,13 +112,15 @@ Keep a copy of `.env` in your password manager. It is never committed and never 
 
 ### 1.8 Nightly backup
 
+Do this **after the first successful deploy**: `pg-backup.sh` reaches `/opt/drivinglessons` with it, and a cron line installed earlier fails every night until then. Check with `ls -l /opt/drivinglessons/pg-backup.sh`.
+
 ```bash
 ssh deploy@<static-ip>
 ( crontab -l 2>/dev/null; echo '30 0 * * * /opt/drivinglessons/pg-backup.sh 2>&1 | logger -t drivinglessons-backup' ) | crontab -
 crontab -l
 ```
 
-00:30 UTC is 02:30 / 03:30 in Israel. Check a run with `journalctl -t drivinglessons-backup --since yesterday`.
+00:30 UTC is 02:30 / 03:30 in Israel. Check a run with `journalctl -t drivinglessons-backup --since yesterday`: a good night ends with `backup uploaded: ...`, a bad one with `backup FAILED (exit <n>)` after the reason. The server keeps the newest 7 dumps in `/var/backups/drivinglessons`; S3 keeps 30 days.
 
 ## 2. Releasing
 
