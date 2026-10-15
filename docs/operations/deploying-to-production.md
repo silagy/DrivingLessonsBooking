@@ -79,7 +79,7 @@ Follow plan task 8 steps 2-3. They point to these runbook sections:
 
 Follow plan task 8 steps 4-12. In short:
 
-1. **First release**: GitHub → Actions → **Deploy** → Run workflow, `ref` = `main`. The first run is expected to **fail** at "Pull and restart", because GitHub creates the image package as private. Make it public (runbook §1.7 step 4: your profile → Packages → `drivinglessonsbooking` → Package settings → Change visibility → Public), then click **Re-run failed jobs**.
+1. **First release**: GitHub → Actions → **Deploy** → Run workflow, `ref` = `main`. The image package takes the repository's visibility, so with the public repository the first run goes green. Only with a private repository does it fail at "Pull and restart" with `denied`; then make the package public (runbook §1.7 step 4) and click **Re-run failed jobs**.
 2. **Check it's live**: `https://<domain>/api/health` answers `Healthy`, `http://` redirects to `https://`, the certificate is from Let's Encrypt, and you can sign in as admin on your phone.
 3. **Drills** (steps 5-10): a deliberately broken release that the health check catches, followed by a rollback; health turning unhealthy while the database is down; rate limits through the real proxy; a full test week end to end with the close-to-inbox time measured (target under one minute); a reboot; a backup and a restore check. All of this uses synthetic test data only.
 4. **Clean up** (step 11): empty the database so the school starts fresh. The admin user is created again automatically.

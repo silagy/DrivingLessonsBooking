@@ -108,7 +108,7 @@ Keep a copy of `.env` in your password manager. It is never committed and never 
 1. Repo → Settings → Environments → New environment **`production`** (optionally: Required reviewers = you).
 2. Environment secrets: `DEPLOY_HOST` = `<static-ip>`; `DEPLOY_SSH_KEY` = contents of `~/.ssh/drivinglessons-deploy` (the private key); `DEPLOY_KNOWN_HOSTS` = output of `ssh-keyscan -t ed25519 <static-ip>`.
 3. Environment variable: `DEPLOY_DOMAIN` = `<domain>`.
-4. After the **first** deploy pushes the image: GitHub → your profile → Packages → `drivinglessonsbooking` → Package settings → Change visibility → **Public** (the server pulls without credentials). The first deploy's pull step fails until this is done; re-run it.
+4. The server pulls the image without credentials, so the package must be **public**. A package first pushed by this repository's workflow takes the repository's visibility, so with a public repository nothing is needed (the first deploy, on 2026-10-15, pulled straight away). If the repository is private, the first deploy fails at "Pull and restart" with `denied`: GitHub → your profile → Packages → `drivinglessonsbooking` → Package settings → Change visibility → **Public**, then **Re-run failed jobs**.
 
 ### 1.8 Nightly backup
 
