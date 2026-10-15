@@ -9,6 +9,7 @@ public static class RateLimitingExtension
 {
     public const int AdminSignInPermitsPerMinute = 5;
     public const int StudentIdentifyPermitsPerMinute = 30;
+    public const int StudentSubmitPermitsPerMinute = 30;
     public const string TooManyRequestsCode = "tooManyRequests";
 
     private const string CodeExtension = "code";
@@ -30,6 +31,9 @@ public static class RateLimitingExtension
             options.AddPolicy(
                 RateLimitPolicies.StudentIdentify,
                 context => PerClientFixedWindow(context, StudentIdentifyPermitsPerMinute));
+            options.AddPolicy(
+                RateLimitPolicies.StudentSubmit,
+                context => PerClientFixedWindow(context, StudentSubmitPermitsPerMinute));
         });
     }
 

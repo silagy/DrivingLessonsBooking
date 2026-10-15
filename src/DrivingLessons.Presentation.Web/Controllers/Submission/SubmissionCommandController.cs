@@ -33,7 +33,7 @@ public class SubmissionCommandController : ControllerBase
     }
 
     [HttpPost("by-link/{token}")]
-    [EnableRateLimiting(RateLimitPolicies.StudentIdentify)]
+    [EnableRateLimiting(RateLimitPolicies.StudentSubmit)]
     [EndpointSummary("Creates the student's submission for the week; fails if one already exists")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -51,7 +51,7 @@ public class SubmissionCommandController : ControllerBase
     }
 
     [HttpPut("by-link/{token}")]
-    [EnableRateLimiting(RateLimitPolicies.StudentIdentify)]
+    [EnableRateLimiting(RateLimitPolicies.StudentSubmit)]
     [EndpointSummary("Replaces the student's submission for the week; fails if there is none yet")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]

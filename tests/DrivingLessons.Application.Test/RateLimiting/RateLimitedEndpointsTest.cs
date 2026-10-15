@@ -19,11 +19,11 @@ public class RateLimitedEndpointsTest
     [DataRow(
         typeof(SubmissionCommandController),
         nameof(SubmissionCommandController.CreateAsync),
-        RateLimitPolicies.StudentIdentify)]
+        RateLimitPolicies.StudentSubmit)]
     [DataRow(
         typeof(SubmissionCommandController),
         nameof(SubmissionCommandController.ReviseAsync),
-        RateLimitPolicies.StudentIdentify)]
+        RateLimitPolicies.StudentSubmit)]
     public void Every_Endpoint_That_Checks_A_Secret_Is_Rate_Limited(
         Type controller,
         string action,

@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using DrivingLessons.Presentation.Web.RateLimiting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
@@ -83,6 +84,76 @@ public class RateLimitingExtensionTest
 
         //then
         key.ShouldBe("unknown");
+    }
+
+    [TestMethod]
+    public async Task Sending_A_Submission_Is_Not_Blocked_By_Spent_Identify_Attempts()
+    {
+        //given
+        var address = IPAddress.Parse("203.0.113.20");
+        var pipeline = RateLimitedPipeline();
+
+        for (var attempt = 0; attempt < RateLimitingExtension.StudentIdentifyPermitsPerMinute; attempt++)
+        {
+            await pipeline(PolicyRequest(address, RateLimitPolicies.StudentIdentify));
+        }
+
+        var identify = PolicyRequest(address, RateLimitPolicies.StudentIdentify);
+        await pipeline(identify);
+        var submit = PolicyRequest(address, RateLimitPolicies.StudentSubmit);
+
+        //when
+        await pipeline(submit);
+
+        //then
+        identify.Response.StatusCode.ShouldBe(StatusCodes.Status429TooManyRequests);
+        submit.Response.StatusCode.ShouldBe(StatusCodes.Status200OK);
+    }
+
+    [TestMethod]
+    public async Task Sending_A_Submission_Is_Limited_Per_Minute()
+    {
+        //given
+        var address = IPAddress.Parse("203.0.113.21");
+        var pipeline = RateLimitedPipeline();
+
+        for (var attempt = 0; attempt < RateLimitingExtension.StudentSubmitPermitsPerMinute; attempt++)
+        {
+            await pipeline(PolicyRequest(address, RateLimitPolicies.StudentSubmit));
+        }
+
+        var submit = PolicyRequest(address, RateLimitPolicies.StudentSubmit);
+
+        //when
+        await pipeline(submit);
+
+        //then
+        submit.Response.StatusCode.ShouldBe(StatusCodes.Status429TooManyRequests);
+    }
+
+    private static RequestDelegate RateLimitedPipeline()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddApiRateLimiting();
+        var provider = services.BuildServiceProvider();
+        var app = new ApplicationBuilder(provider);
+        app.UseRateLimiter();
+        app.Run(context => Task.CompletedTask);
+
+        return app.Build();
+    }
+
+    private static DefaultHttpContext PolicyRequest(IPAddress address, string policy)
+    {
+        var context = ContextFrom(address);
+        context.RequestServices = new ServiceCollection().BuildServiceProvider();
+        context.Response.Body = new MemoryStream();
+        var metadata = new EndpointMetadataCollection(new EnableRateLimitingAttribute(policy));
+        var endpoint = new Endpoint(null, metadata, policy);
+        context.SetEndpoint(endpoint);
+
+        return context;
     }
 
     private static OnRejectedContext RejectedContext(RateLimitLease lease)

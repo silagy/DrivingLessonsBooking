@@ -54,7 +54,7 @@ This constraint is why hosting must be **always-on** — spin-down free tiers an
 - **Email**: AWS SES over SMTP with MailKit (effectively free at this volume) — see [ADR 0005](decisions/0005-email-over-ses-smtp.md); a local Mailpit container catches it in development
 - **Backups**: nightly `pg_dump` cron on the instance, uploaded to S3
 - **Releases**: GitHub Actions: `ci.yml` tests every PR; `deploy.yml` (run by hand) pushes `ghcr.io/silagy/drivinglessonsbooking:<sha>` and restarts the server over SSH, gated on `/api/health`
-- **Abuse limits**: per-IP rate limits on admin sign-in (5/min) and student identify (30/min)
+- **Abuse limits**: per-IP rate limits on admin sign-in (5/min) and student identify (30/min), and a separate 30/min for sending or revising a submission, so one student's identify and send do not share a bucket
 - **Runbook**: [docs/operations/runbook.md](operations/runbook.md)
 - **Timezone handling** per requirements §8.3: containers run in UTC; Asia/Jerusalem is presentation-layer only
 
