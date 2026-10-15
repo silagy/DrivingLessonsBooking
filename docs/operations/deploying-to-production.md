@@ -3,14 +3,14 @@
 The whole path from "nothing in AWS" to the app live at `https://<domain>`, and then how every release after that works. This guide is the map. The exact console clicks and commands live in three places, and each step below links to the right one:
 
 - [aws-account-setup.md](aws-account-setup.md): opening and securing the AWS account.
-- [runbook.md](runbook.md): domain, server, email, backups, secrets, releases, rollback, restore. (Written in task 6 of the plan.)
+- [runbook.md](runbook.md): domain, server, email, backups, secrets, releases, rollback, restore.
 - The deployment plan for [#74](https://github.com/silagy/DrivingLessonsBooking/issues/74): [docs/modules/deployment/us-74-production-deployment-plan/](../modules/deployment/us-74-production-deployment-plan/README.md), tasks 1-8.
 
 Placeholders: `<domain>`, `<static-ip>` and `<bucket>` are filled in during setup. Real secrets are never written in the repo, in GitHub issues or in a chat with Claude.
 
 ## Where things stand
 
-The plan and the AWS account guide are written. **The deployment pipeline itself is not built yet**: tasks 1-7 add the health check, rate limits, CI, the production compose file with Caddy (HTTPS), backups, the server bootstrap script, the runbook and the **Deploy** workflow. Until that PR is merged to `main` there is no Deploy button and nothing to deploy with.
+The plan, the AWS account guide and the pipeline are written. Tasks 1-7 (the health check, rate limits, CI, the production compose file with Caddy (HTTPS), backups, the server bootstrap script, the runbook and the **Deploy** workflow) are one PR, [#122](https://github.com/silagy/DrivingLessonsBooking/pull/122). GitHub shows the Deploy button only once that PR is merged to `main`; then task 8 provisions the server and runs the first deploy.
 
 Don't put the local `docker-compose.yml` on a server as a shortcut. It has no HTTPS, publishes the app on port 8080 to the internet, and has no backups.
 
@@ -33,9 +33,9 @@ Follow [aws-account-setup.md](aws-account-setup.md) to the end, including its ch
 
 ## Phase 1: Long-lead items
 
-These have waiting time, so do them as soon as the account is active. The exact steps are in runbook §1.1 and §1.4. They're also readable now in plan task 8 step 1 and task 6 step 3, before the runbook file exists.
+These have waiting time, so do them as soon as the account is active. The exact steps are in runbook §1.1 and §1.4.
 
-1. **Domain**: Route 53 → Registered domains → Register domain. This also creates the DNS hosted zone. Wait for the "registration succeeded" email.
+1. **Domain**: Route 53 → Registered domains → Register domain, which also creates the DNS hosted zone. For a TLD Route 53 doesn't sell (such as `.co.il`), buy it at a registrar for that TLD, create a public hosted zone in Route 53 and set the registrar's name servers to the zone's four NS values.
 2. **SES email identity**: SES in Frankfurt → Identities → Create identity → Domain `<domain>`, with Easy DKIM and the custom MAIL FROM domain `mail.<domain>`, and publish the DNS records to Route 53.
 3. **DMARC record**: a `_dmarc` TXT record in the hosted zone.
 4. **SES production access**: SES → Account dashboard → Request production access. AWS reviews it within about 24 hours. Until it's approved, SES only delivers to addresses you have verified.
@@ -92,17 +92,17 @@ Once phase 4 is done, this is all a release takes.
 
 1. **Pick a quiet moment.** Avoid releasing while a submission window is open, unless the change is needed for that window. The admin dashboard shows which publications are open.
 2. **Merge the change to `main`** and make sure CI on `main` is green.
-3. **Run Deploy**: GitHub → Actions → **Deploy** → Run workflow → `ref` = `main` (or a specific commit sha) → Run workflow. From a terminal you can do the same with:
+3. **Run Deploy**: GitHub → Actions → **Deploy** → Run workflow → `ref` = `main` (or a specific commit sha, short or full) → Run workflow. From a terminal you can do the same with:
    ```bash
    gh workflow run deploy.yml -f ref=main
    ```
    and then follow it with `gh run watch`.
-4. **Wait for green.** The workflow runs the tests, builds and pushes `ghcr.io/silagy/drivinglessonsbooking:<sha>`, copies the compose files to the server, restarts, and waits up to 3 minutes for `/api/health`. Database migrations are applied when the app starts.
+4. **Wait for green.** The workflow runs the tests, builds and pushes `ghcr.io/silagy/drivinglessonsbooking:<sha>`, copies the compose files to the server, restarts, and waits up to 3 minutes for `/api/health` to answer `Healthy`. Database migrations are applied when the app starts.
 5. **Check**: open `https://<domain>/api/health` (it should say `Healthy`) and sign in.
 
 ### If the run goes red
 
-Production may be running the new image, but unhealthy. **Roll back**: run Deploy again with `ref` = the sha of the last successful release (it's in that run's log as `APP_TAG`, and in `git log`). Every image is kept, so this takes about a minute. See runbook §3.
+Production may be running the new image, but unhealthy. **Roll back** (runbook §3): on the server, point `release.env` at the full sha of the last successful release (its run log says `Healthy on <sha>`) and restart the app. Every image is kept, so this takes about a minute. Then run Deploy with that sha so the server's files match it; Deploy tests and rebuilds first, so it takes several minutes.
 
 A rollback can't undo a database migration, because migrations only move forward. If a release's migration has to be reverted, that's a restore from backup (runbook §6).
 
@@ -113,6 +113,7 @@ All of these are in the runbook:
 | Need | Runbook |
 |---|---|
 | See what's running, logs, disk and memory | §4 |
+| Monthly refresh of the Caddy and Postgres images | §4 |
 | After a server reboot | §5 |
 | Restore or check a backup | §6 |
 | Change a secret or setting in `.env` | §7 |

@@ -9,7 +9,11 @@ import { WelcomeBack } from '../../../domain/welcome-back';
 import { isNationalIdCandidate, toNationalIdDigits } from '../../../domain/national-id-input';
 import { WizardStepComponent } from '../wizard-step/wizard-step.component';
 
-const RESUBMITTABLE_STATUSES: ReadonlySet<IdentifyStatus> = new Set([IdentifyStatus.found, IdentifyStatus.failed]);
+const RESUBMITTABLE_STATUSES: ReadonlySet<IdentifyStatus> = new Set([
+    IdentifyStatus.found,
+    IdentifyStatus.failed,
+    IdentifyStatus.tooManyAttempts,
+]);
 const REJECTED_STATUSES: ReadonlySet<IdentifyStatus> = new Set([IdentifyStatus.notOnRoster, IdentifyStatus.invalidId]);
 const SINGLE_PICK = 1;
 

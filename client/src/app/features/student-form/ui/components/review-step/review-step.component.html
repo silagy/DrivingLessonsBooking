@@ -153,6 +153,11 @@
                     {{ 'studentForm.review.errors.failed' | transloco }}
                 </p-message>
             }
+            @case (statuses.tooManyAttempts) {
+                <p-message severity="warn" class="review__too-many">
+                    {{ 'studentForm.review.errors.tooManyAttempts' | transloco }}
+                </p-message>
+            }
         }
     </div>
 

@@ -82,6 +82,11 @@
                         {{ 'studentForm.identify.failed' | transloco }}
                     </p-message>
                 }
+                @case (statuses.tooManyAttempts) {
+                    <p-message severity="warn" class="identify__too-many">
+                        {{ 'studentForm.identify.tooManyAttempts' | transloco }}
+                    </p-message>
+                }
             }
         </div>
 

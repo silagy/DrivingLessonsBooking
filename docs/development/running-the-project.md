@@ -1,6 +1,6 @@
 # Running the Project
 
-How to run the driving-lessons app locally. See [tech-stack.md](../tech-stack.md) for the architecture.
+How to run the driving-lessons app locally. See [tech-stack.md](../tech-stack.md) for the architecture. Production setup and operations: [operations/runbook.md](../operations/runbook.md).
 
 | Setup | What runs where | Reloads on save? | Use it for |
 |-------|-----------------|------------------|------------|

@@ -32,6 +32,9 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DrivingLessonsDbContext>());
         services.AddScoped<ITeacherAndCarLocks, TeacherAndCarLocks>();
 
+        services.AddHealthChecks()
+                .AddDbContextCheck<DrivingLessonsDbContext>();
+
         services.AddOptions<AdminOptions>()
             .Bind(configuration.GetSection(AdminOptions.SectionName))
             .ValidateDataAnnotations()

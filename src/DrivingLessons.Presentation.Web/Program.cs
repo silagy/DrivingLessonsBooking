@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using DrivingLessons.Presentation.Web.Filters;
 using DrivingLessons.Presentation.Web.OpenApi;
+using DrivingLessons.Presentation.Web.RateLimiting;
 using DrivingLessons.Application;
 using DrivingLessons.Application.Auth;
 using DrivingLessons.Application.Commands.SeedFirstAdministrator;
@@ -27,6 +28,7 @@ builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApiRateLimiting();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddScoped<SignedInUserJwtBearerEvents>();
@@ -77,9 +79,12 @@ if (app.Environment.IsDevelopment())
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+app.UseRateLimiter();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHealthChecks("/api/health").AllowAnonymous();
 app.MapControllers();
 
 app.MapFallbackToFile("index.html").AllowAnonymous();

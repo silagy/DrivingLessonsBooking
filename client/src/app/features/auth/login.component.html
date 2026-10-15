@@ -26,8 +26,8 @@
       </div>
     </div>
 
-    @if (error()) {
-      <p-message severity="error" [textContent]="'auth.invalidCredentials' | transloco" styleClass="login__error" />
+    @if (errorKey(); as key) {
+      <p-message severity="error" [textContent]="key | transloco" styleClass="login__error" />
     }
 
     <p-button
