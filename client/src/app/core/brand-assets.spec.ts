@@ -13,6 +13,10 @@ function icoImages(icon: Uint8Array): { size: number; head: number[] }[] {
     });
 }
 
+function brandKeys(lang: string): { appName: string; nameLead: string; nameAccent: string } {
+    return JSON.parse(readFileSync(`public/i18n/${lang}.json`, 'utf8')).brand;
+}
+
 describe('brand assets', () => {
     it('names the browser tab Slotline in Hebrew before the app starts', () => {
         //when
@@ -48,5 +52,13 @@ describe('brand assets', () => {
         //then
         expect(images.map(image => image.size)).toEqual([32, 48, 256]);
         expect(images.every(image => image.head.join() === PNG_SIGNATURE.join())).toBe(true);
+    });
+
+    it('spells the wordmark halves into the product name in both languages', () => {
+        //when
+        const names = ['en', 'he'].map(brandKeys).map(brand => [brand.appName, brand.nameLead + brand.nameAccent]);
+
+        //then
+        expect(names).toEqual([['DriveCal', 'DriveCal'], ['דרייבקל', 'דרייבקל']]);
     });
 });
