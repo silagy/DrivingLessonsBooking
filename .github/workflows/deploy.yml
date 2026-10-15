@@ -109,6 +109,7 @@ jobs:
             fi
             sleep 5
           done
-          echo "Not healthy after 3 minutes - roll back by running Deploy with the previous sha." >&2
-          ssh "$TARGET" "cd /opt/drivinglessons && ./dl-compose.sh ps && ./dl-compose.sh logs --tail 100 app"
+          echo "Not healthy after 3 minutes - roll back (runbook section 3)." >&2
+          echo "App logs stay on the server (this run log is public): ./dl-compose.sh logs --tail 200 app" >&2
+          ssh "$TARGET" 'cd /opt/drivinglessons && ./dl-compose.sh ps'
           exit 1

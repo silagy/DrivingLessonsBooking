@@ -128,7 +128,21 @@ Avoid releasing while a submission window is open unless the change is needed fo
 
 ## 3. Rolling back
 
-Run **Deploy** again with `ref` = the previous good sha (the `APP_TAG` in an earlier successful run's log, or `git log`). Images are never deleted, so any earlier sha redeploys in about a minute. Database migrations only move forward: a release whose migration must be undone needs a restore (section 6).
+You need the previous good **full** 40-character sha: the `Healthy on <sha>` line of an earlier successful Deploy run, or `git log --format=%H`. A short sha fails at checkout.
+
+**Fast path (about a minute, use it when the site is down):** the image of every sha ever deployed is still in GHCR, so the server can switch back without GitHub building anything.
+
+```bash
+ssh deploy@<static-ip>
+cd /opt/drivinglessons
+printf 'APP_TAG=%s\n' <previous-full-sha> > release.env
+./dl-compose.sh up -d
+curl -fsS https://<domain>/api/health    # Healthy
+```
+
+Then run **Deploy** with `ref` = that same sha, so the compose files, `Caddyfile` and scripts on the server match it again (only needed if the bad release changed them, but harmless otherwise). Deploy re-runs the tests and rebuilds the image first, so it takes several minutes; do not use it as the first response while students are submitting.
+
+Database migrations only move forward: a release whose migration must be undone needs a restore (section 6).
 
 ## 4. Day to day
 
