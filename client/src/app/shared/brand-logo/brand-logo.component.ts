@@ -17,7 +17,9 @@ import { TranslocoPipe } from '@jsverse/transloco';
         @let lead = 'brand.nameLead' | transloco;
         @let accent = 'brand.nameAccent' | transloco;
         <span class="brand__word">
-          <span class="brand__name">{{ lead }}<span class="brand__accent">{{ accent }}</span></span>
+          <span class="brand__name" role="img" [attr.aria-label]="'brand.appName' | transloco">
+            <span aria-hidden="true">{{ lead }}<span class="brand__accent">{{ accent }}</span></span>
+          </span>
           @if (showTagline()) {
             <span class="brand__tagline">{{ 'brand.tagline' | transloco }}</span>
           }
