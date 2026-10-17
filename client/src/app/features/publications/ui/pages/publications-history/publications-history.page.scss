@@ -41,3 +41,87 @@
 .history__action {
     text-align: end;
 }
+
+.history__cards {
+    display: none;
+    list-style: none;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.history-card {
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: 14px;
+    box-shadow: var(--app-shadow-card);
+    padding: 0.875rem 0.875rem 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+}
+
+.history-card__top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    app-publication-state-tag {
+        margin-inline-start: auto;
+    }
+}
+
+.history-card__identity {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+}
+
+.history-card__week {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--app-ink);
+}
+
+.history-card__teacher {
+    font-size: 0.8125rem;
+    color: var(--app-text-secondary);
+}
+
+.history-card__details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.375rem 0.875rem;
+    margin: 0;
+    font-size: 0.84375rem;
+
+    dt {
+        color: var(--app-text-secondary);
+    }
+
+    dd {
+        margin: 0;
+        color: var(--app-ink);
+    }
+}
+
+:host ::ng-deep .history-card__action.p-button {
+    inline-size: calc(100% + 1.75rem);
+    margin-inline: -0.875rem;
+    block-size: 2.75rem;
+    justify-content: flex-start;
+    padding-inline: 0.875rem;
+    border-block-start: 1px solid var(--app-bg-muted);
+    border-radius: 0 0 14px 14px;
+}
+
+@media screen and (max-width: 639px) {
+    .history__table-wrap {
+        display: none;
+    }
+
+    .history__cards {
+        display: flex;
+    }
+}
