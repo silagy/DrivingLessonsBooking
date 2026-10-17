@@ -2,7 +2,8 @@
     <div class="week-grid__corner"></div>
     @for (day of days; track day) {
         <div class="week-grid__day-head">
-            <span class="week-grid__day-name">{{ 'weekGrid.days.' + day | transloco }}</span>
+            <span class="week-grid__day-name week-grid__day-name--long">{{ 'weekGrid.days.' + day | transloco }}</span>
+            <span class="week-grid__day-name week-grid__day-name--short">{{ 'weekGrid.daysShort.' + day | transloco }}</span>
             @if (dateFor(day); as date) {
                 <span class="week-grid__day-date"><bdi>{{ date }}</bdi></span>
             }
@@ -12,7 +13,8 @@
         <div class="week-grid__window-label">
             <span class="week-grid__window-name">{{ 'weekGrid.windows.' + window | transloco }}</span>
             @if (windowTimes()[window]; as time) {
-                <span class="week-grid__window-time"><bdi>{{ time }}</bdi></span>
+                <span class="week-grid__window-time week-grid__window-time--long"><bdi>{{ time }}</bdi></span>
+                <span class="week-grid__window-time week-grid__window-time--compact"><bdi>{{ compactTime(time) }}</bdi></span>
             }
         </div>
         @for (day of days; track day) {

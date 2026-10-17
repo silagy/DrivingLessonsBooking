@@ -304,6 +304,14 @@
       "thursday": "Thursday",
       "friday": "Friday"
     },
+    "daysShort": {
+      "sunday": "Sun",
+      "monday": "Mon",
+      "tuesday": "Tue",
+      "wednesday": "Wed",
+      "thursday": "Thu",
+      "friday": "Fri"
+    },
     "windows": {
       "morning": "Morning",
       "noon": "Noon",

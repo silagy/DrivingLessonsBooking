@@ -304,6 +304,14 @@
       "thursday": "חמישי",
       "friday": "שישי"
     },
+    "daysShort": {
+      "sunday": "א׳",
+      "monday": "ב׳",
+      "tuesday": "ג׳",
+      "wednesday": "ד׳",
+      "thursday": "ה׳",
+      "friday": "ו׳"
+    },
     "windows": {
       "morning": "בוקר",
       "noon": "צהריים",

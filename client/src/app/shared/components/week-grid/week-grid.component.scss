@@ -48,3 +48,51 @@
   background: var(--p-surface-100);
   border-radius: 6px;
 }
+
+.week-grid__day-name--short,
+.week-grid__window-time--compact {
+  display: none;
+}
+
+@media screen and (max-width: 639px) {
+  .week-grid {
+    grid-template-columns: 3.25rem repeat(6, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .week-grid__day-head {
+    padding-block-end: 4px;
+    font-size: 0.8125rem;
+  }
+
+  .week-grid__day-date {
+    font-size: 0.6875rem;
+  }
+
+  .week-grid__window-label {
+    padding-inline-end: 0;
+  }
+
+  .week-grid__window-name {
+    font-size: 0.8125rem;
+  }
+
+  .week-grid__window-time {
+    font-size: 0.65625rem;
+  }
+
+  .week-grid__cell {
+    min-height: 48px;
+    min-inline-size: 0;
+  }
+
+  .week-grid__day-name--long,
+  .week-grid__window-time--long {
+    display: none;
+  }
+
+  .week-grid__day-name--short,
+  .week-grid__window-time--compact {
+    display: inline;
+  }
+}
