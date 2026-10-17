@@ -106,6 +106,18 @@ describe('BrandLogoComponent', () => {
         expect(name?.querySelector('.brand__accent')?.textContent).toBe('Cal');
     });
 
+    it('announces the two-tone name to assistive technology as the single product name', async () => {
+        //given
+        const logo = await renderLogo();
+
+        //when
+        const name = logo.querySelector('.brand__name');
+
+        //then
+        expect(attributes(name, ['role', 'aria-label'])).toEqual(['img', 'DriveCal']);
+        expect(Array.from(name?.children ?? [], child => child.getAttribute('aria-hidden'))).toEqual(['true']);
+    });
+
     it('shows no tagline unless asked', async () => {
         //given
         const logo = await renderLogo();

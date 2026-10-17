@@ -31,8 +31,8 @@ describe('brand assets', () => {
         const page = readFileSync('src/index.html', 'utf8');
 
         //then
-        expect(page).toContain('<link rel="icon" href="favicon.ico" sizes="32x32">');
-        expect(page).toContain('<link rel="icon" href="favicon.svg" type="image/svg+xml">');
+        expect(page).toContain('<link rel="icon" href="favicon.ico?v=2" sizes="32x32">');
+        expect(page).toContain('<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">');
     });
 
     it('draws the plain wheel in the svg favicon, reversed on dark tab bars', () => {
