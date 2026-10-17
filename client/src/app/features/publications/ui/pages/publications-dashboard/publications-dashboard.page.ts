@@ -2,21 +2,20 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
 import { DialogService } from 'primeng/dynamicdialog';
 import { WeekGridComponent } from '../../../../../shared/components/week-grid/week-grid.component';
 import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
-import { PublicationStateTagComponent } from '../../../../../shared/components/publication-state-tag/publication-state-tag.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
 import { formatInstantInJerusalem, formatWeekdayInstantInJerusalem } from '../../../../../shared/dates/jerusalem-time';
 import { LanguageService } from '../../../../../core/language.service';
+import { WindowStatus } from '../../../domain/window-status.model';
 import { PublicationsStore } from '../../../state/publications.store';
 import { SlotCountCellComponent } from '../../components/slot-count-cell/slot-count-cell.component';
 import { PublicationStatChipComponent } from '../../components/publication-stat-chip/publication-stat-chip.component';
 import { ShareLinkBoxComponent } from '../../components/share-link-box/share-link-box.component';
+import { PublicationWeekHeadingComponent } from '../../components/publication-week-heading/publication-week-heading.component';
 import { PublishWeekDialog, PublishWeekResult } from '../../dialogs/publish-week/publish-week.dialog';
 import { ExtendWindowDialog, WindowEndResult } from '../../dialogs/extend-window/extend-window.dialog';
 import { ReopenWindowDialog } from '../../dialogs/reopen-window/reopen-window.dialog';
@@ -25,26 +24,19 @@ const PUBLISH_FLAG = '1';
 const DIALOG_WIDTH = '35rem';
 const NARROW_DIALOG_WIDTH = '28rem';
 
-interface WindowStatus {
-    key: string;
-    moment: string;
-}
-
 @Component({
     selector: 'app-publications-dashboard-page',
     imports: [
-        FormsModule,
         RouterLink,
         TranslocoPipe,
         ButtonModule,
-        SelectModule,
         ProgressSpinnerModule,
         WeekGridComponent,
         WeekGridLegendComponent,
-        PublicationStateTagComponent,
         SlotCountCellComponent,
         PublicationStatChipComponent,
         ShareLinkBoxComponent,
+        PublicationWeekHeadingComponent,
     ],
     providers: [DialogService],
     templateUrl: './publications-dashboard.page.html',

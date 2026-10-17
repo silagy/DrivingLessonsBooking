@@ -21,3 +21,26 @@
     font-size: 0.78rem;
     color: var(--app-text-secondary);
 }
+
+@media screen and (max-width: 639px) {
+    :host {
+        display: block;
+    }
+
+    .stat-chip {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        block-size: 100%;
+        padding: 0.625rem 0.75rem;
+    }
+
+    .stat-chip__value {
+        font-size: 1.375rem;
+    }
+
+    .stat-chip__label {
+        font-size: 0.8125rem;
+        line-height: 1.3;
+    }
+}

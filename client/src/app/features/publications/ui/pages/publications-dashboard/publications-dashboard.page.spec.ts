@@ -86,7 +86,7 @@ async function renderFixture(
 function weekPickerModel(fixture: ComponentFixture<PublicationsDashboardPage>): NgModel {
     const weekPicker = fixture.debugElement
         .queryAll(By.directive(NgModel))
-        .find((element) => (element.nativeElement as HTMLElement).matches('.dashboard__week-select'));
+        .find((element) => (element.nativeElement as HTMLElement).matches('.week-heading__week-select'));
 
     return weekPicker!.injector.get(NgModel);
 }
@@ -130,7 +130,7 @@ describe('PublicationsDashboardPage', () => {
         const page = await render(store);
 
         //then
-        expect(page.querySelector('.dashboard__week-select .p-select-label')?.textContent?.trim()).toBe(WEEK_LABEL);
+        expect(page.querySelector('.week-heading__week-select .p-select-label')?.textContent?.trim()).toBe(WEEK_LABEL);
     });
 
     it('explains that the week is not prepared and links to weekly prep', async () => {
@@ -211,7 +211,7 @@ describe('PublicationsDashboardPage', () => {
 
         //then
         expect(buttonLabels(page)).toEqual(['publications.reopenWindow', 'publications.downloadExcel']);
-        expect(page.querySelector('.dashboard__teacher-select')).not.toBeNull();
+        expect(page.querySelector('.week-heading__teacher-select')).not.toBeNull();
     });
 
     it('hides the Teacher picker from a Teacher', async () => {
@@ -222,7 +222,7 @@ describe('PublicationsDashboardPage', () => {
         const page = await render(store);
 
         //then
-        expect(page.querySelector('.dashboard__teacher-select')).toBeNull();
+        expect(page.querySelector('.week-heading__teacher-select')).toBeNull();
     });
 
     it('keeps refresh and the Excel download for a Teacher while the week is open, without extending', async () => {
@@ -285,7 +285,7 @@ describe('PublicationsDashboardPage', () => {
         const page = await render(store);
 
         //then
-        expect(page.querySelector('.dashboard__only-yours')?.textContent?.trim()).toBe(
+        expect(page.querySelector('.week-heading__only-yours')?.textContent?.trim()).toBe(
             'publications.dashboard.onlyYours',
         );
     });
@@ -300,9 +300,64 @@ describe('PublicationsDashboardPage', () => {
         const page = await render(store);
 
         //then
-        const label = page.querySelector('.dashboard__teacher-select .p-select-label');
+        const label = page.querySelector('.week-heading__teacher-select .p-select-label');
         expect(label?.textContent).toContain('Teacher Cohen');
-        expect(label?.querySelector('.dashboard__me')?.textContent?.trim()).toBe('publications.me');
-        expect(page.querySelector('.dashboard__only-yours')).toBeNull();
+        expect(label?.querySelector('.week-heading__me')?.textContent?.trim()).toBe('publications.me');
+        expect(page.querySelector('.week-heading__only-yours')).toBeNull();
+    });
+
+    it('offers Extend deadline next to the window status for a phone', async () => {
+        //given
+        const store = fakeStore({});
+
+        //when
+        const page = await render(store);
+
+        //then
+        const extend = page.querySelector('.week-heading__window-line .week-heading__extend .p-button-label');
+        expect(extend?.textContent?.trim()).toBe('publications.extendWindow');
+    });
+
+    it('extends the window from the phone button', async () => {
+        //given
+        const fixture = await renderFixture(fakeStore({}));
+        const page = fixture.componentInstance as unknown as { onExtend: () => void };
+        const onExtend = vi.spyOn(page, 'onExtend').mockImplementation(() => undefined);
+
+        //when
+        (fixture.nativeElement as HTMLElement)
+            .querySelector<HTMLButtonElement>('.week-heading__window-line button.week-heading__extend')
+            ?.click();
+
+        //then
+        expect(onExtend).toHaveBeenCalledTimes(1);
+    });
+
+    it('titles the week without the teacher separator for a phone', async () => {
+        //given
+        const store = fakeStore({});
+
+        //when
+        const page = await render(store);
+
+        //then
+        const title = page.querySelector('.week-heading__week');
+        expect(title?.querySelector('.week-heading__wide-only')?.textContent?.trim()).toBe(
+            'publications.dashboard.weekTitle',
+        );
+        expect(title?.querySelector('.week-heading__phone-only')?.textContent?.trim()).toBe(
+            'publications.dashboard.weekTitleAlone',
+        );
+    });
+
+    it('leaves the phone Extend out for a Teacher', async () => {
+        //given
+        const store = fakeStore({ ...AS_TEACHER });
+
+        //when
+        const page = await render(store);
+
+        //then
+        expect(page.querySelector('.week-heading__extend')).toBeNull();
     });
 });

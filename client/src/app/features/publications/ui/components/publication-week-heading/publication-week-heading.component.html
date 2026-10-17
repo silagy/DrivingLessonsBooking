@@ -1,0 +1,63 @@
+<div class="week-heading__title-row">
+    <h2 class="week-heading__title">
+        @if (canChooseTeacher()) {
+            <p-select
+                styleClass="week-heading__teacher-select"
+                [options]="teachers()"
+                optionLabel="name"
+                optionValue="id"
+                [ngModel]="selectedTeacherId()"
+                (ngModelChange)="teacherSelected.emit($event)"
+                [placeholder]="'publications.selectTeacher' | transloco"
+                [ariaLabel]="'publications.selectTeacher' | transloco">
+                <ng-template pTemplate="selectedItem" let-teacher>
+                    <span>{{ teacher.name }}</span>
+                    @if (teacher.isMe) {
+                        <span class="week-heading__me">{{ 'publications.me' | transloco }}</span>
+                    }
+                </ng-template>
+                <ng-template pTemplate="item" let-teacher>
+                    <span>{{ teacher.name }}</span>
+                    @if (teacher.isMe) {
+                        <span class="week-heading__me">{{ 'publications.me' | transloco }}</span>
+                    }
+                </ng-template>
+            </p-select>
+        }
+        @if (weekNumber(); as weekNumber) {
+            <span class="week-heading__week">
+                <span class="week-heading__wide-only">{{ 'publications.dashboard.weekTitle' | transloco: { weekNumber } }}</span>
+                <span class="week-heading__phone-only">{{ 'publications.dashboard.weekTitleAlone' | transloco: { weekNumber } }}</span>
+            </span>
+        }
+    </h2>
+    @if (state(); as state) {
+        <app-publication-state-tag [state]="state" />
+    }
+</div>
+@if (!canChooseTeacher()) {
+    <p class="week-heading__only-yours">{{ 'publications.dashboard.onlyYours' | transloco }}</p>
+}
+<div class="week-heading__subtitle">
+    <p-select
+        styleClass="week-heading__week-select"
+        [options]="weekChoices()"
+        optionLabel="label"
+        optionValue="weekStart"
+        [ngModel]="selectedWeekStart()"
+        (ngModelChange)="weekPicked.emit($event)"
+        [ariaLabel]="'publications.week' | transloco" />
+    <div class="week-heading__window-line">
+        @if (windowStatus(); as status) {
+            <span class="week-heading__window">{{ status.key | transloco: { moment: status.moment } }}</span>
+        }
+        @if (canExtend()) {
+            <p-button
+                class="week-heading__phone-only"
+                styleClass="week-heading__extend"
+                [label]="'publications.extendWindow' | transloco"
+                text
+                (onClick)="extendRequested.emit()" />
+        }
+    </div>
+</div>

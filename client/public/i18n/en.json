@@ -397,6 +397,7 @@
       "publishedNotice": "Submissions open automatically at {{opensAt}}.",
       "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher.",
       "weekTitle": "- Week {{weekNumber}}",
+      "weekTitleAlone": "Week {{weekNumber}}",
       "opensAt": "Submissions open {{moment}}",
       "closesAt": "Submissions close {{moment}}",
       "closedAt": "Submissions closed {{moment}}",
