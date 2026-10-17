@@ -67,7 +67,7 @@ Where the code differs from the tasks below, and why:
 - **The dashboard's count cells got task 4's fallback**: a 1rem number, 48px cells, and the "requests" caption and "Unavailable" label visually hidden on the phone. They were 58px wide in 38px columns.
 - **Header buttons, the dock link and the history card action use `block-size: 2.75rem`**, not `min-block-size`; PrimeNG's padding made them 46 to 48px.
 - **Selects stay 42px tall** (decision 8), the one known `shortTargets` entry on Weekly prep.
-- **Still overflowing at 390px, not designed yet:** `/students` (408px in Hebrew, table), `/publications` (453px in Hebrew, 522px in English, the action buttons), and `/users` (table clipped inside its card).
+- **Still overflowing at 390px, not designed yet:** `/students` (408px in Hebrew, table), `/publications` (453px in Hebrew, 522px in English, the action buttons), and `/users` (table clipped inside its card). Designed in frames 06 to 09 and fixed by [Students, Users and Publications on a phone](../admin-mobile-pages-plan/README.md).
 
 ## Global Constraints
 

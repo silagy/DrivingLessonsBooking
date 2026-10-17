@@ -49,6 +49,32 @@ Business rules, stores and API calls don't change.
 | 13 | **Flags on a card are 13px** (rule 11): the card sets the `app-car-flag` / `app-deleted-flag` font size; the flag components don't change. |
 | 14 | **Verification is in the browser pane, so execution is native.** |
 
+## As built (after execution)
+
+Where the code differs from the tasks below, and why:
+
+- **More pieces became components, for the 4 kB style budget.** The budget counts each component's compressed CSS. With their phone blocks, `users.page.scss` reached 4.48 kB and `publications-dashboard.page.scss` 4.82 kB (warnings), and `students.page.scss` 7.88 kB, 120 bytes under the 8 kB error. Global utility classes weren't an option: component styles are unlayered, so they beat anything in `@layer app` whatever its specificity. So:
+  - `PublicationWeekHeadingComponent` (`features\publications\ui\components\publication-week-heading\`) holds the dashboard's teacher select, week title, state tag, only-yours note, week select, window status and the phone-only Extend (`teacherSelected`, `weekPicked`, `extendRequested` outputs). Its classes are `week-heading__*`; the page spec's selectors follow. `WindowStatus` moved to `features\publications\domain\window-status.model.ts`.
+  - `StudentsEmptyStateComponent` (`icon`, `titleKey`, `hintKey` inputs, actions projected) replaces the two copies of the empty-state markup (no Students yet, no match).
+  - `NoOtherUsersComponent` (`disabled` input, `addRequested` output) is the Users "only you" empty state.
+  - Result: users 3.64 kB, dashboard 1.94 kB, week heading 2.96 kB, students 7.11 kB (its warning predates this plan; it was 6.68 kB). No new budget warning.
+- **The share link stacks on a phone.** A real link is about 67 characters (the host plus a long token), so next to the Copy button it wrapped to four lines. The link takes the full width (two lines) and Copy is a full-width 44px button under it. Decision 11 is otherwise as planned.
+- **One more phone-only label: `publications.dashboard.weekTitleAlone`** ("שבוע {{weekNumber}}" / "Week {{weekNumber}}"). `weekTitle` starts with "- ", the separator after the teacher name on the desktop's single line; on its own phone line it read "- שבוע 43".
+- **Tags are captions in the measurement.** The design sets tags at 11 to 12px (frame 06 `.tag`, `.tag.sm`), so the phone measurement's caption list adds `.p-tag, app-transmission-tag`.
+- **Header buttons get `padding-inline: 1rem` on a phone** (frame 05's `.btn` uses 18px). PrimeNG's 26px padding pushed "ייבוא רשימה" 3px past its half-width button at 360px.
+- **The Deleted User card has no bottom padding** instead of a negative margin on Restore: the margin sat on the inner button and didn't reach the `p-button` host, leaving a gap under the row.
+- **Not verified in the browser:** the Published state (no dev week was Published; it has no actions, so the row is hidden by `:empty`, covered by CSS only), and a Teacher-role User's heading (no Teacher sign-in in the dev data; the spec covers that the select and the phone Extend are left out). The Copy button's toast showed the clipboard error in the browser pane; the copy path wasn't changed, only the button's size.
+
+Measured at the end (dev data, `pageScrollWidth`, all with no clipping and no small text):
+
+| Page | 390 he | 390 en | 360 he | 360 en |
+|------|--------|--------|--------|--------|
+| `/students` | 390 | 390 | 360 | 360 |
+| `/users` | 390 | 390 | 360 | 360 |
+| `/publications` (Open, Closed, Draft, none) | 390 | 390 | 360 | 360 |
+
+Dashboard count cells: 44px at 390, 39px at 360 (rule 17). The only `shortTargets` entry is the Students teacher select at 42px (parent decision 8).
+
 ## Global Constraints
 
 The parent plan's apply unchanged: standalone, OnPush, signals; logical CSS properties; no `!important`; `::ng-deep` only under `:host`; tokens only, no hex; every new string a key in `he.json` and `en.json`; no long dashes or ellipsis characters in source (`source-text.spec.ts`); desktop re-measured at 1280px after each task.
@@ -77,6 +103,10 @@ Commands (from `client\`, PowerShell), the dev servers and sign-in are as in the
 | `client\src\app\features\publications\ui\components\publication-stat-chip\*.scss` | Stacked chip on a phone | 3 |
 | `client\src\app\features\publications\ui\components\share-link-box\*.scss` | Wrapping link, 44px copy | 3 |
 | `client\public\i18n\he.json`, `en.json` | `students.importRosterShort` | 1 |
+| `client\src\app\features\publications\ui\components\publication-week-heading\*` | As built: the dashboard heading, for the style budget | 3 |
+| `client\src\app\features\publications\domain\window-status.model.ts` | As built: `WindowStatus`, shared by the page and the heading | 3 |
+| `client\src\app\features\students\ui\components\students-empty-state\*` | As built: one empty state for both Students cases | 3 |
+| `client\src\app\features\users\ui\components\no-other-users\*` | As built: the Users "only you" empty state | 3 |
 | `docs\modules\admin-mobile\admin-mobile-plan\README.md` | "Still overflowing" line points here | 4 |
 
 ## Execution Order
