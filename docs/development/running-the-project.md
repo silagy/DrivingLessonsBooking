@@ -204,7 +204,7 @@ DriveCal installs as an app ([ADR 0008](../decisions/0008-installable-app-withou
 - **Chrome on Android:** the install banner, or the browser menu → "Install app".
 - **Safari on iPhone or iPad:** Share → "Add to Home Screen".
 
-The app loads the latest deploy whenever it starts, because only the offline page is cached. An app left open across a deploy shows "A new version of DriveCal is ready" with Refresh when it comes back to the screen. Installing works on `https://drivecal.co.il` and on `http://localhost` only. The student form doesn't offer it.
+The app loads the latest deploy whenever it starts, because only the offline page is cached. An app left open across a deploy shows "A new version of DriveCal is ready" with Refresh and "Not now" when it comes back to the screen; "Not now" hides it until the next time. Installing works on `https://drivecal.co.il` and on `http://localhost` only. The student form doesn't offer it.
 
 The Claude desktop browser pane can't register service workers; check the worker in Chrome or Edge.
 

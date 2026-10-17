@@ -1,4 +1,4 @@
-import { DOCUMENT, inject, Injectable, signal } from '@angular/core';
+import { computed, DOCUMENT, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AppPageApiService } from './app-page-api.service';
 
@@ -15,11 +15,18 @@ export class NewVersionStore {
 
   private readonly ready = signal(false);
   private readonly checking = signal(false);
+  private readonly dismissed = signal(false);
 
   readonly isReady = this.ready.asReadonly();
+  readonly isShown = computed(() => this.ready() && !this.dismissed());
 
   async check(): Promise<void> {
-    if (this.ready() || this.checking()) {
+    if (this.ready()) {
+      this.dismissed.set(false);
+      return;
+    }
+
+    if (this.checking()) {
       return;
     }
 
@@ -36,6 +43,10 @@ export class NewVersionStore {
     } finally {
       this.checking.set(false);
     }
+  }
+
+  dismiss(): void {
+    this.dismissed.set(true);
   }
 
   reload(): void {

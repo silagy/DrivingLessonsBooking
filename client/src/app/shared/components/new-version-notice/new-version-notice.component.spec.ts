@@ -5,8 +5,9 @@ import { NewVersionStore } from '../../../core/pwa/new-version.store';
 import { NewVersionNoticeComponent } from './new-version-notice.component';
 
 describe('NewVersionNoticeComponent', () => {
-    let isReady: ReturnType<typeof signal<boolean>>;
+    let isShown: ReturnType<typeof signal<boolean>>;
     let reload: ReturnType<typeof vi.fn>;
+    let dismiss: ReturnType<typeof vi.fn>;
 
     async function renderNotice(): Promise<ComponentFixture<NewVersionNoticeComponent>> {
         TestBed.configureTestingModule({
@@ -14,7 +15,7 @@ describe('NewVersionNoticeComponent', () => {
                 TranslocoTestingModule.forRoot({
                     langs: {
                         en: {
-                            pwa: { newVersionReady: 'A new version of DriveCal is ready.' },
+                            pwa: { newVersionReady: 'A new version of DriveCal is ready.', later: 'Not now' },
                             general: { refresh: 'Refresh' },
                         },
                     },
@@ -22,7 +23,10 @@ describe('NewVersionNoticeComponent', () => {
                     preloadLangs: true,
                 }),
             ],
-            providers: [provideZonelessChangeDetection(), { provide: NewVersionStore, useValue: { isReady, reload } }],
+            providers: [
+                provideZonelessChangeDetection(),
+                { provide: NewVersionStore, useValue: { isShown, reload, dismiss } },
+            ],
         });
         const fixture = TestBed.createComponent(NewVersionNoticeComponent);
         await fixture.whenStable();
@@ -30,46 +34,65 @@ describe('NewVersionNoticeComponent', () => {
         return fixture;
     }
 
-    beforeEach(() => {
-        isReady = signal(false);
-        reload = vi.fn();
-    });
-
-    it('shows nothing while the running version is current', async () => {
-        //given
+    async function renderShownNotice(): Promise<HTMLElement> {
         const fixture = await renderNotice();
-
-        //when
-        const notice = (fixture.nativeElement as HTMLElement).querySelector('[role=status]');
-
-        //then
-        expect(notice).toBeNull();
-    });
-
-    it('offers a refresh once a new version is ready', async () => {
-        //given
-        const fixture = await renderNotice();
-        isReady.set(true);
+        isShown.set(true);
         await fixture.whenStable();
 
+        return fixture.nativeElement as HTMLElement;
+    }
+
+    beforeEach(() => {
+        isShown = signal(false);
+        reload = vi.fn();
+        dismiss = vi.fn();
+    });
+
+    it('keeps an empty live region in the page while the running version is current', async () => {
+        //given
+        const fixture = await renderNotice();
+
         //when
-        const notice = (fixture.nativeElement as HTMLElement).querySelector('[role=status]');
+        const liveRegion = (fixture.nativeElement as HTMLElement).querySelector('[role=status]');
+
+        //then
+        expect(liveRegion?.textContent?.trim()).toBe('');
+        expect(liveRegion?.querySelector('.new-version')).toBeNull();
+    });
+
+    it('announces a new version inside the live region', async () => {
+        //given
+        const element = await renderShownNotice();
+
+        //when
+        const notice = element.querySelector('[role=status] .new-version');
 
         //then
         expect(notice?.textContent).toContain('A new version of DriveCal is ready.');
-        expect(notice?.querySelector('button')?.textContent).toContain('Refresh');
+        expect(notice?.querySelector('.new-version__refresh')?.textContent).toContain('Refresh');
+        expect(notice?.querySelector('.new-version__later')?.textContent).toContain('Not now');
     });
 
     it('reloads into the new version when the User asks', async () => {
         //given
-        const fixture = await renderNotice();
-        isReady.set(true);
-        await fixture.whenStable();
+        const element = await renderShownNotice();
 
         //when
-        (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('[role=status] button')?.click();
+        element.querySelector<HTMLButtonElement>('.new-version__refresh')?.click();
 
         //then
         expect(reload).toHaveBeenCalledOnce();
+    });
+
+    it('puts the notice off when the User asks', async () => {
+        //given
+        const element = await renderShownNotice();
+
+        //when
+        element.querySelector<HTMLButtonElement>('.new-version__later')?.click();
+
+        //then
+        expect(dismiss).toHaveBeenCalledOnce();
+        expect(reload).not.toHaveBeenCalled();
     });
 });

@@ -4,9 +4,10 @@
   inset-block-end: 1rem;
   z-index: 1000;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem 1rem;
   max-inline-size: 28rem;
   margin-inline: auto;
   padding-block: 0.75rem;
@@ -18,6 +19,13 @@
   box-shadow: var(--app-shadow-lift);
 }
 
+.new-version__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+
+.new-version__later,
 .new-version__refresh {
   flex-shrink: 0;
   min-block-size: 2.5rem;
@@ -25,17 +33,30 @@
   padding-inline: 1rem;
   border: none;
   border-radius: var(--app-radius-field);
-  background: var(--p-primary-color);
-  color: var(--p-primary-contrast-color);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+}
+
+.new-version__later {
+  background: transparent;
+  color: var(--app-text-secondary);
+}
+
+.new-version__later:hover {
+  background: var(--app-bg-muted);
+}
+
+.new-version__refresh {
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
 }
 
 .new-version__refresh:hover {
   background: var(--p-primary-hover-color);
 }
 
+.new-version__later:focus-visible,
 .new-version__refresh:focus-visible {
   outline: 2px solid var(--p-primary-color);
   outline-offset: 2px;

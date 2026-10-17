@@ -750,6 +750,7 @@
     "emailInvalid": "Enter a valid email address"
   },
   "pwa": {
-    "newVersionReady": "A new version of DriveCal is ready."
+    "newVersionReady": "A new version of DriveCal is ready.",
+    "later": "Not now"
   }
 }

@@ -93,6 +93,37 @@ describe('NewVersionStore', () => {
         http.verify();
     });
 
+    it('hides the notice when the User puts it off', async () => {
+        //given
+        const store = TestBed.inject(NewVersionStore);
+        const checking = store.check();
+        TestBed.inject(HttpTestingController).expectOne('/index.html').flush(servedPage('main-BBBBBBBB.js'));
+        await checking;
+
+        //when
+        store.dismiss();
+
+        //then
+        expect(store.isShown()).toBe(false);
+    });
+
+    it('shows the notice again when the app comes back after the User put it off', async () => {
+        //given
+        const store = TestBed.inject(NewVersionStore);
+        const http = TestBed.inject(HttpTestingController);
+        const checking = store.check();
+        http.expectOne('/index.html').flush(servedPage('main-BBBBBBBB.js'));
+        await checking;
+        store.dismiss();
+
+        //when
+        await store.check();
+
+        //then
+        expect(store.isShown()).toBe(true);
+        http.verify();
+    });
+
     it('asks the server once while a check is in flight', async () => {
         //given
         const store = TestBed.inject(NewVersionStore);
