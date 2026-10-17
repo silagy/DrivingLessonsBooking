@@ -9,12 +9,14 @@ import { routes } from './app.routes';
 import { AppPreset } from './theme/app-preset';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { authInterceptor } from './core/auth.interceptor';
+import { providePwa } from './core/pwa/provide-pwa';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor])),
+    providePwa(),
     MessageService,
     providePrimeNG({
       theme: {
