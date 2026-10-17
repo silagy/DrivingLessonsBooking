@@ -27,6 +27,7 @@ import { StudentsStore } from '../../../state/students.store';
 import { CarFlagComponent } from '../../components/car-flag/car-flag.component';
 import { DeletedFlagComponent } from '../../components/deleted-flag/deleted-flag.component';
 import { StudentCardComponent } from '../../components/student-card/student-card.component';
+import { StudentsEmptyStateComponent } from '../../components/students-empty-state/students-empty-state.component';
 import { TransmissionTagComponent } from '../../components/transmission-tag/transmission-tag.component';
 import { AddStudentDialog } from '../../dialogs/add-student/add-student.dialog';
 import { AddStudentDialogData } from '../../dialogs/add-student/add-student-dialog-data';
@@ -70,6 +71,7 @@ interface StatusOption {
         CarFlagComponent,
         DeletedFlagComponent,
         StudentCardComponent,
+        StudentsEmptyStateComponent,
     ],
     templateUrl: './students.page.html',
     styleUrl: './students.page.scss',

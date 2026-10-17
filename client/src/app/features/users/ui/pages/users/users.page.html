@@ -114,17 +114,7 @@
       <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" />
 
       @if (store.hasOnlyOneUser()) {
-        <div class="users__empty">
-          <span class="users__empty-icon" aria-hidden="true"><i class="pi pi-user"></i></span>
-          <p class="users__empty-title">{{ 'users.emptyTitle' | transloco }}</p>
-          <p class="users__empty-hint">{{ 'users.emptyHint' | transloco }}</p>
-          <p-button
-            class="users__empty-action"
-            [label]="'users.addUser' | transloco"
-            size="small"
-            [disabled]="store.isMutating()"
-            (onClick)="onAddUser()" />
-        </div>
+        <app-no-other-users [disabled]="store.isMutating()" (addRequested)="onAddUser()" />
       } @else {
         <p class="users__footer">{{ 'users.footer' | transloco: { count: store.users().length } }}</p>
       }

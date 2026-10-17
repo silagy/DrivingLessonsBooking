@@ -1,0 +1,11 @@
+<div class="no-other-users">
+  <span class="no-other-users__icon" aria-hidden="true"><i class="pi pi-user"></i></span>
+  <p class="no-other-users__title">{{ 'users.emptyTitle' | transloco }}</p>
+  <p class="no-other-users__hint">{{ 'users.emptyHint' | transloco }}</p>
+  <p-button
+    class="no-other-users__action"
+    [label]="'users.addUser' | transloco"
+    size="small"
+    [disabled]="disabled()"
+    (onClick)="addRequested.emit()" />
+</div>

@@ -1,0 +1,8 @@
+<div class="students-empty">
+  <span class="students-empty__icon" aria-hidden="true"><i class="pi" [class]="icon()"></i></span>
+  <p class="students-empty__title">{{ titleKey() | transloco }}</p>
+  <p class="students-empty__hint">{{ hintKey() | transloco }}</p>
+  <div class="students-empty__actions">
+    <ng-content />
+  </div>
+</div>

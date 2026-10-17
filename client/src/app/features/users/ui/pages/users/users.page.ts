@@ -14,6 +14,7 @@ import { ChangeUserRoleRequest } from '../../../data/change-user-role.request';
 import { Role } from '../../../../../shared/models/role.enum';
 import { User } from '../../../domain/user.model';
 import { UsersStore } from '../../../state/users.store';
+import { NoOtherUsersComponent } from '../../components/no-other-users/no-other-users.component';
 import { UserCardComponent } from '../../components/user-card/user-card.component';
 import { AddUserDialog, AddUserDialogData, AddUserResult } from '../../dialogs/add-user/add-user.dialog';
 import { ChangeUserRoleDialog } from '../../dialogs/change-user-role/change-user-role.dialog';
@@ -32,6 +33,7 @@ import { UserDialogData } from '../../dialogs/user-dialog-data';
         ProgressSpinnerModule,
         TableModule,
         TagModule,
+        NoOtherUsersComponent,
         UserCardComponent,
     ],
     templateUrl: './users.page.html',

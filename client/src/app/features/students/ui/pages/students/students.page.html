@@ -105,25 +105,20 @@
         <p-button [label]="'students.retry' | transloco" text size="small" (onClick)="store.reload()" />
       </div>
     } @else if (store.isEmpty()) {
-      <div class="students__empty">
-        <span class="students__empty-icon" aria-hidden="true"><i class="pi pi-user"></i></span>
-        <p class="students__empty-title">{{ 'students.emptyTitle' | transloco }}</p>
-        <p class="students__empty-hint">{{ 'students.emptyHint' | transloco }}</p>
-        <div class="students__empty-actions">
-          <a
-            pButton
-            severity="secondary"
-            [outlined]="true"
-            size="small"
-            [label]="'students.importRoster' | transloco"
-            [routerLink]="importRosterLink"></a>
-          <p-button
-            [label]="'students.addStudent' | transloco"
-            size="small"
-            [disabled]="store.isMutating()"
-            (onClick)="onAddStudent()" />
-        </div>
-      </div>
+      <app-students-empty-state icon="pi-user" titleKey="students.emptyTitle" hintKey="students.emptyHint">
+        <a
+          pButton
+          severity="secondary"
+          [outlined]="true"
+          size="small"
+          [label]="'students.importRoster' | transloco"
+          [routerLink]="importRosterLink"></a>
+        <p-button
+          [label]="'students.addStudent' | transloco"
+          size="small"
+          [disabled]="store.isMutating()"
+          (onClick)="onAddStudent()" />
+      </app-students-empty-state>
     } @else {
       <div class="students__table-wrap">
         <p-table [value]="store.visibleStudents()" dataKey="id">
@@ -258,18 +253,13 @@
 </div>
 
 <ng-template #noMatch>
-  <div class="students__empty">
-    <span class="students__empty-icon" aria-hidden="true"><i class="pi pi-search"></i></span>
-    <p class="students__empty-title">{{ 'students.noMatchTitle' | transloco }}</p>
-    <p class="students__empty-hint">{{ 'students.noMatchHint' | transloco }}</p>
-    <div class="students__empty-actions">
-      <p-button
-        styleClass="students__clear-filters"
-        [label]="'students.clearFilters' | transloco"
-        severity="secondary"
-        [outlined]="true"
-        size="small"
-        (onClick)="store.clearFilters()" />
-    </div>
-  </div>
+  <app-students-empty-state icon="pi-search" titleKey="students.noMatchTitle" hintKey="students.noMatchHint">
+    <p-button
+      styleClass="students__clear-filters"
+      [label]="'students.clearFilters' | transloco"
+      severity="secondary"
+      [outlined]="true"
+      size="small"
+      (onClick)="store.clearFilters()" />
+  </app-students-empty-state>
 </ng-template>
