@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+  <title>דרייבקל</title>
+  <style>
+    body {
+      margin: 0;
+      background: #FBFBFF;
+      color: #121418;
+      font-family: 'Helvetica Neue', Arial, 'Liberation Sans', sans-serif;
+    }
+
+    main {
+      max-inline-size: 28rem;
+      margin-inline: auto;
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+
+    svg {
+      display: block;
+      margin-inline: auto;
+      margin-block-end: 1.5rem;
+    }
+
+    h1 {
+      margin-block: 0 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    p {
+      margin-block: 0 1.25rem;
+      color: #52555C;
+      line-height: 1.5;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding-block: 0.625rem;
+      padding-inline: 1.25rem;
+      background: #0057FF;
+      color: #FFFFFF;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    section + section {
+      border-block-start: 1px solid #E6E8F6;
+      margin-block-start: 2rem;
+      padding-block-start: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="19" fill="#003293"/>
+      <path d="M6.06 16A14.5 14.5 0 0 1 33.94 16C29 16.5 25 12 20 12S11 16.5 6.06 16Z" fill="#FFFFFF"/>
+      <path d="M5.9 23.5C10 23.5 14 25.5 15.5 30L16 34A14.5 14.5 0 0 1 5.9 23.5Z" fill="#FFFFFF"/>
+      <path d="M34.1 23.5C30 23.5 26 25.5 24.5 30L24 34A14.5 14.5 0 0 0 34.1 23.5Z" fill="#FFFFFF"/>
+      <circle cx="20" cy="21.5" r="4.6" fill="none" stroke="#7BAEFF" stroke-width="2.2"/>
+    </svg>
+    <section>
+      <h1>אין חיבור לאינטרנט</h1>
+      <p>דרייבקל צריך חיבור כדי להציג נתונים עדכניים. בדקו את החיבור לאינטרנט ונסו שוב.</p>
+      <button type="button" onclick="location.reload()">נסו שוב</button>
+    </section>
+    <section lang="en" dir="ltr">
+      <h1>No internet connection</h1>
+      <p>DriveCal needs a connection to show current data. Check your connection and try again.</p>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </section>
+  </main>
+</body>
+</html>

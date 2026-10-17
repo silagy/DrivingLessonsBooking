@@ -63,6 +63,25 @@ describe('pwa assets', () => {
         expect(page).toContain('<meta name="apple-mobile-web-app-title" content="דרייבקל">');
     });
 
+    it('offline page stands alone, in hebrew and english', () => {
+        //when
+        const page = publicText('offline.html');
+
+        //then
+        expect(page).toContain('<html lang="he" dir="rtl">');
+        expect(page).toContain('<title>דרייבקל</title>');
+        expect(page).toContain('אין חיבור לאינטרנט');
+        expect(page).toContain('דרייבקל צריך חיבור כדי להציג נתונים עדכניים. בדקו את החיבור לאינטרנט ונסו שוב.');
+        expect(page).toContain('נסו שוב');
+        expect(page).toContain('lang="en" dir="ltr"');
+        expect(page).toContain('No internet connection');
+        expect(page).toContain('DriveCal needs a connection to show current data. Check your connection and try again.');
+        expect(page).toContain('Try again');
+        expect(page).toContain('onclick="location.reload()"');
+        expect(page).toContain('cx="20" cy="20" r="19"');
+        expect(page).not.toMatch(/<script\s[^>]*src|<link|<img|url\(/);
+    });
+
     it('writes the public text files with a plain hyphen and three dots', () => {
         //when
         const offending = readdirSync('public', { recursive: true })
