@@ -13,7 +13,7 @@ Part of [Installable DriveCal app](README.md). Read the README's Global Constrai
 - Produces:
   - `registerServiceWorker(container: ServiceWorkerContainer | undefined): Promise<void>`: calls `container.register('/sw.js', { scope: '/' })`; resolves without calling anything when `container` is `undefined`; resolves (never rejects) when `register` rejects.
   - `holdBackInstallPromptOnStudentForm(target: Window): void`: adds a `beforeinstallprompt` listener to `target` that calls `event.preventDefault()` when `target.location.pathname` starts with `` `/${AppRoutes.studentForm}/` ``. The path is read when the event fires, not when the listener is added, because the browser fires the event after the app has routed.
-  - `providePwa(): EnvironmentProviders`: `provideAppInitializer` that takes `inject(DOCUMENT).defaultView`, and when it isn't null calls `holdBackInstallPromptOnStudentForm(view)` and starts `registerServiceWorker('serviceWorker' in view.navigator ? view.navigator.serviceWorker : undefined)` without awaiting it, so startup never waits for the worker.
+  - `providePwa(): EnvironmentProviders`: `provideAppInitializer` that takes `inject(DOCUMENT).defaultView`, and when it isn't null calls `holdBackInstallPromptOnStudentForm(view)` and starts `registerServiceWorker('serviceWorker' in view.navigator ? view.navigator.serviceWorker : undefined)` without awaiting it, so startup never waits for the worker. Task 4 adds a third job to this initializer.
   - `appConfig.providers` gains `providePwa()` after `provideHttpClient(...)`.
 
 - [ ] **Step 1: Write the failing specs**

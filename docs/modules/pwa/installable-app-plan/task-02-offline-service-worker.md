@@ -10,7 +10,7 @@ Part of [Installable DriveCal app](README.md). Read the README's Global Constrai
 
 **Interfaces:**
 - Consumes: `publicText(path)` from task 1's `pwa-assets.spec.ts`.
-- Produces: `/sw.js`, a classic (non-module) worker script that task 3 registers with `navigator.serviceWorker.register('/sw.js', { scope: '/' })`; `/offline.html`. Task 4 checks both in the browser.
+- Produces: `/sw.js`, a classic (non-module) worker script that task 3 registers with `navigator.serviceWorker.register('/sw.js', { scope: '/' })`; `/offline.html`. Task 5 checks both in the browser.
 
 ## The worker's behavior
 
