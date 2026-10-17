@@ -410,3 +410,84 @@
 ::ng-deep [dir='rtl'] .students-menu__item--mirrored-icon .p-menu-item-icon {
     transform: scaleX(-1);
 }
+
+.students__cards,
+.students__phone-only-link {
+    display: none;
+}
+
+@media screen and (max-width: 639px) {
+    .students__header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .students__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    :host ::ng-deep :is(.students__actions .p-button, .students__clear-filters.p-button) {
+        inline-size: 100%;
+        block-size: 2.75rem;
+        padding-inline: 1rem;
+        white-space: nowrap;
+    }
+
+    .students__wide-only-link,
+    .students__table-wrap {
+        display: none;
+    }
+
+    .students__phone-only-link {
+        display: inline-flex;
+    }
+
+    :host ::ng-deep .students__status.p-selectbutton {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+
+        .p-togglebutton {
+            block-size: 2.75rem;
+        }
+    }
+
+    .students__card--list {
+        background: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+    }
+
+    .students__cards {
+        display: flex;
+        flex-direction: column;
+        gap: 0.625rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .students__no-match {
+        background: var(--app-bg-card);
+        border: 1px solid var(--app-border);
+        border-radius: 14px;
+        box-shadow: var(--app-shadow-card);
+
+        .students__empty-actions {
+            align-self: stretch;
+        }
+
+        p-button {
+            flex: 1;
+        }
+    }
+
+    .students__footer {
+        padding: 1rem 0 0;
+        font-size: 0.8125rem;
+        text-align: center;
+    }
+}

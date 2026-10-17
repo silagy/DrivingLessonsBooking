@@ -139,6 +139,7 @@
     "title": "Students",
     "subtitle": "Students are the people who submit weekly requests. This list includes Students from the Roster and Students added by hand.",
     "importRoster": "Import Roster",
+    "importRosterShort": "Import Roster",
     "filters": {
       "teacher": "Teacher",
       "allTeachers": "All Teachers",

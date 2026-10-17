@@ -1,0 +1,114 @@
+.student-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 0.875rem 0.875rem 1.25rem;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: 14px;
+    box-shadow: var(--app-shadow-card);
+}
+
+.student-card--new {
+    background: var(--p-sky-50);
+    border-color: var(--p-sky-100);
+}
+
+.student-card--inactive {
+    background: var(--app-bg-page);
+    box-shadow: none;
+
+    .student-card__faded {
+        opacity: 0.55;
+    }
+}
+
+.student-card__top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.student-card__avatar {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: 999px;
+    background: var(--app-steel-light);
+    color: var(--app-whale);
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.student-card__identity {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    min-inline-size: 0;
+}
+
+.student-card__name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--app-ink);
+    overflow-wrap: anywhere;
+}
+
+.student-card__tag {
+    flex: none;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.student-card__tag--new {
+    background: var(--p-sky-50);
+    color: var(--p-sky-700);
+    border-color: var(--p-sky-100);
+}
+
+:host ::ng-deep .student-card__actions.p-button {
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    margin-block: -0.5rem;
+    margin-inline: -0.5rem -0.625rem;
+}
+
+.student-card__details {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.375rem 0.875rem;
+    margin: 0;
+    font-size: 0.84375rem;
+
+    dt {
+        color: var(--app-text-secondary);
+    }
+
+    dd {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem 0.5rem;
+        min-inline-size: 0;
+        margin: 0;
+        color: var(--app-ink);
+    }
+}
+
+.student-card__ltr {
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+}
+
+:host ::ng-deep .student-card__details :is(.car-flag, .deleted-flag) {
+    font-size: 0.8125rem;
+}

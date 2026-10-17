@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Type, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -25,6 +26,7 @@ import { TeacherOption } from '../../../domain/teacher-option.model';
 import { StudentsStore } from '../../../state/students.store';
 import { CarFlagComponent } from '../../components/car-flag/car-flag.component';
 import { DeletedFlagComponent } from '../../components/deleted-flag/deleted-flag.component';
+import { StudentCardComponent } from '../../components/student-card/student-card.component';
 import { TransmissionTagComponent } from '../../components/transmission-tag/transmission-tag.component';
 import { AddStudentDialog } from '../../dialogs/add-student/add-student.dialog';
 import { AddStudentDialogData } from '../../dialogs/add-student/add-student-dialog-data';
@@ -50,6 +52,7 @@ interface StatusOption {
     selector: 'app-students-page',
     imports: [
         FormsModule,
+        NgTemplateOutlet,
         RouterLink,
         TranslocoPipe,
         InitialsPipe,
@@ -66,6 +69,7 @@ interface StatusOption {
         TransmissionTagComponent,
         CarFlagComponent,
         DeletedFlagComponent,
+        StudentCardComponent,
     ],
     templateUrl: './students.page.html',
     styleUrl: './students.page.scss',
@@ -100,6 +104,10 @@ export class StudentsPage {
     ]);
 
     protected readonly selectedTeacher = computed(() => this.store.filters().teacherId ?? ALL_TEACHERS);
+
+    protected readonly showsList = computed(
+        () => !this.store.isLoading() && !this.store.loadError() && !this.store.isEmpty(),
+    );
 
     protected onTeacherFilter(value: string): void {
         this.store.selectTeacher(value === ALL_TEACHERS ? null : value);
