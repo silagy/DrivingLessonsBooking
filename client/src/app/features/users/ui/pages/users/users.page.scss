@@ -224,3 +224,64 @@
 ::ng-deep .users-menu__item--danger .p-menu-item-label {
     color: var(--p-red-600);
 }
+
+.users__cards {
+    display: none;
+}
+
+@media screen and (max-width: 639px) {
+    .users__header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .users__add {
+        display: block;
+    }
+
+    .users__add--hidden-on-phone,
+    .users__table-wrap {
+        display: none;
+    }
+
+    :host ::ng-deep :is(.users__add, .users__empty-action) .p-button {
+        inline-size: 100%;
+        block-size: 2.75rem;
+    }
+
+    .users__card--list {
+        background: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+    }
+
+    .users__cards {
+        display: flex;
+        flex-direction: column;
+        gap: 0.625rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .users__footer {
+        padding: 1rem 0 0;
+        font-size: 0.8125rem;
+        text-align: center;
+    }
+
+    .users__empty {
+        margin-block-start: 0.625rem;
+        background: var(--app-bg-card);
+        border: 1px solid var(--app-border);
+        border-radius: 14px;
+        box-shadow: var(--app-shadow-card);
+    }
+
+    .users__empty-action {
+        align-self: stretch;
+    }
+}
