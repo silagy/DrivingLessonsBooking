@@ -11,6 +11,13 @@ public static class RosterCsvHeaders
     public const string StartDate = "תאריך התחלה";
     public const string LicenseType = "סוג רישיון";
 
+    public static readonly IReadOnlyDictionary<string, string> BeroshAliases = new Dictionary<string, string>
+    {
+        ["שם התלמיד"] = FullName,
+        ["ת.ז"] = NationalId,
+        ["סוג רשיון"] = LicenseType
+    };
+
     public static readonly string[] Required =
     [
         FullName,

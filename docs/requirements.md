@@ -98,6 +98,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 
 ### 5.5.1 Student Roster (CSV import)
 - The admin uploads a CSV; each row is one student. Columns map to: full name, national ID (identifier), phone, assigned car, assigned teacher, address, notes, start date, license type (transmission), and admin-only bookkeeping fields.
+- The Berosh export is accepted as it comes: its header names (`שם התלמיד`, `ת.ז`, `סוג רשיון`) are read as full name, national ID and license type, and its file, a CSV named `.xlsx`, can be picked on an iPad. A genuine Excel workbook is refused with "save it as CSV".
 - Re-uploading **upserts by national ID**: existing students are updated and new rows are added. Students absent from the new file are **left unchanged**: an import never deactivates a student, so students added or edited by hand survive the next import. A student in the file who is an **Inactive Student** is reactivated.
 - The assigned teacher and car strings in the CSV must resolve to existing Teacher/Car records; unresolved rows are reported as errors and skipped.
 - A row whose car is **not assigned to the row's teacher** is rejected and reported ("car is not assigned to this teacher"); the rest of the file still imports. Students who already break this rule are left as they are unless a consistent row updates them.

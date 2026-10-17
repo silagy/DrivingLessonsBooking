@@ -677,6 +677,7 @@
     "publicationMustBePublished": "השבוע הזה עדיין לא פורסם. רעננו את הדף.",
     "publicationNotFound": "הפרסום של השבוע הזה כבר לא קיים. רעננו את הדף.",
     "rankMustBePositive": "הדירוג מתחיל מ-1.",
+    "rosterFileMustBeCsv": "זהו קובץ אקסל. שמרו אותו באקסל בפורמט CSV (UTF-8) והעלו את הקובץ הזה.",
     "rosterFileMustContainRequiredColumns": "בקובץ חסרות עמודות חובה: {{columns}}.",
     "rosterFileMustNotBeEmpty": "בקובץ אין שורות תלמידים.",
     "rosterFileNameMustNotBeEmpty": "לקובץ אין שם. בחרו את הקובץ שוב.",

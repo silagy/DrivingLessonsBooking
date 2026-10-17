@@ -677,6 +677,7 @@
     "publicationMustBePublished": "This week hasn't been published yet. Refresh the page.",
     "publicationNotFound": "This week's publication no longer exists. Refresh the page.",
     "rankMustBePositive": "Ranks start at 1.",
+    "rosterFileMustBeCsv": "This is an Excel workbook. In Excel, save it as CSV (UTF-8) and upload that file.",
     "rosterFileMustContainRequiredColumns": "The file is missing required columns: {{columns}}.",
     "rosterFileMustNotBeEmpty": "The file has no student rows.",
     "rosterFileNameMustNotBeEmpty": "The file has no name. Choose the file again.",
