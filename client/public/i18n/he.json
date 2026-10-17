@@ -47,6 +47,7 @@
     "addTeacher": "הוספת מורה",
     "editTeacher": "עריכה",
     "deleteTeacher": "מחיקת מורה",
+    "editTeacherAria": "עריכת מורה",
     "confirmDeleteTeacher": "למחוק את {{name}}?",
     "addCar": "הוספת רכב",
     "edit": "עריכה",

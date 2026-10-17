@@ -6,16 +6,27 @@
       <bdi class="card__email">{{ teacher().contactEmail }}</bdi>
     </div>
     <p-button
+      styleClass="card__edit--wide"
       [label]="'teachers.editTeacher' | transloco"
       severity="secondary"
       size="small"
       text
       (onClick)="edit.emit()" />
     <p-button
+      styleClass="card__edit--compact"
+      icon="pi pi-pencil"
+      severity="secondary"
+      text
+      [rounded]="true"
+      [ariaLabel]="'teachers.editTeacherAria' | transloco"
+      (onClick)="edit.emit()" />
+    <p-button
+      styleClass="card__delete"
       icon="pi pi-trash"
       severity="danger"
       size="small"
       text
+      [rounded]="true"
       [ariaLabel]="'teachers.deleteTeacher' | transloco"
       (onClick)="remove.emit()" />
   </header>

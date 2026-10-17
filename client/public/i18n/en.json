@@ -47,6 +47,7 @@
     "addTeacher": "Add teacher",
     "editTeacher": "Edit",
     "deleteTeacher": "Delete teacher",
+    "editTeacherAria": "Edit teacher",
     "confirmDeleteTeacher": "Delete {{name}}?",
     "addCar": "Add car",
     "edit": "Edit",
