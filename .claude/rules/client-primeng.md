@@ -136,7 +136,7 @@ openExtendDeadline(publication: Publication): void {
 ```
 
 - Shared variant classes in `_dialog-overrides.scss` (e.g., a danger variant for destructive confirmations) — defined once, reused
-- On mobile widths the dialog goes full-screen (global override, not per-dialog)
+- Below 640px a dialog is capped at the viewport width less 2rem (one global `max-inline-size` override in `_global.scss`, not per-dialog; full-screen would need `!important` over PrimeNG's inline width)
 
 ### Toasts
 

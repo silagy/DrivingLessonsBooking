@@ -76,3 +76,9 @@ body {
   margin-left: 0;
   margin-inline-start: calc(-1 * (var(--p-popover-gutter) - 2px));
 }
+
+@media screen and (max-width: 639px) {
+  .p-dialog {
+    max-inline-size: calc(100vw - 2rem);
+  }
+}
