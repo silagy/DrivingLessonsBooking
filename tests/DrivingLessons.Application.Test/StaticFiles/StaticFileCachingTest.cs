@@ -15,6 +15,11 @@ public class StaticFileCachingTest
     [DataRow("he.json")]
     [DataRow("en.json")]
     [DataRow("favicon.svg")]
+    [DataRow("manifest.webmanifest")]
+    [DataRow("sw.js")]
+    [DataRow("offline.html")]
+    [DataRow("icon-maskable-512.png")]
+    [DataRow("apple-touch-icon.png")]
     public void A_File_Without_A_Fingerprint_Is_Revalidated(string fileName)
     {
         //given
