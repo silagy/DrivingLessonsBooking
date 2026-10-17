@@ -3,7 +3,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
 import { DialogService } from 'primeng/dynamicdialog';
 import { Menu, MenuModule } from 'primeng/menu';
 import { AuthService } from '../../core/auth.service';
@@ -12,6 +11,7 @@ import { Role } from '../../shared/models/role.enum';
 import { BrandLogoComponent } from '../../shared/brand-logo/brand-logo.component';
 import { LanguageToggleComponent } from '../../shared/language-toggle/language-toggle.component';
 import { navigationFor } from './domain/navigation';
+import { ShellDrawerComponent } from './ui/components/shell-drawer/shell-drawer.component';
 import { ChangeMyPasswordDialog } from './ui/dialogs/change-my-password/change-my-password.dialog';
 
 @Component({
@@ -23,9 +23,9 @@ import { ChangeMyPasswordDialog } from './ui/dialogs/change-my-password/change-m
     TranslocoPipe,
     ButtonModule,
     MenuModule,
-    DrawerModule,
     BrandLogoComponent,
     LanguageToggleComponent,
+    ShellDrawerComponent,
   ],
   templateUrl: './admin-shell.component.html',
   styleUrl: './admin-shell.component.scss',
@@ -73,15 +73,6 @@ export class AdminShellComponent {
 
   protected openDrawer(): void {
     this.isDrawerOpen.set(true);
-  }
-
-  protected closeDrawer(): void {
-    this.isDrawerOpen.set(false);
-  }
-
-  protected onDrawerSignOut(): void {
-    this.closeDrawer();
-    this.auth.logout();
   }
 
   private onChangeMyPassword(): void {

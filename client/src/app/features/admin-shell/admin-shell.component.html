@@ -71,47 +71,13 @@
     </div>
   </header>
 
-  <p-drawer
-    [visible]="isDrawerOpen()"
-    (visibleChange)="isDrawerOpen.set($event)"
+  <app-shell-drawer
+    [(open)]="isDrawerOpen"
+    [navigation]="navigation()"
     [position]="drawerPosition()"
-    styleClass="shell-drawer"
-    [ariaCloseLabel]="'shell.closeMenu' | transloco">
-    <ng-template #header>
-      <app-brand-logo />
-    </ng-template>
-
-    <nav class="shell-drawer__nav">
-      @for (item of navigation(); track item.labelKey) {
-        <a
-          [routerLink]="item.commands"
-          routerLinkActive="shell-drawer__link--active"
-          [routerLinkActiveOptions]="{ exact: item.exact }"
-          class="shell-drawer__link"
-          (click)="closeDrawer()">
-          {{ item.labelKey | transloco }}
-        </a>
-      }
-    </nav>
-
-    <div class="shell-drawer__footer">
-      <div class="shell-drawer__language">
-        <span>{{ 'shell.language' | transloco }}</span>
-        <app-language-toggle [touch]="true" />
-      </div>
-      @if (auth.email(); as email) {
-        <div class="shell-drawer__who">
-          <span class="shell__avatar" aria-hidden="true">{{ initials() }}</span>
-          <bdi class="shell-drawer__email" dir="ltr">{{ email }}</bdi>
-        </div>
-      }
-      <p-button
-        styleClass="shell-drawer__sign-out"
-        [label]="'shell.logout' | transloco"
-        text
-        (onClick)="onDrawerSignOut()" />
-    </div>
-  </p-drawer>
+    [email]="auth.email()"
+    [initials]="initials()"
+    (signOut)="auth.logout()" />
 
   <main class="shell__main">
     <router-outlet />

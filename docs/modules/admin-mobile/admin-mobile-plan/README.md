@@ -53,6 +53,18 @@ Business rules, stores and API calls don't change.
 | 11 | **Only the designed screens get bespoke layouts.** Dashboard, Students, Publications (dashboard) and Users inherit the shell, the dialogs and the week grid, and task 7 measures them at 390px. A page that still scrolls sideways is recorded in the PR and proposed as a follow-up story, not fixed here. Students already has a 992px compact layout. |
 | 12 | **Verification is in the browser pane, so execution should be native** (the session with the Browser tools). Subagents can't measure layout. |
 
+## As built (after execution)
+
+Where the code differs from the tasks below, and why:
+
+- **The drawer is its own component**, `features\admin-shell\ui\components\shell-drawer\` (`ShellDrawerComponent`: `open` model, `navigation`, `position`, `email`, `initials` inputs, `signOut` output). Inline in the shell, its styles pushed `admin-shell.component.scss` to 5.6 kB, over the 4 kB component style budget. The shell spec drives it unchanged.
+- **The drawer's email row puts the avatar first**, so in RTL it sits at the inline-start edge, as frame 01 shows.
+- **Weekly prep cells show a short label on the phone.** English "Unavailable" is 77px wide in a 42px cell. Both full labels become visually hidden on the phone, and an unavailable cell shows `weekSchedules.cellUnavailableShort` (`חסום` / `Blocked`, `aria-hidden`). At 360px, English "Blocked" ellipsizes.
+- **The dashboard's count cells got task 4's fallback**: a 1rem number, 48px cells, and the "requests" caption and "Unavailable" label visually hidden on the phone. They were 58px wide in 38px columns.
+- **Header buttons, the dock link and the history card action use `block-size: 2.75rem`**, not `min-block-size`; PrimeNG's padding made them 46 to 48px.
+- **Selects stay 42px tall** (decision 8), the one known `shortTargets` entry on Weekly prep.
+- **Still overflowing at 390px, not designed yet:** `/students` (408px in Hebrew, table), `/publications` (453px in Hebrew, 522px in English, the action buttons), and `/users` (table clipped inside its card).
+
 ## Global Constraints
 
 - Standalone components, OnPush, signals for state; no new service, store or dependency (`primeng/drawer` ships with PrimeNG 21).
@@ -96,21 +108,24 @@ const smallText = [...document.querySelectorAll('main *')]
     .filter((element) => [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim()))
     .filter((element) => parseFloat(getComputedStyle(element).fontSize) < 13)
     .map((element) => `${element.className || element.tagName}:${getComputedStyle(element).fontSize}`);
+const viewportWidth = screen.width;
 ({
     page: location.pathname,
     lang: document.documentElement.lang,
-    innerWidth,
+    viewportWidth,
     pageScrollWidth: document.documentElement.scrollWidth,
-    pageOverflows: document.documentElement.scrollWidth > innerWidth,
+    pageOverflows: document.documentElement.scrollWidth > viewportWidth,
     clippedAtInlineEdge: [...document.querySelectorAll('main *')]
         .filter(visible)
-        .filter((element) => { const rect = box(element); return rect.right > innerWidth + 1 || rect.left < -1; })
+        .filter((element) => { const rect = box(element); return rect.right > viewportWidth + 1 || rect.left < -1; })
         .slice(0, 5)
         .map((element) => element.className || element.tagName),
     shortTargets: targets.slice(0, 10),
     smallText: smallText.slice(0, 10),
 });
 ```
+
+It compares against `screen.width`, not `innerWidth`: under the browser pane's phone emulation an overflowing page widens `innerWidth` (748 on `/teachers` at 390 before task 3), which would hide the overflow.
 
 Pass: `pageOverflows: false` and `clippedAtInlineEdge: []`. Two lists check rule 7 ("Body text at least 13px, tap targets at least 44px"); each task says which entries it must remove:
 - `shortTargets` lists anything under 44px tall.
@@ -130,6 +145,8 @@ Pass: `pageOverflows: false` and `clippedAtInlineEdge: []`. Two lists check rule
 |------|--------|------|
 | `client\src\app\features\admin-shell\admin-shell.component.html` / `.scss` / `.ts` | Menu button, `p-drawer` with nav + language + email + sign out; `max-width: 639px` compact bar and main padding | 1 |
 | `client\src\app\features\admin-shell\admin-shell.component.spec.ts` | New: drawer opens, lists the Role's links, closes on a link, signs out, side by language | 1 |
+| `client\src\app\features\admin-shell\ui\components\shell-drawer\*` | As built: the drawer, extracted from the shell for the style budget | 7 |
+| `client\src\app\features\publications\ui\components\slot-count-cell\slot-count-cell.component.scss` | As built: task 4's fallback for the dashboard's count cells | 4 |
 | `client\public\i18n\he.json`, `en.json` | `shell.openMenu`, `shell.closeMenu` (1); `weekGrid.daysShort.*` (4); `teachers.editTeacherAria` (3) | 1, 3, 4 |
 | `.claude\rules\client-primeng.md` | 639px layout breakpoint (1); dialogs fit the phone (2) | 1, 2 |
 | `client\src\styles\_global.scss` | `.p-dialog` capped at ≤ 639px | 2 |
