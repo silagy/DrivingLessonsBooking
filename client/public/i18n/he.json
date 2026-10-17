@@ -748,5 +748,8 @@
   "formErrors": {
     "required": "שדה חובה",
     "emailInvalid": "יש להזין כתובת אימייל תקינה"
+  },
+  "pwa": {
+    "newVersionReady": "גרסה חדשה של דרייבקל מוכנה."
   }
 }

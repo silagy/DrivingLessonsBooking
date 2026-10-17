@@ -1,0 +1,42 @@
+.new-version {
+  position: fixed;
+  inset-inline: 1rem;
+  inset-block-end: 1rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-inline-size: 28rem;
+  margin-inline: auto;
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+  background: var(--app-bg-card);
+  color: var(--app-ink);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-card);
+  box-shadow: var(--app-shadow-lift);
+}
+
+.new-version__refresh {
+  flex-shrink: 0;
+  min-block-size: 2.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
+  border: none;
+  border-radius: var(--app-radius-field);
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.new-version__refresh:hover {
+  background: var(--p-primary-hover-color);
+}
+
+.new-version__refresh:focus-visible {
+  outline: 2px solid var(--p-primary-color);
+  outline-offset: 2px;
+}

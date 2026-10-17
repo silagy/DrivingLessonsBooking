@@ -2,12 +2,14 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
 import { LanguageService } from './core/language.service';
+import { NewVersionNoticeComponent } from './shared/components/new-version-notice/new-version-notice.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Toast],
+  imports: [RouterOutlet, Toast, NewVersionNoticeComponent],
   template: `
     <router-outlet />
+    <app-new-version-notice />
     @if (language.isRtl()) {
       <p-toast position="top-left" />
     } @else {
