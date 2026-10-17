@@ -40,7 +40,7 @@ describe('TeacherCardComponent', () => {
         const { card } = await render();
 
         //when
-        const button = card.querySelector('button.card__edit--compact');
+        const button = card.querySelector('.card__edit--compact button');
 
         //then
         expect(button?.getAttribute('aria-label')).toBe('teachers.editTeacherAria');
@@ -51,7 +51,7 @@ describe('TeacherCardComponent', () => {
         const { card, host } = await render();
 
         //when
-        card.querySelector<HTMLButtonElement>('button.card__edit--compact')!.click();
+        card.querySelector<HTMLButtonElement>('.card__edit--compact button')!.click();
 
         //then
         expect(host.edits).toBe(1);

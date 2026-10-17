@@ -180,7 +180,7 @@
   padding: 1.625rem 2.25rem 2.25rem;
 }
 
-:host ::ng-deep .shell__menu-button.p-button {
+.shell__menu-button {
   display: none;
 }
 
@@ -228,8 +228,11 @@
     padding: 0;
   }
 
-  :host ::ng-deep .shell__menu-button.p-button {
+  .shell__menu-button {
     display: inline-flex;
+  }
+
+  :host ::ng-deep .shell__menu-button .p-button {
     inline-size: 2.75rem;
     block-size: 2.75rem;
     color: var(--app-ink);

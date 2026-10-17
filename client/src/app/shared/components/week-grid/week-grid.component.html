@@ -11,7 +11,8 @@
     }
     @for (window of windows; track window) {
         <div class="week-grid__window-label">
-            <span class="week-grid__window-name">{{ 'weekGrid.windows.' + window | transloco }}</span>
+            <span class="week-grid__window-name week-grid__window-name--long">{{ 'weekGrid.windows.' + window | transloco }}</span>
+            <span class="week-grid__window-name week-grid__window-name--short">{{ 'weekGrid.windowsShort.' + window | transloco }}</span>
             @if (windowTimes()[window]; as time) {
                 <span class="week-grid__window-time week-grid__window-time--long"><bdi>{{ time }}</bdi></span>
                 <span class="week-grid__window-time week-grid__window-time--compact"><bdi>{{ compactTime(time) }}</bdi></span>

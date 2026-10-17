@@ -50,6 +50,7 @@
 }
 
 .week-grid__day-name--short,
+.week-grid__window-name--short,
 .week-grid__window-time--compact {
   display: none;
 }
@@ -87,11 +88,13 @@
   }
 
   .week-grid__day-name--long,
+  .week-grid__window-name--long,
   .week-grid__window-time--long {
     display: none;
   }
 
   .week-grid__day-name--short,
+  .week-grid__window-name--short,
   .week-grid__window-time--compact {
     display: inline;
   }

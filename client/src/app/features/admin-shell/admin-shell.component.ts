@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { MenuItem } from 'primeng/api';
@@ -48,6 +48,7 @@ export class AdminShellComponent {
   protected readonly drawerPosition = computed(() => (this.language.isRtl() ? 'right' : 'left'));
 
   private readonly userMenu = viewChild.required<Menu>('userMenu');
+  private readonly menuButton = viewChild.required('menuButton', { read: ElementRef<HTMLElement> });
 
   protected readonly initials = computed(() => {
     const email = this.auth.email();
@@ -73,6 +74,10 @@ export class AdminShellComponent {
 
   protected openDrawer(): void {
     this.isDrawerOpen.set(true);
+  }
+
+  protected focusMenuButton(): void {
+    this.menuButton().nativeElement.querySelector('button')?.focus();
   }
 
   private onChangeMyPassword(): void {

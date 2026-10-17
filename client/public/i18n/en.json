@@ -20,6 +20,7 @@
   "shell": {
     "logout": "Sign out",
     "userMenu": "User menu",
+    "menu": "Menu",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "changeMyPassword": "Change my password",
@@ -312,6 +313,12 @@
       "wednesday": "Wed",
       "thursday": "Thu",
       "friday": "Fri"
+    },
+    "windowsShort": {
+      "morning": "Morn",
+      "noon": "Noon",
+      "afternoon": "Aft",
+      "evening": "Eve"
     },
     "windows": {
       "morning": "Morning",

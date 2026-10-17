@@ -70,6 +70,24 @@ describe('WeekGridComponent', () => {
         ]);
     });
 
+    it('renders a short name for each window', async () => {
+        //given
+        const grid = await render();
+
+        //when
+        const names = [...grid.querySelectorAll('.week-grid__window-name--short')].map((name) =>
+            name.textContent?.trim(),
+        );
+
+        //then
+        expect(names).toEqual([
+            'weekGrid.windowsShort.morning',
+            'weekGrid.windowsShort.noon',
+            'weekGrid.windowsShort.afternoon',
+            'weekGrid.windowsShort.evening',
+        ]);
+    });
+
     it('renders a compact time next to each window time', async () => {
         //given
         const grid = await render();

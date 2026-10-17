@@ -3,7 +3,9 @@
   (visibleChange)="open.set($event)"
   [position]="position()"
   styleClass="shell-drawer"
-  [ariaCloseLabel]="'shell.closeMenu' | transloco">
+  [ariaCloseLabel]="'shell.closeMenu' | transloco"
+  [pt]="{ root: { role: 'dialog', 'aria-modal': 'true', 'aria-label': ('shell.menu' | transloco) } }"
+  (onHide)="dismissed.emit()">
   <ng-template #header>
     <app-brand-logo />
   </ng-template>

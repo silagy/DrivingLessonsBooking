@@ -46,7 +46,7 @@ async function render(role: Role, lang: AppLanguage): Promise<ComponentFixture<A
 }
 
 function menuButton(fixture: ComponentFixture<AdminShellComponent>): HTMLButtonElement {
-    return (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('button.shell__menu-button')!;
+    return (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.shell__menu-button button')!;
 }
 
 async function openDrawer(fixture: ComponentFixture<AdminShellComponent>): Promise<void> {
@@ -54,8 +54,12 @@ async function openDrawer(fixture: ComponentFixture<AdminShellComponent>): Promi
     await fixture.whenStable();
 }
 
+function drawer(fixture: ComponentFixture<AdminShellComponent>): Drawer {
+    return fixture.debugElement.query(By.directive(Drawer)).componentInstance as Drawer;
+}
+
 function drawerPosition(fixture: ComponentFixture<AdminShellComponent>): string {
-    return (fixture.debugElement.query(By.directive(Drawer)).componentInstance as Drawer).position();
+    return drawer(fixture).position();
 }
 
 describe('AdminShellComponent', () => {
@@ -144,6 +148,34 @@ describe('AdminShellComponent', () => {
 
         //then
         expect(drawerPosition(fixture)).toBe('right');
+    });
+
+    it('returns focus to the menu button when the drawer is dismissed', async () => {
+        //given
+        const fixture = await render(Role.administrator, 'he');
+        await openDrawer(fixture);
+
+        //when
+        drawer(fixture).close(new Event('click'));
+        await fixture.whenStable();
+
+        //then
+        expect(document.activeElement).toBe(menuButton(fixture));
+        expect(menuButton(fixture).getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('exposes the drawer as a named modal dialog', async () => {
+        //given
+        const fixture = await render(Role.administrator, 'he');
+
+        //when
+        await openDrawer(fixture);
+
+        //then
+        const panel = document.body.querySelector('.p-drawer.shell-drawer')!;
+        expect(panel.getAttribute('role')).toBe('dialog');
+        expect(panel.getAttribute('aria-modal')).toBe('true');
+        expect(panel.getAttribute('aria-label')).toBe('shell.menu');
     });
 
     it('opens from the left in English', async () => {

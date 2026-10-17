@@ -66,7 +66,7 @@ describe('CarCardComponent', () => {
         const { card, host } = await render();
 
         //when
-        card.querySelector<HTMLButtonElement>('button.car__edit--compact')!.click();
+        card.querySelector<HTMLButtonElement>('.car__edit--compact button')!.click();
 
         //then
         expect(host.edits).toBe(1);

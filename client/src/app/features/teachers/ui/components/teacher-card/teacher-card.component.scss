@@ -81,7 +81,7 @@
     color: var(--app-text-secondary);
 }
 
-:host ::ng-deep .card__edit--compact.p-button {
+.card__edit--compact {
     display: none;
 }
 
@@ -107,13 +107,16 @@
         font-size: 0.8125rem;
     }
 
-    :host ::ng-deep .card__edit--wide.p-button {
+    .card__edit--wide {
         display: none;
     }
 
-    :host ::ng-deep .card__edit--compact.p-button,
-    :host ::ng-deep .card__delete.p-button {
+    .card__edit--compact {
         display: inline-flex;
+    }
+
+    :host ::ng-deep .card__edit--compact .p-button,
+    :host ::ng-deep .card__delete.p-button {
         flex: none;
         inline-size: 2.75rem;
         block-size: 2.75rem;

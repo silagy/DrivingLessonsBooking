@@ -58,6 +58,10 @@ Business rules, stores and API calls don't change.
 Where the code differs from the tasks below, and why:
 
 - **The drawer is its own component**, `features\admin-shell\ui\components\shell-drawer\` (`ShellDrawerComponent`: `open` model, `navigation`, `position`, `email`, `initials` inputs, `signOut` output). Inline in the shell, its styles pushed `admin-shell.component.scss` to 5.6 kB, over the 4 kB component style budget. The shell spec drives it unchanged.
+- **The drawer is a named modal dialog and gives focus back.** It carries `role="dialog"`, `aria-modal` and the `shell.menu` label (`pt` root). When it closes from its X, its scrim or Escape, focus returns to the menu button.
+- **Phone-only and wide-only buttons are hidden on the `p-button` host**, not on the inner button, so they don't leave an empty flex item that still takes a gap. The menu button sits before the user menu's `p-menu` host, which gives the design's 4px gap.
+- **The grid has short window names on the phone too** (`weekGrid.windowsShort.*`; `Morn`, `Noon`, `Aft`, `Eve` in English). Bold "Afternoon" is 62px wide, more than the 52px label column.
+- **The car card's actions row is `flex: 1 1 100%`** so its negative margins reach both edges of the card.
 - **The drawer's email row puts the avatar first**, so in RTL it sits at the inline-start edge, as frame 01 shows.
 - **Weekly prep cells show a short label on the phone.** English "Unavailable" is 77px wide in a 42px cell. Both full labels become visually hidden on the phone, and an unavailable cell shows `weekSchedules.cellUnavailableShort` (`חסום` / `Blocked`, `aria-hidden`). At 360px, English "Blocked" ellipsizes.
 - **The dashboard's count cells got task 4's fallback**: a 1rem number, 48px cells, and the "requests" caption and "Unavailable" label visually hidden on the phone. They were 58px wide in 38px columns.

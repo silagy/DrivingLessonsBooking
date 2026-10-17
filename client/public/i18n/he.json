@@ -20,6 +20,7 @@
   "shell": {
     "logout": "התנתקות",
     "userMenu": "תפריט משתמש",
+    "menu": "תפריט",
     "openMenu": "פתיחת תפריט",
     "closeMenu": "סגירת תפריט",
     "changeMyPassword": "שינוי הסיסמה שלי",
@@ -312,6 +313,12 @@
       "wednesday": "ד׳",
       "thursday": "ה׳",
       "friday": "ו׳"
+    },
+    "windowsShort": {
+      "morning": "בוקר",
+      "noon": "צהריים",
+      "afternoon": "אחה״צ",
+      "evening": "ערב"
     },
     "windows": {
       "morning": "בוקר",

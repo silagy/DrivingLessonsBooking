@@ -30,6 +30,7 @@ export class ShellDrawerComponent {
     readonly initials = input('');
 
     readonly signOut = output<void>();
+    readonly dismissed = output<void>();
 
     protected close(): void {
         this.open.set(false);

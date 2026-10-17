@@ -98,7 +98,7 @@
     display: none;
 }
 
-:host ::ng-deep .car__edit--compact.p-button {
+.car__edit--compact {
     display: none;
 }
 
@@ -163,7 +163,7 @@
     }
 
     .car__actions {
-        flex-basis: 100%;
+        flex: 1 1 100%;
         justify-content: flex-end;
         gap: 0.25rem;
         margin-inline: -0.875rem;
@@ -171,13 +171,16 @@
         border-block-start: 1px solid var(--app-bg-muted);
     }
 
-    :host ::ng-deep .car__edit--wide.p-button {
+    .car__edit--wide {
         display: none;
     }
 
-    :host ::ng-deep .car__edit--compact.p-button,
-    :host ::ng-deep .car__delete.p-button {
+    .car__edit--compact {
         display: inline-flex;
+    }
+
+    :host ::ng-deep .car__edit--compact .p-button,
+    :host ::ng-deep .car__delete.p-button {
         inline-size: 2.75rem;
         block-size: 2.75rem;
     }
