@@ -10,6 +10,7 @@
         @if (store.canPublish()) {
           <a
             pButton
+            class="weekly-prep__publish-link"
             [label]="'weekSchedules.publishWeek' | transloco"
             [routerLink]="['/', appRoutes.publications]"
             [queryParams]="{ teacherId: store.selectedTeacherId(), week: store.selectedWeekStart(), publish: 1 }">
@@ -84,7 +85,10 @@
             [class.slot-cell--unavailable]="slot.state === SlotState.unavailable"
             [disabled]="store.isMutating()"
             (click)="store.toggleSlot(slot)">
-            {{ (slot.state === SlotState.open ? 'weekSchedules.cellOpen' : 'weekSchedules.cellUnavailable') | transloco }}
+            <span class="slot-cell__label">{{ (slot.state === SlotState.open ? 'weekSchedules.cellOpen' : 'weekSchedules.cellUnavailable') | transloco }}</span>
+            @if (slot.state === SlotState.unavailable) {
+              <span class="slot-cell__short" aria-hidden="true">{{ 'weekSchedules.cellUnavailableShort' | transloco }}</span>
+            }
           </button>
         </ng-template>
       </app-week-grid>
@@ -96,5 +100,17 @@
         </span>
       </footer>
     </section>
+  }
+
+  @if (store.publicationState() && store.canPublish()) {
+    <div class="weekly-prep__dock">
+      <a
+        pButton
+        class="weekly-prep__dock-link"
+        [label]="'weekSchedules.publishWeek' | transloco"
+        [routerLink]="['/', appRoutes.publications]"
+        [queryParams]="{ teacherId: store.selectedTeacherId(), week: store.selectedWeekStart(), publish: 1 }">
+      </a>
+    </div>
   }
 </div>

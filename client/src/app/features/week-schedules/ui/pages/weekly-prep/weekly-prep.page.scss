@@ -79,3 +79,92 @@
     cursor: default;
   }
 }
+
+.slot-cell__short,
+.weekly-prep__dock {
+  display: none;
+}
+
+@media screen and (max-width: 639px) {
+  .weekly-prep__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .weekly-prep__publish-link {
+    display: none;
+  }
+
+  .weekly-prep__selectors {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+
+    .field {
+      inline-size: 100%;
+    }
+  }
+
+  :host ::ng-deep .weekly-prep__selectors .p-select {
+    inline-size: 100%;
+  }
+
+  .weekly-prep__card {
+    padding: 0.75rem 0.625rem;
+  }
+
+  .slot-cell {
+    min-height: 48px;
+    min-inline-size: 0;
+    padding: 0;
+    border-radius: 7px;
+    font-size: 0.65625rem;
+    font-weight: 500;
+    overflow: hidden;
+  }
+
+  .slot-cell__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .slot-cell__short {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .weekly-prep__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .weekly-prep__count {
+    font-size: 0.8125rem;
+  }
+
+  .weekly-prep__dock {
+    display: block;
+    position: sticky;
+    inset-block-end: 0;
+    margin-inline: -1rem;
+    margin-block: 1rem -1.5rem;
+    padding: 0.75rem 1rem 1rem;
+    background: var(--app-bg-card);
+    border-block-start: 1px solid var(--app-border);
+  }
+
+  .weekly-prep__dock-link {
+    inline-size: 100%;
+    block-size: 2.75rem;
+    justify-content: center;
+    text-decoration: none;
+  }
+}

@@ -291,6 +291,7 @@
     "notCreatedYet": "מנהל המערכת עדיין לא הכין את השבוע הזה.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
+    "cellUnavailableShort": "חסום",
     "publishWeek": "פרסום שבוע...",
     "unavailableCount": "{{count}} משבצות סומנו כלא זמינות",
     "loadFailed": "טעינת שבוע העבודה נכשלה."

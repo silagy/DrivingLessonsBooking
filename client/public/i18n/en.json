@@ -291,6 +291,7 @@
     "notCreatedYet": "The Administrator hasn't prepared this week yet.",
     "cellOpen": "Open",
     "cellUnavailable": "Unavailable",
+    "cellUnavailableShort": "Blocked",
     "publishWeek": "Publish week...",
     "unavailableCount": "{{count}} slots marked unavailable",
     "loadFailed": "Failed to load the week schedule."
