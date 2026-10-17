@@ -14,6 +14,14 @@ public class RosterCsvParser : IRosterCsvParser
     private const char LineFeed = '\n';
     private const char NonBreakingSpace = ' ';
 
+    private static readonly byte[] ZipSignature =
+    [
+        0x50,
+        0x4B,
+        0x03,
+        0x04
+    ];
+
     private static readonly HashSet<char> BidiMarks =
     [
         '‎',
@@ -31,7 +39,13 @@ public class RosterCsvParser : IRosterCsvParser
 
     public IReadOnlyList<RosterCsvRow> Parse(Stream content)
     {
-        var records = ReadRecords(content);
+        using var buffered = new MemoryStream();
+        content.CopyTo(buffered);
+
+        MustNotBeExcelWorkbook(buffered);
+
+        buffered.Position = 0;
+        var records = ReadRecords(buffered);
 
         if (!records.Any())
         {
@@ -50,6 +64,20 @@ public class RosterCsvParser : IRosterCsvParser
                    .Skip(1)
                    .Select(record => ToRow(record, columns))
                    .ToList();
+    }
+
+    private static void MustNotBeExcelWorkbook(MemoryStream content)
+    {
+        var bytes = content.GetBuffer();
+        var length = (int)content.Length;
+        var startsWithZipSignature = bytes
+                                         .AsSpan(0, length)
+                                         .StartsWith(ZipSignature);
+
+        if (startsWithZipSignature)
+        {
+            throw new RosterFileMustBeCsvException();
+        }
     }
 
     private static List<CsvRecord> ReadRecords(Stream content)
@@ -131,7 +159,9 @@ public class RosterCsvParser : IRosterCsvParser
 
         for (var index = 0; index < headerFields.Count; index++)
         {
-            columns.TryAdd(headerFields[index], index);
+            var header = headerFields[index];
+            var column = RosterCsvHeaders.BeroshAliases.GetValueOrDefault(header, header);
+            columns.TryAdd(column, index);
         }
 
         var missing = RosterCsvHeaders.Required

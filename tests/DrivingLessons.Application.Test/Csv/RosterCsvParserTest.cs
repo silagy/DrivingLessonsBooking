@@ -160,6 +160,63 @@ public class RosterCsvParserTest
     }
 
     [TestMethod]
+    public void Berosh_Export_Headers_Are_Accepted()
+    {
+        //given
+        var csv = "\"שם התלמיד\",\"ת.ז\",\"טלפון\",\"רכב\",\"מורה\",\"כתובת\",\"הערות\",\"תאריך התחלה\",\"סוג רשיון\","
+                  + "\"שולם דמי רישום\",\"הוקלד בברוש\"\n"
+                  + "\"דנה כהן\",\"123456782\",\"050-1234567\",\"טויוטה 123\",\"משה לוי\",\"הרצל 5, תל אביב\",\"\","
+                  + "\"01/09/2026\",\"B\",\"כן\",\"כן\"\n";
+        using var stream = StreamOf(csv);
+        var parser = new RosterCsvParser();
+
+        //when
+        var rows = parser.Parse(stream);
+
+        //then
+        var row = rows.ShouldHaveSingleItem();
+        row.FullName.ShouldBe("דנה כהן");
+        row.NationalId.ShouldBe("123456782");
+        row.Phone.ShouldBe("050-1234567");
+        row.TeacherName.ShouldBe("משה לוי");
+        row.CarName.ShouldBe("טויוטה 123");
+        row.Address.ShouldBe("הרצל 5, תל אביב");
+        row.StartDate.ShouldBe("01/09/2026");
+        row.LicenseType.ShouldBe("B");
+    }
+
+    [TestMethod]
+    public void Missing_Required_Header_Names_The_Column()
+    {
+        //given
+        var csv = "שם התלמיד,ת.ז,מורה,רכב\nדנה כהן,123456782,משה לוי,טויוטה 123";
+        using var stream = StreamOf(csv);
+        var parser = new RosterCsvParser();
+
+        //when
+        var act = () => parser.Parse(stream);
+
+        //then
+        var exception = Should.Throw<RosterFileMustContainRequiredColumnsException>(act);
+        exception.MissingColumns.ShouldBe(["טלפון"]);
+    }
+
+    [TestMethod]
+    public void Excel_Workbook_Throws()
+    {
+        //given
+        byte[] zipSignature = [0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x06, 0x00];
+        using var stream = new MemoryStream(zipSignature);
+        var parser = new RosterCsvParser();
+
+        //when
+        var act = () => parser.Parse(stream);
+
+        //then
+        Should.Throw<RosterFileMustBeCsvException>(act);
+    }
+
+    [TestMethod]
     public void Missing_Required_Header_Throws()
     {
         //given
