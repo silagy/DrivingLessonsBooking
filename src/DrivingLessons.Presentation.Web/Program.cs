@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using DrivingLessons.Presentation.Web.Filters;
 using DrivingLessons.Presentation.Web.OpenApi;
 using DrivingLessons.Presentation.Web.RateLimiting;
+using DrivingLessons.Presentation.Web.StaticFiles;
 using DrivingLessons.Application;
 using DrivingLessons.Application.Auth;
 using DrivingLessons.Application.Commands.SeedFirstAdministrator;
@@ -77,7 +78,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseDefaultFiles();
-app.UseStaticFiles();
+app.UseStaticFiles(StaticFileCaching.Options);
 
 app.UseRateLimiter();
 
@@ -87,6 +88,6 @@ app.UseAuthorization();
 app.MapHealthChecks("/api/health").AllowAnonymous();
 app.MapControllers();
 
-app.MapFallbackToFile("index.html").AllowAnonymous();
+app.MapFallbackToFile("index.html", StaticFileCaching.Options).AllowAnonymous();
 
 app.Run();
