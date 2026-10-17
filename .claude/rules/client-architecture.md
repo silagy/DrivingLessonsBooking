@@ -40,6 +40,7 @@ client\
     │   │   ├── role.guards.ts         administratorGuard, homeGuard (#89)
     │   │   ├── language.service.ts    active language, RTL
     │   │   ├── primeng-translations.ts  PrimeNG locale strings
+    │   │   ├── pwa\                   service worker registration, student-form install prompt, NewVersionStore (ADR 0008)
     │   │   ├── services\              toast.service.ts, clipboard.service.ts, file-download.service.ts
     │   │   └── signed-in-user\        SignedInUserStore over api/me: name, linked Teacher name (#90)
     │   │

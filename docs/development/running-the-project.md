@@ -196,6 +196,18 @@ npm run build
 npm test
 ```
 
+## Installing the app
+
+DriveCal installs as an app ([ADR 0008](../decisions/0008-installable-app-without-offline-cache.md)) and opens in its own window:
+
+- **Chrome or Edge on Windows or macOS:** the install icon at the end of the address bar, or the browser menu → "Install DriveCal".
+- **Chrome on Android:** the install banner, or the browser menu → "Install app".
+- **Safari on iPhone or iPad:** Share → "Add to Home Screen".
+
+The app loads the latest deploy whenever it starts, because only the offline page is cached. An app left open across a deploy shows "A new version of DriveCal is ready" with Refresh and "Not now" when it comes back to the screen; "Not now" hides it until the next time. Installing works on `https://drivecal.co.il` and on `http://localhost` only. The student form doesn't offer it.
+
+The Claude desktop browser pane can't register service workers; check the worker in Chrome or Edge.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
@@ -203,6 +215,7 @@ npm test
 | `28P01: password authentication failed for user "app"` | The database volume was created with a different password than the one the app now uses | Put `POSTGRES_PASSWORD` in `.env` back to the original value. Or, to keep the data, reset it in the database (below). Or wipe the data with `docker compose down -v` |
 | `42P07: relation "..." already exists` on API startup | The API is connected to the old `dl-postgres` container, whose migration history is out of date | [Move off `dl-postgres`](#moving-off-the-old-dl-postgres-container) |
 | Port 5432 already in use | `dl-postgres` or a local Postgres install is running | `docker stop dl-postgres`, or stop the local service |
+| `ports are not available: ... 0.0.0.0:5432: bind: An attempt was made to access a socket in a way forbidden by its access permissions` | Windows reserved a port range that covers 5432 (see `netsh interface ipv4 show excludedportrange protocol=tcp`) | In an administrator terminal: `net stop winnat`, then `net start winnat`; then `docker compose up -d` |
 | Port 8080 already in use | The Compose `app` container is still running | `docker compose stop app` |
 | Docker shows old behavior after a code change | The image wasn't rebuilt | `docker compose up -d --build` |
 | `'ng' is not recognized` on `npm start` | `client\node_modules` is missing or only partly installed | Run `npm ci` in `client\`, then `npm start` |

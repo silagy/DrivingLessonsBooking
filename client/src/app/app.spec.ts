@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
@@ -23,7 +25,13 @@ describe('App', () => {
 
     await TestBed.configureTestingModule({
       imports: [App, TranslocoTestingModule.forRoot({ langs: { en: {}, he: {} } })],
-      providers: [provideZonelessChangeDetection(), provideRouter([]), MessageService],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        MessageService,
+      ],
     }).compileComponents();
   });
 
