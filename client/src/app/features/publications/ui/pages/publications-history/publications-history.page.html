@@ -11,57 +11,104 @@
     } @else if (store.historyIsEmpty()) {
         <div class="history__state">{{ 'publications.history.empty' | transloco }}</div>
     } @else {
-        <div class="history__card">
-            <p-table [value]="store.history()" [rows]="20" styleClass="history__table">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>{{ 'publications.history.week' | transloco }}</th>
-                        <th>{{ 'publications.history.teacher' | transloco }}</th>
-                        <th>{{ 'publications.history.window' | transloco }}</th>
-                        <th>{{ 'publications.history.status' | transloco }}</th>
-                        <th>{{ 'publications.history.lastExcel' | transloco }}</th>
-                        <th></th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-row>
-                    <tr>
-                        <td><bdi>{{ weekLabel(row) }}</bdi></td>
-                        <td>{{ row.teacherName }}</td>
-                        <td class="history__window">
+        <div class="history__table-wrap">
+            <div class="history__card">
+                <p-table [value]="store.history()" [rows]="20" styleClass="history__table">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'publications.history.week' | transloco }}</th>
+                            <th>{{ 'publications.history.teacher' | transloco }}</th>
+                            <th>{{ 'publications.history.window' | transloco }}</th>
+                            <th>{{ 'publications.history.status' | transloco }}</th>
+                            <th>{{ 'publications.history.lastExcel' | transloco }}</th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row>
+                        <tr>
+                            <td><bdi>{{ weekLabel(row) }}</bdi></td>
+                            <td>{{ row.teacherName }}</td>
+                            <td class="history__window">
+                                @if (row.windowStartUtc && row.windowEndUtc) {
+                                    <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
+                                } @else {
+                                    <span class="history__dash">-</span>
+                                }
+                            </td>
+                            <td><app-publication-state-tag [state]="row.state" /></td>
+                            <td>
+                                @if (row.latestExcelVersion !== null) {
+                                    <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
+                                } @else {
+                                    <span class="history__dash">-</span>
+                                }
+                            </td>
+                            <td class="history__action">
+                                @if (canRedownload(row)) {
+                                    <p-button
+                                        [label]="'publications.history.redownload' | transloco"
+                                        severity="secondary"
+                                        text
+                                        size="small"
+                                        (onClick)="onRedownload(row)" />
+                                } @else {
+                                    <p-button
+                                        [label]="'publications.history.viewDashboard' | transloco"
+                                        severity="secondary"
+                                        text
+                                        size="small"
+                                        (onClick)="onViewDashboard(row)" />
+                                }
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+
+        <ul class="history__cards">
+            @for (row of store.history(); track row.publicationId + row.teacherId) {
+                <li class="history-card">
+                    <div class="history-card__top">
+                        <div class="history-card__identity">
+                            <bdi class="history-card__week">{{ weekLabel(row) }}</bdi>
+                            <span class="history-card__teacher">{{ row.teacherName }}</span>
+                        </div>
+                        <app-publication-state-tag [state]="row.state" />
+                    </div>
+                    <dl class="history-card__details">
+                        <dt>{{ 'publications.history.window' | transloco }}</dt>
+                        <dd>
                             @if (row.windowStartUtc && row.windowEndUtc) {
                                 <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
                             } @else {
                                 <span class="history__dash">-</span>
                             }
-                        </td>
-                        <td><app-publication-state-tag [state]="row.state" /></td>
-                        <td>
+                        </dd>
+                        <dt>{{ 'publications.history.lastExcel' | transloco }}</dt>
+                        <dd>
                             @if (row.latestExcelVersion !== null) {
                                 <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
                             } @else {
                                 <span class="history__dash">-</span>
                             }
-                        </td>
-                        <td class="history__action">
-                            @if (canRedownload(row)) {
-                                <p-button
-                                    [label]="'publications.history.redownload' | transloco"
-                                    severity="secondary"
-                                    text
-                                    size="small"
-                                    (onClick)="onRedownload(row)" />
-                            } @else {
-                                <p-button
-                                    [label]="'publications.history.viewDashboard' | transloco"
-                                    severity="secondary"
-                                    text
-                                    size="small"
-                                    (onClick)="onViewDashboard(row)" />
-                            }
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
+                        </dd>
+                    </dl>
+                    @if (canRedownload(row)) {
+                        <p-button
+                            styleClass="history-card__action"
+                            [label]="'publications.history.redownload' | transloco"
+                            text
+                            (onClick)="onRedownload(row)" />
+                    } @else {
+                        <p-button
+                            styleClass="history-card__action"
+                            [label]="'publications.history.viewDashboard' | transloco"
+                            text
+                            (onClick)="onViewDashboard(row)" />
+                    }
+                </li>
+            }
+        </ul>
     }
 </div>

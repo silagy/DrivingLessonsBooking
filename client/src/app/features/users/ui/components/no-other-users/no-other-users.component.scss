@@ -1,0 +1,59 @@
+.no-other-users {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2.375rem 1.5rem 2.625rem;
+    text-align: center;
+}
+
+.no-other-users__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 44px;
+    block-size: 44px;
+    border-radius: 999px;
+    background: var(--app-bg-muted);
+    border: 1px solid var(--app-border);
+    color: var(--p-sky-500);
+    font-size: 1.25rem;
+}
+
+.no-other-users__title {
+    margin: 0.25rem 0 0;
+    font-size: 1.06rem;
+    font-weight: 600;
+    color: var(--app-ink);
+}
+
+.no-other-users__hint {
+    margin: 0;
+    max-inline-size: 460px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--app-text-secondary);
+}
+
+.no-other-users__action {
+    margin-block-start: 0.625rem;
+}
+
+@media screen and (max-width: 639px) {
+    .no-other-users {
+        margin-block-start: 0.625rem;
+        background: var(--app-bg-card);
+        border: 1px solid var(--app-border);
+        border-radius: 14px;
+        box-shadow: var(--app-shadow-card);
+    }
+
+    .no-other-users__action {
+        align-self: stretch;
+    }
+
+    :host ::ng-deep .no-other-users__action .p-button {
+        inline-size: 100%;
+        block-size: 2.75rem;
+    }
+}

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
+import { initials } from '../../../../../shared/text/initials';
 import { Car } from '../../../domain/car.model';
 import { Teacher } from '../../../domain/teacher.model';
 import { Transmission } from '../../../domain/transmission.enum';
@@ -20,6 +21,8 @@ export class CarCardComponent {
     readonly edit = output<void>();
     readonly remove = output<void>();
     readonly assignApplied = output<string[]>();
+
+    protected readonly initialsOf = initials;
 
     protected readonly isManual = computed(() => this.car().transmission === Transmission.manual);
     protected readonly isShared = computed(() => this.car().assignedTeachers.length > 1);

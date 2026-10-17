@@ -6,6 +6,7 @@ import { DayOfWeek } from '../../models/day-of-week.enum';
 import { SlotWindow } from '../../models/slot-window.enum';
 import { WeekGridCell } from '../../models/week-grid-cell';
 import { parseIsoDate } from '../../dates/parse-iso-date';
+import { compactWindowTime } from '../../dates/window-times';
 
 export interface WeekGridCellContext<T extends WeekGridCell> {
     $implicit: T;
@@ -45,6 +46,7 @@ export class WeekGridComponent<T extends WeekGridCell> {
 
     protected readonly days = GRID_DAYS;
     protected readonly windows = GRID_WINDOWS;
+    protected readonly compactTime = compactWindowTime;
 
     protected readonly cellMap = computed(() => {
         const map = new Map<string, T>();

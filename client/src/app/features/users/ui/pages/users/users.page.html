@@ -5,12 +5,14 @@
       <p class="users__subtitle">{{ 'users.subtitle' | transloco }}</p>
     </div>
     <p-button
+      class="users__add"
+      [class.users__add--hidden-on-phone]="store.hasOnlyOneUser()"
       [label]="'users.addUser' | transloco"
       [disabled]="store.isMutating() || !!store.loadError()"
       (onClick)="onAddUser()" />
   </header>
 
-  <section class="users__card">
+  <section class="users__card" [class.users__card--list]="!store.isLoading() && !store.loadError()">
     @if (store.isLoading()) {
       <div class="users__state">
         <p-progressSpinner />
@@ -25,89 +27,94 @@
         <p-button [label]="'users.retry' | transloco" text size="small" (onClick)="store.reload()" />
       </div>
     } @else {
-      <p-table [value]="store.users()" dataKey="id">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>{{ 'users.table.name' | transloco }}</th>
-            <th>{{ 'users.table.signInEmail' | transloco }}</th>
-            <th>{{ 'users.table.role' | transloco }}</th>
-            <th>{{ 'users.table.teacher' | transloco }}</th>
-            <th>{{ 'users.table.status' | transloco }}</th>
-            <th class="users__actions-header">
-              <span class="users__sr-only">{{ 'users.actions' | transloco }}</span>
-            </th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-user>
-          <tr [class.users__row--deleted]="user.isDeleted">
-            <td>
-              <span class="users__name">
-                <span class="users__avatar" aria-hidden="true">{{ user.name | initials }}</span>
-                <span class="users__name-text">{{ user.name }}</span>
-                @if (user.id === store.currentUserId()) {
-                  <p-tag class="users__tag users__tag--you" [value]="'users.you' | transloco" />
+      <div class="users__table-wrap">
+        <p-table [value]="store.users()" dataKey="id">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'users.table.name' | transloco }}</th>
+              <th>{{ 'users.table.signInEmail' | transloco }}</th>
+              <th>{{ 'users.table.role' | transloco }}</th>
+              <th>{{ 'users.table.teacher' | transloco }}</th>
+              <th>{{ 'users.table.status' | transloco }}</th>
+              <th class="users__actions-header">
+                <span class="users__sr-only">{{ 'users.actions' | transloco }}</span>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-user>
+            <tr [class.users__row--deleted]="user.isDeleted">
+              <td>
+                <span class="users__name">
+                  <span class="users__avatar" aria-hidden="true">{{ user.name | initials }}</span>
+                  <span class="users__name-text">{{ user.name }}</span>
+                  @if (user.id === store.currentUserId()) {
+                    <p-tag class="users__tag users__tag--you" [value]="'users.you' | transloco" />
+                  }
+                </span>
+              </td>
+              <td class="users__email"><bdi dir="ltr">{{ user.signInEmail }}</bdi></td>
+              <td>
+                <p-tag
+                  class="users__tag"
+                  [class.users__tag--administrator]="!user.isDeleted && user.role === roles.administrator"
+                  [class.users__tag--teacher]="!user.isDeleted && user.role === roles.teacher"
+                  [class.users__tag--muted]="user.isDeleted"
+                  [value]="('users.roles.' + user.role) | transloco" />
+              </td>
+              <td>
+                @if (user.teacherName; as teacherName) {
+                  {{ teacherName }}
+                } @else {
+                  <span class="users__muted">{{ 'users.noTeacher' | transloco }}</span>
                 }
-              </span>
-            </td>
-            <td class="users__email"><bdi dir="ltr">{{ user.signInEmail }}</bdi></td>
-            <td>
-              <p-tag
-                class="users__tag"
-                [class.users__tag--administrator]="!user.isDeleted && user.role === roles.administrator"
-                [class.users__tag--teacher]="!user.isDeleted && user.role === roles.teacher"
-                [class.users__tag--muted]="user.isDeleted"
-                [value]="('users.roles.' + user.role) | transloco" />
-            </td>
-            <td>
-              @if (user.teacherName; as teacherName) {
-                {{ teacherName }}
-              } @else {
-                <span class="users__muted">{{ 'users.noTeacher' | transloco }}</span>
-              }
-            </td>
-            <td>
-              @if (user.isDeleted) {
-                <p-tag class="users__tag" severity="secondary" [value]="'users.status.deleted' | transloco" />
-              } @else {
-                <p-tag class="users__tag" severity="success" [value]="'users.status.active' | transloco" />
-              }
-            </td>
-            <td class="users__actions">
-              @if (user.isDeleted) {
-                <p-button
-                  [label]="'users.restore' | transloco"
-                  text
-                  size="small"
-                  [disabled]="store.isMutating()"
-                  (onClick)="onRestoreUser(user)" />
-              } @else {
-                <p-button
-                  icon="pi pi-ellipsis-v"
-                  rounded
-                  text
-                  severity="secondary"
-                  [ariaLabel]="'users.actions' | transloco"
-                  (onClick)="onRowActions($event, user)" />
-              }
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+              </td>
+              <td>
+                @if (user.isDeleted) {
+                  <p-tag class="users__tag" severity="secondary" [value]="'users.status.deleted' | transloco" />
+                } @else {
+                  <p-tag class="users__tag" severity="success" [value]="'users.status.active' | transloco" />
+                }
+              </td>
+              <td class="users__actions">
+                @if (user.isDeleted) {
+                  <p-button
+                    [label]="'users.restore' | transloco"
+                    text
+                    size="small"
+                    [disabled]="store.isMutating()"
+                    (onClick)="onRestoreUser(user)" />
+                } @else {
+                  <p-button
+                    icon="pi pi-ellipsis-v"
+                    rounded
+                    text
+                    severity="secondary"
+                    [ariaLabel]="'users.actions' | transloco"
+                    (onClick)="onRowActions($event, user)" />
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <ul class="users__cards">
+        @for (user of store.users(); track user.id) {
+          <li>
+            <app-user-card
+              [user]="user"
+              [isYou]="user.id === store.currentUserId()"
+              [disabled]="store.isMutating()"
+              (actionsRequested)="onRowActions($event, user)"
+              (restoreRequested)="onRestoreUser(user)" />
+          </li>
+        }
+      </ul>
 
       <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" />
 
       @if (store.hasOnlyOneUser()) {
-        <div class="users__empty">
-          <span class="users__empty-icon" aria-hidden="true"><i class="pi pi-user"></i></span>
-          <p class="users__empty-title">{{ 'users.emptyTitle' | transloco }}</p>
-          <p class="users__empty-hint">{{ 'users.emptyHint' | transloco }}</p>
-          <p-button
-            class="users__empty-action"
-            [label]="'users.addUser' | transloco"
-            size="small"
-            [disabled]="store.isMutating()"
-            (onClick)="onAddUser()" />
-        </div>
+        <app-no-other-users [disabled]="store.isMutating()" (addRequested)="onAddUser()" />
       } @else {
         <p class="users__footer">{{ 'users.footer' | transloco: { count: store.users().length } }}</p>
       }

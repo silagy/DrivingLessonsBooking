@@ -20,6 +20,9 @@
   "shell": {
     "logout": "התנתקות",
     "userMenu": "תפריט משתמש",
+    "menu": "תפריט",
+    "openMenu": "פתיחת תפריט",
+    "closeMenu": "סגירת תפריט",
     "changeMyPassword": "שינוי הסיסמה שלי",
     "roles": {
       "administrator": "מנהל מערכת",
@@ -45,6 +48,7 @@
     "addTeacher": "הוספת מורה",
     "editTeacher": "עריכה",
     "deleteTeacher": "מחיקת מורה",
+    "editTeacherAria": "עריכת מורה",
     "confirmDeleteTeacher": "למחוק את {{name}}?",
     "addCar": "הוספת רכב",
     "edit": "עריכה",
@@ -135,6 +139,7 @@
     "title": "תלמידים",
     "subtitle": "תלמידים הם מי שמגישים בקשות שבועיות. הרשימה כוללת תלמידים מרשימת התלמידים ותלמידים שנוספו ידנית.",
     "importRoster": "ייבוא רשימת תלמידים",
+    "importRosterShort": "ייבוא רשימה",
     "filters": {
       "teacher": "מורה",
       "allTeachers": "כל המורים",
@@ -288,6 +293,7 @@
     "notCreatedYet": "מנהל המערכת עדיין לא הכין את השבוע הזה.",
     "cellOpen": "פתוח",
     "cellUnavailable": "חסום",
+    "cellUnavailableShort": "חסום",
     "publishWeek": "פרסום שבוע...",
     "unavailableCount": "{{count}} משבצות סומנו כלא זמינות",
     "loadFailed": "טעינת שבוע העבודה נכשלה."
@@ -300,6 +306,20 @@
       "wednesday": "רביעי",
       "thursday": "חמישי",
       "friday": "שישי"
+    },
+    "daysShort": {
+      "sunday": "א׳",
+      "monday": "ב׳",
+      "tuesday": "ג׳",
+      "wednesday": "ד׳",
+      "thursday": "ה׳",
+      "friday": "ו׳"
+    },
+    "windowsShort": {
+      "morning": "בוקר",
+      "noon": "צהריים",
+      "afternoon": "אחה״צ",
+      "evening": "ערב"
     },
     "windows": {
       "morning": "בוקר",
@@ -377,6 +397,7 @@
       "publishedNotice": "ההגשות ייפתחו אוטומטית ב־{{opensAt}}.",
       "closedNotice": "החלון נסגר ב־{{closedAt}}. אקסל v{{version}} נשלח לכל מורה.",
       "weekTitle": "- שבוע {{weekNumber}}",
+      "weekTitleAlone": "שבוע {{weekNumber}}",
       "opensAt": "ההגשה נפתחת {{moment}}",
       "closesAt": "ההגשה נסגרת {{moment}}",
       "closedAt": "ההגשה נסגרה {{moment}}",

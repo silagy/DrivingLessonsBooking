@@ -20,6 +20,9 @@
   "shell": {
     "logout": "Sign out",
     "userMenu": "User menu",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "changeMyPassword": "Change my password",
     "roles": {
       "administrator": "Administrator",
@@ -45,6 +48,7 @@
     "addTeacher": "Add teacher",
     "editTeacher": "Edit",
     "deleteTeacher": "Delete teacher",
+    "editTeacherAria": "Edit teacher",
     "confirmDeleteTeacher": "Delete {{name}}?",
     "addCar": "Add car",
     "edit": "Edit",
@@ -135,6 +139,7 @@
     "title": "Students",
     "subtitle": "Students are the people who submit weekly requests. This list includes Students from the Roster and Students added by hand.",
     "importRoster": "Import Roster",
+    "importRosterShort": "Import Roster",
     "filters": {
       "teacher": "Teacher",
       "allTeachers": "All Teachers",
@@ -288,6 +293,7 @@
     "notCreatedYet": "The Administrator hasn't prepared this week yet.",
     "cellOpen": "Open",
     "cellUnavailable": "Unavailable",
+    "cellUnavailableShort": "Blocked",
     "publishWeek": "Publish week...",
     "unavailableCount": "{{count}} slots marked unavailable",
     "loadFailed": "Failed to load the week schedule."
@@ -300,6 +306,20 @@
       "wednesday": "Wednesday",
       "thursday": "Thursday",
       "friday": "Friday"
+    },
+    "daysShort": {
+      "sunday": "Sun",
+      "monday": "Mon",
+      "tuesday": "Tue",
+      "wednesday": "Wed",
+      "thursday": "Thu",
+      "friday": "Fri"
+    },
+    "windowsShort": {
+      "morning": "Morn",
+      "noon": "Noon",
+      "afternoon": "Aft",
+      "evening": "Eve"
     },
     "windows": {
       "morning": "Morning",
@@ -377,6 +397,7 @@
       "publishedNotice": "Submissions open automatically at {{opensAt}}.",
       "closedNotice": "Window closed {{closedAt}}. Excel v{{version}} was emailed to each teacher.",
       "weekTitle": "- Week {{weekNumber}}",
+      "weekTitleAlone": "Week {{weekNumber}}",
       "opensAt": "Submissions open {{moment}}",
       "closesAt": "Submissions close {{moment}}",
       "closedAt": "Submissions closed {{moment}}",

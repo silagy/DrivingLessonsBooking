@@ -275,49 +275,6 @@
     color: var(--app-text-muted);
 }
 
-.students__empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 2.75rem 1.5rem 3rem;
-    text-align: center;
-}
-
-.students__empty-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    inline-size: 44px;
-    block-size: 44px;
-    border-radius: 999px;
-    background: var(--app-bg-muted);
-    border: 1px solid var(--app-border);
-    color: var(--p-sky-500);
-    font-size: 1.25rem;
-}
-
-.students__empty-title {
-    margin: 0.25rem 0 0;
-    font-size: 1.06rem;
-    font-weight: 600;
-    color: var(--app-ink);
-}
-
-.students__empty-hint {
-    margin: 0;
-    max-inline-size: 460px;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: var(--app-text-secondary);
-}
-
-.students__empty-actions {
-    display: flex;
-    gap: 0.625rem;
-    margin-block-start: 0.625rem;
-}
-
 .students__compact-only {
     display: none;
 }
@@ -409,4 +366,77 @@
 
 ::ng-deep [dir='rtl'] .students-menu__item--mirrored-icon .p-menu-item-icon {
     transform: scaleX(-1);
+}
+
+.students__cards,
+.students__phone-only-link {
+    display: none;
+}
+
+@media screen and (max-width: 639px) {
+    .students__header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .students__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    :host ::ng-deep :is(.students__actions .p-button, .students__clear-filters.p-button) {
+        inline-size: 100%;
+        block-size: 2.75rem;
+        padding-inline: 1rem;
+        white-space: nowrap;
+    }
+
+    .students__wide-only-link,
+    .students__table-wrap {
+        display: none;
+    }
+
+    .students__phone-only-link {
+        display: inline-flex;
+    }
+
+    :host ::ng-deep .students__status.p-selectbutton {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+
+        .p-togglebutton {
+            block-size: 2.75rem;
+        }
+    }
+
+    .students__card--list {
+        background: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+    }
+
+    .students__cards {
+        display: flex;
+        flex-direction: column;
+        gap: 0.625rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .students__no-match {
+        background: var(--app-bg-card);
+        border: 1px solid var(--app-border);
+        border-radius: 14px;
+        box-shadow: var(--app-shadow-card);
+    }
+
+    .students__footer {
+        padding: 1rem 0 0;
+        font-size: 0.8125rem;
+        text-align: center;
+    }
 }

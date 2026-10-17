@@ -5,90 +5,6 @@
     gap: 24px;
 }
 
-.dashboard__title-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.dashboard__title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    font: inherit;
-}
-
-.dashboard__week-title,
-:host ::ng-deep .dashboard__teacher-select .p-select-label {
-    font-family: var(--app-font-display);
-    font-weight: 500;
-    font-size: 1.625rem;
-    letter-spacing: -0.01em;
-    color: var(--app-ink);
-}
-
-:host ::ng-deep .dashboard__teacher-select {
-    border: none;
-    box-shadow: none;
-    background: transparent;
-
-    .p-select-label {
-        padding-inline: 0;
-    }
-
-    .p-select-dropdown {
-        width: auto;
-        padding-inline-start: 6px;
-        color: var(--app-text-secondary);
-    }
-}
-
-.dashboard__me {
-    margin-inline-start: 4px;
-    color: var(--app-text-secondary);
-}
-
-.dashboard__only-yours {
-    margin-block: 4px 0;
-    color: var(--app-text-secondary);
-}
-
-.dashboard__subtitle {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-block-start: 4px;
-}
-
-.dashboard__subtitle-part {
-    font-size: 0.85rem;
-    color: var(--app-text-secondary);
-}
-
-:host ::ng-deep .dashboard__week-select {
-    border: none;
-    box-shadow: none;
-    background: transparent;
-
-    .p-select-label {
-        padding: 0;
-        font-size: 0.85rem;
-        color: var(--app-text-secondary);
-    }
-
-    .p-select-dropdown {
-        width: auto;
-        padding-inline-start: 4px;
-        color: var(--app-text-secondary);
-    }
-}
-
-.dashboard__subtitle-part::before {
-    content: '·';
-    padding-inline: 6px;
-}
-
 .dashboard__actions {
     display: flex;
     gap: 10px;
@@ -157,4 +73,72 @@
     display: flex;
     justify-content: center;
     padding-block: 48px;
+}
+
+@media screen and (max-width: 639px) {
+    .dashboard__header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .dashboard__wide-only {
+        display: none;
+    }
+
+    .dashboard__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.625rem;
+
+        &:empty {
+            display: none;
+        }
+
+        > :only-child {
+            grid-column: 1 / -1;
+        }
+    }
+
+    :host ::ng-deep .dashboard__actions .p-button {
+        inline-size: 100%;
+        block-size: 2.75rem;
+        white-space: nowrap;
+    }
+
+    .dashboard__stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .dashboard__stamp {
+        grid-column: 1 / -1;
+        margin-inline-start: 0;
+        font-size: 0.8125rem;
+    }
+
+    .dashboard__card {
+        padding: 0.875rem;
+    }
+
+    .dashboard__card--grid {
+        padding: 0.75rem 0.625rem;
+    }
+
+    :host ::ng-deep .dashboard__card--grid .week-grid {
+        grid-template-columns: 2.875rem repeat(6, minmax(0, 1fr));
+        gap: 4px;
+    }
+
+    .dashboard__empty {
+        flex-direction: column;
+        align-items: stretch;
+
+        a {
+            block-size: 2.75rem;
+            justify-content: center;
+        }
+    }
 }

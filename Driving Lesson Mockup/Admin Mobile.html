@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="design_doc_mode" content="canvas">
+<title>DriveCal Admin - Mobile</title>
+<link rel="stylesheet" href="_ds/comply365-design-system-c08fa187-8d1c-4b7b-9020-5ede0ce63bf0/colors_and_type.css">
+<style>
+:root{--ink:#121418;--sky:#0057FF;--skyD:#003293;--skyL:#7BAEFF;--ocean:#00BBC7;--plum:#BA0081;--whale:#005389;--steelL:#DBE3F3;--g2:#2C2F37;--g3:#52555C;--g4:#7A8394;--g5:#E6E8F6;--g6:#F5F6FF;--g7:#FBFBFF;--grad:linear-gradient(135deg,#0057FF 0%,#00BBC7 100%);--sh:0 1px 2px rgba(18,20,24,.06),0 2px 8px rgba(18,20,24,.06);--f:'Helvetica Now Text','Helvetica Neue',Arial,sans-serif;--fd:'Helvetica Now Display','Helvetica Neue',Arial,sans-serif;--stripes:repeating-linear-gradient(45deg,#F0F1F8 0,#F0F1F8 5px,#E3E6F3 5px,#E3E6F3 10px);--disc:#003293;--win:#fff}
+a{color:var(--sky)}a:hover{color:var(--skyD)}
+*{box-sizing:border-box}
+.fr{position:absolute;top:0;width:390px;font-family:var(--f)}
+.cap{font-family:var(--fd);font-weight:800;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g3);margin:0 0 10px;direction:ltr}
+.ph{width:390px;background:var(--g7);border-radius:20px;overflow:hidden;box-shadow:var(--sh);color:var(--ink);position:relative;display:flex;flex-direction:column}
+.bar{height:56px;background:#fff;border-bottom:1px solid var(--g5);display:flex;align-items:center;gap:8px;padding:0 12px 0 6px}
+.logo{display:flex;align-items:center;gap:8px;font-family:Rubik,var(--fd);font-weight:800;font-size:20px;color:var(--skyD);letter-spacing:-.01em}.logo b{color:var(--sky);font-weight:800}
+.bar .end{margin-inline-start:auto;display:flex;align-items:center;gap:4px}
+.av{width:32px;height:32px;border-radius:999px;background:var(--steelL);color:var(--whale);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:12px;direction:ltr}
+.ib{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--ink);flex:none}
+.ib.on{background:var(--g6)}
+.pg{padding:20px 16px 24px;display:flex;flex-direction:column;gap:16px}
+h1{font-family:var(--fd);font-weight:500;font-size:24px;line-height:1.2;margin:0;letter-spacing:-.01em}
+.sub{font-size:14px;line-height:1.5;color:var(--g3);margin:0;text-wrap:pretty}
+.hd{display:flex;flex-direction:column;gap:6px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:500;white-space:nowrap;padding:0 18px}
+.btn.p{background-image:var(--grad);color:#fff}
+.btn.s{background:#fff;color:var(--ink);border:2px solid var(--ink)}
+.btn.full{width:100%}
+.eb{font-family:var(--fd);font-weight:800;font-size:11px;letter-spacing:.09em;color:var(--g4);margin:4px 0 -6px}
+.card{background:#fff;border:1px solid var(--g5);border-radius:14px;box-shadow:var(--sh)}
+.list{display:flex;flex-direction:column;gap:10px}
+.car{padding:14px 14px 4px;display:flex;flex-direction:column;gap:12px}
+.r1{display:flex;align-items:center;gap:12px}
+.ico{width:40px;height:40px;border-radius:10px;background:var(--steelL);color:var(--whale);display:flex;align-items:center;justify-content:center;flex:none}
+.nm{font-size:16px;font-weight:600;line-height:1.25}.kd{font-size:13px;color:var(--g3)}
+.tag{margin-inline-start:auto;flex:none;font-family:var(--fd);font-weight:700;font-size:12px;padding:5px 12px;border-radius:999px;background:#EAF1FF;color:var(--skyD)}
+.tag.m{background:var(--g5);color:var(--g2)}.tag.d{background:var(--g6);color:var(--g3);border:1px solid var(--g5)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;height:32px;border:1px solid var(--g5);border-radius:999px;padding:0 5px 0 12px;font-size:13px;color:var(--g2);background:#fff}
+.chip i{font-style:normal;width:22px;height:22px;border-radius:999px;background:var(--steelL);color:var(--whale);font-family:var(--fd);font-weight:700;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.add{height:32px;display:inline-flex;align-items:center;padding:0 10px;border-radius:999px;border:1px dashed #B9C6EA;color:var(--sky);font-size:13px;font-weight:500}
+.none{font-size:13px;color:var(--g4)}
+.acts{display:flex;justify-content:flex-end;gap:4px;border-top:1px solid var(--g6);margin:0 -14px;padding:2px 6px}
+.acts .ib{color:var(--g3)}.acts .ib.del{color:var(--plum)}
+.tch{padding:14px;display:flex;flex-direction:column;gap:12px}
+.tav{width:40px;height:40px;border-radius:999px;background-image:var(--grad);color:#fff;font-family:var(--fd);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.tav.b{background:var(--steelL);color:var(--whale)}
+.carchip{height:30px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;border-radius:999px;background:var(--g7);border:1px solid var(--g5);font-size:13px;color:var(--g2)}
+.carchip span{font-size:11px;font-weight:700;color:var(--skyD)}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label{font-family:var(--fd);font-weight:700;font-size:13px;color:var(--g2)}
+.sel{height:48px;border:1.5px solid var(--g5);border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:16px}
+.stat{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g3)}
+.grid{padding:12px 10px;display:grid;grid-template-columns:52px repeat(6,minmax(0,1fr));gap:5px;direction:rtl}
+.dh{text-align:center;font-family:var(--fd);font-weight:700;font-size:13px;line-height:1.2;padding-bottom:4px}.dh small{display:block;font-family:var(--f);font-weight:400;font-size:11px;color:var(--g4)}
+.sl{display:flex;flex-direction:column;justify-content:center;font-family:var(--fd);font-weight:700;font-size:13px;line-height:1.2}.sl small{font-family:var(--f);font-weight:400;font-size:10.5px;color:var(--g4);direction:ltr;text-align:right}
+.c{height:48px;border-radius:7px;border:1px solid var(--g5);background:#fff;box-shadow:0 1px 1px rgba(18,20,24,.04)}
+.c.x{background:var(--stripes);box-shadow:none;display:flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--g3);font-weight:500}
+.c.na{border:none;background:transparent;box-shadow:none}
+.leg{display:flex;flex-wrap:wrap;gap:8px 16px;padding:0 4px;font-size:12.5px;color:var(--g3)}
+.leg span{display:inline-flex;align-items:center;gap:6px}.leg b{width:14px;height:14px;border-radius:4px;border:1px solid var(--g5);background:#fff;display:inline-block}
+.dock{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--g5);padding:12px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.dock .meta{font-size:12.5px;color:var(--g3);text-align:center}
+.hc{padding:14px 14px 4px;display:flex;flex-direction:column;gap:10px}
+.wk{font-size:16px;font-weight:600}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13.5px}
+.dl dt{color:var(--g3)}.dl dd{margin:0;color:var(--ink)}
+.lnk{height:44px;display:flex;align-items:center;gap:6px;color:var(--sky);font-size:14px;font-weight:500;border-top:1px solid var(--g6);margin:0 -14px;padding:0 14px}
+.seg{display:inline-flex;background:var(--g6);border:1px solid var(--g5);border-radius:999px;padding:3px;gap:2px;direction:ltr}
+.seg div{height:36px;min-width:56px;display:flex;align-items:center;justify-content:center;border-radius:999px;font-size:14px;color:var(--g3)}
+.seg .on{background:#fff;color:var(--ink);box-shadow:var(--sh);border:1px solid var(--g5)}
+.scrim{position:absolute;inset:0;background:rgba(18,20,24,.45)}
+.drw{position:absolute;top:0;bottom:0;right:0;width:300px;background:#fff;display:flex;flex-direction:column;box-shadow:0 20px 48px rgba(18,20,24,.18)}
+.drw .top{height:56px;display:flex;align-items:center;padding:0 16px 0 6px;border-bottom:1px solid var(--g5)}
+.nav{padding:8px;display:flex;flex-direction:column;gap:2px}
+.nav div{height:48px;display:flex;align-items:center;padding:0 14px;border-radius:10px;font-size:16px;color:var(--g2);position:relative}
+.nav .on{background:#EEF3FF;color:var(--skyD);font-weight:600}
+.nav .on::before{content:"";position:absolute;right:0;top:10px;bottom:10px;width:3px;border-radius:3px;background-image:var(--grad)}
+.dfoot{margin-top:auto;border-top:1px solid var(--g5);padding:16px;display:flex;flex-direction:column;gap:14px}
+.who{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--g2);direction:ltr;justify-content:flex-end}
+.row{display:flex;align-items:center;justify-content:space-between;font-size:14px;color:var(--g2)}
+.out{height:44px;display:flex;align-items:center;color:var(--plum);font-size:15px;font-weight:500}
+.spec{position:absolute;top:0;width:520px;padding:28px 30px;background:#fff;border-radius:14px;box-shadow:var(--sh);font-family:var(--f);color:var(--ink)}
+.spec h2{font-family:var(--fd);font-weight:500;font-size:22px;margin:4px 0 16px}
+.spec ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.5;color:var(--g2)}
+.spec b{color:var(--ink)}
+.ph.t{min-height:844px}
+.r1 .info{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.nm{overflow-wrap:anywhere}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.em{font-size:13px;color:var(--g3);direction:ltr;text-align:right;overflow-wrap:anywhere}
+.ke{width:44px;height:44px;margin:-8px -10px -8px -8px;color:var(--g3)}
+.ke.on{background:var(--g6);color:var(--ink)}
+.tag.g{background:#E9F5EC;color:#1E7A39}.tag.oc{background:#E5F8F9;color:#007A82}.tag.sk{background:#EAF1FF;color:var(--skyD)}
+.tag.nw{margin:0;background:var(--sky);color:#fff;font-size:11px;padding:3px 9px}
+.tag.you{margin:0;background:#fff;border:1px solid var(--g4);color:var(--g2);font-size:11px;padding:2px 9px}
+.tag.dot::before{content:"";width:7px;height:7px;border-radius:9px;background:#289E49;display:inline-block;margin-inline-end:6px;vertical-align:1px}
+.tag.sm{font-size:11px;padding:3px 9px;margin:0}
+.nmrow{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.av.lg{width:40px;height:40px;font-size:14px;flex:none}
+.card.nwc{background:#F2F7FF;border-color:#D7E3FF}
+.card.mu{background:var(--g7);box-shadow:none}.card.mu .dim{opacity:.55}
+.dl dd{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}
+.flag{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--plum);font-weight:500}
+.flt{display:flex;flex-direction:column;gap:10px}
+.segf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--g6);border:1px solid var(--g5);border-radius:999px;padding:3px;gap:2px}
+.segf div{height:38px;display:flex;align-items:center;justify-content:center;border-radius:999px;font-size:14px;color:var(--g3)}
+.segf .on{background:#fff;color:var(--ink);box-shadow:var(--sh);border:1px solid var(--g5);font-weight:500}
+.srch{height:48px;border:1.5px solid var(--g5);border-radius:8px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 14px;font-size:15px;color:var(--g4)}
+.cnt{font-size:13px;color:var(--g3);text-align:center}
+.pop{position:absolute;top:58px;left:8px;z-index:3;width:220px;background:#fff;border:1px solid var(--g5);border-radius:12px;box-shadow:0 20px 48px rgba(18,20,24,.18);padding:6px}
+.pop div{height:44px;display:flex;align-items:center;padding:0 12px;border-radius:8px;font-size:15px;color:var(--ink)}
+.pop .fx{background:#EEF3FF;color:var(--skyD);font-weight:600;gap:8px}
+.pop .ds{color:var(--plum)}
+.pop hr{border:0;border-top:1px solid var(--g6);margin:4px 0}
+.btn.t{color:var(--sky);padding:0 10px}
+.empty{padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.empty .ei{width:52px;height:52px;border-radius:999px;background:var(--g6);color:var(--whale);display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.empty .et{font-size:16px;font-weight:600}
+.empty .eh{font-size:14px;color:var(--g3);line-height:1.5;text-wrap:pretty;margin-bottom:6px}
+.tsel{display:flex;align-items:center;gap:8px;min-height:44px;font-family:var(--fd);font-weight:500;font-size:24px}
+.trow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.trow .wn{font-family:var(--fd);font-size:17px;color:var(--g2)}
+.wsel{height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 14px;border:1.5px solid var(--g5);border-radius:999px;background:#fff;font-size:14px;align-self:flex-start}
+.dline{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 10px;font-size:14px;color:var(--g3)}
+.dline .btn{padding:0 4px;height:44px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.st{padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.st b{font-family:var(--fd);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums}
+.st span{font-size:13px;color:var(--g3);line-height:1.3}
+.stamp{font-size:13px;color:var(--g3);margin-top:-6px}
+.share{padding:14px;display:flex;flex-direction:column;gap:8px}
+.share .lb{font-family:var(--fd);font-weight:700;font-size:13px;color:var(--g2)}
+.urow{display:flex;gap:8px;align-items:stretch}
+.url{flex:1;min-width:0;min-height:44px;display:flex;align-items:center;padding:6px 12px;border:1px solid var(--g5);border-radius:8px;background:var(--g7);font-size:14px;direction:ltr;overflow-wrap:anywhere}
+.grid.k{padding:12px 10px;grid-template-columns:46px repeat(6,minmax(0,1fr));gap:4px}
+.c.n{display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
+.c.n.z{color:var(--g4);font-weight:500}
+.note{padding:14px;display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.5;color:var(--g2)}
+.note .ni{width:32px;height:32px;border-radius:999px;background:#E9F5EC;color:#1E7A39;display:flex;align-items:center;justify-content:center;flex:none}
+.en .sl small{text-align:left}
+.lbls{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:328px;padding:14px;border:1px dashed var(--g4);border-radius:10px;margin-top:6px}
+.lbls .btn{font-size:15px;padding:0 10px}
+.spec h3{font-family:var(--fd);font-weight:700;font-size:14px;margin:20px 0 4px}
+.spec code{font-size:12.5px;background:var(--g6);border:1px solid var(--g5);border-radius:4px;padding:1px 5px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+<defs>
+<symbol id="wheel" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="var(--disc)"></circle><path d="M6.06 16A14.5 14.5 0 0 1 33.94 16C29 16.5 25 12 20 12S11 16.5 6.06 16Z" fill="var(--win)"></path><path d="M5.9 23.5C10 23.5 14 25.5 15.5 30L16 34A14.5 14.5 0 0 1 5.9 23.5Z" fill="var(--win)"></path><path d="M34.1 23.5C30 23.5 26 25.5 24.5 30L24 34A14.5 14.5 0 0 0 34.1 23.5Z" fill="var(--win)"></path><circle cx="20" cy="21.5" r="4.6" fill="none" stroke="#7BAEFF" stroke-width="2.2"></circle></symbol>
+<symbol id="cal" viewBox="0 0 40 40"><rect x="13" y="5" width="25" height="24" rx="5" fill="#0057FF"></rect><rect x="15.5" y="11" width="20" height="15.5" rx="2.5" fill="#fff"></rect><path d="M19.5 2.6v4.8M25.5 2.6v4.8M31.5 2.6v4.8" stroke="#003293" stroke-width="2.4" stroke-linecap="round"></path><path d="M26.6 17.6l2.4 2.4 4.2-4.6" fill="none" stroke="#0057FF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="15" cy="25.5" r="14.2" fill="#fff"></circle><use href="#wheel" x="2" y="12.5" width="26" height="26"></use></symbol>
+<symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></symbol>
+<symbol id="close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></symbol>
+<symbol id="car" viewBox="0 0 20 20"><path d="M3 12.5L4.3 8.2C4.6 7.2 5.5 6.5 6.6 6.5H13.4C14.5 6.5 15.4 7.2 15.7 8.2L17 12.5M3 12.5H17M3 12.5V15M17 12.5V15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="edit" viewBox="0 0 20 20"><path d="M12.5 4.5l3 3M4 16l1-4 8.2-8.2a1.4 1.4 0 012 0l1 1a1.4 1.4 0 010 2L8 15l-4 1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></symbol>
+<symbol id="trash" viewBox="0 0 20 20"><path d="M4 5.5h12M8 5.5V4.2c0-.7.5-1.2 1.2-1.2h1.6c.7 0 1.2.5 1.2 1.2v1.3M6 5.5l.7 10c.05.8.7 1.4 1.5 1.4h3.6c.8 0 1.45-.6 1.5-1.4l.7-10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="chev" viewBox="0 0 12 12"><path d="M2.5 4.5L6 8L9.5 4.5" fill="none" stroke="#7A8394" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="arrow" viewBox="0 0 20 20"><path d="M16.5 10H4M8.5 5L3.5 10l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="kebab" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.8" fill="currentColor"></circle><circle cx="12" cy="12" r="1.8" fill="currentColor"></circle><circle cx="12" cy="18.5" r="1.8" fill="currentColor"></circle></symbol>
+<symbol id="upload" viewBox="0 0 20 20"><path d="M4 13v2a1 1 0 001 1h10a1 1 0 001-1v-2M10 3v9m0-9L6.5 6.5M10 3l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="search" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"></circle><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></symbol>
+<symbol id="alert" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.3" fill="none" stroke="currentColor" stroke-width="1.6"></circle><path d="M10 6.5v4.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path><circle cx="10" cy="13.6" r="1.05" fill="currentColor"></circle></symbol>
+<symbol id="users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M2.5 19c.8-3.2 3.4-5 6.5-5s5.7 1.8 6.5 5M16 5.2a3.5 3.5 0 010 6.6M18.5 14.5c1.5.8 2.6 2.4 3 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></symbol>
+<symbol id="check" viewBox="0 0 20 20"><path d="M4 10.5L8.5 15L16 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+<symbol id="copy" viewBox="0 0 20 20"><rect x="7" y="7" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"></rect><path d="M13 4.5V4a1 1 0 00-1-1H4a1 1 0 00-1 1v8a1 1 0 001 1h.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></symbol>
+</defs>
+</svg>
+
+<div class="fr" style="left:0" data-screen-label="01 Shell + menu">
+<div class="cap">01 · App shell - menu open</div>
+<div class="ph" dir="rtl" style="height:780px">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg"><div class="hd"><h1>היסטוריית פרסומים</h1></div></div>
+<div class="scrim"></div>
+<div class="drw">
+<div class="top"><div class="logo"><svg width="28" height="28"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="ib" style="margin-inline-start:auto"><svg width="22" height="22"><use href="#close"></use></svg></div></div>
+<div class="nav"><div>לוח בקרה</div><div>רכבים ומורים</div><div>תלמידים</div><div>הכנת שבוע</div><div>פרסומים</div><div class="on">היסטוריה</div><div>משתמשים</div></div>
+<div class="dfoot">
+<div class="row"><span>שפה</span><div class="seg"><div>EN</div><div class="on">עב</div></div></div>
+<div class="who">adi.silagy@gmail.com<div class="av">AD</div></div>
+<div class="out">התנתקות</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="fr" style="left:430px" data-screen-label="02 Cars and teachers">
+<div class="cap">02 · Cars &amp; teachers</div>
+<div class="ph" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd"><h1>רכבים ומורים</h1><p class="sub">הרכבים הם מאגר משותף - נהלו אותם פעם אחת ושייכו כל רכב למורה אחד או יותר.</p></div>
+<div class="btns"><div class="btn s">הוספת מורה</div><div class="btn p">הוספת רכב</div></div>
+<div class="eb">רכבים · 3</div>
+<div class="list">
+<div class="card car"><div class="r1"><div class="ico"><svg width="20" height="20"><use href="#car"></use></svg></div><div><div class="nm">ג׳ילי</div><div class="kd">פרטי</div></div><span class="tag">אוטומטי</span></div><div class="chips"><span class="none">לא משויך למורה</span><span class="add">+ שיוך</span></div><div class="acts"><div class="ib"><svg width="20" height="20"><use href="#edit"></use></svg></div><div class="ib del"><svg width="20" height="20"><use href="#trash"></use></svg></div></div></div>
+<div class="card car"><div class="r1"><div class="ico"><svg width="20" height="20"><use href="#car"></use></svg></div><div><div class="nm">טסלה זיו</div><div class="kd">פרטי</div></div><span class="tag">אוטומטי</span></div><div class="chips"><span class="chip"><i>זפ</i>זיו פאר</span><span class="add">+ שיוך</span></div><div class="acts"><div class="ib"><svg width="20" height="20"><use href="#edit"></use></svg></div><div class="ib del"><svg width="20" height="20"><use href="#trash"></use></svg></div></div></div>
+<div class="card car"><div class="r1"><div class="ico"><svg width="20" height="20"><use href="#car"></use></svg></div><div><div class="nm">סנדרו</div><div class="kd">פרטי</div></div><span class="tag m">ידני</span></div><div class="chips"><span class="chip"><i>אפ</i>אושרת פאר</span><span class="chip"><i>זפ</i>זיו פאר</span><span class="add">+ שיוך</span></div><div class="acts"><div class="ib"><svg width="20" height="20"><use href="#edit"></use></svg></div><div class="ib del"><svg width="20" height="20"><use href="#trash"></use></svg></div></div></div>
+</div>
+<div class="eb">מורים · 2</div>
+<div class="list">
+<div class="card tch"><div class="r1"><div class="tav">זפ</div><div style="min-width:0"><div class="nm">זיו פאר</div><div class="kd" style="direction:ltr;text-align:right">ziv@drivecal.co.il</div></div><div class="ib" style="margin-inline-start:auto;color:var(--g3)"><svg width="20" height="20"><use href="#edit"></use></svg></div></div><div class="chips"><span class="carchip">טסלה זיו<span>אוטו׳</span></span><span class="carchip">סנדרו<span style="color:var(--g3)">ידני</span></span></div></div>
+<div class="card tch"><div class="r1"><div class="tav b">אפ</div><div style="min-width:0"><div class="nm">אושרת פאר</div><div class="kd" style="direction:ltr;text-align:right">osherat@drivecal.co.il</div></div><div class="ib" style="margin-inline-start:auto;color:var(--g3)"><svg width="20" height="20"><use href="#edit"></use></svg></div></div><div class="chips"><span class="carchip">סנדרו<span style="color:var(--g3)">ידני</span></span></div></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="fr" style="left:860px" data-screen-label="03 Weekly prep">
+<div class="cap">03 · Weekly prep</div>
+<div class="ph" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd"><h1>הכנת שבוע</h1><p class="sub">כל המשבצות מתחילות פתוחות - הקישו על משבצת כדי לסמן אותה כלא זמינה.</p></div>
+<div class="fld"><label>מורה</label><div class="sel" style="border-color:var(--sky)">זיו פאר<svg width="12" height="12"><use href="#chev"></use></svg></div></div>
+<div class="fld"><label>שבוע</label><div class="sel">18 באוק׳ - 23 באוק׳ 2026<svg width="12" height="12"><use href="#chev"></use></svg></div></div>
+<div class="stat"><span class="tag d" style="margin:0">טיוטה</span>4 משבצות סומנו כלא זמינות</div>
+<div class="card grid">
+<div></div><div class="dh">א׳<small>18.10</small></div><div class="dh">ב׳<small>19.10</small></div><div class="dh">ג׳<small>20.10</small></div><div class="dh">ד׳<small>21.10</small></div><div class="dh">ה׳<small>22.10</small></div><div class="dh">ו׳<small>23.10</small></div>
+<div class="sl">בוקר<small>07-12</small></div><div class="c"></div><div class="c"></div><div class="c x">חסום</div><div class="c x">חסום</div><div class="c"></div><div class="c"></div>
+<div class="sl">צהריים<small>12-15</small></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c x">חסום</div>
+<div class="sl">אחה״צ<small>15-18</small></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c x">חסום</div><div class="c na"></div>
+<div class="sl">ערב<small>18-22</small></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c"></div><div class="c na"></div>
+</div>
+<div class="leg"><span><b></b>פתוח</span><span><b style="background:var(--stripes)"></b>לא זמין</span><span><b style="border-style:dashed;background:transparent"></b>מחוץ לרשת (שישי אחה״צ/ערב)</span></div>
+</div>
+<div class="dock"><div class="btn p full">פרסום שבוע…</div></div>
+</div>
+</div>
+
+<div class="fr" style="left:1290px" data-screen-label="04 History">
+<div class="cap">04 · Publications history</div>
+<div class="ph" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd"><h1>היסטוריית פרסומים</h1><p class="sub">כל שבוע שפורסם, לפי מורה - עם גרסת האקסל האחרונה שנשלחה.</p></div>
+<div class="list">
+<div class="card hc"><div class="r1"><div><div class="wk">18-23 באוק׳ 2026</div><div class="kd">אושרת פאר</div></div><span class="tag d">טיוטה</span></div><dl class="dl"><dt>חלון הגשה</dt><dd>-</dd><dt>אקסל אחרון</dt><dd>-</dd></dl><div class="lnk">המשך הכנה<svg width="16" height="16"><use href="#arrow"></use></svg></div></div>
+<div class="card hc"><div class="r1"><div><div class="wk">18-23 באוק׳ 2026</div><div class="kd">זיו פאר</div></div><span class="tag d">טיוטה</span></div><dl class="dl"><dt>חלון הגשה</dt><dd>-</dd><dt>אקסל אחרון</dt><dd>-</dd></dl><div class="lnk">המשך הכנה<svg width="16" height="16"><use href="#arrow"></use></svg></div></div>
+<div class="card hc"><div class="r1"><div><div class="wk">11-16 באוק׳ 2026</div><div class="kd">זיו פאר</div></div><span class="tag" style="background:var(--g5);color:var(--g3)">נסגר</span></div><dl class="dl"><dt>חלון הגשה</dt><dd>ד׳ 18:00 ← ו׳ 14:00</dd><dt>אקסל אחרון</dt><dd>גרסה 2</dd></dl><div class="lnk">הורדה מחדש<svg width="16" height="16"><use href="#arrow"></use></svg></div></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="spec" style="left:1720px" data-screen-label="05 Rules">
+<div class="cap">05 · Responsive rules</div>
+<h2>What changes below 640px</h2>
+<ol>
+<li><b>Header.</b> One 56px bar: logo, avatar, menu button. The tab row moves into a side drawer with language toggle, email and sign out - no more half-cut tabs.</li>
+<li><b>Page header.</b> Title and description stack full width. Action buttons sit in a 2-column row under them (<code>grid 1fr 1fr</code>), 44px tall, text on one line.</li>
+<li><b>Tables become cards.</b> History rows turn into cards: week + teacher on top, status tag at the end, details as label/value pairs, row action as a full-width link at the bottom.</li>
+<li><b>Car cards</b> wrap into 3 rows: car + transmission, teachers + Assign, then Edit/Delete as 44px icon buttons.</li>
+<li><b>Week grid</b> keeps all 6 days on screen: short day letters, cells 48px tall with no "Open" text (the legend says it). Only "חסום" is labelled. No sideways scrolling.</li>
+<li><b>Publish</b> moves to a sticky bottom bar, full width.</li>
+<li><b>Floor.</b> Body text at least 13px, tap targets at least 44px, nothing <code>nowrap</code> except buttons and tags.</li>
+</ol>
+</div>
+
+<div class="fr" style="left:2290px" data-screen-label="06 Students">
+<div class="cap">06 · Students</div>
+<div class="ph t" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd"><h1>תלמידים</h1><p class="sub">כל התלמידים של בית הספר, עם המורה והרכב של כל אחד.</p></div>
+<div class="btns"><div class="btn s"><svg width="18" height="18"><use href="#upload"></use></svg>ייבוא רשימה</div><div class="btn p">הוספת תלמיד</div></div>
+<div class="flt">
+<div class="sel">כל המורים<svg width="12" height="12"><use href="#chev"></use></svg></div>
+<div class="segf"><div class="on">פעילים</div><div>לא פעילים</div><div>הכול</div></div>
+<div class="srch"><svg width="18" height="18"><use href="#search"></use></svg>חיפוש לפי שם, ת״ז או טלפון</div>
+</div>
+<div class="list">
+<div class="card hc"><div class="r1"><div class="av lg">נמ</div><div class="info"><div class="nm">נועה מזרחי</div></div><span class="tag g">פעיל</span><div class="ib ke"><svg width="22" height="22"><use href="#kebab"></use></svg></div></div><dl class="dl"><dt>ת״ז</dt><dd><span class="ltr">205374188</span></dd><dt>טלפון</dt><dd><span class="ltr">054-2218830</span></dd><dt>מורה</dt><dd>זיו פאר</dd><dt>רכב</dt><dd>טסלה זיו<span class="tag sm">אוטומטי</span></dd></dl><div style="height:10px"></div></div>
+<div class="card hc nwc"><div class="r1"><div class="av lg">עב</div><div class="info"><div class="nmrow"><span class="nm">עומר ביטון</span><span class="tag nw">חדש</span></div></div><span class="tag g">פעיל</span><div class="ib ke"><svg width="22" height="22"><use href="#kebab"></use></svg></div></div><dl class="dl"><dt>ת״ז</dt><dd><span class="ltr">312456789</span></dd><dt>טלפון</dt><dd><span class="ltr">052-7741206</span></dd><dt>מורה</dt><dd>אושרת פאר</dd><dt>רכב</dt><dd>סנדרו<span class="tag sm m">ידני</span></dd></dl><div style="height:10px"></div></div>
+<div class="card hc" style="position:relative;z-index:2"><div class="r1"><div class="av lg">אב</div><div class="info"><div class="nm">אלכסנדרה בן-דוד רוזנטל-אברהמי</div></div><span class="tag g">פעיל</span><div class="ib ke on"><svg width="22" height="22"><use href="#kebab"></use></svg></div></div><dl class="dl"><dt>ת״ז</dt><dd><span class="ltr">301992475</span></dd><dt>טלפון</dt><dd><span class="ltr">053-8120044</span></dd><dt>מורה</dt><dd>זיו פאר</dd><dt>רכב</dt><dd>ג׳ילי<span class="tag sm">אוטומטי</span><span class="flag"><svg width="15" height="15"><use href="#alert"></use></svg>לא הרכב של המורה</span></dd></dl><div style="height:10px"></div>
+<div class="pop"><div class="fx"><svg width="16" height="16"><use href="#alert"></use></svg>תיקון הרכב</div><hr><div>עריכת פרטים</div><div>שינוי מורה</div><div>שינוי רכב</div><hr><div class="ds">סימון כלא פעיל</div></div></div>
+<div class="card hc mu"><div class="r1"><div class="av lg dim" style="background:var(--g5);color:var(--g3)">יש</div><div class="info dim"><div class="nm">יובל שפירא</div></div><span class="tag d">לא פעיל</span><div class="ib ke"><svg width="22" height="22"><use href="#kebab"></use></svg></div></div><dl class="dl dim"><dt>ת״ז</dt><dd><span class="ltr">209113578</span></dd><dt>טלפון</dt><dd><span class="ltr">050-3398217</span></dd><dt>מורה</dt><dd>אושרת פאר</dd><dt>רכב</dt><dd>סנדרו<span class="tag sm m">ידני</span></dd></dl><div style="height:10px"></div></div>
+</div>
+<div class="cnt">55 תלמידים</div>
+</div>
+</div>
+</div>
+
+<div class="fr" style="left:2720px" data-screen-label="06b Students empty filter">
+<div class="cap">06b · Students - no match</div>
+<div class="ph" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="flt">
+<div class="sel">זיו פאר<svg width="12" height="12"><use href="#chev"></use></svg></div>
+<div class="segf"><div>פעילים</div><div class="on">לא פעילים</div><div>הכול</div></div>
+<div class="srch" style="color:var(--ink)"><svg width="18" height="18" style="color:var(--g4)"><use href="#search"></use></svg>כהן</div>
+</div>
+<div class="card empty"><div class="ei"><svg width="24" height="24"><use href="#search"></use></svg></div><div class="et">אין תלמידים שתואמים לסינון</div><div class="eh">נסו חיפוש אחר, או שנו את המורה או הסטטוס.</div><div class="btn s full">ניקוי סינון</div></div>
+</div>
+</div>
+<p class="sub" style="font-size:13px;margin-top:10px;direction:ltr">On a phone the filters stay visible above the empty card, and the reset is a full-width 44px button instead of a text link.</p>
+</div>
+
+<div class="fr" style="left:3150px" data-screen-label="07 Users">
+<div class="cap">07 · Users</div>
+<div class="ph t" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd"><h1>משתמשים</h1><p class="sub">מי יכול להתחבר לדרייבקל, ובאיזה תפקיד.</p></div>
+<div class="btn p full">הוספת משתמש</div>
+<div class="list">
+<div class="card hc"><div class="r1"><div class="av lg">עס</div><div class="info"><div class="nmrow"><span class="nm">עדי סילגי</span><span class="tag you">את/ה</span></div><div class="em">adi.silagy@gmail.com</div></div><span class="tag g">פעיל</span><div class="ib ke"><svg width="22" height="22"><use href="#kebab"></use></svg></div></div><dl class="dl"><dt>תפקיד</dt><dd><span class="tag sm sk">מנהל מערכת</span></dd><dt>מורה</dt><dd style="color:var(--g4)">-</dd></dl><div style="height:10px"></div></div>
+<div class="card hc"><div class="r1"><div class="av lg">זפ</div><div class="info"><div class="nm">זיו פאר</div><div class="em">ziv.peer.driving.instructor@drivecal.co.il</div></div><span class="tag g">פעיל</span><div class="ib ke"><svg width="22" height="22"><use href="#kebab"></use></svg></div></div><dl class="dl"><dt>תפקיד</dt><dd><span class="tag sm oc">מורה</span></dd><dt>מורה</dt><dd>זיו פאר</dd></dl><div style="height:10px"></div></div>
+<div class="card hc mu"><div class="r1"><div class="av lg dim" style="background:var(--g5);color:var(--g3)">אפ</div><div class="info dim"><div class="nm">אושרת פאר</div><div class="em">osherat@drivecal.co.il</div></div><span class="tag d">נמחק</span></div><dl class="dl dim"><dt>תפקיד</dt><dd><span class="tag sm oc">מורה</span></dd><dt>מורה</dt><dd>אושרת פאר</dd></dl><div class="lnk">שחזור</div></div>
+</div>
+<div class="cnt">3 משתמשים</div>
+</div>
+</div>
+</div>
+
+<div class="fr" style="left:3580px" data-screen-label="07b Users only you">
+<div class="cap">07b · Users - only you</div>
+<div class="ph" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd"><h1>משתמשים</h1><p class="sub">מי יכול להתחבר לדרייבקל, ובאיזה תפקיד.</p></div>
+<div class="card empty"><div class="ei"><svg width="26" height="26"><use href="#users"></use></svg></div><div class="et">רק את/ה כאן כרגע</div><div class="eh">הוסיפו מורה כדי שיוכל להתחבר ולראות את המשבצות שלו.</div><div class="btn p full">הוספת משתמש</div></div>
+</div>
+</div>
+<p class="sub" style="font-size:13px;margin-top:10px;direction:ltr">The header action is hidden here so the page has one Add User button, inside the empty state.</p>
+</div>
+
+<div class="fr" style="left:4010px" data-screen-label="08 Publications open">
+<div class="cap">08 · Publications - Open</div>
+<div class="ph t" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd" style="gap:8px">
+<div class="tsel">זיו פאר<svg width="14" height="14"><use href="#chev"></use></svg></div>
+<div class="trow"><span class="wn">שבוע 42</span><span class="tag g dot" style="margin:0">פתוח</span></div>
+<div class="wsel">18-23 באוק׳ 2026<svg width="12" height="12"><use href="#chev"></use></svg></div>
+<div class="dline"><span>נסגר ביום חמישי 18:00</span><div class="btn t">הארכת מועד</div></div>
+</div>
+<div class="btns"><div class="btn s">רענון</div><div class="btn p">הורדת אקסל</div></div>
+<div class="stats"><div class="card st"><b>14</b><span>תלמידים הגישו</span></div><div class="card st"><b>38</b><span>בחירות בסך הכול</span></div><div class="card st"><b>11:37</b><span>הגשה אחרונה</span></div></div>
+<div class="stamp">נתונים נכונים ל-14:32 · רעננו לעדכון</div>
+<div class="card share"><div class="lb">קישור לשיתוף</div><div class="urow"><div class="url">drivecal.co.il/s/peer-w42</div><div class="btn p" style="padding:0 14px"><svg width="16" height="16"><use href="#copy"></use></svg>העתקה</div></div></div>
+<div class="card grid k">
+<div></div><div class="dh">א׳<small>18.10</small></div><div class="dh">ב׳<small>19.10</small></div><div class="dh">ג׳<small>20.10</small></div><div class="dh">ד׳<small>21.10</small></div><div class="dh">ה׳<small>22.10</small></div><div class="dh">ו׳<small>23.10</small></div>
+<div class="sl">בוקר<small>07-12</small></div><div class="c n">1</div><div class="c n">2</div><div class="c x">חסום</div><div class="c x">חסום</div><div class="c n">1</div><div class="c n">4</div>
+<div class="sl">צהריים<small>12-15</small></div><div class="c n">2</div><div class="c n">2</div><div class="c n">1</div><div class="c n z">0</div><div class="c n">3</div><div class="c x">חסום</div>
+<div class="sl">אחה״צ<small>15-18</small></div><div class="c n">5</div><div class="c n">4</div><div class="c n">5</div><div class="c n">6</div><div class="c x">חסום</div><div class="c na"></div>
+<div class="sl">ערב<small>18-22</small></div><div class="c n">3</div><div class="c n">6</div><div class="c n z">0</div><div class="c n">4</div><div class="c n">5</div><div class="c na"></div>
+</div>
+<div class="leg"><span><b></b>מספר בקשות</span><span><b style="background:var(--stripes)"></b>לא זמין</span><span><b style="border-style:dashed;background:transparent"></b>מחוץ לרשת</span></div>
+</div>
+</div>
+</div>
+
+<div class="fr" style="left:4440px" data-screen-label="08b Publications closed">
+<div class="cap">08b · Publications - Closed header</div>
+<div class="ph" dir="rtl">
+<div class="bar"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>דרייב<b>קל</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd" style="gap:8px">
+<div class="tsel">זיו פאר<svg width="14" height="14"><use href="#chev"></use></svg></div>
+<div class="trow"><span class="wn">שבוע 41</span><span class="tag" style="margin:0;background:var(--g5);color:var(--g3)">נסגר</span></div>
+<div class="wsel">11-16 באוק׳ 2026<svg width="12" height="12"><use href="#chev"></use></svg></div>
+<div class="dline" style="min-height:44px"><span>נסגר ב-16 באוק׳, 18:00</span></div>
+</div>
+<div class="btns"><div class="btn s">פתיחה מחדש…</div><div class="btn p">הורדת אקסל</div></div>
+<div class="card note"><div class="ni"><svg width="16" height="16"><use href="#check"></use></svg></div><div>החלון נסגר ב-16 באוק׳, 18:00. גרסת אקסל <span class="ltr">v2</span> נשלחה במייל.</div></div>
+</div>
+</div>
+<p class="sub" style="font-size:13px;margin-top:10px;direction:ltr">Grid card and legend follow below, as in frame 08. Draft has one action (full width); Published has none, so the row is dropped.</p>
+</div>
+
+<div class="fr en" style="left:4870px;width:360px" data-screen-label="08 EN 360">
+<div class="cap">08 · English LTR at 360px</div>
+<div class="ph t" dir="ltr" style="width:360px">
+<div class="bar" style="padding:0 6px 0 12px"><div class="logo"><svg width="32" height="32"><use href="#cal"></use></svg>Drive<b>Cal</b></div><div class="end"><div class="av">AD</div><div class="ib"><svg width="24" height="24"><use href="#menu"></use></svg></div></div></div>
+<div class="pg">
+<div class="hd" style="gap:8px">
+<div class="tsel">Ziv Peer<svg width="14" height="14"><use href="#chev"></use></svg></div>
+<div class="trow"><span class="wn">Week 42</span><span class="tag g dot" style="margin:0">Open</span></div>
+<div class="wsel">Oct 18-23, 2026<svg width="12" height="12"><use href="#chev"></use></svg></div>
+<div class="dline"><span>Closes Thursday 18:00</span><div class="btn t">Extend deadline</div></div>
+</div>
+<div class="btns"><div class="btn s">Refresh</div><div class="btn p">Download Excel</div></div>
+<div class="stats"><div class="card st"><b>14</b><span>students submitted</span></div><div class="card st"><b>38</b><span>total picks</span></div><div class="card st"><b>11:37</b><span>last submission</span></div></div>
+<div class="stamp">Data as of 14:32 · refresh to update</div>
+<div class="card share"><div class="lb">Share link</div><div class="urow"><div class="url">drivecal.co.il/s/peer-w42</div><div class="btn p" style="padding:0 14px"><svg width="16" height="16"><use href="#copy"></use></svg>Copy</div></div></div>
+<div class="card grid k" style="direction:ltr">
+<div></div><div class="dh">S<small>18.10</small></div><div class="dh">M<small>19.10</small></div><div class="dh">T<small>20.10</small></div><div class="dh">W<small>21.10</small></div><div class="dh">T<small>22.10</small></div><div class="dh">F<small>23.10</small></div>
+<div class="sl">Morn.<small>07-12</small></div><div class="c n">1</div><div class="c n">2</div><div class="c x">N/A</div><div class="c x">N/A</div><div class="c n">1</div><div class="c n">4</div>
+<div class="sl">Noon<small>12-15</small></div><div class="c n">2</div><div class="c n">2</div><div class="c n">1</div><div class="c n z">0</div><div class="c n">3</div><div class="c x">N/A</div>
+<div class="sl">Aft.<small>15-18</small></div><div class="c n">5</div><div class="c n">4</div><div class="c n">5</div><div class="c n">6</div><div class="c x">N/A</div><div class="c na"></div>
+<div class="sl">Eve.<small>18-22</small></div><div class="c n">3</div><div class="c n">6</div><div class="c n z">0</div><div class="c n">4</div><div class="c n">5</div><div class="c na"></div>
+</div>
+<div class="leg"><span><b></b>Requests</span><span><b style="background:var(--stripes)"></b>Unavailable</span><span><b style="border-style:dashed;background:transparent"></b>Outside grid</span></div>
+</div>
+</div>
+</div>
+
+<div class="spec" style="left:5270px;width:560px" data-screen-label="09 Rules 06-08">
+<div class="cap">09 · Rules for 06 to 08</div>
+<h2>New decisions</h2>
+<ol start="8">
+<li><b>⋮ on a card.</b> 44px button in the top row's end corner, right after the status tag. The menu opens below it, anchored to that corner, 44px items. A "fix" item goes first, tinted sky, above a divider.</li>
+<li><b>Muted items</b> (Inactive, Deleted): card loses its shadow and goes near-white; avatar, name and details fade to 55%. The status tag and the action (⋮ or Restore) stay full strength so they still read and tap.</li>
+<li><b>Action that replaces ⋮</b> (Restore) sits at the bottom of the card as a full-width 44px text row, like History's row link.</li>
+<li><b>Flags</b> (deleted teacher, not this teacher's car) sit inline after the value they describe: Plum icon + 13px text, wrapping onto a new line when needed.</li>
+<li><b>LTR values</b> (ID, phone, email, link) are isolated <code>dir="ltr"</code> spans. Long emails and links wrap with <code>overflow-wrap:anywhere</code> instead of truncating.</li>
+<li><b>Filters</b> stack full width: teacher select, then the 3-way status control (equal thirds), then search. They stay visible in the no-match state.</li>
+<li><b>One header action</b> goes full width. Hide it when an empty state already shows the same button.</li>
+<li><b>Three header actions.</b> The text action (Extend deadline) moves up next to the deadline it changes; the other two take the 2-column row.</li>
+<li><b>Stat chips</b> sit in 3 equal columns, labels wrap to two lines. The "data as of" stamp goes on its own line under them.</li>
+<li><b>Count grid</b> uses 12×10px card padding, a 46px label column and 4px gaps: cells are about 39px wide at 360px. Cells show the number only; the legend explains.</li>
+<li><b>Phone-only labels.</b> "ייבוא רשימת תלמידים" → "ייבוא רשימה" with the upload icon. Every other label stays as it is.</li>
+</ol>
+<h3>Longest English labels, half-width at 360px</h3>
+<div class="lbls"><div class="btn s"><svg width="18" height="18"><use href="#upload"></use></svg>Import Roster</div><div class="btn p">Add Student</div><div class="btn s">Reopen window…</div><div class="btn p">Download Excel</div><div class="btn t" style="grid-column:1/-1">Extend deadline</div></div>
+</div>
+</body>
+</html>

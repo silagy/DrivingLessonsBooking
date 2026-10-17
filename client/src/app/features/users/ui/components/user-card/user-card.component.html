@@ -1,0 +1,57 @@
+@let account = user();
+<article class="user-card" [class.user-card--deleted]="account.isDeleted">
+  <div class="user-card__top">
+    <span class="user-card__avatar user-card__faded" aria-hidden="true">{{ account.name | initials }}</span>
+    <div class="user-card__identity user-card__faded">
+      <div class="user-card__name-row">
+        <span class="user-card__name">{{ account.name }}</span>
+        @if (isYou()) {
+          <p-tag class="user-card__tag user-card__tag--you" [value]="'users.you' | transloco" />
+        }
+      </div>
+      <bdi dir="ltr" class="user-card__email">{{ account.signInEmail }}</bdi>
+    </div>
+    @if (account.isDeleted) {
+      <p-tag class="user-card__tag" severity="secondary" [value]="'users.status.deleted' | transloco" />
+    } @else {
+      <p-tag class="user-card__tag" severity="success" [value]="'users.status.active' | transloco" />
+      <p-button
+        styleClass="user-card__actions"
+        icon="pi pi-ellipsis-v"
+        rounded
+        text
+        severity="secondary"
+        [ariaLabel]="'users.actions' | transloco"
+        (onClick)="actionsRequested.emit($event)" />
+    }
+  </div>
+
+  <dl class="user-card__details user-card__faded">
+    <dt>{{ 'users.table.role' | transloco }}</dt>
+    <dd>
+      <p-tag
+        class="user-card__tag"
+        [class.user-card__tag--administrator]="!account.isDeleted && account.role === roles.administrator"
+        [class.user-card__tag--teacher]="!account.isDeleted && account.role === roles.teacher"
+        [class.user-card__tag--muted]="account.isDeleted"
+        [value]="('users.roles.' + account.role) | transloco" />
+    </dd>
+    <dt>{{ 'users.table.teacher' | transloco }}</dt>
+    <dd>
+      @if (account.teacherName; as teacherName) {
+        {{ teacherName }}
+      } @else {
+        <span class="user-card__muted">{{ 'users.noTeacher' | transloco }}</span>
+      }
+    </dd>
+  </dl>
+
+  @if (account.isDeleted) {
+    <p-button
+      styleClass="user-card__restore"
+      [label]="'users.restore' | transloco"
+      text
+      [disabled]="disabled()"
+      (onClick)="restoreRequested.emit()" />
+  }
+</article>

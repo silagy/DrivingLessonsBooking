@@ -80,3 +80,45 @@
     text-transform: uppercase;
     color: var(--app-text-secondary);
 }
+
+.card__edit--compact {
+    display: none;
+}
+
+@media screen and (max-width: 639px) {
+    .card {
+        padding: 0.875rem;
+        gap: 0.75rem;
+    }
+
+    .card__header {
+        gap: 0.625rem;
+    }
+
+    .card__email {
+        font-size: 0.8125rem;
+    }
+
+    .card__cars {
+        margin-block-start: 0;
+    }
+
+    .card__chip {
+        font-size: 0.8125rem;
+    }
+
+    .card__edit--wide {
+        display: none;
+    }
+
+    .card__edit--compact {
+        display: inline-flex;
+    }
+
+    :host ::ng-deep .card__edit--compact .p-button,
+    :host ::ng-deep .card__delete.p-button {
+        flex: none;
+        inline-size: 2.75rem;
+        block-size: 2.75rem;
+    }
+}

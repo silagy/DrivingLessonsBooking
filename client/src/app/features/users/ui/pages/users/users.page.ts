@@ -14,6 +14,8 @@ import { ChangeUserRoleRequest } from '../../../data/change-user-role.request';
 import { Role } from '../../../../../shared/models/role.enum';
 import { User } from '../../../domain/user.model';
 import { UsersStore } from '../../../state/users.store';
+import { NoOtherUsersComponent } from '../../components/no-other-users/no-other-users.component';
+import { UserCardComponent } from '../../components/user-card/user-card.component';
 import { AddUserDialog, AddUserDialogData, AddUserResult } from '../../dialogs/add-user/add-user.dialog';
 import { ChangeUserRoleDialog } from '../../dialogs/change-user-role/change-user-role.dialog';
 import { DeleteUserDialog, DeleteUserDialogData } from '../../dialogs/delete-user/delete-user.dialog';
@@ -23,7 +25,17 @@ import { UserDialogData } from '../../dialogs/user-dialog-data';
 
 @Component({
     selector: 'app-users-page',
-    imports: [TranslocoPipe, InitialsPipe, ButtonModule, MenuModule, ProgressSpinnerModule, TableModule, TagModule],
+    imports: [
+        TranslocoPipe,
+        InitialsPipe,
+        ButtonModule,
+        MenuModule,
+        ProgressSpinnerModule,
+        TableModule,
+        TagModule,
+        NoOtherUsersComponent,
+        UserCardComponent,
+    ],
     templateUrl: './users.page.html',
     styleUrl: './users.page.scss',
     providers: [UsersStore, DialogService],

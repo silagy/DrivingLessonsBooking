@@ -180,6 +180,10 @@
   padding: 1.625rem 2.25rem 2.25rem;
 }
 
+.shell__menu-button {
+  display: none;
+}
+
 @media screen and (max-width: 1279px) {
   .shell__bar {
     block-size: auto;
@@ -194,5 +198,47 @@
     flex-basis: 100%;
     block-size: 2.75rem;
     gap: 1.25rem;
+  }
+}
+
+@media screen and (max-width: 639px) {
+  .shell__bar {
+    block-size: 3.5rem;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    padding-block-start: 0;
+    padding-inline: 0.75rem 0.375rem;
+  }
+
+  .shell__nav,
+  .shell__bar-language,
+  .shell__email,
+  .shell__chevron {
+    display: none;
+  }
+
+  .shell__actions {
+    gap: 0.25rem;
+  }
+
+  :host ::ng-deep .shell__user.p-button {
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .shell__menu-button {
+    display: inline-flex;
+  }
+
+  :host ::ng-deep .shell__menu-button .p-button {
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    color: var(--app-ink);
+  }
+
+  .shell__main {
+    padding: 1.25rem 1rem 1.5rem;
   }
 }

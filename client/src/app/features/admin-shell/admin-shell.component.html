@@ -15,7 +15,7 @@
     </nav>
 
     <div class="shell__actions">
-      <app-language-toggle />
+      <app-language-toggle class="shell__bar-language" />
 
       <p-button
         [styleClass]="isUserMenuOpen() ? 'shell__user shell__user--open' : 'shell__user'"
@@ -30,6 +30,17 @@
         }
         <i class="pi pi-chevron-down shell__chevron" [class.shell__chevron--open]="isUserMenuOpen()" aria-hidden="true"></i>
       </p-button>
+
+      <p-button
+        #menuButton
+        class="shell__menu-button"
+        icon="pi pi-bars"
+        [rounded]="true"
+        severity="secondary"
+        text
+        [ariaLabel]="'shell.openMenu' | transloco"
+        [pt]="{ root: { 'aria-haspopup': 'dialog', 'aria-expanded': isDrawerOpen() ? 'true' : 'false' } }"
+        (onClick)="openDrawer()" />
 
       <p-menu
         #userMenu
@@ -60,6 +71,15 @@
       </p-menu>
     </div>
   </header>
+
+  <app-shell-drawer
+    [(open)]="isDrawerOpen"
+    [navigation]="navigation()"
+    [position]="drawerPosition()"
+    [email]="auth.email()"
+    [initials]="initials()"
+    (signOut)="auth.logout()"
+    (dismissed)="focusMenuButton()" />
 
   <main class="shell__main">
     <router-outlet />

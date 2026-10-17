@@ -1,0 +1,55 @@
+@let row = student();
+<article
+  class="student-card"
+  [class.student-card--new]="row.isNew"
+  [class.student-card--inactive]="!row.isActive">
+  <div class="student-card__top">
+    <span class="student-card__avatar student-card__faded" aria-hidden="true">{{ row.name | initials }}</span>
+    <div class="student-card__identity student-card__faded">
+      <span class="student-card__name">{{ row.name }}</span>
+      @if (row.isNew) {
+        <p-tag class="student-card__tag student-card__tag--new" [value]="'students.new' | transloco" />
+      }
+    </div>
+    <p-tag
+      class="student-card__tag student-card__status"
+      [severity]="row.isActive ? 'success' : 'secondary'"
+      [value]="(row.isActive ? 'students.status.active' : 'students.status.inactive') | transloco" />
+    <p-button
+      styleClass="student-card__actions"
+      icon="pi pi-ellipsis-v"
+      rounded
+      text
+      severity="secondary"
+      [ariaLabel]="'students.actions.menuFor' | transloco: { name: row.name }"
+      [disabled]="disabled()"
+      (onClick)="actionsRequested.emit($event)" />
+  </div>
+
+  <dl class="student-card__details student-card__faded">
+    <dt>{{ 'students.table.nationalId' | transloco }}</dt>
+    <dd><bdi dir="ltr" class="student-card__ltr">{{ row.nationalId }}</bdi></dd>
+    <dt>{{ 'students.table.phone' | transloco }}</dt>
+    <dd><bdi dir="ltr" class="student-card__ltr">{{ row.phone }}</bdi></dd>
+    <dt>{{ 'students.table.teacher' | transloco }}</dt>
+    <dd>
+      <span>{{ row.teacherName }}</span>
+      @if (row.isTeacherDeleted) {
+        <app-deleted-flag [part]="removedParts.teacher" />
+      }
+    </dd>
+    <dt>{{ 'students.table.car' | transloco }}</dt>
+    <dd>
+      <span>{{ row.carName }}</span>
+      <app-transmission-tag [transmission]="row.carTransmission" [muted]="!row.isActive" />
+      @switch (row.carMarker) {
+        @case (carMarkers.deleted) {
+          <app-deleted-flag [part]="removedParts.car" />
+        }
+        @case (carMarkers.notOfTeacher) {
+          <app-car-flag [teacherName]="row.teacherName" [isActive]="row.isActive" />
+        }
+      }
+    </dd>
+  </dl>
+</article>

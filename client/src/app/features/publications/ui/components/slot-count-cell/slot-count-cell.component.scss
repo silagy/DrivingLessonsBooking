@@ -46,3 +46,28 @@
     font-weight: 500;
     color: var(--app-text-secondary);
 }
+
+@media screen and (max-width: 639px) {
+    :host,
+    .slot-count {
+        min-inline-size: 0;
+    }
+
+    .slot-count {
+        min-height: 48px;
+    }
+
+    .slot-count__value {
+        font-size: 1rem;
+    }
+
+    .slot-count__caption,
+    .slot-count__blocked-label {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}

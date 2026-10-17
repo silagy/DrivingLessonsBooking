@@ -9,7 +9,7 @@
   </span>
   <span class="car__teachers">
     @for (teacher of car().assignedTeachers; track teacher.id) {
-      <span class="car__chip">{{ teacher.name }}</span>
+      <span class="car__chip"><span class="car__chip-initials" aria-hidden="true">{{ initialsOf(teacher.name) }}</span>{{ teacher.name }}</span>
     }
     <app-assign-teachers-popover
       [teachers]="teachers()"
@@ -21,16 +21,27 @@
       <span class="car__shared">{{ 'teachers.shared' | transloco }}</span>
     }
     <p-button
+      class="car__edit--wide"
       [label]="'teachers.edit' | transloco"
       severity="secondary"
       size="small"
       text
       (onClick)="edit.emit()" />
     <p-button
+      class="car__edit--compact"
+      icon="pi pi-pencil"
+      severity="secondary"
+      text
+      [rounded]="true"
+      [ariaLabel]="'teachers.editCar' | transloco"
+      (onClick)="edit.emit()" />
+    <p-button
+      styleClass="car__delete"
       icon="pi pi-trash"
       severity="danger"
       size="small"
       text
+      [rounded]="true"
       [ariaLabel]="'teachers.deleteCar' | transloco"
       (onClick)="remove.emit()" />
   </span>

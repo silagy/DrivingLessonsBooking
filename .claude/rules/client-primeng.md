@@ -136,7 +136,7 @@ openExtendDeadline(publication: Publication): void {
 ```
 
 - Shared variant classes in `_dialog-overrides.scss` (e.g., a danger variant for destructive confirmations) — defined once, reused
-- On mobile widths the dialog goes full-screen (global override, not per-dialog)
+- Below 640px a dialog is capped at the viewport width less 2rem (one global `max-inline-size` override in `_global.scss`, not per-dialog; full-screen would need `!important` over PrimeNG's inline width)
 
 ### Toasts
 
@@ -164,7 +164,7 @@ The grid (admin preparation, admin dashboard, student slot picking) is **one sha
 - Student form: mobile-first, ~375px design width, 40px minimum touch targets, single-column flow
 - Admin: desktop-first; compact 32px inputs above the desktop breakpoint
 - One breakpoint convention: `992px` separates mobile/desktop; sizing overrides live in one place in `@layer app`, not per component
-- `992px` is the sizing breakpoint. A component may add its own **layout** breakpoint when measured content needs one; write down why in its plan: e.g. the admin shell's two-row bar at `max-width: 1279px` (#106: a single row clipped nav links below 1280px)
+- `992px` is the sizing breakpoint. A component may add its own **layout** breakpoint when measured content needs one; write down why in its plan: e.g. the admin shell's two-row bar at `max-width: 1279px` (#106: a single row clipped nav links below 1280px), and the admin phone layout at `max-width: 639px` (Admin Mobile design, "What changes below 640px"; see `docs\modules\admin-mobile\admin-mobile-plan`)
 
 ```scss
 @layer app {
