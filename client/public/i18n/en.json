@@ -20,6 +20,8 @@
   "shell": {
     "logout": "Sign out",
     "userMenu": "User menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "changeMyPassword": "Change my password",
     "roles": {
       "administrator": "Administrator",

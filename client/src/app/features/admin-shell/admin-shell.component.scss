@@ -180,6 +180,118 @@
   padding: 1.625rem 2.25rem 2.25rem;
 }
 
+:host ::ng-deep .shell__menu-button.p-button {
+  display: none;
+}
+
+::ng-deep .p-drawer.shell-drawer {
+  inline-size: min(18.75rem, 85vw);
+}
+
+::ng-deep .shell-drawer .p-drawer-header {
+  block-size: 3.5rem;
+  padding-block: 0;
+  padding-inline: 1rem 0.375rem;
+  border-block-end: 1px solid var(--app-border);
+}
+
+::ng-deep .shell-drawer .p-drawer-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+::ng-deep .shell-drawer .shell-drawer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.5rem;
+}
+
+::ng-deep .shell-drawer .shell-drawer__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  block-size: 3rem;
+  padding-inline: 0.875rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: var(--app-text-secondary);
+  text-decoration: none;
+}
+
+::ng-deep .shell-drawer .shell-drawer__link--active {
+  background: var(--p-sky-50);
+  color: var(--p-sky-700);
+  font-weight: 600;
+}
+
+::ng-deep .shell-drawer .shell-drawer__link--active::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 0.625rem;
+  inline-size: 3px;
+  border-radius: 3px;
+  background: var(--app-grad-sky);
+}
+
+::ng-deep .shell-drawer .shell-drawer__footer {
+  margin-block-start: auto;
+  border-block-start: 1px solid var(--app-border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+::ng-deep .shell-drawer .shell-drawer__language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--app-text-secondary);
+}
+
+::ng-deep .shell-drawer .shell-drawer__who {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-inline-size: 0;
+}
+
+::ng-deep .shell-drawer .shell-drawer__email {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: var(--app-text-secondary);
+}
+
+::ng-deep .shell-drawer .shell__avatar {
+  flex: none;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 999px;
+  background: var(--app-steel-light);
+  color: var(--app-whale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--app-font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+::ng-deep .shell-drawer .shell-drawer__sign-out.p-button {
+  justify-content: flex-start;
+  min-block-size: 2.75rem;
+  padding-inline: 0;
+  font-size: 0.9375rem;
+  color: var(--p-red-600);
+}
+
 @media screen and (max-width: 1279px) {
   .shell__bar {
     block-size: auto;
@@ -194,5 +306,44 @@
     flex-basis: 100%;
     block-size: 2.75rem;
     gap: 1.25rem;
+  }
+}
+
+@media screen and (max-width: 639px) {
+  .shell__bar {
+    block-size: 3.5rem;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    padding-block-start: 0;
+    padding-inline: 0.75rem 0.375rem;
+  }
+
+  .shell__nav,
+  .shell__bar-language,
+  .shell__email,
+  .shell__chevron {
+    display: none;
+  }
+
+  .shell__actions {
+    gap: 0.25rem;
+  }
+
+  :host ::ng-deep .shell__user.p-button {
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+    justify-content: center;
+    padding: 0;
+  }
+
+  :host ::ng-deep .shell__menu-button.p-button {
+    display: inline-flex;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    color: var(--app-ink);
+  }
+
+  .shell__main {
+    padding: 1.25rem 1rem 1.5rem;
   }
 }

@@ -20,6 +20,8 @@
   "shell": {
     "logout": "התנתקות",
     "userMenu": "תפריט משתמש",
+    "openMenu": "פתיחת תפריט",
+    "closeMenu": "סגירת תפריט",
     "changeMyPassword": "שינוי הסיסמה שלי",
     "roles": {
       "administrator": "מנהל מערכת",

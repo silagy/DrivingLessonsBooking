@@ -15,7 +15,7 @@
     </nav>
 
     <div class="shell__actions">
-      <app-language-toggle />
+      <app-language-toggle class="shell__bar-language" />
 
       <p-button
         [styleClass]="isUserMenuOpen() ? 'shell__user shell__user--open' : 'shell__user'"
@@ -58,8 +58,60 @@
           </div>
         </ng-template>
       </p-menu>
+
+      <p-button
+        styleClass="shell__menu-button"
+        icon="pi pi-bars"
+        [rounded]="true"
+        severity="secondary"
+        text
+        [ariaLabel]="'shell.openMenu' | transloco"
+        [pt]="{ root: { 'aria-haspopup': 'dialog', 'aria-expanded': isDrawerOpen() ? 'true' : 'false' } }"
+        (onClick)="openDrawer()" />
     </div>
   </header>
+
+  <p-drawer
+    [visible]="isDrawerOpen()"
+    (visibleChange)="isDrawerOpen.set($event)"
+    [position]="drawerPosition()"
+    styleClass="shell-drawer"
+    [ariaCloseLabel]="'shell.closeMenu' | transloco">
+    <ng-template #header>
+      <app-brand-logo />
+    </ng-template>
+
+    <nav class="shell-drawer__nav">
+      @for (item of navigation(); track item.labelKey) {
+        <a
+          [routerLink]="item.commands"
+          routerLinkActive="shell-drawer__link--active"
+          [routerLinkActiveOptions]="{ exact: item.exact }"
+          class="shell-drawer__link"
+          (click)="closeDrawer()">
+          {{ item.labelKey | transloco }}
+        </a>
+      }
+    </nav>
+
+    <div class="shell-drawer__footer">
+      <div class="shell-drawer__language">
+        <span>{{ 'shell.language' | transloco }}</span>
+        <app-language-toggle [touch]="true" />
+      </div>
+      @if (auth.email(); as email) {
+        <div class="shell-drawer__who">
+          <span class="shell__avatar" aria-hidden="true">{{ initials() }}</span>
+          <bdi class="shell-drawer__email" dir="ltr">{{ email }}</bdi>
+        </div>
+      }
+      <p-button
+        styleClass="shell-drawer__sign-out"
+        [label]="'shell.logout' | transloco"
+        text
+        (onClick)="onDrawerSignOut()" />
+    </div>
+  </p-drawer>
 
   <main class="shell__main">
     <router-outlet />
