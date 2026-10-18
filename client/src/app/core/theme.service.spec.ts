@@ -153,6 +153,20 @@ describe('ThemeService', () => {
         expect([darkInSystem, document.documentElement.classList.contains('app-dark')]).toEqual([true, false]);
     });
 
+    it('keeps the choice another tab saved when the device changes', () => {
+        //given
+        withSavedTheme(null);
+        withDevice(false);
+        startService();
+        localStorage.setItem('drivecal.theme', 'dark');
+
+        //when
+        changeDevice(true);
+
+        //then
+        expect(localStorage.getItem('drivecal.theme')).toBe('dark');
+    });
+
     it('colours the status bar like the top bar', () => {
         //given
         withSavedTheme('dark');

@@ -99,7 +99,7 @@ export const AppPreset = definePreset(Aura, {
       dark: {
         primary: {
           color: '{sky.400}',
-          contrastColor: '#ffffff',
+          contrastColor: '{surface.900}',
           hoverColor: '{sky.300}',
           activeColor: '{sky.200}',
         },
@@ -189,6 +189,14 @@ export const AppPreset = definePreset(Aura, {
         dark: {
           error: { color: '{red.400}', outlined: { color: '{red.400}' }, simple: { color: '{red.400}' } },
           info: { color: '{blue.400}', outlined: { color: '{blue.400}' }, simple: { color: '{blue.400}' } },
+        },
+      },
+    },
+    toast: {
+      colorScheme: {
+        dark: {
+          error: { color: '{red.400}' },
+          info: { color: '{blue.400}' },
         },
       },
     },

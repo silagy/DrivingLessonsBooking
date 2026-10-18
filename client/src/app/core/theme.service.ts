@@ -28,10 +28,11 @@ export class ThemeService {
     this.deviceQuery.addEventListener('change', onDeviceChange);
     inject(DestroyRef).onDestroy(() => this.deviceQuery.removeEventListener('change', onDeviceChange));
 
+    effect(() => localStorage.setItem(STORAGE_KEY, this.mode()));
+
     effect(() => {
       const isDark = this.isDark();
       const root = document.documentElement;
-      localStorage.setItem(STORAGE_KEY, this.mode());
       root.classList.toggle(DARK_CLASS, isDark);
       root.style.colorScheme = isDark ? 'dark' : 'light';
       document

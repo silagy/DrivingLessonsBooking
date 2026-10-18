@@ -22,10 +22,19 @@ interface DarkFormFieldPreset {
     };
 }
 
+type Severity = 'error' | 'info' | 'warn' | 'success';
+
 interface DarkMessagePreset {
     primitive: Record<string, Record<number, string>>;
-    semantic: { colorScheme: { dark: { surface: Record<number, string> } } };
-    components: { message: { colorScheme: { dark: Record<'error' | 'info' | 'warn' | 'success', { color: string }> } } };
+    semantic: {
+        colorScheme: {
+            dark: {
+                surface: Record<number, string>;
+                primary: Record<'color' | 'hoverColor' | 'activeColor' | 'contrastColor', string>;
+            };
+        };
+    };
+    components: Record<'message' | 'toast', { colorScheme: { dark: Record<Severity, { color: string }> } }>;
 }
 
 const NOT_COLOURS = [
@@ -74,6 +83,18 @@ function mix(top: string, bottom: string, share: number): string {
     const mixed = [1, 3, 5].map((i) => Math.round(channel(top, i) * share + channel(bottom, i) * (1 - share)));
 
     return `#${mixed.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function resolveDark(preset: DarkMessagePreset, token: string): string {
+    const reference = token.match(/\{(\w+)\.(\d+)\}/);
+
+    if (!reference) {
+        return token;
+    }
+
+    const [, palette, step] = reference;
+
+    return palette === 'surface' ? preset.semantic.colorScheme.dark.surface[Number(step)] : preset.primitive[palette][Number(step)];
 }
 
 function failingPairs(pairs: [string, string][], minimum: number): string[] {
@@ -181,25 +202,39 @@ describe('dark tokens', () => {
         expect(Object.entries(ratios).filter(([, ratio]) => ratio < BODY_TEXT)).toEqual([]);
     });
 
-    it('keeps messages readable on a dark page', () => {
+    it('keeps text on primary fills readable in dark', () => {
         //given
         const preset = AppPreset as unknown as DarkMessagePreset;
-        const resolve = (token: string) => {
-            const [, palette, step] = token.match(/\{(\w+)\.(\d+)\}/)!;
-            return palette === 'surface' ? preset.semantic.colorScheme.dark.surface[Number(step)] : preset.primitive[palette][Number(step)];
-        };
-        const messages = preset.components.message.colorScheme.dark;
-        const tintedPage = (token: string) =>
-            mix(resolve(`{${token.match(/\{(\w+)\./)![1]}.500}`), resolve('{surface.900}'), MESSAGE_TINT);
+        const primary = preset.semantic.colorScheme.dark.primary;
 
         //when
-        const failing = (['error', 'info', 'warn', 'success'] as const)
-            .map((severity) => {
-                const color = messages[severity].color;
-                return { severity, ratio: contrast(resolve(color), tintedPage(color)) };
-            })
+        const failing = (['color', 'hoverColor', 'activeColor'] as const)
+            .map((fill) => ({ fill, ratio: contrast(resolveDark(preset, primary.contrastColor), resolveDark(preset, primary[fill])) }))
             .filter(({ ratio }) => ratio < BODY_TEXT)
-            .map(({ severity, ratio }) => `${severity}: ${ratio.toFixed(2)}`);
+            .map(({ fill, ratio }) => `${fill}: ${ratio.toFixed(2)}`);
+
+        //then
+        expect(failing).toEqual([]);
+    });
+
+    it('keeps messages and toasts readable on a dark page', () => {
+        //given
+        const preset = AppPreset as unknown as DarkMessagePreset;
+        const resolve = (token: string) => resolveDark(preset, token);
+        const tintedPage = (token: string) =>
+            mix(resolve(`{${token.match(/\{(\w+)\./)![1]}.500}`), resolve('{surface.900}'), MESSAGE_TINT);
+        const severities: Severity[] = ['error', 'info', 'warn', 'success'];
+
+        //when
+        const failing = (['message', 'toast'] as const)
+            .flatMap((component) =>
+                severities.map((severity) => {
+                    const color = preset.components[component].colorScheme.dark[severity].color;
+                    return { name: `${component} ${severity}`, ratio: contrast(resolve(color), tintedPage(color)) };
+                }),
+            )
+            .filter(({ ratio }) => ratio < BODY_TEXT)
+            .map(({ name, ratio }) => `${name}: ${ratio.toFixed(2)}`);
 
         //then
         expect(failing).toEqual([]);
