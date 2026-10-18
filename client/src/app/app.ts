@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
 import { LanguageService } from './core/language.service';
+import { ThemeService } from './core/theme.service';
 import { NewVersionNoticeComponent } from './shared/components/new-version-notice/new-version-notice.component';
 
 @Component({
@@ -19,4 +20,5 @@ import { NewVersionNoticeComponent } from './shared/components/new-version-notic
 })
 export class App {
   protected readonly language = inject(LanguageService);
+  private readonly theme = inject(ThemeService);
 }

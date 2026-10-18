@@ -22,6 +22,10 @@ describe('App', () => {
         clear: () => storage.clear(),
       } as Storage,
     });
+    Object.defineProperty(globalThis, 'matchMedia', {
+      configurable: true,
+      value: () => ({ matches: false, addEventListener: () => undefined, removeEventListener: () => undefined }),
+    });
 
     await TestBed.configureTestingModule({
       imports: [App, TranslocoTestingModule.forRoot({ langs: { en: {}, he: {} } })],
