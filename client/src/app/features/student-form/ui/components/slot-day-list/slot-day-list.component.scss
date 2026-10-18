@@ -69,17 +69,17 @@
 }
 
 .slot-chip:focus-visible {
-    outline: 2px solid var(--p-sky-500);
+    outline: 2px solid var(--app-brand);
     outline-offset: 2px;
 }
 
 .slot-chip--picked {
-    border-color: var(--p-sky-500);
-    background: var(--p-sky-50);
+    border-color: var(--app-selected-border);
+    background: var(--app-selected-bg);
 }
 
 .slot-chip--picked .slot-chip__window {
-    color: var(--p-sky-700);
+    color: var(--app-brand-deep);
 }
 
 .slot-chip--unavailable {

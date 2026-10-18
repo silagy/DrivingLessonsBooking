@@ -1,4 +1,9 @@
 :host {
+  --brand-mark-sky: var(--p-sky-500);
+  --brand-mark-deep: var(--p-sky-700);
+  --brand-mark-soft: var(--p-sky-300);
+  --brand-mark-page: var(--p-surface-0);
+
   display: inline-flex;
   min-inline-size: 0;
 }
@@ -17,35 +22,38 @@
 }
 
 .brand__calendar {
-  fill: var(--app-brand);
+  fill: var(--brand-mark-sky);
 }
 
 .brand__page {
-  fill: var(--app-on-accent);
+  fill: var(--brand-mark-page);
 }
 
 .brand__rings {
   fill: none;
-  stroke: var(--app-brand-deep);
+  stroke: var(--brand-mark-deep);
 }
 
 .brand__check {
   fill: none;
-  stroke: var(--app-brand);
+  stroke: var(--brand-mark-sky);
 }
 
-.brand__halo,
-.brand__window {
+.brand__halo {
   fill: var(--brand-logo-backdrop, var(--app-bg-card));
 }
 
+.brand__window {
+  fill: var(--brand-mark-page);
+}
+
 .brand__disc {
-  fill: var(--app-brand-deep);
+  fill: var(--brand-mark-deep);
 }
 
 .brand__hub {
   fill: none;
-  stroke: var(--app-brand-soft);
+  stroke: var(--brand-mark-soft);
 }
 
 .brand__word {

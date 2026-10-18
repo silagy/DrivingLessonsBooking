@@ -114,14 +114,14 @@
 }
 
 .pick-sheet__option--selected {
-    border: 2px solid var(--p-sky-500);
-    background: var(--p-sky-50);
-    color: var(--p-sky-700);
+    border: 2px solid var(--app-selected-border);
+    background: var(--app-selected-bg);
+    color: var(--app-brand-deep);
     font-weight: 500;
 }
 
 .pick-sheet__option:has(:focus-visible) {
-    outline: 2px solid var(--p-sky-500);
+    outline: 2px solid var(--app-brand);
     outline-offset: 2px;
 }
 

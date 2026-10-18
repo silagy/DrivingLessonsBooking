@@ -1,15 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 
-const SCANNED = [
-    'src/app/features/admin-shell',
-    'src/app/features/users',
-    'src/app/features/students',
-    'src/app/features/publications',
-    'src/app/features/teachers',
-    'src/app/features/roster',
-    'src/app/features/week-schedules',
-    'src/styles/_global.scss',
-];
+const SCANNED = ['src/app', 'src/styles/_global.scss'];
 
 const LITERAL =
     /#[0-9a-fA-F]{3,8}\b|\brgba?\(|--p-(?:sky|ocean|steel|whale|plum|primary|surface|red|green|blue|orange|yellow|gray|zinc|slate)-\d+/;

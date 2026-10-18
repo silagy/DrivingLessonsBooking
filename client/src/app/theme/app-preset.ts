@@ -159,7 +159,11 @@ export const AppPreset = definePreset(Aura, {
       },
       colorScheme: {
         light: { root: { primary: gradientPrimaryButton } },
-        dark: { root: { primary: gradientPrimaryButton } },
+        dark: {
+          root: { primary: gradientPrimaryButton },
+          outlined: { secondary: { color: '{surface.100}', borderColor: '{surface.500}' } },
+          text: { secondary: { color: '{surface.200}', hoverBackground: '{surface.700}', activeBackground: '{surface.600}' } },
+        },
       },
     },
     tag: {
@@ -171,6 +175,14 @@ export const AppPreset = definePreset(Aura, {
           success: { background: 'var(--app-tag-green-bg)', color: 'var(--app-tag-green-fg)' },
           info: { background: 'var(--app-tag-sky-bg)', color: 'var(--app-tag-sky-fg)' },
           secondary: { background: '{surface.600}', color: '{surface.100}' },
+        },
+      },
+    },
+    message: {
+      colorScheme: {
+        dark: {
+          error: { color: '{red.400}', outlined: { color: '{red.400}' }, simple: { color: '{red.400}' } },
+          info: { color: '{blue.400}', outlined: { color: '{blue.400}' }, simple: { color: '{blue.400}' } },
         },
       },
     },

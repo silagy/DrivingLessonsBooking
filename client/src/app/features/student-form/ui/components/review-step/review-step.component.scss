@@ -59,11 +59,11 @@
 }
 
 .review__item--preferred {
-    border-color: var(--p-sky-500);
+    border-color: var(--app-selected-border);
 }
 
 .review__item.cdk-drag-preview {
-    border-color: var(--p-sky-500);
+    border-color: var(--app-selected-border);
     box-shadow: var(--app-shadow-lift);
 }
 
@@ -160,8 +160,8 @@
 }
 
 .review__type--double {
-    background: var(--p-sky-50);
-    color: var(--p-sky-700);
+    background: var(--app-tag-sky-bg);
+    color: var(--app-tag-sky-fg);
 }
 
 .review__constraint {

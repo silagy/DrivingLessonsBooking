@@ -34,9 +34,9 @@
 }
 
 .status__icon--danger {
-    border-color: var(--p-red-200);
-    background: var(--p-red-50);
-    color: var(--p-red-600);
+    border-color: var(--app-error-border);
+    background: var(--app-error-bg);
+    color: var(--app-error);
 }
 
 .status__heading {
