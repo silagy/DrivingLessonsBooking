@@ -1,0 +1,57 @@
+:host {
+  display: inline-flex;
+}
+
+:host ::ng-deep .appearance.p-selectbutton {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--app-bg-muted);
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+
+  .p-togglebutton {
+    justify-content: center;
+    min-block-size: 2.25rem;
+    min-inline-size: 3.5rem;
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--app-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .p-togglebutton-content {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .p-togglebutton-checked {
+    background: var(--app-bg-card);
+    border-color: var(--app-border);
+    color: var(--app-ink);
+    box-shadow: var(--app-shadow-card);
+  }
+
+  .p-togglebutton:focus-visible {
+    outline: 2px solid var(--app-brand);
+    outline-offset: 1px;
+  }
+}
+
+:host ::ng-deep .appearance--fill.p-selectbutton {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  inline-size: 100%;
+
+  .p-togglebutton {
+    min-block-size: 2.125rem;
+    min-inline-size: 0;
+    font-size: 0.84375rem;
+  }
+}
+
+:host:has(.appearance--fill) {
+  display: flex;
+}

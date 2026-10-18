@@ -5,8 +5,10 @@ import { provideRouter } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { providePrimeNG } from 'primeng/config';
 import { Drawer } from 'primeng/drawer';
+import { Menu } from 'primeng/menu';
 import { AuthService } from '../../core/auth.service';
 import { AppLanguage, LanguageService } from '../../core/language.service';
+import { ThemeService } from '../../core/theme.service';
 import { Role } from '../../shared/models/role.enum';
 import { AdminShellComponent } from './admin-shell.component';
 
@@ -36,6 +38,7 @@ async function render(role: Role, lang: AppLanguage): Promise<ComponentFixture<A
                     use: vi.fn(),
                 },
             },
+            { provide: ThemeService, useValue: { mode: signal('system'), use: vi.fn() } },
         ],
     });
 
@@ -56,6 +59,15 @@ async function openDrawer(fixture: ComponentFixture<AdminShellComponent>): Promi
 
 function drawer(fixture: ComponentFixture<AdminShellComponent>): Drawer {
     return fixture.debugElement.query(By.directive(Drawer)).componentInstance as Drawer;
+}
+
+async function openUserMenu(fixture: ComponentFixture<AdminShellComponent>): Promise<void> {
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.shell__user button, button.shell__user')!.click();
+    await fixture.whenStable();
+}
+
+function userMenu(fixture: ComponentFixture<AdminShellComponent>): Menu {
+    return fixture.debugElement.query(By.directive(Menu)).componentInstance as Menu;
 }
 
 function drawerPosition(fixture: ComponentFixture<AdminShellComponent>): string {
@@ -187,5 +199,51 @@ describe('AdminShellComponent', () => {
 
         //then
         expect(drawerPosition(fixture)).toBe('left');
+    });
+
+    it('puts Appearance in the drawer footer, under the language', async () => {
+        //given
+        const fixture = await render(Role.administrator, 'he');
+
+        //when
+        await openDrawer(fixture);
+
+        //then
+        const language = document.body.querySelector('.shell-drawer__footer .shell-drawer__language')!;
+        const appearance = language.nextElementSibling!;
+        expect(appearance.classList.contains('shell-drawer__appearance')).toBe(true);
+        expect(appearance.querySelector('app-appearance-toggle')).toBeTruthy();
+        expect(appearance.textContent).toContain('shell.appearance.label');
+    });
+
+    it('puts Appearance between the identity and the menu items', async () => {
+        //given
+        const fixture = await render(Role.administrator, 'he');
+
+        //when
+        await openUserMenu(fixture);
+
+        //then
+        const header = document.body.querySelector('.shell-user-menu__header')!;
+        const appearance = document.body.querySelector('.shell-user-menu__appearance')!;
+        const list = document.body.querySelector('.p-menu.shell-user-menu .p-menu-list')!;
+        expect(header.compareDocumentPosition(appearance) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(appearance.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(appearance.querySelector('.appearance--fill')).toBeTruthy();
+    });
+
+    it('keeps the user menu open after picking an appearance', async () => {
+        //given
+        const fixture = await render(Role.administrator, 'he');
+        await openUserMenu(fixture);
+
+        //when
+        document.body.querySelectorAll<HTMLElement>('.shell-user-menu__appearance .p-togglebutton')[1].click();
+        await fixture.whenStable();
+
+        //then
+        expect(TestBed.inject(ThemeService).use).toHaveBeenCalledWith('dark');
+        expect(userMenu(fixture).visible).toBe(true);
+        expect(document.body.querySelector('.p-menu.shell-user-menu')).toBeTruthy();
     });
 });
