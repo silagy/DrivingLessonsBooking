@@ -374,6 +374,10 @@
 }
 
 @media screen and (max-width: 639px) {
+    .students__search {
+        min-block-size: 2.75rem;
+    }
+
     .students__header {
         flex-direction: column;
         align-items: stretch;
