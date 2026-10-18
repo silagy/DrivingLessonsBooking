@@ -52,12 +52,11 @@ public class ExcelTypographyTest
             DayOfWeek.Sunday,
             SlotWindowType.Afternoon,
             "Smoke Student A",
-            "000000018",
-            "050-0000001",
-            Transmission.Manual,
+            "Smoke Auto",
             SessionType.Double,
             1,
             2,
+            3,
             "only after 16:00");
 
         A.CallTo(() => publicationRepository.GetAsync(publication.Id))

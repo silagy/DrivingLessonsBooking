@@ -30,16 +30,6 @@ public static class HebrewExcelLabels
         };
     }
 
-    public static string TransmissionOf(Transmission transmission)
-    {
-        return transmission switch
-        {
-            Transmission.Automatic => "אוטומטי",
-            Transmission.Manual => "ידני",
-            _ => throw new ArgumentOutOfRangeException(nameof(transmission), transmission, null)
-        };
-    }
-
     public static string SessionTypeOf(SessionType sessionType)
     {
         return sessionType switch
@@ -48,5 +38,10 @@ public static class HebrewExcelLabels
             SessionType.Double => "כפול",
             _ => throw new ArgumentOutOfRangeException(nameof(sessionType), sessionType, null)
         };
+    }
+
+    public static string RequestedLessonsOf(int targetCount, int pickCount)
+    {
+        return $"{targetCount} מתוך {pickCount}";
     }
 }

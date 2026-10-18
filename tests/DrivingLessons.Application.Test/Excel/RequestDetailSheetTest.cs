@@ -9,8 +9,10 @@ namespace DrivingLessons.Application.Test.Excel;
 [TestClass]
 public class RequestDetailSheetTest
 {
-    private const int ColumnCount = 10;
-    private const int ConstraintsColumn = 10;
+    private const int ColumnCount = 8;
+    private const int CarColumn = 4;
+    private const int RequestedLessonsColumn = 7;
+    private const int ConstraintsColumn = 8;
 
     [TestMethod]
     public void Writes_The_Hebrew_Header_Row()
@@ -28,12 +30,10 @@ public class RequestDetailSheetTest
                 "יום",
                 "משבצת",
                 "שם התלמיד/ה",
-                "תעודת זהות",
-                "טלפון",
-                "תיבת הילוכים",
+                "רכב",
                 "סוג שיעור",
                 "דירוג",
-                "יעד שיעורים",
+                "שיעורים מבוקשים",
                 "אילוצים"
             ]);
         sheet.Cell(1, 1).Style.Font.Bold.ShouldBeTrue();
@@ -63,11 +63,10 @@ public class RequestDetailSheetTest
             SlotWindowType.Afternoon,
             rank: 2,
             studentName: "דנה כהן",
-            nationalId: "000000034",
-            phone: "050-0000003",
-            transmission: Transmission.Manual,
+            carName: "Smoke Manual",
             sessionType: SessionType.Double,
             targetCount: 3,
+            pickCount: 5,
             constraint: "רק אחרי 16:00");
 
         //when
@@ -80,16 +79,14 @@ public class RequestDetailSheetTest
                 "שלישי",
                 "אחה״צ",
                 "דנה כהן",
-                "000000034",
-                "050-0000003",
-                "ידני",
+                "Smoke Manual",
                 "כפול",
                 "2",
-                "3",
+                "3 מתוך 5",
                 "רק אחרי 16:00"
             ]);
-        sheet.Cell(2, 8).DataType.ShouldBe(XLDataType.Number);
-        sheet.Cell(2, 9).DataType.ShouldBe(XLDataType.Number);
+        sheet.Cell(2, 6).DataType.ShouldBe(XLDataType.Number);
+        sheet.Cell(2, RequestedLessonsColumn).DataType.ShouldBe(XLDataType.Text);
     }
 
     [TestMethod]
@@ -111,7 +108,7 @@ public class RequestDetailSheetTest
 
         //then
         var sheet = Reloaded(workbook);
-        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[7]}").ShouldBe(
+        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[5]}").ShouldBe(
             [
                 "ראשון בוקר 1",
                 "ראשון בוקר 3",
@@ -122,15 +119,15 @@ public class RequestDetailSheetTest
     }
 
     [TestMethod]
-    public void Orders_Students_With_The_Same_Slot_And_Rank_By_Name()
+    public void Orders_Students_With_The_Same_Slot_And_Rank_By_Name_Then_Car()
     {
         //given
         var workbook = new XLWorkbook();
         SlotRequestDetail[] requests =
         [
-            Request(studentName: "דנה כהן", nationalId: "000000034"),
-            Request(studentName: "Smoke Student E", nationalId: "000000067"),
-            Request(studentName: "Smoke Student A", nationalId: "000000018")
+            Request(studentName: "דנה כהן", carName: "Smoke Old"),
+            Request(studentName: "Smoke Student A", carName: "Smoke Manual"),
+            Request(studentName: "Smoke Student A", carName: "Smoke Auto")
         ];
 
         //when
@@ -138,32 +135,47 @@ public class RequestDetailSheetTest
 
         //then
         var sheet = Reloaded(workbook);
-        RequestRowsOf(sheet).Select(row => row[2]).ShouldBe(
+        RequestRowsOf(sheet).Select(row => $"{row[2]} {row[3]}").ShouldBe(
             [
-                "Smoke Student A",
-                "Smoke Student E",
-                "דנה כהן"
+                "Smoke Student A Smoke Auto",
+                "Smoke Student A Smoke Manual",
+                "דנה כהן Smoke Old"
             ]);
     }
 
     [TestMethod]
-    public void Keeps_National_Id_And_Phone_As_Text()
+    [DataRow(1, 1, "1 מתוך 1")]
+    [DataRow(1, 3, "1 מתוך 3")]
+    [DataRow(2, 5, "2 מתוך 5")]
+    public void Writes_The_Requested_Lessons_As_Target_Out_Of_Picks(int targetCount, int pickCount, string expected)
     {
         //given
         var workbook = new XLWorkbook();
-        var request = Request(nationalId: "000000018", phone: "050-0000001");
 
         //when
-        RequestDetailSheet.AddTo(workbook, [request]);
+        RequestDetailSheet.AddTo(workbook, [Request(targetCount: targetCount, pickCount: pickCount)]);
 
         //then
-        var sheet = Reloaded(workbook);
-        sheet.Cell(2, 4).DataType.ShouldBe(XLDataType.Text);
-        sheet.Cell(2, 4).GetText().ShouldBe("000000018");
-        sheet.Cell(2, 5).DataType.ShouldBe(XLDataType.Text);
-        sheet.Cell(2, 5).GetText().ShouldBe("050-0000001");
-        sheet.Column(4).Style.NumberFormat.Format.ShouldBe("@");
-        sheet.Column(5).Style.NumberFormat.Format.ShouldBe("@");
+        Reloaded(workbook).Cell(2, RequestedLessonsColumn).GetText().ShouldBe(expected);
+    }
+
+    [TestMethod]
+    [DataRow("12-345-67")]
+    [DataRow("0501234")]
+    [DataRow("=A1")]
+    public void Keeps_A_Car_Name_That_Looks_Like_A_Number_Or_A_Formula_As_Text(string carName)
+    {
+        //given
+        var workbook = new XLWorkbook();
+
+        //when
+        RequestDetailSheet.AddTo(workbook, [Request(carName: carName)]);
+
+        //then
+        var cell = Reloaded(workbook).Cell(2, CarColumn);
+        cell.HasFormula.ShouldBeFalse();
+        cell.DataType.ShouldBe(XLDataType.Text);
+        cell.GetText().ShouldBe(carName);
     }
 
     [TestMethod]
@@ -229,7 +241,7 @@ public class RequestDetailSheetTest
         sheet.RightToLeft.ShouldBeTrue();
         sheet.SheetView.SplitRow.ShouldBe(1);
         sheet.AutoFilter.IsEnabled.ShouldBeTrue();
-        sheet.AutoFilter.Range.RangeAddress.ToString().ShouldBe("A1:J3");
+        sheet.AutoFilter.Range.RangeAddress.ToString().ShouldBe("A1:H3");
     }
 
     [TestMethod]
@@ -269,21 +281,6 @@ public class RequestDetailSheetTest
     }
 
     [TestMethod]
-    [DataRow(Transmission.Automatic, "אוטומטי")]
-    [DataRow(Transmission.Manual, "ידני")]
-    public void Names_The_Transmission_In_Hebrew(Transmission transmission, string expected)
-    {
-        //given
-        var workbook = new XLWorkbook();
-
-        //when
-        RequestDetailSheet.AddTo(workbook, [Request(transmission: transmission)]);
-
-        //then
-        Reloaded(workbook).Cell(2, 6).GetText().ShouldBe(expected);
-    }
-
-    [TestMethod]
     [DataRow(SessionType.Single, "יחיד")]
     [DataRow(SessionType.Double, "כפול")]
     public void Names_The_Session_Type_In_Hebrew(SessionType sessionType, string expected)
@@ -295,7 +292,7 @@ public class RequestDetailSheetTest
         RequestDetailSheet.AddTo(workbook, [Request(sessionType: sessionType)]);
 
         //then
-        Reloaded(workbook).Cell(2, 7).GetText().ShouldBe(expected);
+        Reloaded(workbook).Cell(2, 5).GetText().ShouldBe(expected);
     }
 
     private static SlotRequestDetail Request(
@@ -303,23 +300,21 @@ public class RequestDetailSheetTest
         SlotWindowType window = SlotWindowType.Morning,
         int rank = 1,
         string studentName = "Smoke Student A",
-        string nationalId = "000000018",
-        string phone = "050-0000001",
-        Transmission transmission = Transmission.Automatic,
+        string carName = "Smoke Auto",
         SessionType sessionType = SessionType.Single,
         int targetCount = 1,
+        int pickCount = 1,
         string? constraint = null)
     {
         return new SlotRequestDetail(
             day,
             window,
             studentName,
-            nationalId,
-            phone,
-            transmission,
+            carName,
             sessionType,
             rank,
             targetCount,
+            pickCount,
             constraint);
     }
 

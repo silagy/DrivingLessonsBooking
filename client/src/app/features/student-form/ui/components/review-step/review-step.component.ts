@@ -58,6 +58,9 @@ export class ReviewStepComponent {
     protected readonly statuses = SubmitStatus;
     protected readonly sessionTypes = SessionType;
     protected readonly isSubmitting = computed(() => this.submitStatus() === SubmitStatus.submitting);
+    protected readonly hasDoublePick = computed(() =>
+        this.items().some(item => item.sessionType === SessionType.double),
+    );
     protected readonly movedItem = computed(
         () => this.items().find(item => item.slotId === this.movedPickId()) ?? null,
     );

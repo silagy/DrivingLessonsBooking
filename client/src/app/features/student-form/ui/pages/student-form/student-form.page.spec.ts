@@ -328,6 +328,20 @@ async function reachReview(
     await clickContinue(fixture);
 }
 
+async function reachReviewWithOneDouble(fixture: ComponentFixture<StudentFormPage>, targetCount: number): Promise<void> {
+    await reachTarget(fixture);
+
+    for (let count = 1; count < targetCount; count++) {
+        await press(fixture, '.target__increase');
+    }
+
+    await clickContinue(fixture);
+    await tapChip(fixture, 'sunday-afternoon');
+    await chooseDouble(fixture);
+    await press(fixture, '.pick-sheet__save button');
+    await clickContinue(fixture);
+}
+
 function accessibleNameOf(fixture: ComponentFixture<StudentFormPage>, selector: string): string {
     const labelIds = page(fixture).querySelector(selector)!.getAttribute('aria-labelledby') ?? '';
 
@@ -672,6 +686,18 @@ describe('StudentFormPage', () => {
             //then
             expect(single).toMatch(/studentForm\.target\.unitOne$/);
             expect(textOf(fixture, '.target__unit')).toMatch(/studentForm\.target\.unit$/);
+        });
+
+        it('tells the student a double lesson counts once toward the target', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachTarget(fixture);
+
+            //then
+            expect(textOf(fixture, '.target__note')).toMatch(/studentForm\.target\.doubleCountsOnce$/);
         });
 
         it('goes back to the details and keeps the chosen target', async () => {
@@ -1069,6 +1095,45 @@ describe('StudentFormPage', () => {
     });
 
     describe('review and submit', () => {
+        it('reminds that a double counts as one pick when a short list holds one', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReviewWithOneDouble(fixture, 2);
+
+            //then
+            expect(page(fixture).querySelector('.review__not-enough')).not.toBeNull();
+            expect(textOf(fixture, '.review__double-note')).toMatch(/studentForm\.review\.doubleCountsOnce$/);
+        });
+
+        it('leaves the double reminder out when a short list holds only single lessons', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 3, ['sunday-afternoon']);
+
+            //then
+            expect(page(fixture).querySelector('.review__not-enough')).not.toBeNull();
+            expect(page(fixture).querySelector('.review__double-note')).toBeNull();
+        });
+
+        it('shows no not-enough message or double reminder when a double covers a target of one', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReviewWithOneDouble(fixture, 1);
+
+            //then
+            expect(page(fixture).querySelector('.review__not-enough')).toBeNull();
+            expect(page(fixture).querySelector('.review__double-note')).toBeNull();
+        });
+
         it('lists the picks in rank order, the ones inside the target as preferred', async () => {
             //given
             provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));

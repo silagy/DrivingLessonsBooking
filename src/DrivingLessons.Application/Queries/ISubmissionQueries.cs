@@ -23,10 +23,9 @@ public record SlotRequestDetail(
     DayOfWeek Day,
     SlotWindowType Window,
     string StudentName,
-    string NationalId,
-    string Phone,
-    Transmission Transmission,
+    string CarName,
     SessionType SessionType,
     int Rank,
     int TargetCount,
+    int PickCount,
     string? Constraint);
