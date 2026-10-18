@@ -28,7 +28,32 @@
   --app-wordmark-tracking: -0.02em;
   --app-steel-light: var(--p-steel-100);
   --app-whale: var(--p-whale-500);
-  --app-plum: var(--p-plum-500);
+  --app-danger: var(--p-plum-500);
+
+  --app-border-interactive: var(--p-steel-200);
+
+  --app-tag-sky-bg: var(--p-sky-50);
+  --app-tag-sky-fg: var(--p-sky-700);
+  --app-tag-sky-border: var(--p-sky-100);
+  --app-tag-ocean-bg: var(--p-ocean-50);
+  --app-tag-ocean-fg: var(--p-ocean-700);
+  --app-tag-ocean-border: var(--p-ocean-100);
+  --app-tag-green-bg: var(--p-green-100);
+  --app-tag-green-fg: var(--p-green-700);
+
+  --app-row-new-bg: var(--p-sky-50);
+  --app-row-new-border: var(--p-sky-100);
+  --app-row-muted-bg: var(--app-bg-page);
+  --app-selected-bg: var(--p-sky-50);
+  --app-selected-border: var(--p-sky-500);
+
+  --app-error: var(--p-red-600);
+  --app-error-strong: var(--p-red-700);
+  --app-error-bg: var(--p-red-50);
+  --app-error-bg-strong: var(--p-red-100);
+  --app-error-border: var(--p-red-200);
+  --app-success: var(--p-green-600);
+  --app-info: var(--p-blue-600);
 
   --app-grad-sky: linear-gradient(135deg, var(--p-sky-500) 0%, var(--p-ocean-500) 100%);
 
@@ -45,4 +70,53 @@
   --app-caps-tracking: 0;
   --app-wordmark-style: normal;
   --app-wordmark-tracking: -0.01em;
+}
+
+:root.app-dark {
+  --app-ink: #F5F6FF;
+  --app-text-secondary: #A9B1C2;
+  --app-text-muted: #8A93A6;
+
+  --app-bg-page: #121418;
+  --app-bg-muted: #1F2228;
+  --app-bg-card: #1B1D22;
+  --app-border: #2C2F37;
+  --app-border-interactive: #3A4A6E;
+
+  --app-slot-unavailable: repeating-linear-gradient(45deg, #1F2228, #1F2228 6px, #2A2D35 6px, #2A2D35 12px);
+
+  --app-on-accent: #FFFFFF;
+  --app-brand: #5C95FF;
+  --app-brand-deep: #A9C6FF;
+  --app-brand-soft: #5C95FF;
+  --app-steel-light: #22304A;
+  --app-whale: #A9C6FF;
+  --app-danger: #FF8AD8;
+
+  --app-tag-sky-bg: #132447;
+  --app-tag-sky-fg: #A9C6FF;
+  --app-tag-sky-border: #1E3566;
+  --app-tag-ocean-bg: #0A2E31;
+  --app-tag-ocean-fg: #6FE6EC;
+  --app-tag-ocean-border: #12474B;
+  --app-tag-green-bg: #12301D;
+  --app-tag-green-fg: #86DCA0;
+
+  --app-row-new-bg: #14213A;
+  --app-row-new-border: #24395F;
+  --app-row-muted-bg: #16181C;
+  --app-selected-bg: #14213A;
+  --app-selected-border: #5C95FF;
+
+  --app-error: var(--p-red-400);
+  --app-error-strong: var(--p-red-300);
+  --app-error-bg: color-mix(in srgb, var(--p-red-500), transparent 84%);
+  --app-error-bg-strong: color-mix(in srgb, var(--p-red-500), transparent 76%);
+  --app-error-border: color-mix(in srgb, var(--p-red-400), transparent 60%);
+  --app-success: var(--p-green-400);
+  --app-info: var(--p-blue-400);
+
+  --app-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --app-shadow-lift: 0 20px 48px rgba(0, 0, 0, 0.55);
+  --app-scrim: rgba(0, 0, 0, 0.6);
 }
