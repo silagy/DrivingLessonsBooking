@@ -77,8 +77,29 @@ body {
   margin-inline-start: calc(-1 * (var(--p-popover-gutter) - 2px));
 }
 
+.slot-requests-dialog .p-dialog-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
 @media screen and (max-width: 639px) {
   .p-dialog {
     max-inline-size: calc(100vw - 2rem);
+  }
+
+  .p-dialog.slot-requests-dialog {
+    min-inline-size: 100%;
+    max-inline-size: 100%;
+    max-block-size: 78dvh;
+    margin-block: auto 0;
+    margin-inline: 0;
+    border-radius: 20px 20px 0 0;
+    transition: transform 160ms ease-out;
+  }
+
+  .p-dialog.slot-requests-dialog.sheet-dragging {
+    transition: none;
   }
 }

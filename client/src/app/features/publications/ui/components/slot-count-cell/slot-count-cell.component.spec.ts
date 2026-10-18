@@ -87,6 +87,14 @@ describe('SlotCountCellComponent', () => {
         expect(button(fixture)?.getAttribute('aria-haspopup')).toBe('dialog');
     });
 
+    it('names a slot with one request in the singular', async () => {
+        //when
+        const fixture = await render({ requestCount: 1, slotState: SlotState.open, selected: false });
+
+        //then
+        expect(button(fixture)?.getAttribute('aria-label')).toBe('publications.slotRequests.openAriaOne');
+    });
+
     it('marks the slot whose students are showing', async () => {
         //when
         const selected = await render({ requestCount: 3, slotState: SlotState.open, selected: true });

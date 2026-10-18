@@ -19,10 +19,14 @@ import { PublicationWeekHeadingComponent } from '../../components/publication-we
 import { PublishWeekDialog, PublishWeekResult } from '../../dialogs/publish-week/publish-week.dialog';
 import { ExtendWindowDialog, WindowEndResult } from '../../dialogs/extend-window/extend-window.dialog';
 import { ReopenWindowDialog } from '../../dialogs/reopen-window/reopen-window.dialog';
+import { SlotRequestsDialog } from '../../dialogs/slot-requests/slot-requests.dialog';
+import { SlotRequestsDialogData } from '../../dialogs/slot-requests/slot-requests-dialog-data';
 
 const PUBLISH_FLAG = '1';
 const DIALOG_WIDTH = '35rem';
 const NARROW_DIALOG_WIDTH = '28rem';
+const SLOT_REQUESTS_DIALOG_CLASS = 'slot-requests-dialog';
+const SLOT_REQUESTS_MASK_CLASS = 'slot-requests-mask';
 
 @Component({
     selector: 'app-publications-dashboard-page',
@@ -157,6 +161,36 @@ export class PublicationsDashboardPage {
             if (result) {
                 void this.store.publish(result);
             }
+        });
+    }
+
+    protected onSlotOpened(slotId: string, cell: HTMLElement): void {
+        this.store.openSlotRequests(slotId);
+
+        const data: SlotRequestsDialogData = {
+            slot: this.store.openedSlot,
+            requests: this.store.slotRequests,
+            isLoading: this.store.slotRequestsAreLoading,
+            errorKey: this.store.slotRequestsError,
+            weekStart: this.store.selectedWeekStart,
+            windowTimes: this.store.windowTimes,
+        };
+
+        const ref = this.dialogs.open(SlotRequestsDialog, {
+            showHeader: false,
+            closable: true,
+            width: NARROW_DIALOG_WIDTH,
+            modal: true,
+            dismissableMask: true,
+            closeOnEscape: true,
+            styleClass: SLOT_REQUESTS_DIALOG_CLASS,
+            maskStyleClass: SLOT_REQUESTS_MASK_CLASS,
+            data,
+        });
+
+        ref?.onClose.subscribe(() => {
+            this.store.closeSlotRequests();
+            cell.focus();
         });
     }
 

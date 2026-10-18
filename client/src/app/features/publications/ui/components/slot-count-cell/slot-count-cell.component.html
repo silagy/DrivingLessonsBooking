@@ -11,7 +11,7 @@
         aria-haspopup="dialog"
         [attr.aria-expanded]="selected()"
         [attr.aria-label]="
-            'publications.slotRequests.openAria'
+            openAriaKey()
                 | transloco
                     : {
                           count: requestCount(),

@@ -5,7 +5,7 @@ import { LanguageService } from '../../../core/language.service';
 import { DayOfWeek } from '../../models/day-of-week.enum';
 import { SlotWindow } from '../../models/slot-window.enum';
 import { WeekGridCell } from '../../models/week-grid-cell';
-import { parseIsoDate } from '../../dates/parse-iso-date';
+import { gridDayDate } from '../../dates/grid-date';
 import { compactWindowTime } from '../../dates/window-times';
 
 export interface WeekGridCellContext<T extends WeekGridCell> {
@@ -65,8 +65,6 @@ export class WeekGridComponent<T extends WeekGridCell> {
         if (!weekStart) {
             return undefined;
         }
-        const date = parseIsoDate(weekStart);
-        date.setDate(date.getDate() + this.days.indexOf(day));
-        return date.toLocaleDateString(this.language.locale(), { day: 'numeric', month: 'numeric' });
+        return gridDayDate(weekStart, day, this.language.locale());
     }
 }

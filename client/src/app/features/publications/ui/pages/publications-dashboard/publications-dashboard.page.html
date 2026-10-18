@@ -92,7 +92,7 @@
                         [weekStart]="store.selectedWeekStart()"
                         [windowTimes]="store.windowTimes()">
                         <ng-template let-cell>
-                            <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" [day]="cell.day" [window]="cell.window" />
+                            <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" [day]="cell.day" [window]="cell.window" [selected]="store.openedSlot()?.slotId === cell.slotId" (opened)="onSlotOpened(cell.slotId, $event)" />
                         </ng-template>
                     </app-week-grid>
                     <app-week-grid-legend class="dashboard__legend" firstLabelKey="publications.dashboard.legendRequests" />
@@ -108,7 +108,7 @@
                         [weekStart]="store.selectedWeekStart()"
                         [windowTimes]="store.windowTimes()">
                         <ng-template let-cell>
-                            <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" [day]="cell.day" [window]="cell.window" />
+                            <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" [day]="cell.day" [window]="cell.window" [selected]="store.openedSlot()?.slotId === cell.slotId" (opened)="onSlotOpened(cell.slotId, $event)" />
                         </ng-template>
                     </app-week-grid>
                     <app-week-grid-legend class="dashboard__legend" firstLabelKey="publications.dashboard.legendRequests" />

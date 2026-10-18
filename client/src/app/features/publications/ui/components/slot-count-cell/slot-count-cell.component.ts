@@ -4,6 +4,8 @@ import { DayOfWeek } from '../../../../../shared/models/day-of-week.enum';
 import { SlotState } from '../../../../../shared/models/slot-state.enum';
 import { SlotWindow } from '../../../../../shared/models/slot-window.enum';
 
+const SINGLE_REQUEST = 1;
+
 @Component({
     selector: 'app-slot-count-cell',
     imports: [TranslocoPipe],
@@ -23,4 +25,9 @@ export class SlotCountCellComponent {
     protected readonly isUnavailable = computed(() => this.slotState() === SlotState.unavailable);
     protected readonly isEmpty = computed(() => this.requestCount() === 0);
     protected readonly isOpenable = computed(() => !this.isUnavailable() && !this.isEmpty());
+    protected readonly openAriaKey = computed(() =>
+        this.requestCount() === SINGLE_REQUEST
+            ? 'publications.slotRequests.openAriaOne'
+            : 'publications.slotRequests.openAria',
+    );
 }

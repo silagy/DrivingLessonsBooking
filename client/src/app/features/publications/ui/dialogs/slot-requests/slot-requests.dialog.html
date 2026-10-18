@@ -1,0 +1,73 @@
+@if (slot(); as slot) {
+    <div class="slot-requests">
+        <div class="slot-requests__top" appSheetDragClose (dismissed)="close()">
+            <span class="slot-requests__grab" aria-hidden="true"></span>
+            <div class="slot-requests__header">
+                <div class="slot-requests__heading">
+                    <h2 class="slot-requests__title">
+                        {{
+                            'publications.slotRequests.title'
+                                | transloco
+                                    : {
+                                          day: ('weekGrid.daysShort.' + slot.day | transloco),
+                                          date: date(),
+                                          window: ('weekGrid.windows.' + slot.window | transloco),
+                                      }
+                        }}
+                    </h2>
+                    <p class="slot-requests__subtitle">
+                        @if (time()) {
+                            <bdi dir="ltr">{{ time() }}</bdi>
+                            ·
+                        }
+                        <span class="slot-requests__count">{{
+                            studentCountKey() | transloco: { count: studentCount() }
+                        }}</span>
+                    </p>
+                </div>
+                <p-button
+                    styleClass="slot-requests__close"
+                    icon="pi pi-times"
+                    rounded
+                    text
+                    severity="secondary"
+                    [ariaLabel]="'general.close' | transloco"
+                    (onClick)="close()" />
+            </div>
+        </div>
+
+        <div class="slot-requests__body">
+            @if (isLoading()) {
+                <div class="slot-requests__state"><p-progressSpinner /></div>
+            } @else if (errorKey(); as errorKey) {
+                <p class="slot-requests__state">{{ errorKey | transloco }}</p>
+            } @else if (!requests().length) {
+                <p class="slot-requests__state">{{ 'publications.slotRequests.none' | transloco }}</p>
+            } @else {
+                <ul class="slot-requests__list">
+                    @for (request of requests(); track request.studentId) {
+                        <li class="slot-requests__item">
+                            <span class="slot-requests__avatar" aria-hidden="true">{{
+                                request.studentName | initials
+                            }}</span>
+                            <span class="slot-requests__name">{{ request.studentName }}</span>
+                            <span class="slot-requests__choice">{{
+                                'publications.slotRequests.choice'
+                                    | transloco: { rank: request.rank, count: request.pickCount }
+                            }}</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="slot-requests__footer">
+            <p-button
+                styleClass="slot-requests__footer-button"
+                [label]="'general.close' | transloco"
+                severity="secondary"
+                outlined
+                (onClick)="close()" />
+        </div>
+    </div>
+}

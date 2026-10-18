@@ -387,7 +387,14 @@
       "newEnd": "New close time"
     },
     "slotRequests": {
-      "openAria": "{{count}} requests, {{day}}, {{window}}. Show the students"
+      "openAria": "{{count}} requests, {{day}}, {{window}}. Show the students",
+      "openAriaOne": "1 request, {{day}}, {{window}}. Show the student",
+      "title": "{{day}} {{date}} · {{window}}",
+      "requestedByOne": "1 student requested",
+      "requestedByMany": "{{count}} students requested",
+      "choice": "Choice {{rank}} of {{count}}",
+      "none": "No student requests this slot now. Refresh the page.",
+      "loadFailed": "The student list couldn't load."
     },
     "dashboard": {
       "requests": "requests",

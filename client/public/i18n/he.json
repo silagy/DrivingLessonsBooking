@@ -387,7 +387,14 @@
       "newEnd": "מועד סגירה חדש"
     },
     "slotRequests": {
-      "openAria": "{{count}} בקשות, יום {{day}}, {{window}}. הצגת התלמידים"
+      "openAria": "{{count}} בקשות, יום {{day}}, {{window}}. הצגת התלמידים",
+      "openAriaOne": "בקשה אחת, יום {{day}}, {{window}}. הצגת התלמיד",
+      "title": "יום {{day}} {{date}} · {{window}}",
+      "requestedByOne": "תלמיד אחד ביקש",
+      "requestedByMany": "{{count}} תלמידים ביקשו",
+      "choice": "בחירה {{rank}} מ-{{count}}",
+      "none": "אף תלמיד לא מבקש את המשבצת הזו כרגע. רעננו את הדף.",
+      "loadFailed": "לא ניתן לטעון את רשימת התלמידים."
     },
     "dashboard": {
       "requests": "בקשות",
