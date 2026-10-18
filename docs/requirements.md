@@ -141,7 +141,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 3. Publish the week **once**: set the submission window start and end datetimes. The system generates **one** shareable link covering all teachers.
 4. Distribute the single link (outside the system, e.g., WhatsApp). Every teacher's students use the same link; each student's record routes them to the right grid.
 ### 6.3 During the window
-- **Dashboard:** the summary grid (day × slot) shows the current request count per slot at any point during the window. Data reflects the state at page load; the admin refreshes the page to see new submissions. No push/auto-refresh requirement.
+- **Dashboard:** the summary grid (day × slot) shows the current request count per slot at any point during the window. Data reflects the state at page load; the admin refreshes the page to see new submissions. No push/auto-refresh requirement. Selecting a count with one or more requests lists the Students who requested that Slot, in submission order, each with which of their picks it was ("choice 2 of 3"); counts of 0 and Unavailable Slots open nothing. The list is read when it opens.
 ### 6.4 Window close and reopen
 - At end time, the link becomes read-only for students and the Excel is **automatically emailed** to the teacher's contact email.
 - The admin may extend the deadline before close, or reopen after close.

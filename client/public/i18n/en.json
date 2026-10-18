@@ -197,6 +197,7 @@
       "changeTeacher": "Change Teacher",
       "changeCar": "Change Car",
       "fix": "Fix",
+      "fixCar": "Fix the car",
       "menu": "Actions",
       "menuFor": "Actions - {{name}}",
       "deactivate": "Deactivate",
@@ -330,7 +331,7 @@
     "legend": {
       "open": "Open",
       "unavailable": "Unavailable",
-      "outsideGrid": "Outside grid (Fri PM, Saturday)"
+      "noLessons": "No lessons (Fri PM, Saturday)"
     }
   },
   "publications": {
@@ -386,8 +387,19 @@
       "subtitle": "Reopening sets a new close time and lets students edit again. The next close emails a fresh version.",
       "newEnd": "New close time"
     },
+    "slotRequests": {
+      "openAria": "{{count}} requests, {{day}}, {{window}}. Show the students",
+      "openAriaOne": "1 request, {{day}}, {{window}}. Show the student",
+      "title": "{{day}} {{date}} · {{window}}",
+      "requestedByOne": "1 student requested",
+      "requestedByMany": "{{count}} students requested",
+      "choice": "Choice {{rank}} of {{count}}",
+      "none": "No student requests this slot now. Refresh the page.",
+      "loadFailed": "The student list couldn't load."
+    },
     "dashboard": {
       "requests": "requests",
+      "legendRequests": "Requests - tap or click a count to see the students",
       "studentsSubmitted": "students submitted",
       "totalPicks": "total picks",
       "lastSubmission": "last submission",

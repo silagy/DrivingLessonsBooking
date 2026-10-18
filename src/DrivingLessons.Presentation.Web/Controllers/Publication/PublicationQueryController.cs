@@ -1,5 +1,6 @@
 using DrivingLessons.Application.Queries.DownloadPublicationExcel;
 using DrivingLessons.Application.Queries.FindPublicationHistory;
+using DrivingLessons.Application.Queries.FindSlotRequests;
 using DrivingLessons.Application.Queries.GetPublication;
 using DrivingLessons.Application.Queries.GetPublicationDashboard;
 using DrivingLessons.Presentation.Web.Auth;
@@ -38,6 +39,20 @@ public class PublicationQueryController : ControllerBase
         [FromQuery] Guid teacherId)
     {
         return await interactor.ExecuteAsync(id, teacherId);
+    }
+
+    [HttpGet("{id:guid}/slots/{slotId:guid}/requests")]
+    [EndpointSummary("Lists the students who requested a slot of the teacher's week, in submission order")]
+    [ProducesResponseType(typeof(IReadOnlyList<ItemForFindSlotRequestsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IReadOnlyList<ItemForFindSlotRequestsResponse>> FindSlotRequests(
+        [FromServices] FindSlotRequestsInteractor interactor,
+        [FromRoute] Guid id,
+        [FromRoute] Guid slotId,
+        [FromQuery] Guid teacherId)
+    {
+        return await interactor.ExecuteAsync(id, teacherId, slotId);
     }
 
     [HttpGet("history")]

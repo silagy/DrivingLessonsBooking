@@ -16,6 +16,7 @@ import { ExtendPublicationWindowRequest } from '../data/extend-publication-windo
 import { GetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
 import { GetPublicationResponse } from '../data/get-publication.response';
 import { ItemForFindPublicationHistoryResponse } from '../data/item-for-find-publication-history.response';
+import { ItemForFindSlotRequestsResponse } from '../data/item-for-find-slot-requests.response';
 import { PublicationsApiService } from '../data/publications-api.service';
 import { PublishPublicationRequest } from '../data/publish-publication.request';
 import { ReopenPublicationRequest } from '../data/reopen-publication.request';
@@ -115,6 +116,23 @@ export class PublicationsStore {
         },
     });
 
+    private readonly openedSlotIdState = linkedSignal<string, string | null>({
+        source: () => `${this.publication()?.id ?? ''}|${this.selectedTeacherIdState() ?? ''}`,
+        computation: () => null,
+    });
+
+    private readonly slotRequestsResource = resource({
+        params: () => {
+            const publication = this.publication();
+            const teacherId = this.selectedTeacherIdState();
+            const slotId = this.openedSlotIdState();
+
+            return publication && teacherId && slotId ? { publicationId: publication.id, teacherId, slotId } : undefined;
+        },
+        loader: ({ params }) =>
+            firstValueFrom(this.api.findSlotRequests(params.publicationId, params.teacherId, params.slotId)),
+    });
+
     readonly selectedTeacherId = this.selectedTeacherIdState.asReadonly();
     readonly canChooseTeacher = computed(() => this.auth.isAdministrator());
     readonly canManageLifecycle = computed(() => this.auth.isAdministrator());
@@ -161,6 +179,20 @@ export class PublicationsStore {
 
     readonly windowTimes = computed<Partial<Record<SlotWindow, string>>>(() => windowTimesOf(this.slotCounts()));
 
+    readonly openedSlot = computed<SlotCountForGetPublicationDashboardResponse | undefined>(() => {
+        const slotId = this.openedSlotIdState();
+
+        return slotId ? this.slotCounts().find((slot) => slot.slotId === slotId) : undefined;
+    });
+
+    readonly slotRequests = computed<ItemForFindSlotRequestsResponse[]>(() =>
+        this.slotRequestsResource.hasValue() ? this.slotRequestsResource.value() : [],
+    );
+    readonly slotRequestsAreLoading = this.slotRequestsResource.isLoading;
+    readonly slotRequestsError = computed(() =>
+        this.slotRequestsResource.error() ? 'publications.slotRequests.loadFailed' : null,
+    );
+
     readonly hasPublication = computed(() => this.publication() !== undefined);
 
     readonly isLoading = computed(
@@ -189,6 +221,14 @@ export class PublicationsStore {
 
     selectWeek(weekStart: string): void {
         this.selectedWeekStartState.set(weekStart);
+    }
+
+    openSlotRequests(slotId: string): void {
+        this.openedSlotIdState.set(slotId);
+    }
+
+    closeSlotRequests(): void {
+        this.openedSlotIdState.set(null);
     }
 
     async publish(request: PublishPublicationRequest): Promise<void> {

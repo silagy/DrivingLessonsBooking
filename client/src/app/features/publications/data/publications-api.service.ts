@@ -5,6 +5,7 @@ import { ExtendPublicationWindowRequest } from './extend-publication-window.requ
 import { GetPublicationDashboardResponse } from './get-publication-dashboard.response';
 import { GetPublicationResponse } from './get-publication.response';
 import { ItemForFindPublicationHistoryResponse } from './item-for-find-publication-history.response';
+import { ItemForFindSlotRequestsResponse } from './item-for-find-slot-requests.response';
 import { PublishPublicationRequest } from './publish-publication.request';
 import { ReopenPublicationRequest } from './reopen-publication.request';
 
@@ -35,6 +36,14 @@ export class PublicationsApiService {
         const params = new HttpParams().set('teacherId', teacherId);
 
         return this.http.get<GetPublicationDashboardResponse>(`${this.baseUrl}/${id}/dashboard`, { params });
+    }
+
+    findSlotRequests(id: string, teacherId: string, slotId: string): Observable<ItemForFindSlotRequestsResponse[]> {
+        const params = new HttpParams().set('teacherId', teacherId);
+
+        return this.http.get<ItemForFindSlotRequestsResponse[]>(`${this.baseUrl}/${id}/slots/${slotId}/requests`, {
+            params,
+        });
     }
 
     findHistory(): Observable<ItemForFindPublicationHistoryResponse[]> {

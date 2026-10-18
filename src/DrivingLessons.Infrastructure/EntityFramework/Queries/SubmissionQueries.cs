@@ -1,4 +1,5 @@
 using DrivingLessons.Application.Queries;
+using DrivingLessons.Application.Queries.FindSlotRequests;
 using DrivingLessons.Domain.Entities;
 using DrivingLessons.Domain.Values;
 using Microsoft.EntityFrameworkCore;
@@ -84,6 +85,41 @@ public class SubmissionQueries : ISubmissionQueries
                        x.Rank.Value,
                        x.TargetCount.Value,
                        x.Constraint?.Value))
+                   .ToList();
+    }
+
+    public async Task<IReadOnlyList<ItemForFindSlotRequestsResponse>> FindSlotRequestsAsync(
+        Guid publicationId,
+        Guid teacherId,
+        Guid slotId)
+    {
+        var resolvedSlotId = SlotId.Of(slotId);
+        var submissions = TeacherSubmissions(publicationId, teacherId);
+
+        var query = from submission in submissions
+                    join student in dbContext.Students
+                        on submission.StudentId equals student.Id
+                    from request in submission.SlotRequests
+                    where request.SlotId == resolvedSlotId
+                    orderby submission.SubmittedAtUtc, student.Name, student.Id
+                    select new
+                    {
+                        StudentId = student.Id,
+                        StudentName = student.Name,
+                        request.Rank,
+                        PickCount = submission.SlotRequests.Count()
+                    };
+
+        var rows = await query.ToListAsync();
+
+        return rows
+                   .Select(x => new ItemForFindSlotRequestsResponse
+                   {
+                       StudentId = x.StudentId.Value,
+                       StudentName = x.StudentName.Value,
+                       Rank = x.Rank.Value,
+                       PickCount = x.PickCount
+                   })
                    .ToList();
     }
 

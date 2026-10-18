@@ -197,6 +197,7 @@
       "changeTeacher": "החלפת מורה",
       "changeCar": "החלפת רכב",
       "fix": "תיקון",
+      "fixCar": "תיקון הרכב",
       "menu": "פעולות",
       "menuFor": "פעולות - {{name}}",
       "deactivate": "סימון כלא פעיל",
@@ -330,7 +331,7 @@
     "legend": {
       "open": "פתוח",
       "unavailable": "לא זמין",
-      "outsideGrid": "מחוץ לרשת (שישי אחה״צ/ערב, שבת)"
+      "noLessons": "אין שיעורים (שישי אחה״צ/ערב, שבת)"
     }
   },
   "publications": {
@@ -386,8 +387,19 @@
       "subtitle": "פתיחה מחדש קובעת מועד סגירה חדש ומאפשרת לתלמידים לערוך שוב. הסגירה הבאה תשלח גרסה חדשה.",
       "newEnd": "מועד סגירה חדש"
     },
+    "slotRequests": {
+      "openAria": "{{count}} בקשות, יום {{day}}, {{window}}. הצגת התלמידים",
+      "openAriaOne": "בקשה אחת, יום {{day}}, {{window}}. הצגת התלמיד",
+      "title": "יום {{day}} {{date}} · {{window}}",
+      "requestedByOne": "תלמיד אחד ביקש",
+      "requestedByMany": "{{count}} תלמידים ביקשו",
+      "choice": "בחירה {{rank}} מ-{{count}}",
+      "none": "אף תלמיד לא מבקש את המשבצת הזו כרגע. רעננו את הדף.",
+      "loadFailed": "לא ניתן לטעון את רשימת התלמידים."
+    },
     "dashboard": {
       "requests": "בקשות",
+      "legendRequests": "מספר בקשות - הקישו לרשימת התלמידים",
       "studentsSubmitted": "תלמידים הגישו",
       "totalPicks": "סה״כ בחירות",
       "lastSubmission": "הגשה אחרונה",

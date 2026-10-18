@@ -17,6 +17,29 @@
     box-shadow: var(--app-shadow-card);
 }
 
+.slot-count--openable {
+    inline-size: 100%;
+    padding: 0;
+    border-color: var(--p-steel-200);
+    font: inherit;
+    cursor: pointer;
+}
+
+.slot-count--openable:focus-visible {
+    outline: 2px solid var(--p-sky-500);
+    outline-offset: 2px;
+}
+
+.slot-count--selected {
+    outline: 2px solid var(--p-sky-500);
+    outline-offset: -1px;
+    background: var(--p-sky-50);
+}
+
+.slot-count--selected .slot-count__value {
+    color: var(--p-sky-700);
+}
+
 .slot-count--blocked {
     background: var(--app-slot-unavailable);
     box-shadow: none;

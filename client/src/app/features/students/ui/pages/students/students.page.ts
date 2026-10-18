@@ -41,6 +41,7 @@ import {
 } from '../../dialogs/deactivate-student/deactivate-student.dialog';
 import { EditStudentDialog } from '../../dialogs/edit-student/edit-student.dialog';
 import { EditStudentDialogData } from '../../dialogs/edit-student/edit-student-dialog-data';
+import { studentCardActions } from './student-card-actions';
 
 const ALL_TEACHERS = 'all';
 
@@ -139,6 +140,19 @@ export class StudentsPage {
 
     protected onRowActions(event: Event, student: StudentRow): void {
         this.rowActions.set(student.isActive ? this.activeRowActions(student) : this.inactiveRowActions(student));
+        this.rowMenu().toggle(event);
+    }
+
+    protected onCardActions(event: Event, student: StudentRow): void {
+        this.rowActions.set(
+            studentCardActions(student, (key) => this.transloco.translate(key), {
+                editDetails: () => void this.onEditDetails(student),
+                changeTeacher: () => this.onChangeTeacher(student),
+                changeCar: () => this.onChangeCar(student),
+                deactivate: () => this.onDeactivate(student),
+                reactivate: () => void this.store.reactivate(student),
+            }),
+        );
         this.rowMenu().toggle(event);
     }
 

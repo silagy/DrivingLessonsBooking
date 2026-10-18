@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
-import { DialogService } from 'primeng/dynamicdialog';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { WeekGridComponent } from '../../../../../shared/components/week-grid/week-grid.component';
 import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
@@ -19,10 +19,14 @@ import { PublicationWeekHeadingComponent } from '../../components/publication-we
 import { PublishWeekDialog, PublishWeekResult } from '../../dialogs/publish-week/publish-week.dialog';
 import { ExtendWindowDialog, WindowEndResult } from '../../dialogs/extend-window/extend-window.dialog';
 import { ReopenWindowDialog } from '../../dialogs/reopen-window/reopen-window.dialog';
+import { SlotRequestsDialog } from '../../dialogs/slot-requests/slot-requests.dialog';
+import { SlotRequestsDialogData } from '../../dialogs/slot-requests/slot-requests-dialog-data';
 
 const PUBLISH_FLAG = '1';
 const DIALOG_WIDTH = '35rem';
 const NARROW_DIALOG_WIDTH = '28rem';
+const SLOT_REQUESTS_DIALOG_CLASS = 'slot-requests-dialog';
+const SLOT_REQUESTS_MASK_CLASS = 'slot-requests-mask';
 
 @Component({
     selector: 'app-publications-dashboard-page',
@@ -57,6 +61,8 @@ export class PublicationsDashboardPage {
     readonly teacherId = input<string>();
     readonly week = input<string>();
     readonly publish = input<string>();
+
+    private slotRequestsRef: DynamicDialogRef | null = null;
 
     protected readonly windowLabel = computed(() => {
         const dashboard = this.store.dashboard();
@@ -95,6 +101,14 @@ export class PublicationsDashboardPage {
     });
 
     constructor() {
+        effect(() => {
+            const slotIsGone = !this.store.openedSlot();
+
+            if (slotIsGone && this.slotRequestsRef) {
+                this.slotRequestsRef.close();
+            }
+        });
+
         effect(() => {
             const teacherId = this.teacherId();
 
@@ -157,6 +171,37 @@ export class PublicationsDashboardPage {
             if (result) {
                 void this.store.publish(result);
             }
+        });
+    }
+
+    protected onSlotOpened(slotId: string, cell: HTMLElement): void {
+        this.store.openSlotRequests(slotId);
+
+        const data: SlotRequestsDialogData = {
+            slot: this.store.openedSlot,
+            requests: this.store.slotRequests,
+            isLoading: this.store.slotRequestsAreLoading,
+            errorKey: this.store.slotRequestsError,
+            weekStart: this.store.selectedWeekStart,
+            windowTimes: this.store.windowTimes,
+        };
+
+        this.slotRequestsRef = this.dialogs.open(SlotRequestsDialog, {
+            showHeader: false,
+            closable: true,
+            width: NARROW_DIALOG_WIDTH,
+            modal: true,
+            dismissableMask: true,
+            closeOnEscape: true,
+            styleClass: SLOT_REQUESTS_DIALOG_CLASS,
+            maskStyleClass: SLOT_REQUESTS_MASK_CLASS,
+            data,
+        });
+
+        this.slotRequestsRef?.onClose.subscribe(() => {
+            this.slotRequestsRef = null;
+            this.store.closeSlotRequests();
+            cell.focus();
         });
     }
 

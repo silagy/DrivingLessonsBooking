@@ -3,11 +3,11 @@
     align-items: center;
     gap: 0.3125rem;
     padding-block-end: 1px;
-    border-block-end: 1px dotted var(--p-red-600);
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--p-red-600);
-    white-space: nowrap;
+    border-block-end: 1px dotted var(--flag-underline, var(--p-red-600));
+    font-size: var(--flag-font-size, 0.78rem);
+    font-weight: var(--flag-font-weight, 600);
+    color: var(--flag-color, var(--p-red-600));
+    white-space: var(--flag-white-space, nowrap);
     cursor: help;
 }
 
@@ -22,5 +22,5 @@
 }
 
 .car-flag--muted {
-    border-block-end-color: var(--p-red-300);
+    border-block-end-color: var(--flag-underline, var(--p-red-300));
 }

@@ -1,3 +1,4 @@
+using DrivingLessons.Application.Queries.FindSlotRequests;
 using DrivingLessons.Domain.Values;
 
 namespace DrivingLessons.Application.Queries;
@@ -9,6 +10,11 @@ public interface ISubmissionQueries
     Task<SubmissionStats> GetStatsAsync(Guid publicationId, Guid teacherId);
 
     Task<IReadOnlyList<SlotRequestDetail>> GetSlotRequestDetailsAsync(Guid publicationId, Guid teacherId);
+
+    Task<IReadOnlyList<ItemForFindSlotRequestsResponse>> FindSlotRequestsAsync(
+        Guid publicationId,
+        Guid teacherId,
+        Guid slotId);
 }
 
 public record SubmissionStats(int StudentsSubmitted, int TotalPicks, DateTimeOffset? LastSubmissionAtUtc);

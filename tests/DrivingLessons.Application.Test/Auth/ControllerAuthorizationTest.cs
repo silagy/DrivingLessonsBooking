@@ -19,6 +19,7 @@ public class ControllerAuthorizationTest
         "WeekScheduleCommandController.MarkSlotAvailable",
         "PublicationQueryController.GetByWeek",
         "PublicationQueryController.GetDashboard",
+        "PublicationQueryController.FindSlotRequests",
         "PublicationQueryController.FindHistory",
         "PublicationQueryController.DownloadExcel",
         "MeCommandController.ChangePasswordAsync",

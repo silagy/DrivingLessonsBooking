@@ -234,7 +234,7 @@
             <app-student-card
               [student]="row"
               [disabled]="store.isMutating()"
-              (actionsRequested)="onRowActions($event, row)" />
+              (actionsRequested)="onCardActions($event, row)" />
           </li>
         } @empty {
           <li class="students__no-match">
@@ -243,7 +243,7 @@
         }
       </ul>
 
-      <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" />
+      <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" styleClass="card-menu" />
 
       @if (store.visibleStudents().length) {
         <p class="students__footer">{{ store.footerKey() | transloco: { count: store.visibleStudents().length } }}</p>

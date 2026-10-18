@@ -5,8 +5,14 @@ import { By } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { providePrimeNG } from 'primeng/config';
+import { DialogService } from 'primeng/dynamicdialog';
+import { Subject } from 'rxjs';
 import { LanguageService } from '../../../../../core/language.service';
+import { DayOfWeek } from '../../../../../shared/models/day-of-week.enum';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
+import { SlotState } from '../../../../../shared/models/slot-state.enum';
+import { SlotWindow } from '../../../../../shared/models/slot-window.enum';
+import { SlotRequestsDialog } from '../../dialogs/slot-requests/slot-requests.dialog';
 import { PublicationsStore } from '../../../state/publications.store';
 import { PublicationsDashboardPage } from './publications-dashboard.page';
 
@@ -47,6 +53,12 @@ function fakeStore(overrides: Record<string, unknown>) {
         copyLink: async () => undefined,
         refresh: () => undefined,
         downloadExcel: async () => undefined,
+        openedSlot: signal(undefined),
+        slotRequests: signal([]),
+        slotRequestsAreLoading: signal(false),
+        slotRequestsError: signal(null),
+        openSlotRequests: vi.fn(),
+        closeSlotRequests: vi.fn(),
         ...overrides,
     };
 }
@@ -59,6 +71,7 @@ async function render(store: ReturnType<typeof fakeStore>): Promise<HTMLElement>
 
 async function renderFixture(
     store: ReturnType<typeof fakeStore>,
+    dialogs?: { open: ReturnType<typeof vi.fn> },
 ): Promise<ComponentFixture<PublicationsDashboardPage>> {
     TestBed.configureTestingModule({
         imports: [
@@ -76,6 +89,12 @@ async function renderFixture(
             { provide: LanguageService, useValue: { lang: signal('en'), locale: signal('en-IL') } },
         ],
     });
+
+    if (dialogs) {
+        TestBed.overrideComponent(PublicationsDashboardPage, {
+            set: { providers: [{ provide: DialogService, useValue: dialogs }] },
+        });
+    }
 
     const fixture = TestBed.createComponent(PublicationsDashboardPage);
     await fixture.whenStable();
@@ -359,5 +378,111 @@ describe('PublicationsDashboardPage', () => {
 
         //then
         expect(page.querySelector('.week-heading__extend')).toBeNull();
+    });
+
+    describe('slot requests', () => {
+        const WEDNESDAY_AFTERNOON = {
+            slotId: 'slot-a',
+            day: DayOfWeek.wednesday,
+            window: SlotWindow.afternoon,
+            state: SlotState.open,
+            requestCount: 2,
+            startLocal: '15:00:00',
+            endLocal: '18:00:00',
+        };
+
+        async function openWeekWithRequests() {
+            const closed = new Subject<void>();
+            const ref = { onClose: closed, close: vi.fn(() => closed.next()) };
+            const dialogs = { open: vi.fn(() => ref) };
+            const openedSlot = signal<typeof WEDNESDAY_AFTERNOON | undefined>(undefined);
+            const store = fakeStore({
+                slotCounts: signal([WEDNESDAY_AFTERNOON]),
+                openedSlot,
+                openSlotRequests: vi.fn(() => openedSlot.set(WEDNESDAY_AFTERNOON)),
+                closeSlotRequests: vi.fn(() => openedSlot.set(undefined)),
+            });
+            const fixture = await renderFixture(store, dialogs);
+            const cell = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+                'button.slot-count--openable',
+            );
+
+            return { fixture, store, dialogs, ref, closed, openedSlot, cell: cell! };
+        }
+
+        it('closes the list when its slot goes away, as when the week changes', async () => {
+            //given
+            const { fixture, store, ref, openedSlot, cell } = await openWeekWithRequests();
+            cell.click();
+            await fixture.whenStable();
+
+            //when
+            openedSlot.set(undefined);
+            await fixture.whenStable();
+
+            //then
+            expect(ref.close).toHaveBeenCalledTimes(1);
+            expect(store.closeSlotRequests).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps the list open while its slot is there', async () => {
+            //given
+            const { fixture, ref, cell } = await openWeekWithRequests();
+
+            //when
+            cell.click();
+            await fixture.whenStable();
+
+            //then
+            expect(ref.close).not.toHaveBeenCalled();
+        });
+
+        it('opens the students of a slot from its count', async () => {
+            //given
+            const { store, dialogs, cell } = await openWeekWithRequests();
+
+            //when
+            cell.click();
+
+            //then
+            expect(store.openSlotRequests).toHaveBeenCalledWith('slot-a');
+            expect(dialogs.open).toHaveBeenCalledWith(
+                SlotRequestsDialog,
+                expect.objectContaining({
+                    showHeader: false,
+                    closable: true,
+                    modal: true,
+                    dismissableMask: true,
+                    closeOnEscape: true,
+                    styleClass: 'slot-requests-dialog',
+                    maskStyleClass: 'slot-requests-mask',
+                }),
+            );
+        });
+
+        it('forgets the slot when the list closes', async () => {
+            //given
+            const { store, closed, cell } = await openWeekWithRequests();
+            cell.click();
+
+            //when
+            closed.next();
+
+            //then
+            expect(store.closeSlotRequests).toHaveBeenCalledTimes(1);
+        });
+
+        it('gives focus back to the cell it opened from', async () => {
+            //given
+            const { closed, cell } = await openWeekWithRequests();
+            cell.click();
+            cell.blur();
+
+            //when
+            closed.next();
+
+            //then
+            expect(document.activeElement).toBe(cell);
+        });
     });
 });
