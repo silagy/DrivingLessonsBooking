@@ -10,12 +10,12 @@
 }
 
 .student-card--new {
-    background: var(--p-sky-50);
-    border-color: var(--p-sky-100);
+    background: var(--app-row-new-bg);
+    border-color: var(--app-row-new-border);
 }
 
 .student-card--inactive {
-    background: var(--app-bg-page);
+    background: var(--app-row-muted-bg);
     box-shadow: none;
 
     .student-card__faded {
@@ -70,9 +70,9 @@
 }
 
 .student-card__tag--new {
-    background: var(--p-sky-50);
-    color: var(--p-sky-700);
-    border-color: var(--p-sky-100);
+    background: var(--app-tag-sky-bg);
+    color: var(--app-tag-sky-fg);
+    border-color: var(--app-tag-sky-border);
 }
 
 :host ::ng-deep .student-card__actions.p-button {
@@ -110,7 +110,7 @@
 }
 
 .student-card__details {
-    --flag-color: var(--app-plum);
+    --flag-color: var(--app-danger);
     --flag-font-size: 0.8125rem;
     --flag-font-weight: 500;
     --flag-white-space: normal;

@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
+import { AppearanceToggleComponent } from '../../../../../shared/appearance-toggle/appearance-toggle.component';
 import { BrandLogoComponent } from '../../../../../shared/brand-logo/brand-logo.component';
 import { LanguageToggleComponent } from '../../../../../shared/language-toggle/language-toggle.component';
 import { NavigationItem } from '../../../domain/navigation';
@@ -17,6 +18,7 @@ import { NavigationItem } from '../../../domain/navigation';
         DrawerModule,
         BrandLogoComponent,
         LanguageToggleComponent,
+        AppearanceToggleComponent,
     ],
     templateUrl: './shell-drawer.component.html',
     styleUrl: './shell-drawer.component.scss',

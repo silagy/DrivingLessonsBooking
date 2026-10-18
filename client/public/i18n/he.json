@@ -30,6 +30,12 @@
     },
     "languageToggle": "English",
     "language": "שפה",
+    "appearance": {
+      "label": "מראה",
+      "light": "בהיר",
+      "dark": "כהה",
+      "system": "מערכת"
+    },
     "nav": {
       "dashboard": "לוח בקרה",
       "teachers": "רכבים ומורים",

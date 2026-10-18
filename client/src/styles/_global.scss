@@ -85,16 +85,16 @@ body {
 }
 
 .card-menu__item--fix .p-menu-item-content {
-  background: var(--p-sky-50);
+  background: var(--app-selected-bg);
 }
 
 .card-menu__item--fix :is(.p-menu-item-link, .p-menu-item-icon, .p-menu-item-label) {
-  color: var(--p-sky-700);
+  color: var(--app-brand-deep);
   font-weight: 600;
 }
 
 .card-menu__item--destructive :is(.p-menu-item-link, .p-menu-item-icon, .p-menu-item-label) {
-  color: var(--app-plum);
+  color: var(--app-danger);
 }
 
 @media screen and (max-width: 639px) {

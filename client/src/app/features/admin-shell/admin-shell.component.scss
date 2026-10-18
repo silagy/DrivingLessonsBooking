@@ -132,15 +132,31 @@
 }
 
 .shell-user-menu__role--administrator {
-  background: var(--p-sky-50);
-  color: var(--p-sky-700);
-  border-color: var(--p-sky-100);
+  background: var(--app-tag-sky-bg);
+  color: var(--app-tag-sky-fg);
+  border-color: var(--app-tag-sky-border);
 }
 
 .shell-user-menu__role--teacher {
-  background: var(--p-ocean-50);
-  color: var(--p-ocean-700);
-  border-color: var(--p-ocean-100);
+  background: var(--app-tag-ocean-bg);
+  color: var(--app-tag-ocean-fg);
+  border-color: var(--app-tag-ocean-border);
+}
+
+.shell-user-menu__appearance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+  margin-block-end: 0.25rem;
+  border-block-end: 1px solid var(--app-border);
+}
+
+.shell-user-menu__appearance-label {
+  font-family: var(--app-font-display);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: var(--app-ink);
 }
 
 ::ng-deep .p-menu.shell-user-menu {

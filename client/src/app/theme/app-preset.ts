@@ -4,6 +4,21 @@ import Aura from '@primeuix/themes/aura';
 const skyGradient = 'linear-gradient(135deg, #0057FF 0%, #00BBC7 100%)';
 const skyGradientDark = 'linear-gradient(135deg, #003293 0%, #007A82 100%)';
 
+const gradientPrimaryButton = {
+  background: skyGradient,
+  hoverBackground: skyGradientDark,
+  activeBackground: skyGradientDark,
+  borderColor: 'transparent',
+  hoverBorderColor: 'transparent',
+  activeBorderColor: 'transparent',
+  color: '#ffffff',
+  hoverColor: '#ffffff',
+  activeColor: '#ffffff',
+};
+
+const darkSurfaceBorder = '{surface.600}';
+const darkLift = 'var(--app-shadow-lift)';
+
 export const AppPreset = definePreset(Aura, {
   primitive: {
     sky: {
@@ -81,6 +96,62 @@ export const AppPreset = definePreset(Aura, {
           950: '#0B0C0E',
         },
       },
+      dark: {
+        primary: {
+          color: '{sky.400}',
+          contrastColor: '{surface.900}',
+          hoverColor: '{sky.300}',
+          activeColor: '{sky.200}',
+        },
+        surface: {
+          0: '#ffffff',
+          50: '#F5F6FF',
+          100: '#D5DAE6',
+          200: '#A9B1C2',
+          300: '#8A93A6',
+          400: '#6B7385',
+          500: '#43464D',
+          600: '#2C2F37',
+          700: '#23262C',
+          800: '#1B1D22',
+          900: '#121418',
+          950: '#0B0C0E',
+        },
+        text: {
+          color: '{surface.50}',
+          hoverColor: '{surface.0}',
+          mutedColor: '{surface.300}',
+          hoverMutedColor: '{surface.200}',
+        },
+        content: {
+          background: '{surface.800}',
+          hoverBackground: '{surface.700}',
+          borderColor: darkSurfaceBorder,
+        },
+        overlay: {
+          select: { background: '{surface.800}', borderColor: darkSurfaceBorder, shadow: darkLift },
+          popover: { background: '{surface.800}', borderColor: darkSurfaceBorder, shadow: darkLift },
+          modal: { background: '{surface.800}', borderColor: darkSurfaceBorder, shadow: darkLift },
+          navigation: { shadow: darkLift },
+        },
+        formField: {
+          background: '{surface.800}',
+          borderColor: darkSurfaceBorder,
+          hoverBorderColor: '{surface.500}',
+          color: '{surface.50}',
+          placeholderColor: '{surface.300}',
+          floatLabelColor: '{surface.300}',
+          floatLabelActiveColor: '{surface.300}',
+          iconColor: '{surface.300}',
+          disabledColor: '{surface.300}',
+        },
+        navigation: {
+          item: { focusBackground: '{surface.700}' },
+        },
+        list: {
+          option: { focusBackground: '{surface.700}' },
+        },
+      },
     },
   },
   components: {
@@ -93,20 +164,56 @@ export const AppPreset = definePreset(Aura, {
         label: { fontWeight: '600' },
       },
       colorScheme: {
+        light: { root: { primary: gradientPrimaryButton } },
+        dark: {
+          root: { primary: gradientPrimaryButton },
+          outlined: { secondary: { color: '{surface.100}', borderColor: '{surface.500}' } },
+          text: { secondary: { color: '{surface.200}', hoverBackground: '{surface.700}', activeBackground: '{surface.600}' } },
+        },
+      },
+    },
+    tag: {
+      colorScheme: {
         light: {
+          success: { background: 'var(--app-tag-green-bg)', color: 'var(--app-tag-green-fg)' },
+        },
+        dark: {
+          success: { background: 'var(--app-tag-green-bg)', color: 'var(--app-tag-green-fg)' },
+          info: { background: 'var(--app-tag-sky-bg)', color: 'var(--app-tag-sky-fg)' },
+          secondary: { background: '{surface.600}', color: '{surface.100}' },
+        },
+      },
+    },
+    message: {
+      colorScheme: {
+        dark: {
+          error: { color: '{red.400}', outlined: { color: '{red.400}' }, simple: { color: '{red.400}' } },
+          info: { color: '{blue.400}', outlined: { color: '{blue.400}' }, simple: { color: '{blue.400}' } },
+        },
+      },
+    },
+    toast: {
+      colorScheme: {
+        dark: {
+          error: { color: '{red.400}' },
+          info: { color: '{blue.400}' },
+        },
+      },
+    },
+    togglebutton: {
+      colorScheme: {
+        dark: {
           root: {
-            primary: {
-              background: skyGradient,
-              hoverBackground: skyGradientDark,
-              activeBackground: skyGradientDark,
-              borderColor: 'transparent',
-              hoverBorderColor: 'transparent',
-              activeBorderColor: 'transparent',
-              color: '#ffffff',
-              hoverColor: '#ffffff',
-              activeColor: '#ffffff',
-            },
+            background: '{surface.800}',
+            hoverBackground: '{surface.800}',
+            checkedBackground: '{surface.800}',
+            borderColor: darkSurfaceBorder,
+            checkedBorderColor: darkSurfaceBorder,
+            color: '{surface.200}',
+            hoverColor: '{surface.100}',
+            checkedColor: '{surface.50}',
           },
+          content: { checkedBackground: '{surface.600}' },
         },
       },
     },

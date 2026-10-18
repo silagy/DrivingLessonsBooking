@@ -24,8 +24,8 @@
 }
 
 .change-car__card--selected {
-    border-color: var(--p-sky-500);
-    background: #f2f7ff;
+    border-color: var(--app-selected-border);
+    background: var(--app-selected-bg);
 }
 
 .change-car__card--selected .change-car__name {
@@ -69,7 +69,7 @@
 
 .change-car__link {
     font-weight: 600;
-    color: var(--p-sky-500);
+    color: var(--app-brand);
 }
 
 .change-car__refresh {
@@ -82,6 +82,6 @@
     background: none;
     font: inherit;
     font-weight: 600;
-    color: var(--p-sky-500);
+    color: var(--app-brand);
     cursor: pointer;
 }

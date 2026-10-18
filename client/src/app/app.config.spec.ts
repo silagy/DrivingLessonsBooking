@@ -30,4 +30,17 @@ describe('appConfig', () => {
         const aria = TestBed.inject(PrimeNG).translation.aria;
         expect([aria?.close, aria?.moveUp]).toEqual(['סגירה', 'Move Up']);
     });
+
+    it('switches PrimeNG to dark under the app-dark class', () => {
+        //given
+        TestBed.configureTestingModule({
+            providers: [...appConfig.providers, { provide: TRANSLOCO_LOADER, useValue: { getTranslation: () => of({}) } }],
+        });
+
+        //when
+        const theme = TestBed.inject(PrimeNG).theme();
+
+        //then
+        expect(theme?.options?.darkModeSelector).toBe('.app-dark');
+    });
 });

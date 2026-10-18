@@ -192,6 +192,7 @@ The same holds for the student's target: a `Double` pick counts once toward "pic
 ### 8.4 Localization
 - Hebrew and English, user-toggleable on both admin and student surfaces.
 - Hebrew is RTL-first; layouts must be mirror-correct, not merely translated.
+- Light, Dark or System (the default) appearance, chosen per device in the admin drawer or user menu; sign-in and the Student form follow the device's saved choice or its system setting.
 ## 9. Excel Output Specification
  
 One file per teacher per publication. Two sheets.

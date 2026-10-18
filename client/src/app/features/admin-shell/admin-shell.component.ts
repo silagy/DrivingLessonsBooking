@@ -8,6 +8,7 @@ import { Menu, MenuModule } from 'primeng/menu';
 import { AuthService } from '../../core/auth.service';
 import { LanguageService } from '../../core/language.service';
 import { Role } from '../../shared/models/role.enum';
+import { AppearanceToggleComponent } from '../../shared/appearance-toggle/appearance-toggle.component';
 import { BrandLogoComponent } from '../../shared/brand-logo/brand-logo.component';
 import { LanguageToggleComponent } from '../../shared/language-toggle/language-toggle.component';
 import { navigationFor } from './domain/navigation';
@@ -26,6 +27,7 @@ import { ChangeMyPasswordDialog } from './ui/dialogs/change-my-password/change-m
     BrandLogoComponent,
     LanguageToggleComponent,
     ShellDrawerComponent,
+    AppearanceToggleComponent,
   ],
   templateUrl: './admin-shell.component.html',
   styleUrl: './admin-shell.component.scss',

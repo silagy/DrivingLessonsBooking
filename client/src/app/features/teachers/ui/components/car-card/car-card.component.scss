@@ -30,8 +30,8 @@
     text-transform: uppercase;
     padding: 0.25rem 0.7rem;
     border-radius: 999px;
-    background: var(--p-primary-50);
-    color: var(--p-primary-800);
+    background: var(--app-tag-sky-bg);
+    color: var(--app-tag-sky-fg);
 }
 
 :host-context([dir='rtl']) .car__pill {
@@ -80,9 +80,9 @@
     font-weight: 700;
     letter-spacing: calc(0.07em * var(--app-caps-tracking));
     text-transform: uppercase;
-    color: var(--p-primary-700);
-    background: var(--p-primary-50);
-    border: 1px solid var(--p-primary-100);
+    color: var(--app-tag-sky-fg);
+    background: var(--app-tag-sky-bg);
+    border: 1px solid var(--app-tag-sky-border);
     border-radius: 999px;
     padding: 0.25rem 0.625rem;
 }

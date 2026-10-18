@@ -6,6 +6,19 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
   <meta name="theme-color" content="#ffffff">
+  <style>html.app-dark { color-scheme: dark; background: #121418; }</style>
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('drivecal.theme'); } catch (e) {}
+      var dark = saved === 'dark' || (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+      var root = document.documentElement;
+      root.classList.toggle('app-dark', dark);
+      root.style.colorScheme = dark ? 'dark' : 'light';
+      var bar = document.querySelector('meta[name="theme-color"]');
+      if (bar) { bar.setAttribute('content', dark ? '#1B1D22' : '#ffffff'); }
+    })();
+  </script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="דרייבקל">

@@ -28,6 +28,10 @@
       <span>{{ 'shell.language' | transloco }}</span>
       <app-language-toggle [touch]="true" />
     </div>
+    <div class="shell-drawer__appearance">
+      <span>{{ 'shell.appearance.label' | transloco }}</span>
+      <app-appearance-toggle />
+    </div>
     @if (email(); as signedInEmail) {
       <div class="shell-drawer__who">
         <span class="shell-drawer__avatar" aria-hidden="true">{{ initials() }}</span>

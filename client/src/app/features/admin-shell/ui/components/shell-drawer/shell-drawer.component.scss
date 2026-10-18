@@ -20,7 +20,7 @@
     justify-content: flex-start;
     min-block-size: 2.75rem;
     padding-inline: 0;
-    color: var(--p-red-600);
+    color: var(--app-error);
   }
 }
 
@@ -44,8 +44,8 @@
 }
 
 .shell-drawer__link--active {
-  background: var(--p-sky-50);
-  color: var(--p-sky-700);
+  background: var(--app-selected-bg);
+  color: var(--app-brand-deep);
   font-weight: 600;
 
   &::before {
@@ -67,6 +67,7 @@
 }
 
 .shell-drawer__language,
+.shell-drawer__appearance,
 .shell-drawer__who {
   display: flex;
   align-items: center;
@@ -75,8 +76,18 @@
   color: var(--app-text-secondary);
 }
 
-.shell-drawer__language {
+.shell-drawer__language,
+.shell-drawer__appearance {
   justify-content: space-between;
+}
+
+.shell-drawer__appearance {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+
+  app-appearance-toggle {
+    margin-inline-start: auto;
+  }
 }
 
 .shell-drawer__email {

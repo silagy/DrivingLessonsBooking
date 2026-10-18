@@ -30,6 +30,12 @@
     },
     "languageToggle": "עברית",
     "language": "Language",
+    "appearance": {
+      "label": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
     "nav": {
       "dashboard": "Dashboard",
       "teachers": "Cars & teachers",
