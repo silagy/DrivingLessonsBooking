@@ -180,4 +180,51 @@ Native (`superpowers:executing-plans`) is recommended. Tasks 4 to 7 end in brows
 
 ## As built (after execution)
 
-Filled in by task 7.
+Where the code differs from the tasks below, and why:
+
+- **The task-2 authorization test needed a line.** `ControllerAuthorizationTest` pins every endpoint's policy, so `PublicationQueryController.FindSlotRequests` joined its Teacher-or-Administrator list. The plan missed it.
+- **The dialog doesn't inject the store.** `client-state.md` says dialogs never inject stores, so the page passes the store's signals in `DynamicDialogConfig.data` (`SlotRequestsDialogData`), the way `EditStudentDialog` gets its signals.
+- **The sheet sits at the bottom by `margin-block: auto 0` on the dialog,** not by `align-items` on the mask. PrimeNG writes `align-items: center` inline on the mask, which CSS can't beat without `!important`. `maskStyleClass` is still passed.
+- **The dialog config adds `closable: true`.** PrimeNG's Dialog binds Escape and the scrim only when it is closable (`primeng-dialog.mjs:635`, `:838`). The browser check caught a real Escape not closing the sheet. `showHeader: false` keeps PrimeNG's own ✕ hidden.
+- **The drag directive ignores a press that starts on a button or link,** so pointer capture doesn't swallow the ✕. It moves the sheet with `transform: translateY()`. When the sheet closes from a drag it leaves the sheet where the finger let go, rather than snapping it back first.
+- **`gridDayDate` is tested with the app's locales,** `he-IL` and `en-IL`: English dates read `21/10`, not `10/21` as the plan wrote.
+- **A count cell with one request has a singular accessible name,** `publications.slotRequests.openAriaOne`, because "1 בקשות" read wrong.
+- **The card flags also take `--flag-font-weight` (500, the design's `.flag`).** The card's custom properties replace its `::ng-deep` font-size override.
+- **The sweep found one drift: the Students search field was 36px on a phone** (PrimeNG's default; no rule set it). It is 44px at ≤ 639px now, with the icon still centred. `students.page.scss` is 7.15 kB (was 7.11; error at 8).
+
+Measured at the end (dev data, `pageScrollWidth`, no clipping, no small text; the only short target is the known 42px select on `/students` and `/week-schedules`):
+
+| Page | 390 he | 390 en | 360 he | 360 en |
+|------|--------|--------|--------|--------|
+| `/` | 390 | 390 | 360 | 360 |
+| `/teachers` | 390 | 390 | 360 | 360 |
+| `/week-schedules` | 390 | 390 | 360 | 360 |
+| `/publications` Draft, Closed, no Publication | 390 | 390 | 360 | 360 |
+| `/publications/history` | 390 | 390 | 360 | 360 |
+| `/students` and its no-match state | 390 | 390 | 360 | 360 |
+| `/users` | 390 | 390 | 360 | 360 |
+| `/students/import` (Roster import, not in the design) | **664** | **714** | **664** | **713** |
+
+Rules checked by hand at 390 in Hebrew, all as the request says:
+- the 56px bar and the drawer (from the right, 48px items, the active one sky with a 3px gradient bar, language, email and Sign out at the bottom);
+- the header action grid (two 174px columns, 44px);
+- the filter order and equal thirds;
+- card `dl`s (`auto 1fr`), the ⋮ after the tag;
+- muted cards (no shadow, `--g7`, 0.55 on avatar, name and details only);
+- LTR isolates;
+- Users role tags (Administrator sky, Teacher ocean, "-" for an Administrator);
+- Weekly prep (12px × 10px card, 48px cells, short days, only "חסום" visible, sticky full-width bar);
+- History cards (full-width 44px action);
+- the dashboard (24px teacher select, Closed: Reopen + Excel in the 2-column row, 12px × 10px grid card, 46px label column, 4px gaps).
+
+Not verified in the browser:
+- **The Open and Published states.** No dev week is Open or Published; the page specs cover their actions.
+- **A Teacher-role sign-in.** There's none in the dev data; `FindSlotRequestsInteractorTest` covers the scoping.
+- **A real finger drag and a real Escape key.** The browser pane wasn't drawing, so the drag used synthetic `PointerEvent`s and Escape a synthetic `keydown` that PrimeNG's document listener handles.
+
+**Roster import still scrolls sideways on a phone.** `/students/import` overflows at both widths, in both languages:
+- its table is wider than the screen;
+- stat tiles and the summary are 12.5px;
+- the back link is 24px.
+
+This branch doesn't touch it, and no design frame covers it, so it's left for a follow-up with its own design.
