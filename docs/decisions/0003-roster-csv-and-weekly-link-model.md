@@ -58,3 +58,7 @@ This supersedes decisions #3 (link scope), #6 (email reloads submission), and #1
 The "Delete students missing from a re-upload" alternative above stays rejected; the soft-deactivation it argued for is now a manual action rather than an import step.
 
 The "Allow ad-hoc (unlisted) students to self-enter" alternative also stays rejected, but no longer because the Roster is authoritative: Students still can't add themselves, and enter only through the Roster or an Administrator adding them by hand (requirements decision #25). An unknown national ID is still refused on the student form.
+
+## Amendment (October 2026): the Excel no longer carries National ID or Phone
+
+At the customer's request (feedback of 18 October 2026), the Excel detail sheet no longer carries National ID or Phone (nor Transmission). The teacher identifies the student there by name and car. The national ID remains the student-form identifier; this changes only what the Excel shows, not the identity model above.

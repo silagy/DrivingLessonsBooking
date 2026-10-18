@@ -208,13 +208,13 @@ One row per slot request, sorted by day, then slot, then student rank:
 | Day | Sunday-Friday |
 | Slot | Morning / Noon / Afternoon / Evening |
 | Student name | Full name (from the student's record) |
-| National ID | Identifier |
-| Phone | Contact number (from the student's record) |
-| Transmission | Automatic / Manual |
+| Car | The name of the student's roster car |
 | Session type | Single / Double |
 | Rank | Position in the student's preference order |
-| Target count | The student's declared weekly target |
+| Requested lessons | The student's weekly target out of the slots they picked, for example "1 out of 3" (`1 מתוך 3`) |
 | Constraints | Free text for this slot request |
+
+National ID, phone and transmission were removed at the customer's request (October 2026).
  
 ### Delivery
 - **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4)

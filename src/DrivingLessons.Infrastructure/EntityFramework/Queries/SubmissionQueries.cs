@@ -62,12 +62,11 @@ public class SubmissionQueries : ISubmissionQueries
                         slot.Day,
                         slot.Window,
                         StudentName = student.Name,
-                        student.NationalId,
-                        student.Phone,
-                        car.Transmission,
+                        CarName = car.Name,
                         request.SessionType,
                         request.Rank,
                         submission.TargetCount,
+                        PickCount = submission.SlotRequests.Count(),
                         request.Constraint
                     };
 
@@ -78,12 +77,11 @@ public class SubmissionQueries : ISubmissionQueries
                        x.Day,
                        x.Window,
                        x.StudentName.Value,
-                       x.NationalId.Value,
-                       x.Phone.Value,
-                       x.Transmission,
+                       x.CarName.Value,
                        x.SessionType,
                        x.Rank.Value,
                        x.TargetCount.Value,
+                       x.PickCount,
                        x.Constraint?.Value))
                    .ToList();
     }

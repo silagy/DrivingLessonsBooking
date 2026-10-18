@@ -49,11 +49,10 @@ public class ExcelGeneratorTest
             DayOfWeek.Sunday,
             SlotWindowType.Morning,
             "Smoke Student A",
-            "000000018",
-            "050-0000001",
-            Transmission.Automatic,
+            "Smoke Auto",
             SessionType.Single,
             1,
+            2,
             2,
             null);
 
@@ -67,7 +66,7 @@ public class ExcelGeneratorTest
         var detail = WorkbookOf(excel).Worksheet(RequestDetailSheet.Name);
         detail.LastRowUsed()!.RowNumber().ShouldBe(2);
         detail.Cell(2, 3).GetText().ShouldBe("Smoke Student A");
-        detail.Cell(2, 4).GetText().ShouldBe("000000018");
+        detail.Cell(2, 4).GetText().ShouldBe("Smoke Auto");
     }
 
     [TestMethod]

@@ -10,22 +10,17 @@ public static class RequestDetailSheet
     private const int HeaderRow = 1;
     private const int FirstRequestRow = 2;
     private const int FirstColumn = 1;
-    private const int NationalIdColumn = 4;
-    private const int PhoneColumn = 5;
-    private const int ConstraintsColumn = 10;
-    private const string TextFormat = "@";
+    private const int ConstraintsColumn = 8;
 
     private static readonly string[] Headers =
     [
         "יום",
         "משבצת",
         "שם התלמיד/ה",
-        "תעודת זהות",
-        "טלפון",
-        "תיבת הילוכים",
+        "רכב",
         "סוג שיעור",
         "דירוג",
-        "יעד שיעורים",
+        "שיעורים מבוקשים",
         "אילוצים"
     ];
 
@@ -34,12 +29,10 @@ public static class RequestDetailSheet
         8,
         10,
         24,
-        12,
-        14,
-        13,
+        18,
         10,
         7,
-        11,
+        14,
         40
     ];
 
@@ -64,8 +57,6 @@ public static class RequestDetailSheet
             sheet.Column(index + FirstColumn).Width = ColumnWidths[index];
         }
 
-        sheet.Column(NationalIdColumn).Style.NumberFormat.Format = TextFormat;
-        sheet.Column(PhoneColumn).Style.NumberFormat.Format = TextFormat;
         sheet.Column(ConstraintsColumn).Style.Alignment.WrapText = true;
     }
 
@@ -86,7 +77,7 @@ public static class RequestDetailSheet
                           .ThenBy(x => x.Window)
                           .ThenBy(x => x.Rank)
                           .ThenBy(x => x.StudentName, StringComparer.Ordinal)
-                          .ThenBy(x => x.NationalId, StringComparer.Ordinal);
+                          .ThenBy(x => x.CarName, StringComparer.Ordinal);
 
         var row = FirstRequestRow;
 
@@ -104,12 +95,10 @@ public static class RequestDetailSheet
             HebrewExcelLabels.DayOf(request.Day),
             HebrewExcelLabels.WindowOf(request.Window),
             request.StudentName,
-            request.NationalId,
-            request.Phone,
-            HebrewExcelLabels.TransmissionOf(request.Transmission),
+            request.CarName,
             HebrewExcelLabels.SessionTypeOf(request.SessionType),
             request.Rank,
-            request.TargetCount,
+            HebrewExcelLabels.RequestedLessonsOf(request.TargetCount, request.PickCount),
             ConstraintOf(request.Constraint)
         };
 
