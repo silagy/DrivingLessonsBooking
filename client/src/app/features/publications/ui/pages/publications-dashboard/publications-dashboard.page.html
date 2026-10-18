@@ -95,7 +95,7 @@
                             <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" />
                         </ng-template>
                     </app-week-grid>
-                    <app-week-grid-legend class="dashboard__legend" />
+                    <app-week-grid-legend class="dashboard__legend" firstLabelKey="publications.dashboard.legendRequests" />
                 </section>
             }
             @case (PublicationState.closed) {
@@ -111,7 +111,7 @@
                             <app-slot-count-cell [requestCount]="cell.requestCount" [slotState]="cell.state" />
                         </ng-template>
                     </app-week-grid>
-                    <app-week-grid-legend class="dashboard__legend" />
+                    <app-week-grid-legend class="dashboard__legend" firstLabelKey="publications.dashboard.legendRequests" />
                 </section>
             }
         }

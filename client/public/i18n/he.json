@@ -330,7 +330,7 @@
     "legend": {
       "open": "פתוח",
       "unavailable": "לא זמין",
-      "outsideGrid": "מחוץ לרשת (שישי אחה״צ/ערב, שבת)"
+      "noLessons": "אין שיעורים (שישי אחה״צ/ערב, שבת)"
     }
   },
   "publications": {
@@ -388,6 +388,7 @@
     },
     "dashboard": {
       "requests": "בקשות",
+      "legendRequests": "מספר בקשות - הקישו לרשימת התלמידים",
       "studentsSubmitted": "תלמידים הגישו",
       "totalPicks": "סה״כ בחירות",
       "lastSubmission": "הגשה אחרונה",

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
@@ -8,4 +8,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
     styleUrl: './week-grid-legend.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WeekGridLegendComponent {}
+export class WeekGridLegendComponent {
+    readonly firstLabelKey = input('weekGrid.legend.open');
+}

@@ -330,7 +330,7 @@
     "legend": {
       "open": "Open",
       "unavailable": "Unavailable",
-      "outsideGrid": "Outside grid (Fri PM, Saturday)"
+      "noLessons": "No lessons (Fri PM, Saturday)"
     }
   },
   "publications": {
@@ -388,6 +388,7 @@
     },
     "dashboard": {
       "requests": "requests",
+      "legendRequests": "Requests - tap or click a count to see the students",
       "studentsSubmitted": "students submitted",
       "totalPicks": "total picks",
       "lastSubmission": "last submission",
