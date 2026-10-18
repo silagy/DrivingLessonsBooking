@@ -1,13 +1,18 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApplicationRef, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { NEVER, Observable, of, throwError } from 'rxjs';
+import { NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { LanguageService } from '../../../core/language.service';
 import { ClipboardService } from '../../../core/services/clipboard.service';
 import { FileDownloadService } from '../../../core/services/file-download.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { DayOfWeek } from '../../../shared/models/day-of-week.enum';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
+import { SlotState } from '../../../shared/models/slot-state.enum';
+import { SlotWindow } from '../../../shared/models/slot-window.enum';
+import { GetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
+import { ItemForFindSlotRequestsResponse } from '../data/item-for-find-slot-requests.response';
 import { GetPublicationResponse } from '../data/get-publication.response';
 import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
 import { PublicationsApiService } from '../data/publications-api.service';
@@ -33,6 +38,46 @@ const OPEN_PUBLICATION: GetPublicationResponse = {
     windowStartUtc: '2026-10-01T16:00:00Z',
     windowEndUtc: '2026-10-09T11:00:00Z',
 };
+
+const OPEN_DASHBOARD: GetPublicationDashboardResponse = {
+    state: PublicationState.open,
+    windowStartUtc: '2026-10-01T16:00:00Z',
+    windowEndUtc: '2026-10-09T11:00:00Z',
+    linkToken: 'link-token',
+    studentsSubmitted: 3,
+    totalPicks: 5,
+    lastSubmissionAtUtc: null,
+    latestExcelVersion: null,
+    slotCounts: [
+        {
+            slotId: 'slot-a',
+            day: DayOfWeek.wednesday,
+            window: SlotWindow.afternoon,
+            state: SlotState.open,
+            requestCount: 2,
+            startLocal: '15:00:00',
+            endLocal: '18:00:00',
+        },
+        {
+            slotId: 'slot-b',
+            day: DayOfWeek.thursday,
+            window: SlotWindow.morning,
+            state: SlotState.open,
+            requestCount: 1,
+            startLocal: '07:00:00',
+            endLocal: '12:00:00',
+        },
+    ],
+};
+
+const SLOT_A_REQUESTS: ItemForFindSlotRequestsResponse[] = [
+    { studentId: 'student-noa', studentName: 'Noa Mizrahi', rank: 1, pickCount: 3 },
+    { studentId: 'student-omer', studentName: 'Omer Biton', rank: 2, pickCount: 2 },
+];
+
+const SLOT_B_REQUESTS: ItemForFindSlotRequestsResponse[] = [
+    { studentId: 'student-maya', studentName: 'Maya Cohen', rank: 3, pickCount: 3 },
+];
 
 interface SignedInAs {
     userId: string;
@@ -70,6 +115,7 @@ function createStore(
     teachers: Observable<ItemForFindTeachersResponse[]>,
     publication: Observable<GetPublicationResponse>,
     user: SignedInAs = ADMINISTRATOR,
+    api: Partial<Record<keyof PublicationsApiService, unknown>> = {},
 ): PublicationsStore {
     signIn(user);
 
@@ -89,6 +135,8 @@ function createStore(
                     getDashboard: () => NEVER,
                     findHistory: vi.fn(() => of([])),
                     downloadExcel: vi.fn(() => of(new Blob())),
+                    findSlotRequests: vi.fn(() => NEVER),
+                    ...api,
                 },
             },
             { provide: ToastService, useValue: { success: () => undefined, apiError: () => undefined } },
@@ -348,5 +396,97 @@ describe('PublicationsStore', () => {
 
         //expected
         expect(store.selectedTeacherId()).toBe('teacher-cohen');
+    });
+});
+
+describe('PublicationsStore slot requests', () => {
+    async function openWeek(findSlotRequests: (id: string, teacher: string, slot: string) => unknown) {
+        const store = createStore(of(TEACHERS), of(OPEN_PUBLICATION), ADMINISTRATOR, {
+            getDashboard: () => of(OPEN_DASHBOARD),
+            findSlotRequests: vi.fn(findSlotRequests),
+        });
+        await vi.waitFor(() => expect(store.slotCounts()).toHaveLength(2));
+
+        return { store, api: TestBed.inject(PublicationsApiService) };
+    }
+
+    it('loads the students who requested the opened slot', async () => {
+        //given
+        const { store, api } = await openWeek(() => of(SLOT_A_REQUESTS));
+
+        //when
+        store.openSlotRequests('slot-a');
+        await vi.waitFor(() => expect(store.slotRequests()).toHaveLength(2));
+
+        //then
+        expect(api.findSlotRequests).toHaveBeenCalledWith('publication-1', 'teacher-cohen', 'slot-a');
+        expect(store.openedSlot()?.slotId).toBe('slot-a');
+        expect(store.slotRequests()).toEqual(SLOT_A_REQUESTS);
+        expect(store.slotRequestsAreLoading()).toBe(false);
+    });
+
+    it('forgets the opened slot when the list closes', async () => {
+        //given
+        const { store } = await openWeek(() => of(SLOT_A_REQUESTS));
+        store.openSlotRequests('slot-a');
+        await vi.waitFor(() => expect(store.slotRequests()).toHaveLength(2));
+
+        //when
+        store.closeSlotRequests();
+        await TestBed.inject(ApplicationRef).whenStable();
+
+        //then
+        expect(store.openedSlot()).toBeUndefined();
+        expect(store.slotRequests()).toEqual([]);
+    });
+
+    it('shows the requests of the last slot opened', async () => {
+        //given
+        const lateSlotA = new Subject<ItemForFindSlotRequestsResponse[]>();
+        const { store, api } = await openWeek((_id, _teacher, slot) =>
+            slot === 'slot-a' ? lateSlotA : of(SLOT_B_REQUESTS),
+        );
+        store.openSlotRequests('slot-a');
+        await vi.waitFor(() =>
+            expect(api.findSlotRequests).toHaveBeenCalledWith('publication-1', 'teacher-cohen', 'slot-a'),
+        );
+
+        //when
+        store.openSlotRequests('slot-b');
+        await vi.waitFor(() => expect(store.slotRequests()).toEqual(SLOT_B_REQUESTS));
+        lateSlotA.next(SLOT_A_REQUESTS);
+        lateSlotA.complete();
+        await TestBed.inject(ApplicationRef).whenStable();
+
+        //then
+        expect(store.openedSlot()?.slotId).toBe('slot-b');
+        expect(store.slotRequests()).toEqual(SLOT_B_REQUESTS);
+    });
+
+    it('says the list could not load', async () => {
+        //given
+        const { store } = await openWeek(() =>
+            throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR })),
+        );
+
+        //when
+        store.openSlotRequests('slot-a');
+
+        //then
+        await vi.waitFor(() => expect(store.slotRequestsError()).toBe('publications.slotRequests.loadFailed'));
+        expect(store.slotRequests()).toEqual([]);
+    });
+
+    it('closes the opened slot when another Teacher is chosen', async () => {
+        //given
+        const { store } = await openWeek(() => of(SLOT_A_REQUESTS));
+        store.openSlotRequests('slot-a');
+        await vi.waitFor(() => expect(store.openedSlot()?.slotId).toBe('slot-a'));
+
+        //when
+        store.selectTeacher('teacher-levi');
+
+        //then
+        expect(store.openedSlot()).toBeUndefined();
     });
 });
