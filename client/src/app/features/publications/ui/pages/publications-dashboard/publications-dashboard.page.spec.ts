@@ -393,15 +393,49 @@ describe('PublicationsDashboardPage', () => {
 
         async function openWeekWithRequests() {
             const closed = new Subject<void>();
-            const dialogs = { open: vi.fn(() => ({ onClose: closed })) };
-            const store = fakeStore({ slotCounts: signal([WEDNESDAY_AFTERNOON]) });
+            const ref = { onClose: closed, close: vi.fn(() => closed.next()) };
+            const dialogs = { open: vi.fn(() => ref) };
+            const openedSlot = signal<typeof WEDNESDAY_AFTERNOON | undefined>(undefined);
+            const store = fakeStore({
+                slotCounts: signal([WEDNESDAY_AFTERNOON]),
+                openedSlot,
+                openSlotRequests: vi.fn(() => openedSlot.set(WEDNESDAY_AFTERNOON)),
+                closeSlotRequests: vi.fn(() => openedSlot.set(undefined)),
+            });
             const fixture = await renderFixture(store, dialogs);
             const cell = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
                 'button.slot-count--openable',
             );
 
-            return { fixture, store, dialogs, closed, cell: cell! };
+            return { fixture, store, dialogs, ref, closed, openedSlot, cell: cell! };
         }
+
+        it('closes the list when its slot goes away, as when the week changes', async () => {
+            //given
+            const { fixture, store, ref, openedSlot, cell } = await openWeekWithRequests();
+            cell.click();
+            await fixture.whenStable();
+
+            //when
+            openedSlot.set(undefined);
+            await fixture.whenStable();
+
+            //then
+            expect(ref.close).toHaveBeenCalledTimes(1);
+            expect(store.closeSlotRequests).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps the list open while its slot is there', async () => {
+            //given
+            const { fixture, ref, cell } = await openWeekWithRequests();
+
+            //when
+            cell.click();
+            await fixture.whenStable();
+
+            //then
+            expect(ref.close).not.toHaveBeenCalled();
+        });
 
         it('opens the students of a slot from its count', async () => {
             //given

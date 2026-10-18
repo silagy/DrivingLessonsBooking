@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AppRoutes } from '../../../../../shared/config/app-routes';
-import { DialogService } from 'primeng/dynamicdialog';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { WeekGridComponent } from '../../../../../shared/components/week-grid/week-grid.component';
 import { WeekGridLegendComponent } from '../../../../../shared/components/week-grid-legend/week-grid-legend.component';
 import { PublicationState } from '../../../../../shared/models/publication-state.enum';
@@ -62,6 +62,8 @@ export class PublicationsDashboardPage {
     readonly week = input<string>();
     readonly publish = input<string>();
 
+    private slotRequestsRef: DynamicDialogRef | null = null;
+
     protected readonly windowLabel = computed(() => {
         const dashboard = this.store.dashboard();
 
@@ -99,6 +101,14 @@ export class PublicationsDashboardPage {
     });
 
     constructor() {
+        effect(() => {
+            const slotIsGone = !this.store.openedSlot();
+
+            if (slotIsGone && this.slotRequestsRef) {
+                this.slotRequestsRef.close();
+            }
+        });
+
         effect(() => {
             const teacherId = this.teacherId();
 
@@ -176,7 +186,7 @@ export class PublicationsDashboardPage {
             windowTimes: this.store.windowTimes,
         };
 
-        const ref = this.dialogs.open(SlotRequestsDialog, {
+        this.slotRequestsRef = this.dialogs.open(SlotRequestsDialog, {
             showHeader: false,
             closable: true,
             width: NARROW_DIALOG_WIDTH,
@@ -188,7 +198,8 @@ export class PublicationsDashboardPage {
             data,
         });
 
-        ref?.onClose.subscribe(() => {
+        this.slotRequestsRef?.onClose.subscribe(() => {
+            this.slotRequestsRef = null;
             this.store.closeSlotRequests();
             cell.focus();
         });

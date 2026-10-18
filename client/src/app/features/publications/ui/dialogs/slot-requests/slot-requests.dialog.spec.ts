@@ -44,7 +44,10 @@ interface DialogState {
     errorKey: string | null;
 }
 
-async function render(state: DialogState): Promise<{ page: HTMLElement; ref: { close: ReturnType<typeof vi.fn> } }> {
+async function render(
+    state: DialogState,
+    dialogFrame?: HTMLElement,
+): Promise<{ page: HTMLElement; ref: { close: ReturnType<typeof vi.fn> } }> {
     const data: SlotRequestsDialogData = {
         slot: signal(WEDNESDAY_AFTERNOON),
         requests: signal(state.requests),
@@ -73,6 +76,7 @@ async function render(state: DialogState): Promise<{ page: HTMLElement; ref: { c
     });
 
     const fixture: ComponentFixture<SlotRequestsDialog> = TestBed.createComponent(SlotRequestsDialog);
+    dialogFrame?.appendChild(fixture.nativeElement as HTMLElement);
     await fixture.whenStable();
 
     return { page: fixture.nativeElement as HTMLElement, ref };
@@ -95,6 +99,22 @@ describe('SlotRequestsDialog', () => {
         expect(text(page, 'h2.slot-requests__title')).toBe(
             'weekGrid.daysShort.wednesday|21/10|weekGrid.windows.afternoon',
         );
+    });
+
+    it('names the dialog after its title for screen readers', async () => {
+        //given
+        const dialogFrame = document.createElement('div');
+        dialogFrame.setAttribute('role', 'dialog');
+        dialogFrame.setAttribute('aria-labelledby', 'pn_id_1_header');
+        document.body.appendChild(dialogFrame);
+
+        //when
+        const { page } = await render(loaded([NOA]), dialogFrame);
+
+        //then
+        const labelledBy = dialogFrame.getAttribute('aria-labelledby');
+        expect(page.querySelector(`#${labelledBy}`)).toBe(page.querySelector('h2.slot-requests__title'));
+        dialogFrame.remove();
     });
 
     it('shows the window time left to right', async () => {

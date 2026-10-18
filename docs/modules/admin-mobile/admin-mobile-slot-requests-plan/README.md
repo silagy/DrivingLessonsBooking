@@ -190,6 +190,9 @@ Where the code differs from the tasks below, and why:
 - **`gridDayDate` is tested with the app's locales,** `he-IL` and `en-IL`: English dates read `21/10`, not `10/21` as the plan wrote.
 - **A count cell with one request has a singular accessible name,** `publications.slotRequests.openAriaOne`, because "1 בקשות" read wrong.
 - **The card flags also take `--flag-font-weight` (500, the design's `.flag`).** The card's custom properties replace its `::ng-deep` font-size override.
+- **The final review found two fixes:**
+  - **The sheet now has a name.** With `showHeader: false`, PrimeNG's `aria-labelledby` pointed at a header that never renders. The dialog gives its title a stable id and points the `role="dialog"` frame at it after the first render.
+  - **The page closes the sheet when its slot goes away.** A back gesture that changes the week left a modal with an empty sheet.
 - **The sweep found one drift: the Students search field was 36px on a phone** (PrimeNG's default; no rule set it). It is 44px at ≤ 639px now, with the icon still centred. `students.page.scss` is 7.15 kB (was 7.11; error at 8).
 
 Measured at the end (dev data, `pageScrollWidth`, no clipping, no small text; the only short target is the known 42px select on `/students` and `/week-schedules`):

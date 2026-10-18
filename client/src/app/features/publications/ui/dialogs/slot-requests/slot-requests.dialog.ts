@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, computed, ElementRef, inject } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -10,6 +10,9 @@ import { InitialsPipe } from '../../../../../shared/pipes/initials.pipe';
 import { SlotRequestsDialogData } from './slot-requests-dialog-data';
 
 const SINGLE_STUDENT = 1;
+const DIALOG_FRAME_SELECTOR = '[role="dialog"]';
+
+let nextTitleNumber = 0;
 
 @Component({
     selector: 'app-slot-requests-dialog',
@@ -22,6 +25,9 @@ export class SlotRequestsDialog {
     private readonly ref = inject(DynamicDialogRef);
     private readonly language = inject(LanguageService);
     private readonly data = inject(DynamicDialogConfig<SlotRequestsDialogData>).data as SlotRequestsDialogData;
+    private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+    protected readonly titleId = `slot-requests-title-${nextTitleNumber++}`;
 
     protected readonly slot = this.data.slot;
     protected readonly requests = this.data.requests;
@@ -51,6 +57,13 @@ export class SlotRequestsDialog {
             ? 'publications.slotRequests.requestedByOne'
             : 'publications.slotRequests.requestedByMany',
     );
+
+    constructor() {
+        afterNextRender(() => {
+            const frame = this.host.nativeElement.closest(DIALOG_FRAME_SELECTOR);
+            frame?.setAttribute('aria-labelledby', this.titleId);
+        });
+    }
 
     protected close(): void {
         this.ref.close();
