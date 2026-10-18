@@ -7,16 +7,16 @@ function labelsOf(role: Role | null): string[] {
 }
 
 describe('navigationFor', () => {
-    it('gives an Administrator every screen, with Users last', () => {
+    it('gives an Administrator every screen, weekly prep first and the dashboard last', () => {
         //expected
         expect(labelsOf(Role.administrator)).toEqual([
-            'shell.nav.dashboard',
-            'shell.nav.teachers',
-            'shell.nav.students',
             'shell.nav.weeklyPrep',
             'shell.nav.publications',
             'shell.nav.history',
+            'shell.nav.students',
+            'shell.nav.teachers',
             'shell.nav.users',
+            'shell.nav.dashboard',
         ]);
     });
 
@@ -41,7 +41,7 @@ describe('navigationFor', () => {
         );
 
         //expected
-        expect(commandsByLabel.get('shell.nav.dashboard')).toEqual(['/']);
+        expect(commandsByLabel.get('shell.nav.dashboard')).toEqual(['/', 'dashboard']);
         expect(commandsByLabel.get('shell.nav.teachers')).toEqual(['/', 'teachers']);
         expect(commandsByLabel.get('shell.nav.students')).toEqual(['/', 'students']);
         expect(commandsByLabel.get('shell.nav.weeklyPrep')).toEqual(['/', 'week-schedules']);
@@ -50,14 +50,14 @@ describe('navigationFor', () => {
         expect(commandsByLabel.get('shell.nav.users')).toEqual(['/', 'users']);
     });
 
-    it('highlights the dashboard and publications only on their exact route', () => {
+    it('highlights publications only on its exact route', () => {
         //given
         const exactLabels = navigationFor(Role.administrator)
             .filter((item) => item.exact)
             .map((item) => item.labelKey);
 
         //expected
-        expect(exactLabels).toEqual(['shell.nav.dashboard', 'shell.nav.publications']);
+        expect(exactLabels).toEqual(['shell.nav.publications']);
     });
 
     it('keeps Students highlighted on the Roster import page below it', () => {

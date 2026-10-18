@@ -1,5 +1,6 @@
 export const AppRoutes = {
     login: 'login',
+    dashboard: 'dashboard',
     teachers: 'teachers',
     students: 'students',
     rosterImport: 'import',

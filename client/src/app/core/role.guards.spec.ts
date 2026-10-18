@@ -1,9 +1,9 @@
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, Route, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { provideRouter, Route, Router, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
 import { ToastService } from './services/toast.service';
-import { administratorGuard, homeGuard } from './role.guards';
+import { administratorGuard } from './role.guards';
 
 interface SignedInAs {
     isAuthenticated: boolean;
@@ -34,10 +34,6 @@ function urlOf(router: Router, result: unknown): string {
 
 function runAdministratorGuard(): unknown {
     return TestBed.runInInjectionContext(() => administratorGuard({} as Route, []));
-}
-
-function runHomeGuard(): unknown {
-    return TestBed.runInInjectionContext(() => homeGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot));
 }
 
 describe('administratorGuard', () => {
@@ -74,31 +70,6 @@ describe('administratorGuard', () => {
 
         //then
         expect(urlOf(router, result)).toBe('/login');
-        expect(info).not.toHaveBeenCalled();
-    });
-});
-
-describe('homeGuard', () => {
-    it('keeps an Administrator on the dashboard', () => {
-        //given
-        setUp({ isAuthenticated: true, isAdministrator: true });
-
-        //when
-        const result = runHomeGuard();
-
-        //then
-        expect(result).toBe(true);
-    });
-
-    it('sends a Teacher from the dashboard to weekly prep without a toast', () => {
-        //given
-        const { info, router } = setUp({ isAuthenticated: true, isAdministrator: false });
-
-        //when
-        const result = runHomeGuard();
-
-        //then
-        expect(urlOf(router, result)).toBe('/week-schedules');
         expect(info).not.toHaveBeenCalled();
     });
 });

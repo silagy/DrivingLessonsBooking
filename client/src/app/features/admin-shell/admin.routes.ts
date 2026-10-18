@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { administratorGuard, homeGuard } from '../../core/role.guards';
+import { administratorGuard } from '../../core/role.guards';
 import { AppRoutes } from '../../shared/config/app-routes';
 import { AdminShellComponent } from './admin-shell.component';
 import { DashboardComponent } from './dashboard.component';
@@ -9,7 +9,7 @@ export const ADMIN_ROUTES: Routes = [
     path: '',
     component: AdminShellComponent,
     children: [
-      { path: '', pathMatch: 'full', component: DashboardComponent, canActivate: [homeGuard] },
+      { path: '', pathMatch: 'full', redirectTo: AppRoutes.weekSchedules },
       {
         path: AppRoutes.teachers,
         canMatch: [administratorGuard],
@@ -43,6 +43,7 @@ export const ADMIN_ROUTES: Routes = [
         canMatch: [administratorGuard],
         loadChildren: () => import('../users/users.routes'),
       },
+      { path: AppRoutes.dashboard, canMatch: [administratorGuard], component: DashboardComponent },
     ],
   },
 ];
