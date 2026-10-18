@@ -1,6 +1,6 @@
 .failed-panel {
     background: var(--app-bg-card);
-    border: 1px solid var(--p-red-200);
+    border: 1px solid var(--app-error-border);
     border-radius: var(--app-radius-card);
     box-shadow: var(--app-shadow-card);
     overflow: hidden;
@@ -13,11 +13,11 @@
     justify-content: space-between;
     gap: 10px;
     padding: 12px 18px;
-    background: var(--p-red-50);
-    color: var(--p-red-700);
+    background: var(--app-error-bg);
+    color: var(--app-error-strong);
     font-weight: 600;
     font-size: 0.84rem;
-    border-block-end: 1px solid var(--p-red-100);
+    border-block-end: 1px solid var(--app-error-bg-strong);
 }
 
 .failed-panel__count {
@@ -28,7 +28,7 @@
     height: 22px;
     padding-inline: 6px;
     border-radius: 999px;
-    background: var(--p-red-100);
+    background: var(--app-error-bg-strong);
     font-variant-numeric: tabular-nums;
 }
 
@@ -57,5 +57,5 @@
 
 .failed-panel__reason {
     font-size: 0.78rem;
-    color: var(--p-red-600);
+    color: var(--app-error);
 }

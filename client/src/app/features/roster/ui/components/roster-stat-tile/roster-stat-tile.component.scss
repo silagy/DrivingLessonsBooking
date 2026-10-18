@@ -23,13 +23,13 @@
 }
 
 .stat-tile--success .stat-tile__value {
-    color: var(--p-green-600);
+    color: var(--app-success);
 }
 
 .stat-tile--info .stat-tile__value {
-    color: var(--p-blue-600);
+    color: var(--app-info);
 }
 
 .stat-tile--danger .stat-tile__value {
-    color: var(--p-red-600);
+    color: var(--app-error);
 }

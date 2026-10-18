@@ -11,7 +11,7 @@
 
 .user-card--deleted {
     padding-block-end: 0;
-    background: var(--app-bg-page);
+    background: var(--app-row-muted-bg);
     box-shadow: none;
 
     .user-card__faded {
@@ -85,15 +85,15 @@
 }
 
 .user-card__tag--administrator {
-    background: var(--p-sky-50);
-    color: var(--p-sky-700);
-    border-color: var(--p-sky-100);
+    background: var(--app-tag-sky-bg);
+    color: var(--app-tag-sky-fg);
+    border-color: var(--app-tag-sky-border);
 }
 
 .user-card__tag--teacher {
-    background: var(--p-ocean-50);
-    color: var(--p-ocean-700);
-    border-color: var(--p-ocean-100);
+    background: var(--app-tag-ocean-bg);
+    color: var(--app-tag-ocean-fg);
+    border-color: var(--app-tag-ocean-border);
 }
 
 .user-card__tag--muted {

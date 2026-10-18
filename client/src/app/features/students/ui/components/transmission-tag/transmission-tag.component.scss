@@ -11,9 +11,9 @@
 }
 
 .transmission-tag--automatic {
-    background: var(--p-sky-50);
-    color: var(--p-sky-700);
-    border-color: var(--p-sky-100);
+    background: var(--app-tag-sky-bg);
+    color: var(--app-tag-sky-fg);
+    border-color: var(--app-tag-sky-border);
 }
 
 .transmission-tag--manual {

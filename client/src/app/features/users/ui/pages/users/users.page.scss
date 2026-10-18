@@ -53,7 +53,7 @@
     }
 
     .p-datatable-tbody > tr.users__row--deleted {
-        background: var(--app-bg-page);
+        background: var(--app-row-muted-bg);
     }
 
     .p-datatable-tbody > tr.users__row--deleted > td {
@@ -104,15 +104,15 @@
 }
 
 .users__tag--administrator {
-    background: var(--p-sky-50);
-    color: var(--p-sky-700);
-    border-color: var(--p-sky-100);
+    background: var(--app-tag-sky-bg);
+    color: var(--app-tag-sky-fg);
+    border-color: var(--app-tag-sky-border);
 }
 
 .users__tag--teacher {
-    background: var(--p-ocean-50);
-    color: var(--p-ocean-700);
-    border-color: var(--p-ocean-100);
+    background: var(--app-tag-ocean-bg);
+    color: var(--app-tag-ocean-fg);
+    border-color: var(--app-tag-ocean-border);
 }
 
 .users__tag--muted {
@@ -144,7 +144,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.9rem;
-    color: var(--p-red-600);
+    color: var(--app-error);
 }
 
 .users__footer {
@@ -181,7 +181,7 @@
 ::ng-deep .users-menu__item--danger .p-menu-item-link,
 ::ng-deep .users-menu__item--danger .p-menu-item-icon,
 ::ng-deep .users-menu__item--danger .p-menu-item-label {
-    color: var(--p-red-600);
+    color: var(--app-error);
 }
 
 .users__cards {

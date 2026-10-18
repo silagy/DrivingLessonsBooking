@@ -41,7 +41,7 @@
 
 .add-student__link {
     font-weight: 600;
-    color: var(--p-sky-500);
+    color: var(--app-brand);
 }
 
 .add-student__refresh {
@@ -54,6 +54,6 @@
     background: none;
     font: inherit;
     font-weight: 600;
-    color: var(--p-sky-500);
+    color: var(--app-brand);
     cursor: pointer;
 }
