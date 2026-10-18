@@ -197,6 +197,7 @@
       "changeTeacher": "Change Teacher",
       "changeCar": "Change Car",
       "fix": "Fix",
+      "fixCar": "Fix the car",
       "menu": "Actions",
       "menuFor": "Actions - {{name}}",
       "deactivate": "Deactivate",

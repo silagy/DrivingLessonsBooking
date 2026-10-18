@@ -197,6 +197,7 @@
       "changeTeacher": "החלפת מורה",
       "changeCar": "החלפת רכב",
       "fix": "תיקון",
+      "fixCar": "תיקון הרכב",
       "menu": "פעולות",
       "menuFor": "פעולות - {{name}}",
       "deactivate": "סימון כלא פעיל",

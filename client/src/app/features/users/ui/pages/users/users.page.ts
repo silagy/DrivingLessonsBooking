@@ -73,7 +73,17 @@ export class UsersPage {
     }
 
     protected onRowActions(event: Event, user: User): void {
-        this.rowActions.set([
+        this.rowActions.set(this.userActions(user, 'users-menu__item--danger'));
+        this.rowMenu().toggle(event);
+    }
+
+    protected onCardActions(event: Event, user: User): void {
+        this.rowActions.set(this.userActions(user, 'card-menu__item--destructive'));
+        this.rowMenu().toggle(event);
+    }
+
+    private userActions(user: User, destructiveClass: string): MenuItem[] {
+        return [
             {
                 label: this.transloco.translate('users.editDetails'),
                 icon: 'pi pi-pencil',
@@ -93,11 +103,10 @@ export class UsersPage {
             {
                 label: this.transloco.translate('users.delete'),
                 icon: 'pi pi-trash',
-                styleClass: 'users-menu__item--danger',
+                styleClass: destructiveClass,
                 command: () => this.onDeleteUser(user),
             },
-        ]);
-        this.rowMenu().toggle(event);
+        ];
     }
 
     protected onRestoreUser(user: User): void {

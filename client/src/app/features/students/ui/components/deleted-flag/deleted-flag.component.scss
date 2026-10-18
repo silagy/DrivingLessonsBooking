@@ -3,11 +3,11 @@
     align-items: center;
     gap: 0.3125rem;
     padding-block-end: 1px;
-    border-block-end: 1px dotted var(--p-surface-400);
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--p-surface-600);
-    white-space: nowrap;
+    border-block-end: 1px dotted var(--flag-underline, var(--p-surface-400));
+    font-size: var(--flag-font-size, 0.78rem);
+    font-weight: var(--flag-font-weight, 600);
+    color: var(--flag-color, var(--p-surface-600));
+    white-space: var(--flag-white-space, nowrap);
     cursor: help;
 }
 

@@ -109,6 +109,10 @@
     font-variant-numeric: tabular-nums;
 }
 
-:host ::ng-deep .student-card__details :is(.car-flag, .deleted-flag) {
-    font-size: 0.8125rem;
+.student-card__details {
+    --flag-color: var(--app-plum);
+    --flag-font-size: 0.8125rem;
+    --flag-font-weight: 500;
+    --flag-white-space: normal;
+    --flag-underline: transparent;
 }

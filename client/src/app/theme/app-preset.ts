@@ -40,6 +40,9 @@ export const AppPreset = definePreset(Aura, {
     whale: {
       500: '#005389',
     },
+    plum: {
+      500: '#BA0081',
+    },
   },
   semantic: {
     primary: {

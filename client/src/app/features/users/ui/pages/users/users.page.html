@@ -105,13 +105,13 @@
               [user]="user"
               [isYou]="user.id === store.currentUserId()"
               [disabled]="store.isMutating()"
-              (actionsRequested)="onRowActions($event, user)"
+              (actionsRequested)="onCardActions($event, user)"
               (restoreRequested)="onRestoreUser(user)" />
           </li>
         }
       </ul>
 
-      <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" />
+      <p-menu #rowMenu [model]="rowActions()" [popup]="true" appendTo="body" styleClass="card-menu" />
 
       @if (store.hasOnlyOneUser()) {
         <app-no-other-users [disabled]="store.isMutating()" (addRequested)="onAddUser()" />
