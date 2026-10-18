@@ -138,6 +138,12 @@ export const AppPreset = definePreset(Aura, {
           background: '{surface.800}',
           borderColor: darkSurfaceBorder,
           hoverBorderColor: '{surface.500}',
+          color: '{surface.50}',
+          placeholderColor: '{surface.300}',
+          floatLabelColor: '{surface.300}',
+          floatLabelActiveColor: '{surface.300}',
+          iconColor: '{surface.300}',
+          disabledColor: '{surface.300}',
         },
         navigation: {
           item: { focusBackground: '{surface.700}' },

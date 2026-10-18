@@ -143,4 +143,44 @@ Native (`superpowers:executing-plans`) is recommended. Tasks 3 to 6 end in brows
 
 ## As built (after execution)
 
-Where the code differs from the tasks below, and why: *(filled in by task 6)*
+Where the code differs from the tasks below, and why:
+
+- **More PrimeNG tokens in the dark preset.** The contrast script found three Aura dark defaults that failed on the dark surfaces, beyond Decision 4's list. Each is now pinned by a spec in `dark-tokens.spec.ts` that failed first:
+  - secondary buttons: outlined `{surface.100}` text on a `{surface.500}` border, text buttons `{surface.200}`. Aura used `surface.400` (3.55:1) on both, and its text-button hover equalled the card. Found on the Student form's "check the form again" button. Spec: `keeps secondary buttons readable on a dark card`;
+  - error and info messages: `{red.400}` / `{blue.400}`. Aura's 500 steps were 4.17 / 4.13 on their own 16% tint. Spec: `keeps messages readable on a dark page`;
+  - form fields: placeholder, float label, icon and disabled text at `{surface.300}`, and the value at `{surface.50}`. Aura used `surface.400`, 3.55:1 on the field (3.19:1 for a disabled field). Found on the "Select a teacher" placeholders in Add Student and Add User. Spec: `keeps form field hints readable in dark`.
+- **The Appearance toggle zeroes PrimeNG's 4px button padding;** without that its options were 39px, not 36 / 34.
+- **The drawer's Appearance row may wrap.** In English at 360px, "Appearance" and three options need 283px of a 264px row. The control then drops to its own line, at the end. Hebrew, and every width from 390px up, stay on one row. Shrinking the options below the design's 56px was the other choice.
+- **The guard spec works within `src\testing\node-fs.d.ts`.** It tells files from folders by the `.scss` suffix and joins paths as strings.
+- **The arrow-key test is two tests** (Hebrew and English), so the component spec has 9 tests, not 8.
+- **No `--app-dot-green`** (Decision 6) and **no dashed "+ assign" border:** the code has neither element.
+
+Measured at the end, in dark, against the compose `app` container through a scratch proxy. Columns are the leftover script / the contrast script / the page width; `0 / 0` means none found:
+
+| Page | 360 he | 360 en | 390 he | 390 en | 1280 he | 1280 en |
+|------|--------|--------|--------|--------|---------|---------|
+| `/` | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| `/teachers` (+ Add car dialog) | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| `/students` (+ ⋮, Add Student, Teacher select) | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| `/students/import` | 0 / 0 / **664** | 0 / 0 / **713** | 0 / 0 / **664** | 0 / 0 / **714** | 0 / 0 | 0 / 0 |
+| `/week-schedules` (+ select) | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| `/publications` Closed (+ select) | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| `/publications/history` | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| `/users` (+ ⋮, Add User) | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| Sign-in | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+| Student form, steps 1 to 5, pick sheet, rejected submit | 0 / 0 / 360 | 0 / 0 / 360 | 0 / 0 / 390 | 0 / 0 / 390 | 0 / 0 | 0 / 0 |
+
+Every page was scanned with the drawer (phone) or user menu (desktop) open. `/students/import` scrolls sideways on phones, as on `main` (admin-mobile-slot-requests-plan, As built); light measures the same widths. In light, no dark surface appears on any page at 390 or 1280. The Administrator, Teacher, transmission and menu role tags, the selected slot and the pick sheet option keep their `main` colours.
+
+Also checked:
+- **Screenshots against the design:** D06 (Students), D08b (dashboard, Closed) and D10 (desktop user menu) match.
+- **The boot path:** a reload in dark comes up with `app-dark`, `color-scheme: dark` and the `#1B1D22` status bar. Light picked on a dark OS stays light.
+- **The production `index.html`** keeps the boot `<style>` and `<script>` in `<head>`, after the `theme-color` meta and before the stylesheet. `styles.css` loads with the `media="print"` swap, and the inlined critical CSS has no `:root.app-dark`, so the boot style is what keeps the first paint dark.
+- **Excel and emails:** `git diff origin/main -- src tests` is empty.
+- **Bundle:** the initial bundle grew from 586.77 kB to 592.12 kB. Its budget warning, and the one for `students.page.scss` (now 7.19 kB), were already on `main`.
+
+Not verified in the browser:
+- **System following a live OS switch.** The browser pane emulates `prefers-color-scheme`, but while hidden it doesn't run the rendering step that fires media-query `change` events; a raw listener on the page got none either. `theme.service.spec.ts` `follows the device when it changes, in System only` covers it.
+- **The Student form against a real Open Publication.** None is Open in the compose data, and reopening one would change that data. The form ran against a fake Open Publication and a made-up Student, served by the scratch proxy. The real server saw none of those calls, and the rejected submit was the proxy's 409.
+- **Real mouse clicks.** The pane wasn't drawing, so clicks were dispatched events: pointer down, focus, then click.
+- **The Open and Published dashboard states, and a Teacher-role sign-in:** none in the dev data.

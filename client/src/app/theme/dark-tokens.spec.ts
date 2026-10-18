@@ -8,6 +8,20 @@ interface DarkButtonPreset {
     };
 }
 
+interface DarkFormFieldPreset {
+    semantic: {
+        colorScheme: {
+            dark: {
+                surface: Record<number, string>;
+                formField: Record<
+                    'background' | 'disabledBackground' | 'placeholderColor' | 'floatLabelColor' | 'iconColor' | 'disabledColor',
+                    string
+                >;
+            };
+        };
+    };
+}
+
 interface DarkMessagePreset {
     primitive: Record<string, Record<number, string>>;
     semantic: { colorScheme: { dark: { surface: Record<number, string> } } };
@@ -146,6 +160,25 @@ describe('dark tokens', () => {
 
         //then
         expect(ratios.every((ratio) => ratio >= BODY_TEXT)).toBe(true);
+    });
+
+    it('keeps form field hints readable in dark', () => {
+        //given
+        const preset = AppPreset as unknown as DarkFormFieldPreset;
+        const surface = preset.semantic.colorScheme.dark.surface;
+        const resolve = (token: string) => surface[Number(token.match(/\{surface\.(\d+)\}/)![1])];
+        const field = preset.semantic.colorScheme.dark.formField;
+
+        //when
+        const ratios = {
+            placeholder: contrast(resolve(field.placeholderColor), resolve(field.background)),
+            floatLabel: contrast(resolve(field.floatLabelColor), resolve(field.background)),
+            icon: contrast(resolve(field.iconColor), resolve(field.background)),
+            disabled: contrast(resolve(field.disabledColor), resolve(field.disabledBackground)),
+        };
+
+        //then
+        expect(Object.entries(ratios).filter(([, ratio]) => ratio < BODY_TEXT)).toEqual([]);
     });
 
     it('keeps messages readable on a dark page', () => {

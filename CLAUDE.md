@@ -51,7 +51,7 @@ src\
 └── DrivingLessons.Presentation.Web\  controllers, exception filter, DI, startup; serves the Angular build
 client\                               Angular workspace (latest Angular, PrimeNG, signals, standalone)
 └── src\app\
-    ├── core\                         singletons: auth, role guards, language, toast/clipboard/download services, signed-in user, PWA (service worker, new version check)
+    ├── core\                         singletons: auth, role guards, language, theme (light / dark / system), toast/clipboard/download services, signed-in user, PWA (service worker, new version check)
     ├── features\                     lazy bounded contexts: admin-shell, auth, teachers, week-schedules, publications, users, students, roster, student-form
     │   └── {feature}\                domain\ · data\ · state\ · ui\ (see client-architecture.md)
     ├── shared\                       feature-agnostic components, dialogs, models, dates, pipes, config (AppRoutes)

@@ -13,7 +13,7 @@ Rules for using and styling PrimeNG. Theming is **TypeScript design tokens** (`d
 
 1. **All theming flows through `providePrimeNG` + `definePreset`** — never import `theme.css` or any PrimeNG CSS in `angular.json`
 2. **Every line of custom CSS lives in `@layer app`** — outside the layer it loses to PrimeNG's injected styles
-3. **No hardcoded hex colors** — `var(--p-*)` tokens or `--app-*` aliases only
+3. **No hardcoded hex colors** — `--app-*` tokens, or `--p-*` tokens without a palette step (`--p-primary-color`, never `--p-sky-50`); `theme\no-hardcoded-colours.spec.ts` enforces it
 4. **No `!important`** — CSS layers make it unnecessary; treat any new one as a defect
 5. **RTL-correct by construction** — logical properties in every override (see `client-i18n.md`)
 6. **Two form factors** — student form mobile-first (~375px), admin desktop-first
@@ -25,7 +25,7 @@ providePrimeNG({
     theme: {
         preset: AppPreset,
         options: {
-            darkModeSelector: false,
+            darkModeSelector: '.app-dark',
             cssLayer: { name: 'primeng', order: 'primeng, app' },
         },
     },
@@ -43,6 +43,15 @@ export const AppPreset = definePreset(Aura, {
 ```
 
 PrimeNG renders RTL when `document.documentElement.dir === 'rtl'` — `LanguageService` owns that attribute; nothing PrimeNG-specific is needed beyond logical-property discipline in overrides.
+
+## Dark Mode
+
+Light, Dark or System, per device ([ADR 0009](../../docs/decisions/0009-dark-mode.md)):
+
+- `core\theme.service.ts` toggles `app-dark` and `color-scheme` on `<html>`; `index.html` sets both before Angular boots, so a reload in dark never flashes white
+- Every colour token has a value in `:root` and an explicit hex in `:root.app-dark` (`_tokens.scss`); `theme\dark-tokens.spec.ts` checks that, and the dark contrast of text, tags, secondary buttons, form-field hints and messages
+- The preset's `colorScheme.dark` holds the dark surfaces and the PrimeNG tokens whose Aura defaults fail on them; a preset token may read `var(--app-*)`
+- Component SCSS reads `--app-*` and step-less `--p-*` tokens only; `brand-logo`'s `--brand-mark-*` (the mark keeps its colours in dark) is the one exception
 
 ## Customization Ladder
 
