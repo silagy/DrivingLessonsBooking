@@ -2,6 +2,29 @@
     <div class="slot-count slot-count--blocked">
         <span class="slot-count__blocked-label">{{ 'weekGrid.legend.unavailable' | transloco }}</span>
     </div>
+} @else if (isOpenable()) {
+    <button
+        #cell
+        type="button"
+        class="slot-count slot-count--openable"
+        [class.slot-count--selected]="selected()"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="selected()"
+        [attr.aria-label]="
+            'publications.slotRequests.openAria'
+                | transloco
+                    : {
+                          count: requestCount(),
+                          day: ('weekGrid.days.' + day() | transloco),
+                          window: ('weekGrid.windows.' + window() | transloco),
+                      }
+        "
+        (click)="opened.emit(cell)">
+        <span class="slot-count__value">
+            <bdi>{{ requestCount() }}</bdi>
+        </span>
+        <span class="slot-count__caption">{{ 'publications.dashboard.requests' | transloco }}</span>
+    </button>
 } @else {
     <div class="slot-count">
         <span class="slot-count__value" [class.slot-count__value--empty]="isEmpty()">

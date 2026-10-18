@@ -386,6 +386,9 @@
       "subtitle": "Reopening sets a new close time and lets students edit again. The next close emails a fresh version.",
       "newEnd": "New close time"
     },
+    "slotRequests": {
+      "openAria": "{{count}} requests, {{day}}, {{window}}. Show the students"
+    },
     "dashboard": {
       "requests": "requests",
       "legendRequests": "Requests - tap or click a count to see the students",
