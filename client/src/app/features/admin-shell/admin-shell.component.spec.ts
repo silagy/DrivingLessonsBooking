@@ -90,13 +90,13 @@ describe('AdminShellComponent', () => {
         //then
         const links = [...document.body.querySelectorAll<HTMLAnchorElement>('a.shell-drawer__link')];
         expect(links.map((link) => link.getAttribute('href'))).toEqual([
-            '/',
-            '/teachers',
-            '/students',
             '/week-schedules',
             '/publications',
             '/publications/history',
+            '/students',
+            '/teachers',
             '/users',
+            '/dashboard',
         ]);
         expect(links.map((link) => link.textContent?.trim())).toContain('shell.nav.weeklyPrep');
     });

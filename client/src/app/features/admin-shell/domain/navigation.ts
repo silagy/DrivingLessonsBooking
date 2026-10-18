@@ -7,13 +7,6 @@ export interface NavigationItem {
     exact: boolean;
 }
 
-const DASHBOARD: NavigationItem = { labelKey: 'shell.nav.dashboard', commands: ['/'], exact: true };
-const TEACHERS: NavigationItem = { labelKey: 'shell.nav.teachers', commands: ['/', AppRoutes.teachers], exact: false };
-const STUDENTS: NavigationItem = {
-    labelKey: 'shell.nav.students',
-    commands: ['/', AppRoutes.students],
-    exact: false,
-};
 const WEEKLY_PREP: NavigationItem = {
     labelKey: 'shell.nav.weeklyPrep',
     commands: ['/', AppRoutes.weekSchedules],
@@ -29,16 +22,27 @@ const HISTORY: NavigationItem = {
     commands: ['/', AppRoutes.publications, AppRoutes.publicationsHistory],
     exact: false,
 };
+const STUDENTS: NavigationItem = {
+    labelKey: 'shell.nav.students',
+    commands: ['/', AppRoutes.students],
+    exact: false,
+};
+const TEACHERS: NavigationItem = { labelKey: 'shell.nav.teachers', commands: ['/', AppRoutes.teachers], exact: false };
 const USERS: NavigationItem = { labelKey: 'shell.nav.users', commands: ['/', AppRoutes.users], exact: false };
+const DASHBOARD: NavigationItem = {
+    labelKey: 'shell.nav.dashboard',
+    commands: ['/', AppRoutes.dashboard],
+    exact: false,
+};
 
 const ADMINISTRATOR_NAVIGATION: readonly NavigationItem[] = [
-    DASHBOARD,
-    TEACHERS,
-    STUDENTS,
     WEEKLY_PREP,
     PUBLICATIONS,
     HISTORY,
+    STUDENTS,
+    TEACHERS,
     USERS,
+    DASHBOARD,
 ];
 const TEACHER_NAVIGATION: readonly NavigationItem[] = [WEEKLY_PREP, PUBLICATIONS, HISTORY];
 
