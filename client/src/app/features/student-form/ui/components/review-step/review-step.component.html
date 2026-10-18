@@ -13,6 +13,9 @@
                         'studentForm.review.notEnoughBody'
                             | transloco: { target: targetCount(), picked: pickCount(), missing: missingPicks() }
                     }}
+                    @if (hasDoublePick()) {
+                        <span class="review__double-note">{{ 'studentForm.review.doubleCountsOnce' | transloco }}</span>
+                    }
                 </span>
             </p-message>
             <div class="review__fixes">

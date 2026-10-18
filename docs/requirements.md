@@ -161,7 +161,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
    - **Inactive Student:** a clear message that they can't submit and should contact the school. No form, no submission.
    - **Unknown ID:** a clear "we don't have you on file, please contact your school" message. No form, no submission. (New students are added through the roster or by an Administrator.)
 4. **Confirmation (display only):** the form shows the student their resolved details ("You are submitting availability for **Teacher X**") from their record. There is no teacher selection, no mismatch warning, no "this is not my teacher" action, and no transmission question; the student's record is authoritative.
-5. Student declares the **target session count** for the week.
+5. Student declares the **target session count** for the week. The target step states that a `Double` counts as one lesson toward the target; the not-enough message on review repeats it when the list holds a `Double`.
 6. Student sees the week grid for their assigned teacher. `Unavailable` slots are visibly blocked and unselectable.
 7. For each slot picked, the student specifies:
    - `Single` or `Double` session
@@ -178,6 +178,8 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
  
 ### 8.1 Demand counting
 A `Double` session counts as **one request** in summary counts, by explicit decision. The detail sheet carries the single/double flag, which is what makes this acceptable. **Standing flag:** if the detail sheet is ever removed, this decision must be revisited, because three doubles and three singles would become indistinguishable.
+
+The same holds for the student's target: a `Double` pick counts once toward "picks ≥ target count". Customer feedback (October 2026) asked whether a `Double` should count as two toward the target; it stays one, and the form says so.
  
 ### 8.2 Identity and abuse posture
 - National-ID identification, no passwords, no magic links in v1. Submission requires the ID to belong to an active student, so random walk-ins cannot submit. Accepted risk: anyone holding the link who knows a student's national ID can impersonate that student. National IDs are semi-guessable (9 digits with a check digit), and because the link is now **school-wide**, the blast radius is the **whole school's** weekly preference lists rather than one teacher's. The mitigation remains that the teacher knows his students and reviews the Excel; this mitigation is weaker at school scale and is flagged for revisit if abuse appears.

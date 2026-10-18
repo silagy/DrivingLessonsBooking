@@ -24,6 +24,7 @@
         </button>
     </div>
     <p class="target__unit">{{ unitKey() | transloco: { min: minTargetCount() } }}</p>
+    <p class="target__note">{{ 'studentForm.target.doubleCountsOnce' | transloco }}</p>
 
     <div wizardFooter>
         <p-button type="button" fluid [label]="'studentForm.target.pickSlots' | transloco" (onClick)="continued.emit()" />

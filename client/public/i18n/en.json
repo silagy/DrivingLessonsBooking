@@ -583,6 +583,7 @@
     "target": {
       "title": "How many lessons do you want this week?",
       "body": "You'll then pick at least that many slots, ranked by preference.",
+      "doubleCountsOnce": "A double lesson counts as one lesson toward your target. Want one double lesson? Choose 1.",
       "unitOne": "lesson · minimum {{min}}",
       "unit": "lessons · minimum {{min}}",
       "fewer": "Fewer lessons",
@@ -617,6 +618,7 @@
       "preferredMany": "Ranks 1-{{target}} are your preferred slots; the rest are backups.",
       "notEnoughTitle": "Not enough picks.",
       "notEnoughBody": "Your target is {{target}}, but you've picked {{picked}}. Add {{missing}} more, or lower your target.",
+      "doubleCountsOnce": "A double lesson counts as one pick.",
       "addSlots": "Add more slots",
       "changeTarget": "Change my target",
       "replaces": "You already sent a list for this week. Submitting now replaces it.",
