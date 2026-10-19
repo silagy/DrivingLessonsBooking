@@ -27,7 +27,7 @@ Behind this, the system gets a simple, durable way to publish **integration even
 
 | # | Capability |
 |---|------------|
-| 1 | Integration events, a transactional outbox in PostgreSQL, an in-process outbox processor, and consumers registered independently, many per event |
+| 1 | Integration events, a transactional outbox in PostgreSQL, an outbox processor run by Quartz, and consumers registered independently, many per event |
 | 2 | **Opening notification**: when a Publication becomes `Open`, every recipient (§4.1) gets a WhatsApp template message with the link |
 | 3 | **Window change notification**: when an open window is extended, or a closed Publication is reopened, recipients get a WhatsApp message with the new end time and the link |
 | 4 | **Manual reminder**: from the Publication dashboard, a person decides to send a reminder now, to every recipient without a Submission |
@@ -79,7 +79,7 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 
 ### 4.5 Scheduled reminders
 
-- While a Publication is `Open`, a recurring check runs at configured local times (Asia/Jerusalem), e.g. `10:00, 14:00, 19:00`. The times are configuration, not code.
+- While a Publication is `Open`, a recurring check runs at configured local times (Asia/Jerusalem), e.g. `10:00, 14:00, 19:00`. The times are configuration, not code. Quartz runs the check (§5.3).
 - Each check reminds recipients without a Submission, subject to these limits:
   - no reminder in the first hours after the opening notification, or within a minimum gap after the Student's last reminder, manual or scheduled;
   - at most **N** reminders per Student per Publication, counting manual and scheduled together;
@@ -114,11 +114,15 @@ A domain event is never published as is. An application-level handler maps it to
 - Written by the same `DbContext` and transaction as the business change. If the transaction rolls back, the event never existed. If it commits, the event will be delivered.
 - No outbound call ever happens inside a request's unit of work.
 
-### 5.3 Outbox processor
+### 5.3 Quartz runs everything that happens on time
 
-- In-process background worker (a hosted service or a Quartz recurring job; Quartz is already in place) polling the outbox every few seconds.
-- Claims rows with `SELECT ... FOR UPDATE SKIP LOCKED`, so a second app instance during a deploy never double-claims a row.
-- Transport behind one interface. Replacing it with a broker later changes only this piece, never producers or consumers.
+Quartz is already the app's scheduler: `OpenPublicationJob` and `ClosePublicationJob` run from `PublicationScheduler`, and `PublicationReconciliationHostedService` catches up on startup. Everything new that runs on a clock uses it too, with no second scheduler and no hand-written `BackgroundService` loop.
+
+- **Outbox processor:** one recurring Quartz job, every few seconds, marked `[DisallowConcurrentExecution]` so runs never overlap. Each run claims a batch of due rows with `SELECT ... FOR UPDATE SKIP LOCKED`, so a second app instance during a deploy never double-claims a row, and hands each row to its consumers.
+- **Retries:** stored on the outbox row (attempts, next attempt time), not as extra Quartz triggers. The same recurring job picks a row up again once its next attempt time has passed, so a retry survives a restart.
+- **Scheduled reminders:** one Quartz cron trigger per open Publication, in the Asia/Jerusalem time zone, built from the configured times. It is registered when the Publication opens or reopens, kept when the window is extended, and removed when it closes, through `PublicationScheduler`, next to the existing open and close triggers. A run only writes a "reminder requested (scheduled)" integration event to the outbox; it never sends anything itself.
+- **After a restart:** Quartz keeps its triggers in memory today (`AddQuartz()` with the default RAM store), so `PublicationReconciliationHostedService` also re-registers the outbox job and the reminder triggers of every open Publication, the same way it re-registers open and close today. Nothing is lost, because what must happen is in the database (the outbox and the Publication's state), not in Quartz. A persistent Quartz store isn't needed.
+- **Transport behind one interface:** the outbox job calls the consumers through it. Replacing it with a broker later changes only this piece, never producers or consumers.
 
 ### 5.4 Consumers
 
@@ -149,7 +153,7 @@ Person presses "Send reminder" (dashboard, 202 Accepted)
     → integration event "reminder requested (manual)", outbox
     → consumer: reminder → recipients without Submission, limits (§4.5) → per-Student messages → WhatsApp
 
-Recurring check at configured times, while Open
+Quartz cron trigger at configured times, while Open
     → integration event "reminder requested (scheduled)", outbox
     → same reminder consumer
 
@@ -174,7 +178,7 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 
 - `docs/requirements.md`: §3 in scope, §6.2 step 4 (the link is sent by the system; manual distribution stays possible), §6.3 (reminders during the window), and a new decision #26 in §11. Decision #13 stays, narrowed to "final schedule notification".
 - `CONTEXT.md`: new glossary terms (e.g. Opening Notification, Window Change Notification, Submission Reminder, Recipient), with words to avoid.
-- New ADRs: **0010** integration events and transactional outbox (in-process processor, per-consumer delivery, no broker); **0011** WhatsApp over the Cloud API (templates, configuration, consent held by the school's own system, cost).
+- New ADRs: **0010** integration events and transactional outbox (processor and reminder checks run by Quartz, per-consumer delivery, no broker); **0011** WhatsApp over the Cloud API (templates, configuration, consent held by the school's own system, cost).
 - ADR 0005 amended: the teacher's email is sent by an outbox consumer, with retries, instead of inline with no retry.
 - `.claude/rules/ddd-architecture.md`: where integration events, outbox writes and consumers live, so later code follows one pattern.
 - `docs/operations/runbook.md`: WhatsApp credentials and template setup, reading dead outbox messages.
@@ -203,7 +207,7 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 | 7 | A window change made during quiet hours: send right away, or hold until quiet hours end? | Hold until quiet hours end |
 | 8 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
 
-Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), and consent is held by the school's own system, not DriveCal (§4.6).
+Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), and Quartz runs the outbox processor and the scheduled reminder checks (§5.3).
 
 ## 9. Prerequisites outside the code
 

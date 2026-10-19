@@ -19,11 +19,12 @@ Messages the system sends on its own: WhatsApp messages to Students around a Pub
 | # | Decision |
 |---|----------|
 | 1 | **WhatsApp over the Meta Cloud API is the first channel**; other channels are later consumers of the same integration events |
-| 2 | **Integration events go through a transactional outbox in PostgreSQL**, processed in-process; each event may have many consumers, tracked and retried per consumer |
+| 2 | **Integration events go through a transactional outbox in PostgreSQL**, processed by a Quartz job; each event may have many consumers, tracked and retried per consumer |
 | 3 | **No RabbitMQ, SNS, SQS or other broker.** A broker would still need the outbox and adds a container to run; the processor sits behind one interface so a broker can replace it if the app is ever split |
 | 4 | **The teacher's Excel email moves onto the outbox in stage 1**, unchanged in content and versioning (decision #22) |
 | 5 | **Extend and reopen send a window change notification**, never the opening notification again |
 | 6 | **Consent is not captured in DriveCal.** Students come from the school's own system through the Roster and agree to messages there, so every Student counts as having agreed |
+| 7 | **Quartz runs everything on a clock**: the outbox processor (a recurring job) and the scheduled reminder checks (a cron trigger per open Publication, Asia/Jerusalem). Retries live on the outbox row, and startup reconciliation re-registers the triggers |
 
 ## Slices
 
