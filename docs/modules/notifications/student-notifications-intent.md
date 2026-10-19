@@ -67,7 +67,7 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 - Triggered by the two ways a window changes today: **extend window** while `Open` (`PublicationWindowExtended`) and **reopen** after `Closed` (`PublicationReopened`). Every later way of changing the window raises its own domain event and joins this trigger.
 - Content (Hebrew Utility template, separate from the opening one): the week, the **new** end time (Asia/Jerusalem), and a button to the weekly link. For a reopen, the wording says the window is open again.
 - Sent to all recipients by default, including Students who already submitted, since a longer window also lets them revise. Whether to limit it to Students without a Submission is open question 4.
-- Sent right away, because it follows a deliberate action by a person, except during quiet hours (open question 7). It doesn't count toward the reminder cap, but it does count as the Student's latest message for the minimum gap before the next scheduled reminder (§4.5).
+- Sent right away, because it follows a deliberate action by a person, except during quiet hours (open question 6). It doesn't count toward the reminder cap, but it does count as the Student's latest message for the minimum gap before the next scheduled reminder (§4.5).
 - Changing the window again before the previous messages went out sends only the latest end time: messages still waiting for an older change are dropped as superseded.
 
 ### 4.4 Manual reminder
@@ -173,6 +173,7 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 - Configuration through environment variables, like `EMAIL_*` (`.env.example`): access token, Phone Number ID, WhatsApp Business Account ID, template names and language, an `Enabled` switch. Disabled, the sender logs and records the message as skipped. Locally, it stays disabled or points at a fake.
 - Phone numbers: `PhoneNumber` keeps the roster text as entered. A conversion to international format (`05X-XXXXXXX` → `9725XXXXXXXX`) is added, and a number that can't convert is a recorded skip, never an exception that stops the batch.
 - Templates are created and approved in the client's WhatsApp Manager (Utility, Hebrew). The template names in configuration must match.
+- **The school's existing number sends the messages** (Meta's Coexistence): the same number stays active in the WhatsApp Business app on the manager's phone and is connected to the Cloud API. Messages DriveCal sends also appear in the app's chats, and a Student's reply lands there too, so the manager answers by hand as today and DriveCal never handles replies (§3 non-goals). The code is the same as with a dedicated number; only onboarding differs (§9).
 
 ## 6. Documentation and decisions this will change
 
@@ -202,15 +203,15 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 | 2 | Default scheduled times, minimum gap, per-Student cap, and the last-call offset before the window ends | 10:00 / 14:00 / 19:00, 4 hours, 3 reminders, 3 hours before end |
 | 3 | Quiet hours: nights only, or also Friday evening through Saturday? | Nights 21:00-08:00 and Shabbat |
 | 4 | Does the window change notification go to every recipient, or only to Students without a Submission? | Every recipient |
-| 5 | Same phone number on the WhatsApp Business app (Coexistence) or a dedicated number? Affects onboarding only, not the code | Dedicated number |
-| 6 | Do scheduled reminders default to on or off for each Publication? | On |
-| 7 | A window change made during quiet hours: send right away, or hold until quiet hours end? | Hold until quiet hours end |
-| 8 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
+| 5 | Do scheduled reminders default to on or off for each Publication? | On |
+| 6 | A window change made during quiet hours: send right away, or hold until quiet hours end? | Hold until quiet hours end |
+| 7 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
 
-Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), and Quartz runs the outbox processor and the scheduled reminder checks (§5.3).
+Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), Quartz runs the outbox processor and the scheduled reminder checks (§5.3), and messages go out from the school's existing number through Coexistence (§5.7).
 
 ## 9. Prerequisites outside the code
 
-- The client's Meta Business portfolio, WhatsApp Business Account, a registered number and a payment method (see the client guide shared in conversation).
+- The client's Meta Business portfolio, WhatsApp Business Account and a payment method (see the client guide shared in conversation).
+- The school's existing WhatsApp Business app number connected to the Cloud API through Coexistence, with the manager's phone at hand for the verification code. Coexistence is offered through Meta's Embedded Signup and depends on the region; if Meta's direct onboarding doesn't offer it for Israel, a provider that supports Coexistence is used for onboarding, which changes only the sender's configuration, not the design.
 - Three Hebrew Utility templates approved: opening notification, window change notification, and reminder.
 - A permanent system-user access token, stored only in the production `.env`, never in git, chat or email.

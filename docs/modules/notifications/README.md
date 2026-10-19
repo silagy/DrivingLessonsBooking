@@ -25,6 +25,7 @@ Messages the system sends on its own: WhatsApp messages to Students around a Pub
 | 5 | **Extend and reopen send a window change notification**, never the opening notification again |
 | 6 | **Consent is not captured in DriveCal.** Students come from the school's own system through the Roster and agree to messages there, so every Student counts as having agreed |
 | 7 | **Quartz runs everything on a clock**: the outbox processor (a recurring job) and the scheduled reminder checks (a cron trigger per open Publication, Asia/Jerusalem). Retries live on the outbox row, and startup reconciliation re-registers the triggers |
+| 8 | **Messages go out from the school's existing number** (Coexistence): it stays in the WhatsApp Business app on the manager's phone, so replies arrive there and DriveCal never handles them |
 
 ## Slices
 
