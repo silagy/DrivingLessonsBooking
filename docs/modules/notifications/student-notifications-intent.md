@@ -204,7 +204,7 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 | 8 | A window change made during quiet hours: send right away, or hold until quiet hours end? | Hold until quiet hours end |
 | 9 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
 
-Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), and the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8).
+Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), and there is no RabbitMQ or other broker (§3 non-goals).
 
 ## 9. Prerequisites outside the code
 
