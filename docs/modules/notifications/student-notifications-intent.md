@@ -66,8 +66,8 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 
 - Triggered by the two ways a window changes today: **extend window** while `Open` (`PublicationWindowExtended`) and **reopen** after `Closed` (`PublicationReopened`). Every later way of changing the window raises its own domain event and joins this trigger.
 - Content (Hebrew Utility template, separate from the opening one): the week, the **new** end time (Asia/Jerusalem), and a button to the weekly link. For a reopen, the wording says the window is open again.
-- Sent to all recipients by default, including Students who already submitted, since a longer window also lets them revise. Whether to limit it to Students without a Submission is open question 5.
-- Sent right away, because it follows a deliberate action by a person, except during quiet hours (open question 8). It doesn't count toward the reminder cap, but it does count as the Student's latest message for the minimum gap before the next scheduled reminder (§4.5).
+- Sent to all recipients by default, including Students who already submitted, since a longer window also lets them revise. Whether to limit it to Students without a Submission is open question 4.
+- Sent right away, because it follows a deliberate action by a person, except during quiet hours (open question 7). It doesn't count toward the reminder cap, but it does count as the Student's latest message for the minimum gap before the next scheduled reminder (§4.5).
 - Changing the window again before the previous messages went out sends only the latest end time: messages still waiting for an older change are dropped as superseded.
 
 ### 4.4 Manual reminder
@@ -89,11 +89,11 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 
 ### 4.6 Consent
 
-Meta requires the school to hold the Student's agreement to receive WhatsApp messages. How consent is captured, as a Roster column or a field an Administrator sets, and whether a Student without it is skipped, is decided in planning (§8). Until then, the intent is: **no consent, no message**, recorded as skipped.
+Not captured in DriveCal. Students reach DriveCal through the Roster, which the Administrator exports from the school's own system, and Students give their consent to receive messages there. Every Student in DriveCal is treated as having agreed: there is no consent field, no consent column in the Roster and no "no consent" skip. Keeping consent records stays with the school's own system. An opt-out a Student sends in WhatsApp is still a later-stage concern (§3).
 
 ### 4.7 What the Administrator sees
 
-On the Publication dashboard, per Publication: recipients, opening and window change notifications sent / failed / skipped, reminders sent, Students not yet submitted, and whether each Teacher's Excel email was sent. Failures and skips are listed by Student with their reason (e.g. invalid number, no consent, provider error).
+On the Publication dashboard, per Publication: recipients, opening and window change notifications sent / failed / skipped, reminders sent, Students not yet submitted, and whether each Teacher's Excel email was sent. Failures and skips are listed by Student with their reason (e.g. invalid number, provider error).
 
 ## 5. Architecture intent
 
@@ -173,15 +173,15 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 ## 6. Documentation and decisions this will change
 
 - `docs/requirements.md`: §3 in scope, §6.2 step 4 (the link is sent by the system; manual distribution stays possible), §6.3 (reminders during the window), and a new decision #26 in §11. Decision #13 stays, narrowed to "final schedule notification".
-- `CONTEXT.md`: new glossary terms (e.g. Opening Notification, Submission Reminder, Recipient, Consent), with words to avoid.
-- New ADRs: **0010** integration events and transactional outbox (in-process processor, per-consumer delivery, no broker); **0011** WhatsApp over the Cloud API (templates, configuration, consent, cost).
+- `CONTEXT.md`: new glossary terms (e.g. Opening Notification, Window Change Notification, Submission Reminder, Recipient), with words to avoid.
+- New ADRs: **0010** integration events and transactional outbox (in-process processor, per-consumer delivery, no broker); **0011** WhatsApp over the Cloud API (templates, configuration, consent held by the school's own system, cost).
 - ADR 0005 amended: the teacher's email is sent by an outbox consumer, with retries, instead of inline with no retry.
 - `.claude/rules/ddd-architecture.md`: where integration events, outbox writes and consumers live, so later code follows one pattern.
 - `docs/operations/runbook.md`: WhatsApp credentials and template setup, reading dead outbox messages.
 
 ## 7. Success criteria
 
-1. When a Publication opens, every recipient with consent and a valid number gets one opening message. Nobody gets two, including after an app restart during the send.
+1. When a Publication opens, every recipient with a valid number gets one opening message. Nobody gets two, including after an app restart during the send.
 2. A manual reminder reaches only recipients without a Submission at the time it is processed, and the dashboard request never waits on WhatsApp.
 3. Scheduled reminders respect the configured times, quiet hours, minimum gap and per-Student cap, and stop when the window closes.
 4. A WhatsApp outage or a bad number never fails a Publication transition, never blocks other Students, and ends as either a retried success or a visible failure.
@@ -197,14 +197,13 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 | 1 | May a Teacher-role User send a manual reminder, limited to their own Teacher's Students? | Administrator only |
 | 2 | Default scheduled times, minimum gap, per-Student cap, and the last-call offset before the window ends | 10:00 / 14:00 / 19:00, 4 hours, 3 reminders, 3 hours before end |
 | 3 | Quiet hours: nights only, or also Friday evening through Saturday? | Nights 21:00-08:00 and Shabbat |
-| 4 | How consent is captured (Roster column, Administrator field, both) and whether existing Students count as consented | No consent, no message |
-| 5 | Does the window change notification go to every recipient, or only to Students without a Submission? | Every recipient |
-| 6 | Same phone number on the WhatsApp Business app (Coexistence) or a dedicated number? Affects onboarding only, not the code | Dedicated number |
-| 7 | Do scheduled reminders default to on or off for each Publication? | On |
-| 8 | A window change made during quiet hours: send right away, or hold until quiet hours end? | Hold until quiet hours end |
-| 9 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
+| 4 | Does the window change notification go to every recipient, or only to Students without a Submission? | Every recipient |
+| 5 | Same phone number on the WhatsApp Business app (Coexistence) or a dedicated number? Affects onboarding only, not the code | Dedicated number |
+| 6 | Do scheduled reminders default to on or off for each Publication? | On |
+| 7 | A window change made during quiet hours: send right away, or hold until quiet hours end? | Hold until quiet hours end |
+| 8 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
 
-Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), and there is no RabbitMQ or other broker (§3 non-goals).
+Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), and consent is held by the school's own system, not DriveCal (§4.6).
 
 ## 9. Prerequisites outside the code
 

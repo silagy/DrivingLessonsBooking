@@ -23,6 +23,7 @@ Messages the system sends on its own: WhatsApp messages to Students around a Pub
 | 3 | **No RabbitMQ, SNS, SQS or other broker.** A broker would still need the outbox and adds a container to run; the processor sits behind one interface so a broker can replace it if the app is ever split |
 | 4 | **The teacher's Excel email moves onto the outbox in stage 1**, unchanged in content and versioning (decision #22) |
 | 5 | **Extend and reopen send a window change notification**, never the opening notification again |
+| 6 | **Consent is not captured in DriveCal.** Students come from the school's own system through the Roster and agree to messages there, so every Student counts as having agreed |
 
 ## Slices
 
