@@ -67,7 +67,7 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 - Triggered by the two ways a window changes today: **extend window** while `Open` (`PublicationWindowExtended`) and **reopen** after `Closed` (`PublicationReopened`). Every later way of changing the window raises its own domain event and joins this trigger.
 - Content (Hebrew Utility template, separate from the opening one): the week, the **new** end time (Asia/Jerusalem), and a button to the weekly link. For a reopen, the wording says the window is open again.
 - Sent to all recipients by default, including Students who already submitted, since a longer window also lets them revise. Whether to limit it to Students without a Submission is open question 4.
-- Sent right away, because it follows a deliberate action by a person, except during quiet hours (open question 6). It doesn't count toward the reminder cap, but it does count as the Student's latest message for the minimum gap before the next scheduled reminder (§4.5).
+- Sent right away, because it follows a deliberate action by a person, even during quiet hours: quiet hours apply only to scheduled reminders (§4.5). It doesn't count toward the reminder cap, but it does count as the Student's latest message for the minimum gap before the next scheduled reminder (§4.5).
 - Changing the window again before the previous messages went out sends only the latest end time: messages still waiting for an older change are dropped as superseded.
 
 ### 4.4 Manual reminder
@@ -204,10 +204,9 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 | 3 | Quiet hours: nights only, or also Friday evening through Saturday? | Nights 21:00-08:00 and Shabbat |
 | 4 | Does the window change notification go to every recipient, or only to Students without a Submission? | Every recipient |
 | 5 | Do scheduled reminders default to on or off for each Publication? | On |
-| 6 | A window change made during quiet hours: send right away, or hold until quiet hours end? | Hold until quiet hours end |
-| 7 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
+| 6 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
 
-Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), Quartz runs the outbox processor and the scheduled reminder checks (§5.3), and messages go out from the school's existing number through Coexistence (§5.7).
+Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), Quartz runs the outbox processor and the scheduled reminder checks (§5.3), messages go out from the school's existing number through Coexistence (§5.7), and a window change notification is sent right away, even during quiet hours (§4.3).
 
 ## 9. Prerequisites outside the code
 
