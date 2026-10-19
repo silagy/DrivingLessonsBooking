@@ -1,6 +1,6 @@
 # Student Notifications - Intent
 
-**Status:** Draft intent, input to planning
+**Status:** Agreed intent, input to planning
 **Date:** 19 October 2026
 **Module:** `module:notifications` (new)
 
@@ -66,7 +66,7 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 
 - Triggered by the two ways a window changes today: **extend window** while `Open` (`PublicationWindowExtended`) and **reopen** after `Closed` (`PublicationReopened`). Every later way of changing the window raises its own domain event and joins this trigger.
 - Content (Hebrew Utility template, separate from the opening one): the week, the **new** end time (Asia/Jerusalem), and a button to the weekly link. For a reopen, the wording says the window is open again.
-- Sent to all recipients by default, including Students who already submitted, since a longer window also lets them revise. Whether to limit it to Students without a Submission is open question 4.
+- Sent to every recipient, including Students who already submitted, since a longer window also lets them revise (decision 4, §8).
 - Sent right away, because it follows a deliberate action by a person, even during quiet hours: quiet hours apply only to scheduled reminders (§4.5). It doesn't count toward the reminder cap, but it does count as the Student's latest message for the minimum gap before the next scheduled reminder (§4.5).
 - Changing the window again before the previous messages went out sends only the latest end time: messages still waiting for an older change are dropped as superseded.
 
@@ -74,7 +74,7 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 
 - Available only while the Publication is `Open`. Asking for one on a Publication in any other state is refused with the existing `PublicationMustBeOpenException` (409), not silently ignored. That's what CLAUDE.md rule 1, "operations are not idempotent", asks for: a command that can't do what it says fails loudly. Sending a second reminder while the window is still open is not a repeat of the same transition, so it is allowed, and the limits in §4.5 decide who actually gets it.
 - The dashboard shows how many recipients have no Submission yet. The person confirms, and the reminder is queued. The request returns immediately; sending happens in the background.
-- Who may send it: the **Administrator**, for the whole Publication. Whether a Teacher-role User may remind only their own Teacher's Students is an open question (§8).
+- Who may send it: the **Administrator** only, for the whole Publication (decision 1, §8).
 - Who is reminded is decided **when the reminder is processed**, not when it was requested: a Student who submitted in between is not reminded.
 
 ### 4.5 Scheduled reminders
@@ -83,7 +83,7 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 - Each check reminds recipients without a Submission, subject to these limits:
   - no reminder in the first hours after the opening notification, or within a minimum gap after the Student's last reminder, manual or scheduled;
   - at most **N** reminders per Student per Publication, counting manual and scheduled together;
-  - quiet hours (night, and possibly Shabbat, see §8): checks inside them are skipped, not postponed;
+  - quiet hours (nights and Shabbat, decision 3, §8): checks inside them are skipped, not postponed;
   - a last-call reminder at a set time before the window ends, if not already covered by a check.
 - Scheduled reminders can be switched off per Publication (default on), so the person deciding can rely on manual reminders only.
 
@@ -121,7 +121,7 @@ Quartz is already the app's scheduler: `OpenPublicationJob` and `ClosePublicatio
 - **Outbox processor:** one recurring Quartz job, every few seconds, marked `[DisallowConcurrentExecution]` so runs never overlap. Each run claims a batch of due rows with `SELECT ... FOR UPDATE SKIP LOCKED`, so a second app instance during a deploy never double-claims a row, and hands each row to its consumers.
 - **Retries:** stored on the outbox row (attempts, next attempt time), not as extra Quartz triggers. The same recurring job picks a row up again once its next attempt time has passed, so a retry survives a restart.
 - **Scheduled reminders:** one Quartz cron trigger per open Publication, in the Asia/Jerusalem time zone, built from the configured times. It is registered when the Publication opens or reopens, kept when the window is extended, and removed when it closes, through `PublicationScheduler`, next to the existing open and close triggers. A run only writes a "reminder requested (scheduled)" integration event to the outbox; it never sends anything itself.
-- **After a restart:** Quartz keeps its triggers in memory today (`AddQuartz()` with the default RAM store), so `PublicationReconciliationHostedService` also re-registers the outbox job and the reminder triggers of every open Publication, the same way it re-registers open and close today. Nothing is lost, because what must happen is in the database (the outbox and the Publication's state), not in Quartz. A persistent Quartz store isn't needed.
+- **After a restart:** Quartz keeps its triggers in memory today (`AddQuartz()` with the default RAM store), so the outbox job is scheduled from configuration at every start, and `PublicationReconciliationHostedService` re-registers the reminder triggers of every open Publication, the same way it re-registers open and close today. Nothing is lost, because what must happen is in the database (the outbox and the Publication's state), not in Quartz. A persistent Quartz store isn't needed.
 - **Transport behind one interface:** the outbox job calls the consumers through it. Replacing it with a broker later changes only this piece, never producers or consumers.
 
 ### 5.4 Consumers
@@ -195,18 +195,20 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 7. Extending or reopening a window sends one message with the latest end time, never one per intermediate change.
 8. Every close still emails each Teacher exactly one file with the right version. An SMTP failure is retried, and a restart during the close neither loses nor duplicates an email.
 
-## 8. Open questions for planning
+## 8. Decisions closed for planning
 
-| # | Question | Default if not decided |
-|---|----------|------------------------|
-| 1 | May a Teacher-role User send a manual reminder, limited to their own Teacher's Students? | Administrator only |
-| 2 | Default scheduled times, minimum gap, per-Student cap, and the last-call offset before the window ends | 10:00 / 14:00 / 19:00, 4 hours, 3 reminders, 3 hours before end |
-| 3 | Quiet hours: nights only, or also Friday evening through Saturday? | Nights 21:00-08:00 and Shabbat |
-| 4 | Does the window change notification go to every recipient, or only to Students without a Submission? | Every recipient |
-| 5 | Do scheduled reminders default to on or off for each Publication? | On |
-| 6 | Outbox and delivery-record retention: how long are processed rows kept? | 30 days |
+All open questions are answered (19 October 2026). Questions 2 and 6 were not discussed separately and take their proposed defaults; they are configuration, so changing them later needs no code change.
 
-Decided since the first draft (19 October 2026): reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), Quartz runs the outbox processor and the scheduled reminder checks (§5.3), messages go out from the school's existing number through Coexistence (§5.7), and a window change notification is sent right away, even during quiet hours (§4.3).
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | May a Teacher-role User send a manual reminder? | **No. Administrator only**, for the whole Publication |
+| 2 | Scheduled times, minimum gap, per-Student cap, last-call offset | **10:00 / 14:00 / 19:00**, **4 hours** minimum gap, **3** reminders per Student per Publication, last call **3 hours** before the window ends (configuration, default values) |
+| 3 | Quiet hours | **Nights 21:00-08:00 and Shabbat** (Friday 16:00 to Saturday 20:00, Asia/Jerusalem); they apply to scheduled reminders only |
+| 4 | Who gets the window change notification? | **Every recipient**, including Students who already submitted |
+| 5 | Scheduled reminders on or off by default for each Publication? | **On**; an Administrator can switch them off per Publication |
+| 6 | Retention of processed outbox rows and delivery records | **30 days** for succeeded outbox deliveries; message records per Student are kept with the Publication (configuration, default value) |
+
+Also decided since the first draft: reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), Quartz runs the outbox processor and the scheduled reminder checks (§5.3), messages go out from the school's existing number through Coexistence (§5.7), and a window change notification is sent right away, even during quiet hours (§4.3).
 
 ## 9. Prerequisites outside the code
 

@@ -2,7 +2,7 @@
 
 Messages the system sends on its own: WhatsApp messages to Students around a Publication's submission window, and the teacher's Excel email moved onto the same delivery path. Each slice ships as its own branch/PR with its own plan folder (`docs\modules\notifications\...-plan\`, same format as prior modules), authored **just-in-time** when the slice starts.
 
-**Start here:** [Student Notifications - Intent](student-notifications-intent.md) (19 October 2026). It records what stage 1 delivers, the architecture it commits to (integration events, a transactional outbox in PostgreSQL, independent consumers, no broker), and the open questions planning must close.
+**Start here:** [Student Notifications - Intent](student-notifications-intent.md) (19 October 2026). It records what stage 1 delivers, the architecture it commits to (integration events, a transactional outbox in PostgreSQL, independent consumers, no broker), and the questions planning closed.
 
 ## Stage 1 at a glance
 
@@ -30,4 +30,18 @@ Messages the system sends on its own: WhatsApp messages to Students around a Pub
 
 ## Slices
 
-To be decided in planning.
+Each slice ships as its own branch and PR. Slice 1 has its plan; the others get theirs **just in time**, when they start, so they absorb what earlier slices taught.
+
+| Slice | Content | Plan |
+|-------|---------|------|
+| 1. Outbox foundation | Integration events, the transactional outbox, per-consumer deliveries with retries, the Quartz outbox job, and the teacher's Excel email moved onto it as the first consumer. No visible change for Administrators; the email gains retries and never goes out twice | [plan](outbox-foundation-plan/README.md) |
+| 2. WhatsApp and the opening notification | Recipients, Israeli numbers to international format, the per-Student message record, the WhatsApp Cloud API sender (Coexistence, log-only when disabled), the opening template; requirements decision #26, glossary terms, ADR 0011 | when the slice starts |
+| 3. Window change notification | Extend and reopen send the new end time to every recipient, right away; a newer change supersedes messages still waiting | when the slice starts |
+| 4. Manual reminder and what the Administrator sees | "Send reminder" on the dashboard (Administrator only, 202), recipients without a Submission, the shared reminder limits, sent / failed / skipped counts and the per-Student list | when the slice starts |
+| 5. Scheduled reminders | A cron trigger per open Publication (Asia/Jerusalem), quiet hours (nights and Shabbat), the last-call reminder, the per-Publication on/off switch (default on) | when the slice starts |
+
+Slice 1 goes first because every later slice writes integration events and consumers, and moving an existing, well-tested email onto the outbox proves it before any Student is messaged. Slices 2 to 5 follow the order a Publication lives through: open, change, remind by hand, remind on a schedule.
+
+## Answered questions (19 October 2026)
+
+Administrator only for manual reminders; scheduled times 10:00 / 14:00 / 19:00 with a 4-hour gap, at most 3 reminders and a last call 3 hours before the end; quiet hours nights 21:00-08:00 and Shabbat; the window change notification goes to every recipient; scheduled reminders default on; succeeded outbox deliveries are kept 30 days. Details in [the intent §8](student-notifications-intent.md#8-decisions-closed-for-planning).
