@@ -91,7 +91,22 @@ Start a second API process on another port against the same database (`--urls ht
 
 Stop Mailpit; start the API with `--Outbox:MaxAttempts=2`; reopen and close once more; after the first failure pull the retry forward (`q "update outbox_deliveries set next_attempt_at_utc = now() where state = 'Pending'"`). Expected: the delivery is `Dead` with `attempts` 2; one Error line "Outbox delivery [...] is dead after [2] attempts."; the row stays. Then run the runbook's re-arm command from task 5 for that delivery, start Mailpit, and confirm one `גרסה 7` email per Teacher and the delivery `Succeeded`. Finally, purge: `q "update outbox_deliveries set completed_at_utc = now() - interval '31 days' where state = 'Succeeded'"`, wait for the next hourly purge or restart the API (the purge trigger starts now), and confirm `q "select count(*) from outbox_deliveries where state = 'Succeeded'"` → `0` and the messages of purged deliveries are gone.
 
-- [ ] **Step 8: Full check**
+- [ ] **Step 8: A delivery for a consumer that no longer exists (Review Focus 8)**
+
+Restart the API with `--Outbox:PollSeconds=3600` (the outbox job runs once at startup, then not for an hour), reopen and close once more, and wait for `Closed`. The new delivery is `Pending` with `attempts` 0. Rename its consumer to one that isn't registered, then restart with `--Outbox:PollSeconds=2`:
+
+```bash
+q "update outbox_deliveries set consumer = 'RemovedConsumer' where state = 'Pending'"
+```
+
+```bash
+sleep 5
+deliveries
+```
+
+Expected: that delivery is `Dead` with `attempts` 1 and `last_error` starting with `IntegrationEventCatalogException`; one Error line "Outbox delivery [...] is dead after [1] attempts."; no Warning about a retry. The Teachers get no email for this version, which is right for a consumer that no longer exists.
+
+- [ ] **Step 9: Full check**
 
 ```bash
 dotnet build
@@ -103,11 +118,11 @@ git status --short
 
 Expected: build clean, all tests pass, no pending model changes, and `git status` shows nothing but the git-ignored smoke files. No client change in this slice, so the client suites don't need to run; run them anyway if `client/` changed on `main` since the branch was cut.
 
-- [ ] **Step 9: Clean up**
+- [ ] **Step 10: Clean up**
 
 Stop the API processes, `docker rm -f dl-mailpit`, drop `drivinglessons_outbox_smoke`, delete `.superpowers/sdd/outbox-smoke/`.
 
-- [ ] **Step 10: Push and open the PR** (only once your human partner has approved pushing)
+- [ ] **Step 11: Push and open the PR** (only once your human partner has approved pushing)
 
 ```bash
 git push -u origin notifications-outbox-foundation

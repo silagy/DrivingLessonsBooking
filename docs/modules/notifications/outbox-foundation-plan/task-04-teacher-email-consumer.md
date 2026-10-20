@@ -24,7 +24,7 @@
 - Produces:
   - `record PublicationClosedIntegrationEvent(Guid PublicationId, IReadOnlyList<ClosedTeacherVersion> Teachers) : IIntegrationEvent` with `const string Name = "publication-closed.v1"`; `record ClosedTeacherVersion(Guid TeacherId, int Version)`.
   - `PublicationClosedHandler(IPublicationRepository, IOutbox)`: one `PublicationClosedIntegrationEvent` per close, inside the close's transaction.
-  - `SendTeacherExcelEmailsConsumer`: the US-44 email, once per (Publication, Teacher, version); throws `TeacherExcelEmailFailedException` after trying every Teacher when any failed.
+  - `SendTeacherExcelEmailsConsumer`: the US-44 email, once per (Publication, Teacher, version); returns `DeliveryOutcome.Done`, or throws `TeacherExcelEmailFailedException` after trying every Teacher when any failed. It never holds.
   - `ITeacherExcelEmailLog.WasSentAsync(PublicationId, TeacherId, int) : Task<bool>`, `.RecordSent(PublicationId, TeacherId, int, DateTimeOffset)`; table `sent_teacher_excel_emails(publication_id, teacher_id, version, sent_at_utc)`, primary key `(publication_id, teacher_id, version)`.
 
 After this task a close writes one outbox message and one delivery, and the outbox job sends the emails a few seconds later.
@@ -38,7 +38,7 @@ git mv tests/DrivingLessons.Application.Test/EventHandlers/PublicationClosedHand
 
 In the moved file:
 
-1. Usings: add `using DrivingLessons.Application.Common;`, `using DrivingLessons.Application.Consumers.TeacherExcelEmail;`, `using DrivingLessons.Application.IntegrationEvents.Publications;`. Remove `using DrivingLessons.Application.EventHandlers;` and `using DrivingLessons.Domain.Events;`.
+1. Usings: add `using DrivingLessons.Application.Common;`, `using DrivingLessons.Application.Consumers.TeacherExcelEmail;`, `using DrivingLessons.Application.IntegrationEvents;`, `using DrivingLessons.Application.IntegrationEvents.Publications;`. Remove `using DrivingLessons.Application.EventHandlers;` and `using DrivingLessons.Domain.Events;`.
 2. Namespace `DrivingLessons.Application.Test.Consumers`; class `SendTeacherExcelEmailsConsumerTest`.
 3. Replace the fields and `Init()` with:
 
@@ -132,6 +132,20 @@ and keep the two existing `//then` assertions below it (drop the old `//then` ma
         //then
         sent.ShouldHaveSingleItem().ToEmail.ShouldBe("dana.levi@example.com");
         A.CallTo(() => excelGenerator.GenerateAsync(publication.Id, cohen.Id)).MustNotHaveHappened();
+    }
+
+    [TestMethod]
+    public async Task Is_Done_When_Every_Teacher_Was_Sent()
+    {
+        //given
+        var teacher = TeacherNamed("משה כהן", "moshe.cohen@example.com");
+        var publication = Closed(teacher);
+
+        //when
+        var outcome = await consumer.ConsumeAsync(EventFor(publication));
+
+        //then
+        outcome.ShouldBe(DeliveryOutcome.Done);
     }
 
     [TestMethod]
@@ -442,14 +456,14 @@ public class SendTeacherExcelEmailsConsumer : IIntegrationEventConsumer<Publicat
         this.logger = logger;
     }
 
-    public async Task ConsumeAsync(PublicationClosedIntegrationEvent integrationEvent)
+    public async Task<DeliveryOutcome> ConsumeAsync(PublicationClosedIntegrationEvent integrationEvent)
     {
         var publicationId = PublicationId.Of(integrationEvent.PublicationId);
         var publication = await repository.GetAsync(publicationId);
 
         if (publication is null)
         {
-            return;
+            return DeliveryOutcome.Done;
         }
 
         var failedTeacherIds = new List<TeacherId>();
@@ -478,6 +492,8 @@ public class SendTeacherExcelEmailsConsumer : IIntegrationEventConsumer<Publicat
         {
             throw new TeacherExcelEmailFailedException(publicationId, failedTeacherIds);
         }
+
+        return DeliveryOutcome.Done;
     }
 
     private async Task SendOnceAsync(Publication publication, TeacherId teacherId, int version)
@@ -745,7 +761,7 @@ dotnet test tests/DrivingLessons.Domain.Test/DrivingLessons.Domain.Test.csproj
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj
 ```
 
-Expected: handler 3 passed; consumer: the 13 moved test runs plus the 5 new ones pass; full suites pass.
+Expected: handler 3 passed; consumer: the 13 moved test runs plus the 6 new ones pass; full suites pass.
 
 - [ ] **Step 10: Commit**
 

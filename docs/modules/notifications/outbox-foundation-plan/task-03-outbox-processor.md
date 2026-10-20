@@ -12,7 +12,7 @@
 - Test: `tests\DrivingLessons.Application.Test\Outbox\OutboxOptionsTest.cs` (new)
 
 **Interfaces:**
-- Consumes: task 1's `IntegrationEventCatalog` (`TypeOf`, `ConsumerOf`) and `IntegrationEventConsumerRegistration.InvokeAsync`; task 2's `OutboxDelivery` (`Succeed`, `Fail`), `OutboxMessage`, `OutboxSerializer.Deserialize`, `DrivingLessonsDbContext.OutboxDeliveries` / `.OutboxMessages`; Quartz 3.18.2 (`AddQuartz`, `ScheduleJob<T>`, `[DisallowConcurrentExecution]`).
+- Consumes: task 1's `IntegrationEventCatalog` (`TypeOf`, `ConsumerOf`), `IntegrationEventCatalogException`, `IntegrationEventConsumerRegistration.InvokeAsync` and `DeliveryOutcome`; task 2's `OutboxDelivery` (`Succeed`, `Fail`), `OutboxMessage`, `OutboxSerializer.Deserialize`, `DrivingLessonsDbContext.OutboxDeliveries` / `.OutboxMessages`; Quartz 3.18.2 (`AddQuartz`, `ScheduleJob<T>`, `[DisallowConcurrentExecution]`).
 - Produces:
   - `OutboxOptions` (section `Outbox`): `PollSeconds` 5, `BatchSize` 20, `MaxAttempts` 8, `LeaseSeconds` 300, `RetentionDays` 30, all validated with `[Range]` at startup.
   - `OutboxProcessor.ProcessDueAsync(CancellationToken)`: leases due deliveries and runs each once. `OutboxProcessor.PurgeAsync()`: deletes old succeeded deliveries and orphaned messages.
@@ -121,6 +121,7 @@ public sealed class OutboxOptions
 `src\DrivingLessons.Infrastructure\Outbox\OutboxProcessor.cs`:
 
 ```csharp
+using System.Text.Json;
 using DrivingLessons.Application.IntegrationEvents;
 using DrivingLessons.Infrastructure.EntityFramework;
 using DrivingLessons.Infrastructure.Options;
@@ -226,12 +227,44 @@ public class OutboxProcessor
         var delivery = await context.OutboxDeliveries.SingleAsync(x => x.Id == deliveryId);
         var message = await context.OutboxMessages.SingleAsync(x => x.Id == delivery.MessageId);
 
+        IntegrationEventConsumerRegistration registration;
+        IIntegrationEvent integrationEvent;
+
         try
         {
-            await InvokeConsumerAsync(message, delivery);
+            registration = catalog.ConsumerOf(message.EventName, delivery.Consumer);
+            var eventType = catalog.TypeOf(message.EventName);
+            integrationEvent = OutboxSerializer.Deserialize(message.Payload, eventType);
+        }
+        catch (Exception exception) when (exception is IntegrationEventCatalogException or JsonException)
+        {
+            var deadAtUtc = timeProvider.GetUtcNow();
+            delivery.MarkDead(exception, deadAtUtc);
 
-            var completedAtUtc = timeProvider.GetUtcNow();
-            delivery.Succeed(completedAtUtc);
+            LogFailure(exception, message, delivery);
+
+            await context.SaveChangesAsync();
+            return;
+        }
+
+        await RunConsumerAsync(registration, integrationEvent, message, delivery);
+
+        await context.SaveChangesAsync();
+    }
+
+    private async Task RunConsumerAsync(
+        IntegrationEventConsumerRegistration registration,
+        IIntegrationEvent integrationEvent,
+        OutboxMessage message,
+        OutboxDelivery delivery)
+    {
+        try
+        {
+            await using var scope = scopeFactory.CreateAsyncScope();
+
+            var outcome = await registration.InvokeAsync(scope.ServiceProvider, integrationEvent);
+
+            Apply(outcome, delivery);
         }
         catch (Exception exception)
         {
@@ -240,19 +273,18 @@ public class OutboxProcessor
 
             LogFailure(exception, message, delivery);
         }
-
-        await context.SaveChangesAsync();
     }
 
-    private async Task InvokeConsumerAsync(OutboxMessage message, OutboxDelivery delivery)
+    private void Apply(DeliveryOutcome outcome, OutboxDelivery delivery)
     {
-        var eventType = catalog.TypeOf(message.EventName);
-        var registration = catalog.ConsumerOf(message.EventName, delivery.Consumer);
-        var integrationEvent = OutboxSerializer.Deserialize(message.Payload, eventType);
+        if (outcome.HoldUntilUtc is { } holdUntilUtc)
+        {
+            delivery.Hold(holdUntilUtc);
+            return;
+        }
 
-        await using var scope = scopeFactory.CreateAsyncScope();
-
-        await registration.InvokeAsync(scope.ServiceProvider, integrationEvent);
+        var completedAtUtc = timeProvider.GetUtcNow();
+        delivery.Succeed(completedAtUtc);
     }
 
     private void LogFailure(Exception exception, OutboxMessage message, OutboxDelivery delivery)
@@ -285,8 +317,10 @@ public class OutboxProcessor
 How it works:
 - **Lease:** one `UPDATE … RETURNING` statement under Postgres auto-commit. `FOR UPDATE SKIP LOCKED` makes a second instance skip rows the first one is leasing; the row lock ends with the statement, and `locked_until_utc` keeps them away for `LeaseSeconds` (README decision 7). `SqlQuery<Guid>` with `AS "Value"` is EF Core's scalar form; nothing composes over it, so EF sends the SQL as written.
 - **Run:** each delivery's consumer runs in a **new DI scope**, so its `DbContext`, repositories and `IUnitOfWork` are its own. The processor's context only tracks the delivery and message rows, and saves them after the consumer returns or throws.
-- **Catch-all:** any exception from a consumer, including an unknown event or consumer name from the catalog, is a failed attempt. It's recorded on the row and logged, and never stops the batch or the job. This is the one place a broad `catch (Exception)` is right: the processor doesn't know what consumers throw.
-- **Crash:** if the process dies inside `InvokeConsumerAsync`, the lease expires and the delivery runs again (at least once, README decision 9).
+- **Can't be resolved → dead at once** (README decision 17): an event name or consumer name the catalog doesn't know (a consumer removed or renamed, an event no longer registered), or a payload that doesn't deserialize, will fail the same way on every attempt. `MarkDead` records it after one attempt and logs it at Error, instead of retrying 8 times over two hours.
+- **The consumer's outcome** (README decision 16): `Done` → `Succeed`; `HoldUntil(instant)` → `Hold`, which keeps the delivery `Pending` until that instant without counting an attempt. A hold isn't logged: it's planned behavior (slice 5's quiet hours), not a problem.
+- **Catch-all around the consumer:** any exception the consumer throws is a failed attempt, recorded on the row and logged, and never stops the batch or the job. This is the one place a broad `catch (Exception)` is right: the processor doesn't know what consumers throw. The narrower `catch … when` above runs first, before the consumer, so a catalog or JSON problem never counts as a consumer failure.
+- **Crash:** if the process dies inside `RunConsumerAsync`, the lease expires and the delivery runs again (at least once, README decision 9).
 
 If `SqlQuery` turns out to wrap the `UPDATE` in a sub-select at runtime (task 6 Step 3 shows a Postgres syntax error in the log), run the same SQL through `context.Database.GetDbConnection()` with an `NpgsqlCommand` and read the `id`s from its reader. Keep the statement unchanged.
 

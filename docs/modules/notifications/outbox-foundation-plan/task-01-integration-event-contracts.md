@@ -5,6 +5,7 @@
 **Files:**
 - Create: `src\DrivingLessons.Application\IntegrationEvents\IIntegrationEvent.cs`
 - Create: `src\DrivingLessons.Application\IntegrationEvents\IIntegrationEventConsumer.cs`
+- Create: `src\DrivingLessons.Application\IntegrationEvents\DeliveryOutcome.cs`
 - Create: `src\DrivingLessons.Application\IntegrationEvents\IntegrationEventConsumerRegistration.cs`
 - Create: `src\DrivingLessons.Application\IntegrationEvents\IntegrationEventCatalog.cs`
 - Create: `src\DrivingLessons.Application\IntegrationEvents\IntegrationEventCatalogException.cs`
@@ -17,10 +18,11 @@
 - Consumes (on `main`): `Microsoft.Extensions.DependencyInjection` (already referenced by Application for `AddApplication`).
 - Produces (used by tasks 2–4):
   - `interface IIntegrationEvent` (marker).
-  - `interface IIntegrationEventConsumer<in TEvent> where TEvent : IIntegrationEvent { Task ConsumeAsync(TEvent integrationEvent); }`
+  - `interface IIntegrationEventConsumer<in TEvent> where TEvent : IIntegrationEvent { Task<DeliveryOutcome> ConsumeAsync(TEvent integrationEvent); }`
+  - `DeliveryOutcome.Done` (the job is finished) and `DeliveryOutcome.HoldUntil(DateTimeOffset)` (not now, try again then, **without** counting a failed attempt; README decision 16). A consumer that fails throws instead.
   - `interface IOutbox { void Add(IIntegrationEvent integrationEvent); }`: queues the event in the current unit of work; nothing is written until `IUnitOfWork.CommitAsync()`.
   - `IntegrationEventCatalog` (singleton): `NameOf(Type) : string`, `TypeOf(string) : Type`, `ConsumersOf(string eventName) : IReadOnlyList<string>`, `ConsumerOf(string eventName, string consumerName) : IntegrationEventConsumerRegistration`.
-  - `record IntegrationEventConsumerRegistration(string Name, Func<IServiceProvider, IIntegrationEvent, Task> InvokeAsync)`.
+  - `record IntegrationEventConsumerRegistration(string Name, Func<IServiceProvider, IIntegrationEvent, Task<DeliveryOutcome>> InvokeAsync)`.
   - `services.AddIntegrationEventCatalog()` (registers the one catalog, called first in `AddApplication`), `services.AddIntegrationEvent<TEvent>(string name)` and `services.AddIntegrationEventConsumer<TEvent, TConsumer>()`; the last registers `TConsumer` as scoped. A consumer's name is its class name (README decision 4).
   - `IntegrationEventCatalogException`: thrown for a registration mistake (duplicate name, duplicate type, duplicate consumer, consumer of an unregistered event) and for a lookup of an unknown event or consumer.
 
@@ -213,10 +215,39 @@ public class IntegrationEventCatalogTest
         var sample = new SampleHappened(Guid.NewGuid());
 
         //when
-        await registration.InvokeAsync(scope.ServiceProvider, sample);
+        var outcome = await registration.InvokeAsync(scope.ServiceProvider, sample);
 
         //then
         scope.ServiceProvider.GetRequiredService<RecordingConsumer>().Received.ShouldBe([sample]);
+        outcome.ShouldBe(DeliveryOutcome.Done);
+    }
+
+    [TestMethod]
+    public void Done_Is_Not_Held()
+    {
+        //given
+        var outcome = DeliveryOutcome.Done;
+
+        //when
+        var isHeld = outcome.IsHeld;
+
+        //then
+        isHeld.ShouldBeFalse();
+        outcome.HoldUntilUtc.ShouldBeNull();
+    }
+
+    [TestMethod]
+    public void Hold_Until_Carries_The_Instant()
+    {
+        //given
+        var untilUtc = new DateTimeOffset(2026, 10, 24, 18, 0, 0, TimeSpan.Zero);
+
+        //when
+        var outcome = DeliveryOutcome.HoldUntil(untilUtc);
+
+        //then
+        outcome.IsHeld.ShouldBeTrue();
+        outcome.HoldUntilUtc.ShouldBe(untilUtc);
     }
 
     [TestMethod]
@@ -241,19 +272,19 @@ public class IntegrationEventCatalogTest
     {
         public List<SampleHappened> Received { get; } = [];
 
-        public Task ConsumeAsync(SampleHappened integrationEvent)
+        public Task<DeliveryOutcome> ConsumeAsync(SampleHappened integrationEvent)
         {
             Received.Add(integrationEvent);
 
-            return Task.CompletedTask;
+            return Task.FromResult(DeliveryOutcome.Done);
         }
     }
 
     public class OtherConsumer : IIntegrationEventConsumer<SampleHappened>
     {
-        public Task ConsumeAsync(SampleHappened integrationEvent)
+        public Task<DeliveryOutcome> ConsumeAsync(SampleHappened integrationEvent)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(DeliveryOutcome.Done);
         }
     }
 }
@@ -287,16 +318,43 @@ namespace DrivingLessons.Application.IntegrationEvents;
 public interface IIntegrationEventConsumer<in TEvent>
     where TEvent : IIntegrationEvent
 {
-    Task ConsumeAsync(TEvent integrationEvent);
+    Task<DeliveryOutcome> ConsumeAsync(TEvent integrationEvent);
 }
 ```
+
+`src\DrivingLessons.Application\IntegrationEvents\DeliveryOutcome.cs`:
+
+```csharp
+namespace DrivingLessons.Application.IntegrationEvents;
+
+public record DeliveryOutcome
+{
+    public static DeliveryOutcome Done { get; } = new((DateTimeOffset?)null);
+
+    public DateTimeOffset? HoldUntilUtc { get; }
+
+    public bool IsHeld => HoldUntilUtc is not null;
+
+    private DeliveryOutcome(DateTimeOffset? holdUntilUtc)
+    {
+        HoldUntilUtc = holdUntilUtc;
+    }
+
+    public static DeliveryOutcome HoldUntil(DateTimeOffset untilUtc)
+    {
+        return new DeliveryOutcome(untilUtc);
+    }
+}
+```
+
+Three results, three meanings: return `Done` when the job is finished; return `HoldUntil(instant)` when it can't be done *yet* (slice 5: a scheduled reminder that falls in quiet hours), which reschedules without counting a failure; throw when it failed, which counts an attempt and retries with backoff.
 
 `src\DrivingLessons.Application\IntegrationEvents\IntegrationEventConsumerRegistration.cs`:
 
 ```csharp
 namespace DrivingLessons.Application.IntegrationEvents;
 
-public record IntegrationEventConsumerRegistration(string Name, Func<IServiceProvider, IIntegrationEvent, Task> InvokeAsync);
+public record IntegrationEventConsumerRegistration(string Name, Func<IServiceProvider, IIntegrationEvent, Task<DeliveryOutcome>> InvokeAsync);
 ```
 
 `src\DrivingLessons.Application\IntegrationEvents\IntegrationEventCatalogException.cs`:
@@ -377,7 +435,7 @@ public class IntegrationEventCatalog
         var registration = new IntegrationEventConsumerRegistration(consumerName, InvokeAsync);
         consumers.Add(registration);
 
-        static Task InvokeAsync(IServiceProvider provider, IIntegrationEvent integrationEvent)
+        static Task<DeliveryOutcome> InvokeAsync(IServiceProvider provider, IIntegrationEvent integrationEvent)
         {
             var consumer = provider.GetRequiredService<TConsumer>();
 
@@ -505,7 +563,7 @@ The catalog is then always registered, even before any event is (task 3's job re
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~IntegrationEventCatalogTest"
 ```
 
-Expected: 14 passed (13 test methods; the `DataRow` test runs twice).
+Expected: 16 passed (15 test methods; the `DataRow` test runs twice).
 
 - [ ] **Step 7: Full build and suites**
 

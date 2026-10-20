@@ -36,7 +36,7 @@ Domain events are dispatched in-process by `DrivingLessonsDbContext.CommitAsync`
 - **Contracts in Application:** `IIntegrationEvent` records in `Application\IntegrationEvents\{Context}\` (suffix `IntegrationEvent`, primitives only, serialized as camelCase JSON); consumers implement `IIntegrationEventConsumer<TEvent>` in `Application\Consumers\{Job}\`; producers call `IOutbox.Add`. Producers and consumers never reference each other.
 - **Registration is the only link:** `AddIntegrationEvent<TEvent>("{name}.v{n}")` gives each event a stable, versioned wire name; `AddIntegrationEventConsumer<TEvent, TConsumer>()` adds a consumer. `IntegrationEventCatalog` holds both.
 - **Storage:** `outbox_messages` (one row per event) and `outbox_deliveries` (one row per event and consumer), written by the same `CommitAsync` as the change, which now always runs in one transaction.
-- **Delivery:** `ProcessOutboxJob` (Quartz, every 5 s, never overlapping) leases due deliveries with `FOR UPDATE SKIP LOCKED`, runs each consumer in its own DI scope, and marks it succeeded, schedules a retry (1, 2, 4 … 60 minutes) or, after 8 attempts, marks it dead. `PurgeOutboxJob` deletes succeeded deliveries after 30 days. Settings in the `Outbox` section.
+- **Delivery:** `ProcessOutboxJob` (Quartz, every 5 s, never overlapping) leases due deliveries with `FOR UPDATE SKIP LOCKED`, runs each consumer in its own DI scope, and marks it succeeded, schedules a retry (1, 2, 4 … 60 minutes) or, after 8 attempts, marks it dead. A consumer can also answer `HoldUntil(instant)`: the delivery waits until then without counting a failure. An unknown event or consumer name, or a payload that doesn't deserialize, is dead at once, without retries. `PurgeOutboxJob` deletes succeeded deliveries after 30 days. Settings in the `Outbox` section.
 - **Consumers are safe to run twice**, each with its own guard (for the teacher email: `sent_teacher_excel_emails` per Publication, Teacher and version).
 
 ## Alternatives Considered
@@ -97,7 +97,7 @@ Facts published for consumers outside the aggregate's transaction: notifications
 - Registered in `AddApplication` with `AddIntegrationEvent<T>(T.Name)`; never rename a published name, add `.v{n+1}` for a breaking change
 - A consumer implements `IIntegrationEventConsumer<T>`, does one job, lives in `Application\Consumers\{Job}\`, and is registered with `AddIntegrationEventConsumer<TEvent, TConsumer>()`. An event can have many consumers; they never know about each other or about the producer
 - Consumers turn the event's `Guid`s into typed IDs with `.Of()` before touching the domain, use their own `IUnitOfWork`, and **must be safe to run twice** (delivery is at least once): check a guard record before the side effect, record it right after
-- A consumer signals "retry me" by throwing; the outbox retries with backoff and marks the delivery dead after the last attempt
+- A consumer returns `DeliveryOutcome.Done` when finished, returns `DeliveryOutcome.HoldUntil(instant)` when the job can't be done yet (quiet hours, for example: no failure is counted), and **throws** when it failed: the outbox retries with backoff and marks the delivery dead after the last attempt. A delivery whose event or consumer is no longer registered is dead at once
 ```
 
 4. **Deliberately Omitted**: replace "Outbox pattern + message broker integration events — domain events are handled in-process" with:

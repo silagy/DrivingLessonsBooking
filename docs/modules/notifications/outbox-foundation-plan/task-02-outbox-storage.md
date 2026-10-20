@@ -21,7 +21,7 @@
 - Produces (used by tasks 3 and 4):
   - `DrivingLessonsDbContext.OutboxMessages : DbSet<OutboxMessage>`, `.OutboxDeliveries : DbSet<OutboxDelivery>`.
   - `OutboxMessage.Create(string eventName, string payload, DateTimeOffset occurredAtUtc)`; properties `Id`, `EventName`, `Payload`, `OccurredAtUtc`.
-  - `OutboxDelivery.Create(Guid messageId, string consumer, DateTimeOffset nowUtc)`; `Succeed(DateTimeOffset nowUtc)`; `Fail(Exception exception, DateTimeOffset nowUtc, int maxAttempts)`; properties `Id`, `MessageId`, `Consumer`, `State`, `Attempts`, `NextAttemptAtUtc`, `LockedUntilUtc`, `LastError`, `CompletedAtUtc`; `const int LastErrorMaxLength = 1000`.
+  - `OutboxDelivery.Create(Guid messageId, string consumer, DateTimeOffset nowUtc)`; `Succeed(DateTimeOffset nowUtc)`; `Hold(DateTimeOffset untilUtc)` (stays `Pending`, no attempt counted, README decision 16); `Fail(Exception exception, DateTimeOffset nowUtc, int maxAttempts)`; `MarkDead(Exception exception, DateTimeOffset nowUtc)` (dead at once, no retry, README decision 17); properties `Id`, `MessageId`, `Consumer`, `State`, `Attempts`, `NextAttemptAtUtc`, `LockedUntilUtc`, `LastError`, `CompletedAtUtc`; `const int LastErrorMaxLength = 1000`.
   - `OutboxSerializer.Serialize(IIntegrationEvent) : string`, `.Deserialize(string payload, Type eventType) : IIntegrationEvent`.
   - `Outbox : IOutbox`, registered scoped.
   - Tables `outbox_messages(id, event_name, payload jsonb, occurred_at_utc)` and `outbox_deliveries(id, message_id → outbox_messages ON DELETE CASCADE, consumer, state, attempts, next_attempt_at_utc, locked_until_utc, last_error, completed_at_utc)`, unique `(message_id, consumer)`, index `(state, next_attempt_at_utc)`.
@@ -151,6 +151,86 @@ public class OutboxDeliveryTest
         delivery.State.ShouldBe(OutboxDeliveryState.Dead);
         delivery.Attempts.ShouldBe(MaxAttempts);
         delivery.CompletedAtUtc.ShouldBe(NowUtc);
+    }
+
+    [TestMethod]
+    public void A_Hold_Reschedules_Without_Counting_An_Attempt()
+    {
+        //given
+        var delivery = Pending();
+        var untilUtc = NowUtc.AddHours(11);
+
+        //when
+        delivery.Hold(untilUtc);
+
+        //then
+        delivery.State.ShouldBe(OutboxDeliveryState.Pending);
+        delivery.Attempts.ShouldBe(0);
+        delivery.NextAttemptAtUtc.ShouldBe(untilUtc);
+        delivery.LockedUntilUtc.ShouldBeNull();
+        delivery.LastError.ShouldBeNull();
+    }
+
+    [TestMethod]
+    public void A_Hold_After_Failures_Keeps_Their_Count()
+    {
+        //given
+        var delivery = Pending();
+        delivery.Fail(new TimeoutException("SMTP timed out."), NowUtc, MaxAttempts);
+        var untilUtc = NowUtc.AddHours(11);
+
+        //when
+        delivery.Hold(untilUtc);
+
+        //then
+        delivery.Attempts.ShouldBe(1);
+        delivery.NextAttemptAtUtc.ShouldBe(untilUtc);
+    }
+
+    [TestMethod]
+    public void Is_Marked_Dead_At_Once_Without_A_Retry()
+    {
+        //given
+        var delivery = Pending();
+
+        //when
+        delivery.MarkDead(new InvalidOperationException("Consumer [Gone] is not registered."), NowUtc);
+
+        //then
+        delivery.State.ShouldBe(OutboxDeliveryState.Dead);
+        delivery.Attempts.ShouldBe(1);
+        delivery.CompletedAtUtc.ShouldBe(NowUtc);
+        delivery.LastError.ShouldBe("InvalidOperationException: Consumer [Gone] is not registered.");
+    }
+
+    [TestMethod]
+    [DataRow(OutboxDeliveryState.Succeeded)]
+    [DataRow(OutboxDeliveryState.Dead)]
+    public void Delivery_Must_Be_Pending_To_Be_Held(OutboxDeliveryState state)
+    {
+        //given
+        var delivery = InState(state);
+
+        //when
+        var act = () => delivery.Hold(NowUtc.AddHours(1));
+
+        //then
+        act.ShouldThrow<OutboxDeliveryMustBePendingException>();
+    }
+
+    [TestMethod]
+    [DataRow(OutboxDeliveryState.Succeeded)]
+    [DataRow(OutboxDeliveryState.Dead)]
+    public void Delivery_Must_Be_Pending_To_Be_Marked_Dead(OutboxDeliveryState state)
+    {
+        //given
+        var delivery = InState(state);
+
+        //when
+        var act = () => delivery.MarkDead(new InvalidOperationException("Unknown."), NowUtc);
+
+        //then
+        act.ShouldThrow<OutboxDeliveryMustBePendingException>();
     }
 
     [TestMethod]
@@ -368,17 +448,17 @@ public class OutboxTest
 
     public class FirstConsumer : IIntegrationEventConsumer<SampleHappened>
     {
-        public Task ConsumeAsync(SampleHappened integrationEvent)
+        public Task<DeliveryOutcome> ConsumeAsync(SampleHappened integrationEvent)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(DeliveryOutcome.Done);
         }
     }
 
     public class SecondConsumer : IIntegrationEventConsumer<SampleHappened>
     {
-        public Task ConsumeAsync(SampleHappened integrationEvent)
+        public Task<DeliveryOutcome> ConsumeAsync(SampleHappened integrationEvent)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(DeliveryOutcome.Done);
         }
     }
 }
@@ -535,6 +615,25 @@ public class OutboxDelivery
 
         var backoff = BackoffAfter(Attempts);
         NextAttemptAtUtc = nowUtc.Add(backoff);
+    }
+
+    public void Hold(DateTimeOffset untilUtc)
+    {
+        MustBePending();
+
+        NextAttemptAtUtc = untilUtc;
+        LockedUntilUtc = null;
+    }
+
+    public void MarkDead(Exception exception, DateTimeOffset nowUtc)
+    {
+        MustBePending();
+
+        Attempts++;
+        LastError = Describe(exception);
+        LockedUntilUtc = null;
+        State = OutboxDeliveryState.Dead;
+        CompletedAtUtc = nowUtc;
     }
 
     private void MustBePending()
