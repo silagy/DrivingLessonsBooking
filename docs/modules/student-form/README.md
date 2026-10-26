@@ -17,6 +17,7 @@ Slice roadmap for the `module:student-form` backlog (18 open issues). Each slice
 | 5. Edit & close race — [plan](us-25-43-42-edit-and-close-race-plan/README.md) | Returning student loads their submission for editing, edits any number of times until close, clean window-closed rejection screen when the window closed between load and submit | [#26](https://github.com/silagy/DrivingLessonsBooking/issues/26), [#43](https://github.com/silagy/DrivingLessonsBooking/issues/43), [#42](https://github.com/silagy/DrivingLessonsBooking/issues/42) |
 | 6. Mobile acceptance — [plan](us-22-mobile-browser-plan/README.md) | Closes last as the ~375px end-to-end acceptance check — mobile-first is built into every slice, not a phase | [#23](https://github.com/silagy/DrivingLessonsBooking/issues/23) |
 | 7. Double counts once ([plan](double-counts-once-plan/README.md)) | Target-step note and review reminder that a Double counts as one lesson toward the target (customer feedback, October 2026) | none |
+| 8. More slots, better chance ([intent](more-slots-better-chance-intent.md) · [plan](more-slots-better-chance-plan/README.md)) | Copy that unties the number of slots from the number of lessons, and a soft review nudge when a list leaves little room to schedule (customer feedback, October 2026) | none |
 
 Slice 1 is the tracer bullet: it proves the two scariest unknowns (an anonymous API surface against the deny-by-default auth policy, and a public mobile route in an admin-only client) with the smallest story attached.
 

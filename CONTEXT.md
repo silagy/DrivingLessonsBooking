@@ -39,6 +39,10 @@ _Avoid_: Instructor
 A learner identified by national ID, belonging to exactly one Teacher and learning on exactly one of that Teacher's Cars.
 _Avoid_: Pupil, Trainee
 
+**Slot**:
+One time window on one day of a Week Schedule, Open or Unavailable. A Student picks Open Slots, ranked, as Slot Requests. On the Hebrew student form it is a **שיעור אפשרי**; **שיעור** alone means a lesson the Student asks for, never a Slot.
+_Avoid_: Hour (שעה), Appointment
+
 **Change Teacher**:
 Giving a Student another Teacher together with one of that Teacher's Cars. The Student's existing Submissions stay with the Publication they were made to.
 _Avoid_: Assign, Transfer, Reassign, Move

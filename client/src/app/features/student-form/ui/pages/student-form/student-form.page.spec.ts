@@ -100,6 +100,13 @@ const SAVED_SUBMISSION: SubmissionForIdentifyStudentResponse = {
 
 const RETURNING_STUDENT: IdentifyStudentResponse = { ...COHEN_STUDENT, submission: SAVED_SUBMISSION };
 
+const TWO_OPEN_SLOTS = ['sunday-afternoon', 'monday-evening'];
+const TWO_SLOT_STUDENT = studentOf(
+    'Teacher Cohen',
+    Transmission.automatic,
+    weekSlots([]).map(slot => (TWO_OPEN_SLOTS.includes(slot.id) ? slot : { ...slot, state: SlotState.unavailable })),
+);
+
 function publicationIn(state: PublicationState): () => Observable<GetPublicationByLinkResponse> {
     return () =>
         of({
@@ -1391,6 +1398,101 @@ describe('StudentFormPage', () => {
             //then
             expect(createSubmission).toHaveBeenCalledTimes(1);
             expect(continueButton(fixture)!.disabled).toBe(true);
+        });
+    });
+
+    describe('room to schedule', () => {
+        it('suggests more slots when one slot covers a target of one', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //then
+            expect(textOf(fixture, '.review__more-room')).toMatch(/studentForm\.review\.moreRoomTitle/);
+            expect(textOf(fixture, '.review__more-room')).toMatch(/studentForm\.review\.moreRoomBody/);
+            expect(continueButton(fixture)!.disabled).toBe(false);
+        });
+
+        it('keeps suggesting until the list holds two slots beyond the target', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 2, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon']);
+
+            //then
+            expect(page(fixture).querySelector('.review__more-room')).not.toBeNull();
+        });
+
+        it('stops suggesting once the list holds two slots beyond the target', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 2, ['sunday-afternoon', 'monday-evening', 'wednesday-afternoon', 'thursday-evening']);
+
+            //then
+            expect(page(fixture).querySelector('.review__more-room')).toBeNull();
+        });
+
+        it('never suggests more slots when every open slot is picked', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(TWO_SLOT_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 1, TWO_OPEN_SLOTS);
+
+            //then
+            expect(page(fixture).querySelector('app-review-step')).not.toBeNull();
+            expect(page(fixture).querySelector('.review__more-room')).toBeNull();
+        });
+
+        it('never shows the suggestion together with the not-enough message', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachReview(fixture, 3, ['sunday-afternoon']);
+
+            //then
+            expect(page(fixture).querySelector('.review__not-enough')).not.toBeNull();
+            expect(page(fixture).querySelector('.review__more-room')).toBeNull();
+        });
+
+        it('suggests more slots to a returning student whose saved list leaves little room', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(RETURNING_STUDENT));
+            const fixture = await renderPage();
+
+            //when
+            await reachTarget(fixture);
+            await clickContinue(fixture);
+            await clickContinue(fixture);
+
+            //then
+            expect(page(fixture).querySelector('app-review-step')).not.toBeNull();
+            expect(page(fixture).querySelector('.review__more-room')).not.toBeNull();
+        });
+
+        it('sends the student back to the grid from the suggestion, keeping the picks', async () => {
+            //given
+            provideOpenLinkIdentifying(identifyingAs(COHEN_STUDENT));
+            const fixture = await renderPage();
+            await reachReview(fixture, 1, ['sunday-afternoon']);
+
+            //when
+            await press(fixture, '.review__more-room-add button');
+
+            //then
+            expect(page(fixture).querySelector('app-slots-step')).not.toBeNull();
+            expect(rankOn(fixture, 'sunday-afternoon')).toBe('1');
         });
     });
 

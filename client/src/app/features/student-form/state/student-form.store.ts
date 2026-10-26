@@ -22,7 +22,7 @@ import { StudentFormStep } from '../domain/student-form-step.enum';
 import { viewForPublicationState } from '../domain/student-form-view';
 import { StudentFormView } from '../domain/student-form-view.enum';
 import { SubmitStatus } from '../domain/submit-status.enum';
-import { MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
+import { leavesLittleRoom, MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
 import { weekRangeLabel } from '../domain/week-label';
 import { WelcomeBack } from '../domain/welcome-back';
 import { isolateDirection } from '../../../shared/text/isolate-direction';
@@ -220,6 +220,9 @@ export class StudentFormStore {
         reviewItemsOf(this.picks(), this.student()?.slots ?? [], this.target()),
     );
     readonly missingPicks = computed(() => missingPickCount(this.target(), this.pickCount()));
+    readonly suggestsMoreSlots = computed(() =>
+        leavesLittleRoom(this.target(), this.pickCount(), this.openSlotIds().size),
+    );
     readonly submitStatus = this.submitState.asReadonly();
     readonly droppedPickCount = this.droppedPicks.asReadonly();
     readonly replacesEarlierSubmission = computed(

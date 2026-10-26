@@ -19,7 +19,6 @@ import { PickMove } from '../../../domain/slot-pick';
 import { SubmitStatus } from '../../../domain/submit-status.enum';
 import { WizardStepComponent } from '../wizard-step/wizard-step.component';
 
-const SINGLE_PREFERRED_TARGET = 1;
 const SINGLE_DROPPED_PICK = 1;
 const MOVE_UP_BUTTON = '.review__move-up button';
 const MOVE_DOWN_BUTTON = '.review__move-down button';
@@ -38,6 +37,7 @@ export class ReviewStepComponent {
     readonly pickCount = input.required<number>();
     readonly items = input.required<readonly ReviewItem[]>();
     readonly missingPicks = input.required<number>();
+    readonly suggestsMoreSlots = input.required<boolean>();
     readonly replacesEarlierSubmission = input.required<boolean>();
     readonly droppedPickCount = input.required<number>();
     readonly submitStatus = input.required<SubmitStatus>();
@@ -63,11 +63,6 @@ export class ReviewStepComponent {
     );
     protected readonly movedItem = computed(
         () => this.items().find(item => item.slotId === this.movedPickId()) ?? null,
-    );
-    protected readonly preferredKey = computed(() =>
-        this.targetCount() === SINGLE_PREFERRED_TARGET
-            ? 'studentForm.review.preferredOne'
-            : 'studentForm.review.preferredMany',
     );
     protected readonly droppedKey = computed(() =>
         this.droppedPickCount() === SINGLE_DROPPED_PICK ? 'studentForm.review.droppedOne' : 'studentForm.review.droppedMany',

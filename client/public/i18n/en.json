@@ -588,7 +588,7 @@
     },
     "target": {
       "title": "How many lessons do you want this week?",
-      "body": "You'll then pick at least that many slots, ranked by preference.",
+      "body": "Next you'll pick the slots you can make, ranked by preference. They don't have to match the number of lessons: the more slots you give, the better your chance of getting all the lessons you asked for.",
       "doubleCountsOnce": "A double lesson counts as one lesson toward your target. Want one double lesson? Choose 1.",
       "unitOne": "lesson · minimum {{min}}",
       "unit": "lessons · minimum {{min}}",
@@ -603,7 +603,7 @@
       "unavailable": "Unavailable",
       "pickedRank": "pick {{rank}}",
       "summary": "Target: {{target}} · Picked: {{picked}}",
-      "backups": "extra picks = backups",
+      "moreSlotsHint": "more slots = better chance of getting your lessons",
       "review": "Review my list"
     },
     "pick": {
@@ -620,8 +620,9 @@
     },
     "review": {
       "title": "Your ranked list",
-      "preferredOne": "Rank 1 is your preferred slot; any others are backups.",
-      "preferredMany": "Ranks 1-{{target}} are your preferred slots; the rest are backups.",
+      "preferred": "Rank 1 is your preferred slot. Every extra slot on the list improves your chance of getting the lessons you asked for.",
+      "moreRoomTitle": "Want a better chance?",
+      "moreRoomBody": "Your list leaves us little room to schedule you. The more slots you give, the better your chance of getting all the lessons you asked for.",
       "notEnoughTitle": "Not enough picks.",
       "notEnoughBody": "Your target is {{target}}, but you've picked {{picked}}. Add {{missing}} more, or lower your target.",
       "doubleCountsOnce": "A double lesson counts as one pick.",

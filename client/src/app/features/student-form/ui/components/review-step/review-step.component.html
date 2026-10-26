@@ -37,8 +37,24 @@
         } @else {
             <p class="review__summary">
                 <strong>{{ 'studentForm.slots.summary' | transloco: { target: targetCount(), picked: pickCount() } }}</strong>
-                {{ preferredKey() | transloco: { target: targetCount() } }}
+                {{ 'studentForm.review.preferred' | transloco }}
             </p>
+            @if (suggestsMoreSlots()) {
+                <p-message severity="info" class="review__more-room">
+                    <span>
+                        <strong>{{ 'studentForm.review.moreRoomTitle' | transloco }}</strong>
+                        {{ 'studentForm.review.moreRoomBody' | transloco }}
+                    </span>
+                </p-message>
+                <p-button
+                    type="button"
+                    class="review__more-room-add"
+                    severity="secondary"
+                    fluid
+                    [outlined]="true"
+                    [label]="'studentForm.review.addSlots' | transloco"
+                    (onClick)="addSlots.emit()" />
+            }
         }
 
         @if (replacesEarlierSubmission()) {
