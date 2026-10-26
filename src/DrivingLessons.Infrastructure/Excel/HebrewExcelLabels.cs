@@ -40,8 +40,8 @@ public static class HebrewExcelLabels
         };
     }
 
-    public static string RequestedLessonsOf(int targetCount, int pickCount)
+    public static string PickPositionOf(int position, int pickCount)
     {
-        return $"{targetCount} מתוך {pickCount}";
+        return $"{position} מתוך {pickCount}";
     }
 }

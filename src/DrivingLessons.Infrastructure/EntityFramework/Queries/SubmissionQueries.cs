@@ -59,12 +59,12 @@ public class SubmissionQueries : ISubmissionQueries
                     where slot.Id == request.SlotId
                     select new
                     {
+                        SubmissionId = submission.Id,
                         slot.Day,
                         slot.Window,
                         StudentName = student.Name,
                         CarName = car.Name,
                         request.SessionType,
-                        request.Rank,
                         submission.TargetCount,
                         PickCount = submission.SlotRequests.Count(),
                         request.Constraint
@@ -74,12 +74,12 @@ public class SubmissionQueries : ISubmissionQueries
 
         return rows
                    .Select(x => new SlotRequestDetail(
+                       x.SubmissionId.Value,
                        x.Day,
                        x.Window,
                        x.StudentName.Value,
                        x.CarName.Value,
                        x.SessionType,
-                       x.Rank.Value,
                        x.TargetCount.Value,
                        x.PickCount,
                        x.Constraint?.Value))

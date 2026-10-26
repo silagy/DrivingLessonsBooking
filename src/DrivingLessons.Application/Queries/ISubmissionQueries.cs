@@ -20,12 +20,12 @@ public interface ISubmissionQueries
 public record SubmissionStats(int StudentsSubmitted, int TotalPicks, DateTimeOffset? LastSubmissionAtUtc);
 
 public record SlotRequestDetail(
+    Guid SubmissionId,
     DayOfWeek Day,
     SlotWindowType Window,
     string StudentName,
     string CarName,
     SessionType SessionType,
-    int Rank,
     int TargetCount,
     int PickCount,
     string? Constraint);

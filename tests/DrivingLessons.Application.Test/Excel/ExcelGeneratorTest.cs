@@ -46,12 +46,12 @@ public class ExcelGeneratorTest
     {
         //given
         var request = new SlotRequestDetail(
+            Guid.NewGuid(),
             DayOfWeek.Sunday,
             SlotWindowType.Morning,
             "Smoke Student A",
             "Smoke Auto",
             SessionType.Single,
-            1,
             2,
             2,
             null);
