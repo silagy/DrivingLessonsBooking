@@ -621,6 +621,8 @@
     "review": {
       "title": "Your ranked list",
       "preferred": "Rank 1 is your preferred slot. Every extra slot on the list improves your chance of getting the lessons you asked for.",
+      "moreRoomTitle": "Want a better chance?",
+      "moreRoomBody": "Your list leaves us little room to schedule you. The more slots you give, the better your chance of getting all the lessons you asked for.",
       "notEnoughTitle": "Not enough picks.",
       "notEnoughBody": "Your target is {{target}}, but you've picked {{picked}}. Add {{missing}} more, or lower your target.",
       "doubleCountsOnce": "A double lesson counts as one pick.",

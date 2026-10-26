@@ -37,6 +37,7 @@ export class ReviewStepComponent {
     readonly pickCount = input.required<number>();
     readonly items = input.required<readonly ReviewItem[]>();
     readonly missingPicks = input.required<number>();
+    readonly suggestsMoreSlots = input.required<boolean>();
     readonly replacesEarlierSubmission = input.required<boolean>();
     readonly droppedPickCount = input.required<number>();
     readonly submitStatus = input.required<SubmitStatus>();
