@@ -1,6 +1,6 @@
 # Chronological Picks on the Detail Sheet - Intent
 
-**Status:** Agreed intent, input to planning
+**Status:** Agreed intent, input to planning ([plan](chronological-picks-plan/README.md))
 **Date:** 26 October 2026
 **Module:** `module:excel`
 
