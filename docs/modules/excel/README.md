@@ -14,6 +14,7 @@ Slice roadmap for the `module:excel` backlog (3 open issues). Each slice ships a
 | 2. Summary sheet — [plan](us-45-excel-summary-sheet-plan/README.md) | Sheet 1 in Hebrew/RTL: slots × Sunday–Friday grid of request counts, Unavailable slots visibly blocked, Friday Afternoon/Evening cells absent | [#45](https://github.com/silagy/DrivingLessonsBooking/issues/45) |
 | 3. Versioned email — [plan](us-44-versioned-excel-email-plan/README.md) | A real `IEmailSender` (MailKit over SMTP to AWS SES, ADR 0005) sending the two-sheet file to each teacher's contact email at every close, Hebrew subject "בקשות לשבוע N - {teacher} - גרסה K" | [#44](https://github.com/silagy/DrivingLessonsBooking/issues/44) |
 | 4. Customer feedback ([plan](detail-sheet-feedback-plan/README.md)) | Sheet 2 drops National ID, Phone and Transmission, and adds the student's car name and "requested lessons" as `{target} מתוך {picks}` | none (customer feedback, 18 October 2026) |
+| 5. Chronological picks ([intent](chronological-picks-intent.md)) | Sheet 2 drops rank, numbers each student's slots `{position} מתוך {picks}` from Sunday morning to Friday evening, and keeps the target count in its own column | none (customer feedback, 26 October 2026) |
 
 Slice 1 goes first because the detail sheet is what a teacher books from; slice 3 goes last because it only changes delivery of a file the first two slices finish.
 
