@@ -49,12 +49,12 @@ public class ExcelTypographyTest
         };
         var counts = slots.ToDictionary(slot => slot.Id, _ => 1);
         var request = new SlotRequestDetail(
+            Guid.NewGuid(),
             DayOfWeek.Sunday,
             SlotWindowType.Afternoon,
             "Smoke Student A",
             "Smoke Auto",
             SessionType.Double,
-            1,
             2,
             3,
             "only after 16:00");

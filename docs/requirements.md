@@ -204,7 +204,7 @@ One file per teacher per publication. Two sheets.
 - `Unavailable` slots visually marked as blocked
 - Friday Afternoon/Evening cells do not exist
 ### Sheet 2: Request Detail
-One row per slot request, sorted by day, then slot, then student rank:
+One row per slot request, sorted by day, then slot, then student name:
  
 | Column | Content |
 |---|---|
@@ -213,11 +213,12 @@ One row per slot request, sorted by day, then slot, then student rank:
 | Student name | Full name (from the student's record) |
 | Car | The name of the student's roster car |
 | Session type | Single / Double |
-| Rank | Position in the student's preference order |
-| Requested lessons | The student's weekly target out of the slots they picked, for example "1 out of 3" (`1 מתוך 3`) |
+| Slot position | The slot's place among the student's picks, counted from Sunday morning to Friday evening, for example "2 out of 8" (`2 מתוך 8`) |
+| Requested lessons | The student's weekly target, as a number |
 | Constraints | Free text for this slot request |
 
 National ID, phone and transmission were removed at the customer's request (October 2026).
+Rank was removed at the customer's request (October 2026); students still rank their picks on the form.
  
 ### Delivery
 - **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4)

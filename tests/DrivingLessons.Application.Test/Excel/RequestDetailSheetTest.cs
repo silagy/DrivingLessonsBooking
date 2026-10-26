@@ -11,7 +11,8 @@ public class RequestDetailSheetTest
 {
     private const int ColumnCount = 8;
     private const int CarColumn = 4;
-    private const int RequestedLessonsColumn = 7;
+    private const int PositionColumn = 6;
+    private const int TargetCountColumn = 7;
     private const int ConstraintsColumn = 8;
 
     [TestMethod]
@@ -32,7 +33,7 @@ public class RequestDetailSheetTest
                 "שם התלמיד/ה",
                 "רכב",
                 "סוג שיעור",
-                "דירוג",
+                "שיעור אפשרי",
                 "שיעורים מבוקשים",
                 "אילוצים"
             ]);
@@ -59,9 +60,8 @@ public class RequestDetailSheetTest
         //given
         var workbook = new XLWorkbook();
         var request = Request(
-            DayOfWeek.Tuesday,
-            SlotWindowType.Afternoon,
-            rank: 2,
+            day: DayOfWeek.Tuesday,
+            window: SlotWindowType.Afternoon,
             studentName: "דנה כהן",
             carName: "Smoke Manual",
             sessionType: SessionType.Double,
@@ -81,26 +81,25 @@ public class RequestDetailSheetTest
                 "דנה כהן",
                 "Smoke Manual",
                 "כפול",
-                "2",
-                "3 מתוך 5",
+                "1 מתוך 5",
+                "3",
                 "רק אחרי 16:00"
             ]);
-        sheet.Cell(2, 6).DataType.ShouldBe(XLDataType.Number);
-        sheet.Cell(2, RequestedLessonsColumn).DataType.ShouldBe(XLDataType.Text);
+        sheet.Cell(2, PositionColumn).DataType.ShouldBe(XLDataType.Text);
+        sheet.Cell(2, TargetCountColumn).DataType.ShouldBe(XLDataType.Number);
     }
 
     [TestMethod]
-    public void Sorts_By_Day_Then_Slot_Then_Rank()
+    public void Sorts_By_Day_Then_Slot()
     {
         //given
         var workbook = new XLWorkbook();
         SlotRequestDetail[] requests =
         [
-            Request(DayOfWeek.Friday, SlotWindowType.Noon, rank: 1),
-            Request(DayOfWeek.Sunday, SlotWindowType.Evening, rank: 1),
-            Request(DayOfWeek.Sunday, SlotWindowType.Morning, rank: 3),
-            Request(DayOfWeek.Monday, SlotWindowType.Morning, rank: 2),
-            Request(DayOfWeek.Sunday, SlotWindowType.Morning, rank: 1)
+            Request(day: DayOfWeek.Friday, window: SlotWindowType.Noon),
+            Request(day: DayOfWeek.Sunday, window: SlotWindowType.Evening),
+            Request(day: DayOfWeek.Sunday, window: SlotWindowType.Morning),
+            Request(day: DayOfWeek.Monday, window: SlotWindowType.Morning)
         ];
 
         //when
@@ -108,18 +107,17 @@ public class RequestDetailSheetTest
 
         //then
         var sheet = Reloaded(workbook);
-        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[5]}").ShouldBe(
+        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]}").ShouldBe(
             [
-                "ראשון בוקר 1",
-                "ראשון בוקר 3",
-                "ראשון ערב 1",
-                "שני בוקר 2",
-                "שישי צהריים 1"
+                "ראשון בוקר",
+                "ראשון ערב",
+                "שני בוקר",
+                "שישי צהריים"
             ]);
     }
 
     [TestMethod]
-    public void Orders_Students_With_The_Same_Slot_And_Rank_By_Name_Then_Car()
+    public void Orders_Students_In_The_Same_Slot_By_Name_Then_Car()
     {
         //given
         var workbook = new XLWorkbook();
@@ -144,19 +142,75 @@ public class RequestDetailSheetTest
     }
 
     [TestMethod]
-    [DataRow(1, 1, "1 מתוך 1")]
-    [DataRow(1, 3, "1 מתוך 3")]
-    [DataRow(2, 5, "2 מתוך 5")]
-    public void Writes_The_Requested_Lessons_As_Target_Out_Of_Picks(int targetCount, int pickCount, string expected)
+    public void Numbers_A_Students_Slots_From_Sunday_Morning_To_Friday_Evening()
+    {
+        //given
+        var workbook = new XLWorkbook();
+        var submissionId = Guid.NewGuid();
+        SlotRequestDetail[] requests =
+        [
+            Request(submissionId, DayOfWeek.Friday, SlotWindowType.Noon, pickCount: 4),
+            Request(submissionId, DayOfWeek.Sunday, SlotWindowType.Evening, pickCount: 4),
+            Request(submissionId, DayOfWeek.Monday, SlotWindowType.Morning, pickCount: 4),
+            Request(submissionId, DayOfWeek.Sunday, SlotWindowType.Morning, pickCount: 4)
+        ];
+
+        //when
+        RequestDetailSheet.AddTo(workbook, requests);
+
+        //then
+        var sheet = Reloaded(workbook);
+        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[5]}").ShouldBe(
+            [
+                "ראשון בוקר 1 מתוך 4",
+                "ראשון ערב 2 מתוך 4",
+                "שני בוקר 3 מתוך 4",
+                "שישי צהריים 4 מתוך 4"
+            ]);
+    }
+
+    [TestMethod]
+    public void Numbers_Each_Submission_On_Its_Own_Even_With_The_Same_Name()
+    {
+        //given
+        var workbook = new XLWorkbook();
+        var first = Guid.NewGuid();
+        var second = Guid.NewGuid();
+        SlotRequestDetail[] requests =
+        [
+            Request(first, DayOfWeek.Monday, SlotWindowType.Morning, "דנה כהן", pickCount: 2),
+            Request(first, DayOfWeek.Sunday, SlotWindowType.Morning, "דנה כהן", pickCount: 2),
+            Request(second, DayOfWeek.Sunday, SlotWindowType.Evening, "דנה כהן", pickCount: 1)
+        ];
+
+        //when
+        RequestDetailSheet.AddTo(workbook, requests);
+
+        //then
+        var sheet = Reloaded(workbook);
+        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[5]}").ShouldBe(
+            [
+                "ראשון בוקר 1 מתוך 2",
+                "ראשון ערב 1 מתוך 1",
+                "שני בוקר 2 מתוך 2"
+            ]);
+    }
+
+    [TestMethod]
+    [DataRow(1)]
+    [DataRow(3)]
+    public void Writes_The_Target_Count_As_A_Number(int targetCount)
     {
         //given
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(targetCount: targetCount, pickCount: pickCount)]);
+        RequestDetailSheet.AddTo(workbook, [Request(targetCount: targetCount)]);
 
         //then
-        Reloaded(workbook).Cell(2, RequestedLessonsColumn).GetText().ShouldBe(expected);
+        var cell = Reloaded(workbook).Cell(2, TargetCountColumn);
+        cell.DataType.ShouldBe(XLDataType.Number);
+        cell.GetValue<int>().ShouldBe(targetCount);
     }
 
     [TestMethod]
@@ -234,7 +288,7 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(), Request(DayOfWeek.Monday)]);
+        RequestDetailSheet.AddTo(workbook, [Request(), Request(day: DayOfWeek.Monday)]);
 
         //then
         var sheet = Reloaded(workbook);
@@ -257,7 +311,7 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(day)]);
+        RequestDetailSheet.AddTo(workbook, [Request(day: day)]);
 
         //then
         Reloaded(workbook).Cell(2, 1).GetText().ShouldBe(expected);
@@ -296,9 +350,9 @@ public class RequestDetailSheetTest
     }
 
     private static SlotRequestDetail Request(
+        Guid? submissionId = null,
         DayOfWeek day = DayOfWeek.Sunday,
         SlotWindowType window = SlotWindowType.Morning,
-        int rank = 1,
         string studentName = "Smoke Student A",
         string carName = "Smoke Auto",
         SessionType sessionType = SessionType.Single,
@@ -307,12 +361,12 @@ public class RequestDetailSheetTest
         string? constraint = null)
     {
         return new SlotRequestDetail(
+            submissionId ?? Guid.NewGuid(),
             day,
             window,
             studentName,
             carName,
             sessionType,
-            rank,
             targetCount,
             pickCount,
             constraint);
