@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.GetWeekSchedule;
 using DrivingLessons.Domain.Values;
 
@@ -9,10 +10,12 @@ public static class SummarySheet
     public const string Name = "סיכום";
 
     private const string BlockedLabel = "לא זמין";
-    private const int HeaderRow = 1;
+    private const int FirstRow = 1;
     private const int LabelColumn = 1;
-    private const int FirstSlotRow = 2;
     private const int FirstDayColumn = 2;
+    private const int TitleRows = 1;
+    private const int HeaderRows = 1;
+    private const int RowsBetweenGrids = 1;
     private const double LabelColumnWidth = 18;
     private const double DayColumnWidth = 12;
 
@@ -30,13 +33,62 @@ public static class SummarySheet
         IReadOnlyCollection<SlotForGetWeekScheduleResponse> slots,
         IReadOnlyDictionary<Guid, int> counts)
     {
+        var sheet = NewSheet(workbook);
+
+        WriteGrid(sheet, FirstRow, weekStart, slots, counts);
+    }
+
+    public static void AddForTeachersTo(
+        XLWorkbook workbook,
+        DateOnly weekStart,
+        IReadOnlyList<TeacherWeekGrid> grids,
+        IReadOnlyDictionary<Guid, int> counts)
+    {
+        var sheet = NewSheet(workbook);
+        var blockHeight = TitleRows + HeaderRows + Windows.Length + RowsBetweenGrids;
+
+        for (var index = 0; index < grids.Count; index++)
+        {
+            var grid = grids[index];
+            var titleRow = FirstRow + (index * blockHeight);
+
+            WriteTitle(sheet, titleRow, grid.TeacherName);
+            WriteGrid(sheet, titleRow + TitleRows, weekStart, grid.Slots, counts);
+        }
+    }
+
+    private static IXLWorksheet NewSheet(XLWorkbook workbook)
+    {
         var sheet = workbook.Worksheets.Add(Name);
         sheet.RightToLeft = true;
 
         FormatColumns(sheet);
-        WriteDayHeaders(sheet, weekStart);
-        WriteSlotLabels(sheet);
-        WriteSlotCells(sheet, slots, counts);
+
+        return sheet;
+    }
+
+    private static void WriteTitle(IXLWorksheet sheet, int row, string teacherName)
+    {
+        var lastColumn = FirstDayColumn + WeekGridDefinition.Days.Count - 1;
+        var title = sheet.Cell(row, LabelColumn);
+        title.Value = teacherName;
+        title.Style.Font.Bold = true;
+
+        sheet.Range(row, LabelColumn, row, lastColumn).Merge();
+    }
+
+    private static void WriteGrid(
+        IXLWorksheet sheet,
+        int headerRow,
+        DateOnly weekStart,
+        IReadOnlyCollection<SlotForGetWeekScheduleResponse> slots,
+        IReadOnlyDictionary<Guid, int> counts)
+    {
+        var firstSlotRow = headerRow + HeaderRows;
+
+        WriteDayHeaders(sheet, headerRow, weekStart);
+        WriteSlotLabels(sheet, firstSlotRow);
+        WriteSlotCells(sheet, firstSlotRow, slots, counts);
     }
 
     private static void FormatColumns(IXLWorksheet sheet)
@@ -50,22 +102,22 @@ public static class SummarySheet
         }
     }
 
-    private static void WriteDayHeaders(IXLWorksheet sheet, DateOnly weekStart)
+    private static void WriteDayHeaders(IXLWorksheet sheet, int headerRow, DateOnly weekStart)
     {
         for (var index = 0; index < WeekGridDefinition.Days.Count; index++)
         {
             var day = WeekGridDefinition.Days[index];
             var date = weekStart.AddDays(index);
-            var cell = sheet.Cell(HeaderRow, index + FirstDayColumn);
+            var cell = sheet.Cell(headerRow, index + FirstDayColumn);
 
             cell.Value = $"{HebrewExcelLabels.DayOf(day)} {date.Day}.{date.Month}";
             cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
         }
 
-        sheet.Row(HeaderRow).Style.Font.Bold = true;
+        sheet.Row(headerRow).Style.Font.Bold = true;
     }
 
-    private static void WriteSlotLabels(IXLWorksheet sheet)
+    private static void WriteSlotLabels(IXLWorksheet sheet, int firstSlotRow)
     {
         for (var index = 0; index < Windows.Length; index++)
         {
@@ -73,13 +125,14 @@ public static class SummarySheet
             var start = SlotWindowTimes.StartOf(window);
             var end = SlotWindowTimes.EndOf(window);
 
-            sheet.Cell(index + FirstSlotRow, LabelColumn).Value =
+            sheet.Cell(index + firstSlotRow, LabelColumn).Value =
                 $"{HebrewExcelLabels.WindowOf(window)} {start:HH\\:mm}-{end:HH\\:mm}";
         }
     }
 
     private static void WriteSlotCells(
         IXLWorksheet sheet,
+        int firstSlotRow,
         IReadOnlyCollection<SlotForGetWeekScheduleResponse> slots,
         IReadOnlyDictionary<Guid, int> counts)
     {
@@ -97,7 +150,7 @@ public static class SummarySheet
                 }
 
                 var row = Array.IndexOf(Windows, window);
-                var cell = sheet.Cell(row + FirstSlotRow, column + FirstDayColumn);
+                var cell = sheet.Cell(row + firstSlotRow, column + FirstDayColumn);
 
                 WriteSlotCell(cell, slot, counts);
             }

@@ -5,9 +5,13 @@ namespace DrivingLessons.Application.Queries;
 
 public interface ISubmissionQueries
 {
+    Task<IReadOnlyDictionary<Guid, int>> GetSlotRequestCountsAsync(Guid publicationId);
+
     Task<IReadOnlyDictionary<Guid, int>> GetSlotRequestCountsAsync(Guid publicationId, Guid teacherId);
 
     Task<SubmissionStats> GetStatsAsync(Guid publicationId, Guid teacherId);
+
+    Task<IReadOnlyList<SlotRequestDetail>> GetSlotRequestDetailsAsync(Guid publicationId);
 
     Task<IReadOnlyList<SlotRequestDetail>> GetSlotRequestDetailsAsync(Guid publicationId, Guid teacherId);
 
@@ -24,6 +28,7 @@ public record SlotRequestDetail(
     DayOfWeek Day,
     SlotWindowType Window,
     string StudentName,
+    string TeacherName,
     Guid CarId,
     string CarName,
     SessionType SessionType,

@@ -5,32 +5,74 @@ namespace DrivingLessons.Infrastructure.Excel;
 
 public static class RequestDetailSheet
 {
+    private sealed record Column(string Header, double Width, Func<SlotRequestDetail, int, XLCellValue> Value);
+
     private const int TitleRow = 1;
     private const int HeaderRow = 2;
     private const int FirstRequestRow = 3;
     private const int FirstColumn = 1;
-    private const int ConstraintsColumn = 7;
 
-    private static readonly string[] Headers =
-    [
+    private static readonly Column DayColumn = new(
         "יום",
+        8,
+        (request, _) => HebrewExcelLabels.DayOf(request.Day));
+
+    private static readonly Column SlotColumn = new(
         "משבצת",
+        10,
+        (request, _) => HebrewExcelLabels.WindowOf(request.Window));
+
+    private static readonly Column TeacherColumn = new(
+        "מורה",
+        16,
+        (request, _) => request.TeacherName);
+
+    private static readonly Column StudentColumn = new(
         "שם התלמיד/ה",
+        24,
+        (request, _) => request.StudentName);
+
+    private static readonly Column SessionTypeColumn = new(
         "סוג שיעור",
+        10,
+        (request, _) => HebrewExcelLabels.SessionTypeOf(request.SessionType));
+
+    private static readonly Column PositionColumn = new(
         "שיעור אפשרי",
+        12,
+        (request, position) => HebrewExcelLabels.PickPositionOf(position, request.PickCount));
+
+    private static readonly Column TargetCountColumn = new(
         "שיעורים מבוקשים",
-        "אילוצים"
+        14,
+        (request, _) => request.TargetCount);
+
+    private static readonly Column ConstraintsColumn = new(
+        "אילוצים",
+        40,
+        (request, _) => ConstraintOf(request.Constraint));
+
+    private static readonly Column[] PerTeacherColumns =
+    [
+        DayColumn,
+        SlotColumn,
+        StudentColumn,
+        SessionTypeColumn,
+        PositionColumn,
+        TargetCountColumn,
+        ConstraintsColumn
     ];
 
-    private static readonly double[] ColumnWidths =
+    private static readonly Column[] AllTeachersColumns =
     [
-        8,
-        10,
-        24,
-        10,
-        12,
-        14,
-        40
+        DayColumn,
+        SlotColumn,
+        TeacherColumn,
+        StudentColumn,
+        SessionTypeColumn,
+        PositionColumn,
+        TargetCountColumn,
+        ConstraintsColumn
     ];
 
     public static void AddTo(
@@ -39,49 +81,72 @@ public static class RequestDetailSheet
         string carName,
         IReadOnlyCollection<SlotRequestDetail> requests)
     {
+        AddTo(workbook, sheetName, carName, requests, PerTeacherColumns);
+    }
+
+    public static void AddWithTeacherTo(
+        XLWorkbook workbook,
+        string sheetName,
+        string carName,
+        IReadOnlyCollection<SlotRequestDetail> requests)
+    {
+        AddTo(workbook, sheetName, carName, requests, AllTeachersColumns);
+    }
+
+    private static void AddTo(
+        XLWorkbook workbook,
+        string sheetName,
+        string carName,
+        IReadOnlyCollection<SlotRequestDetail> requests,
+        IReadOnlyList<Column> columns)
+    {
         var sheet = workbook.Worksheets.Add(sheetName);
         sheet.RightToLeft = true;
 
-        FormatColumns(sheet);
-        WriteTitle(sheet, carName);
-        WriteHeader(sheet);
-        WriteRequests(sheet, requests);
+        FormatColumns(sheet, columns);
+        WriteTitle(sheet, carName, columns.Count);
+        WriteHeader(sheet, columns);
+        WriteRequests(sheet, requests, columns);
 
         var lastRow = HeaderRow + requests.Count;
-        sheet.Range(HeaderRow, FirstColumn, lastRow, Headers.Length).SetAutoFilter();
+        sheet.Range(HeaderRow, FirstColumn, lastRow, columns.Count).SetAutoFilter();
         sheet.SheetView.FreezeRows(HeaderRow);
     }
 
-    private static void FormatColumns(IXLWorksheet sheet)
+    private static void FormatColumns(IXLWorksheet sheet, IReadOnlyList<Column> columns)
     {
-        for (var index = 0; index < ColumnWidths.Length; index++)
+        for (var index = 0; index < columns.Count; index++)
         {
-            sheet.Column(index + FirstColumn).Width = ColumnWidths[index];
+            sheet.Column(index + FirstColumn).Width = columns[index].Width;
         }
 
-        sheet.Column(ConstraintsColumn).Style.Alignment.WrapText = true;
+        var constraintsColumn = columns.Count - 1 + FirstColumn;
+        sheet.Column(constraintsColumn).Style.Alignment.WrapText = true;
     }
 
-    private static void WriteTitle(IXLWorksheet sheet, string carName)
+    private static void WriteTitle(IXLWorksheet sheet, string carName, int columnCount)
     {
         var title = sheet.Cell(TitleRow, FirstColumn);
         title.Value = carName;
         title.Style.Font.Bold = true;
 
-        sheet.Range(TitleRow, FirstColumn, TitleRow, Headers.Length).Merge();
+        sheet.Range(TitleRow, FirstColumn, TitleRow, columnCount).Merge();
     }
 
-    private static void WriteHeader(IXLWorksheet sheet)
+    private static void WriteHeader(IXLWorksheet sheet, IReadOnlyList<Column> columns)
     {
-        for (var index = 0; index < Headers.Length; index++)
+        for (var index = 0; index < columns.Count; index++)
         {
-            sheet.Cell(HeaderRow, index + FirstColumn).Value = Headers[index];
+            sheet.Cell(HeaderRow, index + FirstColumn).Value = columns[index].Header;
         }
 
         sheet.Row(HeaderRow).Style.Font.Bold = true;
     }
 
-    private static void WriteRequests(IXLWorksheet sheet, IReadOnlyCollection<SlotRequestDetail> requests)
+    private static void WriteRequests(
+        IXLWorksheet sheet,
+        IReadOnlyCollection<SlotRequestDetail> requests,
+        IReadOnlyList<Column> columns)
     {
         var numbered = requests
                            .GroupBy(x => x.SubmissionId)
@@ -90,6 +155,7 @@ public static class RequestDetailSheet
         var ordered = numbered
                           .OrderBy(x => x.Request.Day)
                           .ThenBy(x => x.Request.Window)
+                          .ThenBy(x => x.Request.TeacherName, StringComparer.Ordinal)
                           .ThenBy(x => x.Request.StudentName, StringComparer.Ordinal)
                           .ThenBy(x => x.Request.SubmissionId);
 
@@ -97,7 +163,7 @@ public static class RequestDetailSheet
 
         foreach (var (request, position) in ordered)
         {
-            WriteRequest(sheet.Row(row), request, position);
+            WriteRequest(sheet.Row(row), request, position, columns);
             row++;
         }
     }
@@ -111,22 +177,15 @@ public static class RequestDetailSheet
                    .Select((request, index) => (request, index + 1));
     }
 
-    private static void WriteRequest(IXLRow row, SlotRequestDetail request, int position)
+    private static void WriteRequest(
+        IXLRow row,
+        SlotRequestDetail request,
+        int position,
+        IReadOnlyList<Column> columns)
     {
-        var values = new XLCellValue[]
+        for (var index = 0; index < columns.Count; index++)
         {
-            HebrewExcelLabels.DayOf(request.Day),
-            HebrewExcelLabels.WindowOf(request.Window),
-            request.StudentName,
-            HebrewExcelLabels.SessionTypeOf(request.SessionType),
-            HebrewExcelLabels.PickPositionOf(position, request.PickCount),
-            request.TargetCount,
-            ConstraintOf(request.Constraint)
-        };
-
-        for (var index = 0; index < values.Length; index++)
-        {
-            row.Cell(index + FirstColumn).Value = values[index];
+            row.Cell(index + FirstColumn).Value = columns[index].Value(request, position);
         }
     }
 

@@ -15,17 +15,18 @@ public class SubmissionQueries : ISubmissionQueries
         this.dbContext = dbContext;
     }
 
+    public async Task<IReadOnlyDictionary<Guid, int>> GetSlotRequestCountsAsync(Guid publicationId)
+    {
+        var submissions = PublicationSubmissions(publicationId);
+
+        return await CountsOf(submissions);
+    }
+
     public async Task<IReadOnlyDictionary<Guid, int>> GetSlotRequestCountsAsync(Guid publicationId, Guid teacherId)
     {
         var submissions = TeacherSubmissions(publicationId, teacherId);
 
-        var counts = await submissions
-                               .SelectMany(x => x.SlotRequests)
-                               .GroupBy(x => x.SlotId)
-                               .Select(x => new { SlotId = x.Key, Count = x.Count() })
-                               .ToListAsync();
-
-        return counts.ToDictionary(x => x.SlotId.Value, x => x.Count);
+        return await CountsOf(submissions);
     }
 
     public async Task<SubmissionStats> GetStatsAsync(Guid publicationId, Guid teacherId)
@@ -43,49 +44,18 @@ public class SubmissionQueries : ISubmissionQueries
         return new SubmissionStats(studentsSubmitted, totalPicks, lastSubmissionAtUtc);
     }
 
+    public async Task<IReadOnlyList<SlotRequestDetail>> GetSlotRequestDetailsAsync(Guid publicationId)
+    {
+        var submissions = PublicationSubmissions(publicationId);
+
+        return await DetailsOf(submissions);
+    }
+
     public async Task<IReadOnlyList<SlotRequestDetail>> GetSlotRequestDetailsAsync(Guid publicationId, Guid teacherId)
     {
         var submissions = TeacherSubmissions(publicationId, teacherId);
 
-        var query = from submission in submissions
-                    join weekSchedule in dbContext.WeekSchedules
-                        on submission.WeekScheduleId equals weekSchedule.Id
-                    join student in dbContext.Students
-                        on submission.StudentId equals student.Id
-                    join car in dbContext.Cars.IgnoreQueryFilters([QueryFilters.CarNotDeleted])
-                        on student.CarId equals car.Id
-                    from request in submission.SlotRequests
-                    from slot in weekSchedule.Slots
-                    where slot.Id == request.SlotId
-                    select new
-                    {
-                        SubmissionId = submission.Id,
-                        slot.Day,
-                        slot.Window,
-                        StudentName = student.Name,
-                        CarId = car.Id,
-                        CarName = car.Name,
-                        request.SessionType,
-                        submission.TargetCount,
-                        PickCount = submission.SlotRequests.Count(),
-                        request.Constraint
-                    };
-
-        var rows = await query.ToListAsync();
-
-        return rows
-                   .Select(x => new SlotRequestDetail(
-                       x.SubmissionId.Value,
-                       x.Day,
-                       x.Window,
-                       x.StudentName.Value,
-                       x.CarId.Value,
-                       x.CarName.Value,
-                       x.SessionType,
-                       x.TargetCount.Value,
-                       x.PickCount,
-                       x.Constraint?.Value))
-                   .ToList();
+        return await DetailsOf(submissions);
     }
 
     public async Task<IReadOnlyList<ItemForFindSlotRequestsResponse>> FindSlotRequestsAsync(
@@ -123,16 +93,82 @@ public class SubmissionQueries : ISubmissionQueries
                    .ToList();
     }
 
-    private IQueryable<Submission> TeacherSubmissions(Guid publicationId, Guid teacherId)
+    private static async Task<IReadOnlyDictionary<Guid, int>> CountsOf(IQueryable<Submission> submissions)
+    {
+        var counts = await submissions
+                               .SelectMany(x => x.SlotRequests)
+                               .GroupBy(x => x.SlotId)
+                               .Select(x => new { SlotId = x.Key, Count = x.Count() })
+                               .ToListAsync();
+
+        return counts.ToDictionary(x => x.SlotId.Value, x => x.Count);
+    }
+
+    private async Task<IReadOnlyList<SlotRequestDetail>> DetailsOf(IQueryable<Submission> submissions)
+    {
+        var query = from submission in submissions
+                    join weekSchedule in dbContext.WeekSchedules
+                        on submission.WeekScheduleId equals weekSchedule.Id
+                    join teacher in dbContext.Teachers.IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])
+                        on weekSchedule.TeacherId equals teacher.Id
+                    join student in dbContext.Students
+                        on submission.StudentId equals student.Id
+                    join car in dbContext.Cars.IgnoreQueryFilters([QueryFilters.CarNotDeleted])
+                        on student.CarId equals car.Id
+                    from request in submission.SlotRequests
+                    from slot in weekSchedule.Slots
+                    where slot.Id == request.SlotId
+                    select new
+                    {
+                        SubmissionId = submission.Id,
+                        slot.Day,
+                        slot.Window,
+                        StudentName = student.Name,
+                        TeacherName = teacher.Name,
+                        CarId = car.Id,
+                        CarName = car.Name,
+                        request.SessionType,
+                        submission.TargetCount,
+                        PickCount = submission.SlotRequests.Count(),
+                        request.Constraint
+                    };
+
+        var rows = await query.ToListAsync();
+
+        return rows
+                   .Select(x => new SlotRequestDetail(
+                       x.SubmissionId.Value,
+                       x.Day,
+                       x.Window,
+                       x.StudentName.Value,
+                       x.TeacherName.Value,
+                       x.CarId.Value,
+                       x.CarName.Value,
+                       x.SessionType,
+                       x.TargetCount.Value,
+                       x.PickCount,
+                       x.Constraint?.Value))
+                   .ToList();
+    }
+
+    private IQueryable<Submission> PublicationSubmissions(Guid publicationId)
     {
         var resolvedPublicationId = PublicationId.Of(publicationId);
-        var resolvedTeacherId = TeacherId.Of(teacherId);
 
-        return from submission in dbContext.Submissions
+        return dbContext
+                   .Submissions
+                   .Where(x => x.PublicationId == resolvedPublicationId);
+    }
+
+    private IQueryable<Submission> TeacherSubmissions(Guid publicationId, Guid teacherId)
+    {
+        var resolvedTeacherId = TeacherId.Of(teacherId);
+        var submissions = PublicationSubmissions(publicationId);
+
+        return from submission in submissions
                join weekSchedule in dbContext.WeekSchedules
                    on submission.WeekScheduleId equals weekSchedule.Id
-               where submission.PublicationId == resolvedPublicationId
-                     && weekSchedule.TeacherId == resolvedTeacherId
+               where weekSchedule.TeacherId == resolvedTeacherId
                select submission;
     }
 }

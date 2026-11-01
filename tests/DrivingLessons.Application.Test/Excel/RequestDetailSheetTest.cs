@@ -10,6 +10,7 @@ namespace DrivingLessons.Application.Test.Excel;
 public class RequestDetailSheetTest
 {
     private const int ColumnCount = 7;
+    private const int ColumnCountWithTeacher = 8;
     private const int TitleRow = 1;
     private const int HeaderRow = 2;
     private const int FirstRequestRow = 3;
@@ -369,11 +370,100 @@ public class RequestDetailSheetTest
         Reloaded(workbook).Cell(FirstRequestRow, SessionTypeColumn).GetText().ShouldBe(expected);
     }
 
+    [TestMethod]
+    public void With_Teacher__Writes_The_Teacher_Column_After_The_Slot()
+    {
+        //given
+        var workbook = new XLWorkbook();
+        var request = Request(
+            day: DayOfWeek.Tuesday,
+            window: SlotWindowType.Afternoon,
+            studentName: "דנה כהן",
+            teacherName: "משה כהן",
+            sessionType: SessionType.Double,
+            targetCount: 3,
+            pickCount: 5,
+            constraint: "רק אחרי 16:00");
+
+        //when
+        RequestDetailSheet.AddWithTeacherTo(workbook, SheetName, CarName, [request]);
+
+        //then
+        var sheet = Reloaded(workbook);
+        RowOf(sheet, HeaderRow, ColumnCountWithTeacher).ShouldBe(
+            [
+                "יום",
+                "משבצת",
+                "מורה",
+                "שם התלמיד/ה",
+                "סוג שיעור",
+                "שיעור אפשרי",
+                "שיעורים מבוקשים",
+                "אילוצים"
+            ]);
+        RowOf(sheet, FirstRequestRow, ColumnCountWithTeacher).ShouldBe(
+            [
+                "שלישי",
+                "אחה״צ",
+                "משה כהן",
+                "דנה כהן",
+                "כפול",
+                "1 מתוך 5",
+                "3",
+                "רק אחרי 16:00"
+            ]);
+    }
+
+    [TestMethod]
+    public void With_Teacher__Merges_The_Car_Title_Across_The_Eight_Columns()
+    {
+        //given
+        var workbook = new XLWorkbook();
+
+        //when
+        RequestDetailSheet.AddWithTeacherTo(workbook, SheetName, CarName, [Request()]);
+
+        //then
+        var title = Reloaded(workbook).Cell(TitleRow, 1);
+        title.GetText().ShouldBe(CarName);
+        title.MergedRange().RangeAddress.ToString().ShouldBe("A1:H1");
+    }
+
+    [TestMethod]
+    public void With_Teacher__Orders_The_Same_Slot_By_Teacher_Then_Student()
+    {
+        //given
+        var workbook = new XLWorkbook();
+        SlotRequestDetail[] requests =
+        [
+            Request(studentName: "Smoke Student A", teacherName: "Smoke Teacher B"),
+            Request(studentName: "Smoke Student C", teacherName: "Smoke Teacher A"),
+            Request(studentName: "Smoke Student B", teacherName: "Smoke Teacher A")
+        ];
+
+        //when
+        RequestDetailSheet.AddWithTeacherTo(workbook, SheetName, CarName, requests);
+
+        //then
+        var sheet = Reloaded(workbook);
+        var lastRow = sheet.LastRowUsed()!.RowNumber();
+        Enumerable
+            .Range(FirstRequestRow, lastRow - HeaderRow)
+            .Select(row => $"{sheet.Cell(row, 3).GetText()} {sheet.Cell(row, 4).GetText()}")
+            .ShouldBe(
+                [
+                    "Smoke Teacher A Smoke Student B",
+                    "Smoke Teacher A Smoke Student C",
+                    "Smoke Teacher B Smoke Student A"
+                ]);
+    }
+
     private static SlotRequestDetail Request(
         Guid? submissionId = null,
         DayOfWeek day = DayOfWeek.Sunday,
         SlotWindowType window = SlotWindowType.Morning,
         string studentName = "Smoke Student A",
+        string teacherName = "Smoke Teacher",
         SessionType sessionType = SessionType.Single,
         int targetCount = 1,
         int pickCount = 1,
@@ -384,6 +474,7 @@ public class RequestDetailSheetTest
             day,
             window,
             studentName,
+            teacherName,
             CarId,
             CarName,
             sessionType,
@@ -413,8 +504,13 @@ public class RequestDetailSheetTest
 
     private static string[] RowOf(IXLWorksheet sheet, int row)
     {
+        return RowOf(sheet, row, ColumnCount);
+    }
+
+    private static string[] RowOf(IXLWorksheet sheet, int row, int columnCount)
+    {
         return Enumerable
-                   .Range(1, ColumnCount)
+                   .Range(1, columnCount)
                    .Select(column => sheet.Cell(row, column).GetFormattedString())
                    .ToArray();
     }

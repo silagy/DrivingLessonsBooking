@@ -36,6 +36,7 @@ using DrivingLessons.Application.Commands.SetUserTemporaryPassword;
 using DrivingLessons.Application.Commands.UnassignCarFromTeacher;
 using DrivingLessons.Application.EventHandlers;
 using DrivingLessons.Application.Queries.DownloadPublicationExcel;
+using DrivingLessons.Application.Queries.DownloadPublicationSchoolExcel;
 using DrivingLessons.Application.Queries.FindCars;
 using DrivingLessons.Application.Queries.FindPublicationHistory;
 using DrivingLessons.Application.Queries.FindSlotRequests;
@@ -102,6 +103,7 @@ public static class DependencyInjection
         services.AddScoped<FindSlotRequestsInteractor>();
         services.AddScoped<FindPublicationHistoryInteractor>();
         services.AddScoped<DownloadPublicationExcelInteractor>();
+        services.AddScoped<DownloadPublicationSchoolExcelInteractor>();
         services.AddScoped<ImportRosterInteractor>();
         services.AddScoped<FindStudentsInteractor>();
         services.AddScoped<CreateStudentInteractor>();
