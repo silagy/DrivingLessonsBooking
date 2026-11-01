@@ -195,7 +195,7 @@ The same holds for the student's target: a `Double` pick counts once toward "pic
 - Light, Dark or System (the default) appearance, chosen per device in the admin drawer or user menu; sign-in and the Student form follow the device's saved choice or its system setting.
 ## 9. Excel Output Specification
  
-One file per teacher per publication. Two sheets.
+One file per teacher per publication: a summary sheet, then one request-detail sheet per car.
  
 ### Sheet 1: Summary Grid
 - Rows: slots (Morning / Noon / Afternoon / Evening)
@@ -203,15 +203,14 @@ One file per teacher per publication. Two sheets.
 - Cell value: count of slot requests
 - `Unavailable` slots visually marked as blocked
 - Friday Afternoon/Evening cells do not exist
-### Sheet 2: Request Detail
-One row per slot request, sorted by day, then slot, then student name:
+### Car Sheets: Request Detail
+One sheet per car that has slot requests, after the summary, named after the car and ordered by car name. A name Excel cannot take is made safe (refused characters become `-`, cut to 31 characters, ` (2)` added to a repeated name). Row 1 is the car's full name; then one row per slot request on that car, sorted by day, then slot, then student name. With no slot requests the file is the summary sheet only.
  
 | Column | Content |
 |---|---|
 | Day | Sunday-Friday |
 | Slot | Morning / Noon / Afternoon / Evening |
 | Student name | Full name (from the student's record) |
-| Car | The name of the student's roster car |
 | Session type | Single / Double |
 | Slot position | The slot's place among the student's picks, counted from Sunday morning to Friday evening, for example "2 out of 8" (`2 מתוך 8`) |
 | Requested lessons | The student's weekly target, as a number |
@@ -219,6 +218,7 @@ One row per slot request, sorted by day, then slot, then student name:
 
 National ID, phone and transmission were removed at the customer's request (October 2026).
 Rank was removed at the customer's request (October 2026); students still rank their picks on the form.
+The car column became a sheet per car at the customer's request (November 2026).
  
 ### Delivery
 - **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4)

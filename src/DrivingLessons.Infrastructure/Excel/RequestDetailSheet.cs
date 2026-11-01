@@ -5,19 +5,17 @@ namespace DrivingLessons.Infrastructure.Excel;
 
 public static class RequestDetailSheet
 {
-    public const string Name = "פירוט בקשות";
-
-    private const int HeaderRow = 1;
-    private const int FirstRequestRow = 2;
+    private const int TitleRow = 1;
+    private const int HeaderRow = 2;
+    private const int FirstRequestRow = 3;
     private const int FirstColumn = 1;
-    private const int ConstraintsColumn = 8;
+    private const int ConstraintsColumn = 7;
 
     private static readonly string[] Headers =
     [
         "יום",
         "משבצת",
         "שם התלמיד/ה",
-        "רכב",
         "סוג שיעור",
         "שיעור אפשרי",
         "שיעורים מבוקשים",
@@ -29,19 +27,23 @@ public static class RequestDetailSheet
         8,
         10,
         24,
-        18,
         10,
         12,
         14,
         40
     ];
 
-    public static void AddTo(XLWorkbook workbook, IReadOnlyCollection<SlotRequestDetail> requests)
+    public static void AddTo(
+        XLWorkbook workbook,
+        string sheetName,
+        string carName,
+        IReadOnlyCollection<SlotRequestDetail> requests)
     {
-        var sheet = workbook.Worksheets.Add(Name);
+        var sheet = workbook.Worksheets.Add(sheetName);
         sheet.RightToLeft = true;
 
         FormatColumns(sheet);
+        WriteTitle(sheet, carName);
         WriteHeader(sheet);
         WriteRequests(sheet, requests);
 
@@ -58,6 +60,15 @@ public static class RequestDetailSheet
         }
 
         sheet.Column(ConstraintsColumn).Style.Alignment.WrapText = true;
+    }
+
+    private static void WriteTitle(IXLWorksheet sheet, string carName)
+    {
+        var title = sheet.Cell(TitleRow, FirstColumn);
+        title.Value = carName;
+        title.Style.Font.Bold = true;
+
+        sheet.Range(TitleRow, FirstColumn, TitleRow, Headers.Length).Merge();
     }
 
     private static void WriteHeader(IXLWorksheet sheet)
@@ -80,7 +91,6 @@ public static class RequestDetailSheet
                           .OrderBy(x => x.Request.Day)
                           .ThenBy(x => x.Request.Window)
                           .ThenBy(x => x.Request.StudentName, StringComparer.Ordinal)
-                          .ThenBy(x => x.Request.CarName, StringComparer.Ordinal)
                           .ThenBy(x => x.Request.SubmissionId);
 
         var row = FirstRequestRow;
@@ -108,7 +118,6 @@ public static class RequestDetailSheet
             HebrewExcelLabels.DayOf(request.Day),
             HebrewExcelLabels.WindowOf(request.Window),
             request.StudentName,
-            request.CarName,
             HebrewExcelLabels.SessionTypeOf(request.SessionType),
             HebrewExcelLabels.PickPositionOf(position, request.PickCount),
             request.TargetCount,

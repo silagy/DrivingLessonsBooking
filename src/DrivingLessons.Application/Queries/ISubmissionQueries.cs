@@ -24,6 +24,7 @@ public record SlotRequestDetail(
     DayOfWeek Day,
     SlotWindowType Window,
     string StudentName,
+    Guid CarId,
     string CarName,
     SessionType SessionType,
     int TargetCount,
