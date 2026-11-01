@@ -82,7 +82,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Carries one **submission window**: start datetime and end datetime (Asia/Jerusalem timezone), applying to all teachers at once.
 - States: `Draft` → `Published (window not yet open)` → `Open` → `Closed`
 - Admin may **extend** the end time or **reopen** a closed window at any time; these act on the whole week.
-- Excel is still generated **per teacher** (one file per teacher per publication; see §9), versioned per teacher on each close.
+- Excel is still generated **per teacher** (one file per teacher per publication; see §9), versioned per teacher on each close. Administrators can also download one all-teachers file for the week (§9).
 ### 5.5 Student
 - Identified uniquely by **national ID (ת.ז)** (per school)
 - Students enter the system through the **roster (CSV)** or are **added by hand by an Administrator**; there is no self-registration. An unknown ID cannot submit (see §7).
