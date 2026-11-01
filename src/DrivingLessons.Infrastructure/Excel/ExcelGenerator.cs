@@ -40,7 +40,7 @@ public class ExcelGenerator : IExcelGenerator
         using var workbook = new XLWorkbook();
 
         SummarySheet.AddTo(workbook, weekStart, schedule?.Slots ?? [], counts);
-        RequestDetailSheet.AddTo(workbook, requests);
+        AddCarSheets(workbook, requests);
 
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
@@ -49,5 +49,26 @@ public class ExcelGenerator : IExcelGenerator
         var fileName = $"week-{weekStart:yyyy-MM-dd}-{teacherGuid}.xlsx";
 
         return new ExcelFile(fileName, content, ContentType);
+    }
+
+    private static void AddCarSheets(XLWorkbook workbook, IReadOnlyCollection<SlotRequestDetail> requests)
+    {
+        var cars = requests
+                       .GroupBy(x => x.CarId)
+                       .Select(x => x.ToList())
+                       .OrderBy(x => x[0].CarName, StringComparer.Ordinal)
+                       .ThenBy(x => x[0].CarId)
+                       .ToList();
+
+        var carNames = cars
+                           .Select(x => x[0].CarName)
+                           .ToList();
+
+        var sheetNames = CarSheetNames.For(carNames);
+
+        for (var index = 0; index < cars.Count; index++)
+        {
+            RequestDetailSheet.AddTo(workbook, sheetNames[index], carNames[index], cars[index]);
+        }
     }
 }

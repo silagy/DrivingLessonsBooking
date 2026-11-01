@@ -9,11 +9,17 @@ namespace DrivingLessons.Application.Test.Excel;
 [TestClass]
 public class RequestDetailSheetTest
 {
-    private const int ColumnCount = 8;
-    private const int CarColumn = 4;
-    private const int PositionColumn = 6;
-    private const int TargetCountColumn = 7;
-    private const int ConstraintsColumn = 8;
+    private const int ColumnCount = 7;
+    private const int TitleRow = 1;
+    private const int HeaderRow = 2;
+    private const int FirstRequestRow = 3;
+    private const int SessionTypeColumn = 4;
+    private const int PositionColumn = 5;
+    private const int TargetCountColumn = 6;
+    private const int ConstraintsColumn = 7;
+    private const string SheetName = "Smoke Auto";
+    private const string CarName = "Smoke Auto";
+    private static readonly Guid CarId = Guid.NewGuid();
 
     [TestMethod]
     public void Writes_The_Hebrew_Header_Row()
@@ -22,36 +28,52 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request()]);
+        AddTo(workbook, Request());
 
         //then
         var sheet = Reloaded(workbook);
-        RowOf(sheet, 1).ShouldBe(
+        RowOf(sheet, HeaderRow).ShouldBe(
             [
                 "יום",
                 "משבצת",
                 "שם התלמיד/ה",
-                "רכב",
                 "סוג שיעור",
                 "שיעור אפשרי",
                 "שיעורים מבוקשים",
                 "אילוצים"
             ]);
-        sheet.Cell(1, 1).Style.Font.Bold.ShouldBeTrue();
+        sheet.Cell(HeaderRow, 1).Style.Font.Bold.ShouldBeTrue();
     }
 
     [TestMethod]
-    public void Lists_Only_The_Header_When_There_Are_No_Requests()
+    public void Writes_The_Full_Car_Name_As_A_Bold_Title_Across_The_Columns()
     {
         //given
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, []);
+        RequestDetailSheet.AddTo(workbook, "Corolla (2)", "Corolla", [Request()]);
+
+        //then
+        var sheet = Reloaded(workbook, "Corolla (2)");
+        var title = sheet.Cell(TitleRow, 1);
+        title.GetText().ShouldBe("Corolla");
+        title.Style.Font.Bold.ShouldBeTrue();
+        title.MergedRange().RangeAddress.ToString().ShouldBe("A1:G1");
+    }
+
+    [TestMethod]
+    public void Lists_Only_The_Title_And_Header_When_There_Are_No_Requests()
+    {
+        //given
+        var workbook = new XLWorkbook();
+
+        //when
+        AddTo(workbook);
 
         //then
         var sheet = Reloaded(workbook);
-        sheet.LastRowUsed()!.RowNumber().ShouldBe(1);
+        sheet.LastRowUsed()!.RowNumber().ShouldBe(HeaderRow);
     }
 
     [TestMethod]
@@ -63,30 +85,28 @@ public class RequestDetailSheetTest
             day: DayOfWeek.Tuesday,
             window: SlotWindowType.Afternoon,
             studentName: "דנה כהן",
-            carName: "Smoke Manual",
             sessionType: SessionType.Double,
             targetCount: 3,
             pickCount: 5,
             constraint: "רק אחרי 16:00");
 
         //when
-        RequestDetailSheet.AddTo(workbook, [request]);
+        AddTo(workbook, [request]);
 
         //then
         var sheet = Reloaded(workbook);
-        RowOf(sheet, 2).ShouldBe(
+        RowOf(sheet, FirstRequestRow).ShouldBe(
             [
                 "שלישי",
                 "אחה״צ",
                 "דנה כהן",
-                "Smoke Manual",
                 "כפול",
                 "1 מתוך 5",
                 "3",
                 "רק אחרי 16:00"
             ]);
-        sheet.Cell(2, PositionColumn).DataType.ShouldBe(XLDataType.Text);
-        sheet.Cell(2, TargetCountColumn).DataType.ShouldBe(XLDataType.Number);
+        sheet.Cell(FirstRequestRow, PositionColumn).DataType.ShouldBe(XLDataType.Text);
+        sheet.Cell(FirstRequestRow, TargetCountColumn).DataType.ShouldBe(XLDataType.Number);
     }
 
     [TestMethod]
@@ -103,7 +123,7 @@ public class RequestDetailSheetTest
         ];
 
         //when
-        RequestDetailSheet.AddTo(workbook, requests);
+        AddTo(workbook, requests);
 
         //then
         var sheet = Reloaded(workbook);
@@ -117,27 +137,27 @@ public class RequestDetailSheetTest
     }
 
     [TestMethod]
-    public void Orders_Students_In_The_Same_Slot_By_Name_Then_Car()
+    public void Orders_Students_In_The_Same_Slot_By_Name()
     {
         //given
         var workbook = new XLWorkbook();
         SlotRequestDetail[] requests =
         [
-            Request(studentName: "דנה כהן", carName: "Smoke Old"),
-            Request(studentName: "Smoke Student A", carName: "Smoke Manual"),
-            Request(studentName: "Smoke Student A", carName: "Smoke Auto")
+            Request(studentName: "דנה כהן"),
+            Request(studentName: "Smoke Student B"),
+            Request(studentName: "Smoke Student A")
         ];
 
         //when
-        RequestDetailSheet.AddTo(workbook, requests);
+        AddTo(workbook, requests);
 
         //then
         var sheet = Reloaded(workbook);
-        RequestRowsOf(sheet).Select(row => $"{row[2]} {row[3]}").ShouldBe(
+        RequestRowsOf(sheet).Select(row => row[2]).ShouldBe(
             [
-                "Smoke Student A Smoke Auto",
-                "Smoke Student A Smoke Manual",
-                "דנה כהן Smoke Old"
+                "Smoke Student A",
+                "Smoke Student B",
+                "דנה כהן"
             ]);
     }
 
@@ -156,11 +176,11 @@ public class RequestDetailSheetTest
         ];
 
         //when
-        RequestDetailSheet.AddTo(workbook, requests);
+        AddTo(workbook, requests);
 
         //then
         var sheet = Reloaded(workbook);
-        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[5]}").ShouldBe(
+        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[4]}").ShouldBe(
             [
                 "ראשון בוקר 1 מתוך 4",
                 "ראשון ערב 2 מתוך 4",
@@ -184,11 +204,11 @@ public class RequestDetailSheetTest
         ];
 
         //when
-        RequestDetailSheet.AddTo(workbook, requests);
+        AddTo(workbook, requests);
 
         //then
         var sheet = Reloaded(workbook);
-        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[5]}").ShouldBe(
+        RequestRowsOf(sheet).Select(row => $"{row[0]} {row[1]} {row[4]}").ShouldBe(
             [
                 "ראשון בוקר 1 מתוך 2",
                 "ראשון ערב 1 מתוך 1",
@@ -205,10 +225,10 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(targetCount: targetCount)]);
+        AddTo(workbook, Request(targetCount: targetCount));
 
         //then
-        var cell = Reloaded(workbook).Cell(2, TargetCountColumn);
+        var cell = Reloaded(workbook).Cell(FirstRequestRow, TargetCountColumn);
         cell.DataType.ShouldBe(XLDataType.Number);
         cell.GetValue<int>().ShouldBe(targetCount);
     }
@@ -223,10 +243,10 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(carName: carName)]);
+        RequestDetailSheet.AddTo(workbook, SheetName, carName, [Request()]);
 
         //then
-        var cell = Reloaded(workbook).Cell(2, CarColumn);
+        var cell = Reloaded(workbook).Cell(TitleRow, 1);
         cell.HasFormula.ShouldBeFalse();
         cell.DataType.ShouldBe(XLDataType.Text);
         cell.GetText().ShouldBe(carName);
@@ -239,11 +259,11 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(constraint: null)]);
+        AddTo(workbook, Request(constraint: null));
 
         //then
         var sheet = Reloaded(workbook);
-        sheet.Cell(2, ConstraintsColumn).IsEmpty().ShouldBeTrue();
+        sheet.Cell(FirstRequestRow, ConstraintsColumn).IsEmpty().ShouldBeTrue();
     }
 
     [TestMethod]
@@ -254,11 +274,11 @@ public class RequestDetailSheetTest
         const string constraint = "=HYPERLINK(\"http://example.com\",\"click\")";
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(constraint: constraint)]);
+        AddTo(workbook, Request(constraint: constraint));
 
         //then
         var sheet = Reloaded(workbook);
-        var cell = sheet.Cell(2, ConstraintsColumn);
+        var cell = sheet.Cell(FirstRequestRow, ConstraintsColumn);
         cell.HasFormula.ShouldBeFalse();
         cell.DataType.ShouldBe(XLDataType.Text);
         cell.GetText().ShouldBe(constraint);
@@ -272,11 +292,11 @@ public class RequestDetailSheetTest
         var constraint = new string('א', SlotConstraint.MaxLength);
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(constraint: constraint)]);
+        AddTo(workbook, Request(constraint: constraint));
 
         //then
         var sheet = Reloaded(workbook);
-        sheet.Cell(2, ConstraintsColumn).GetText().ShouldBe(constraint);
+        sheet.Cell(FirstRequestRow, ConstraintsColumn).GetText().ShouldBe(constraint);
         sheet.Column(ConstraintsColumn).Style.Alignment.WrapText.ShouldBeTrue();
         sheet.Column(ConstraintsColumn).Width.ShouldBe(40);
     }
@@ -288,14 +308,14 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(), Request(day: DayOfWeek.Monday)]);
+        AddTo(workbook, Request(), Request(day: DayOfWeek.Monday));
 
         //then
         var sheet = Reloaded(workbook);
         sheet.RightToLeft.ShouldBeTrue();
-        sheet.SheetView.SplitRow.ShouldBe(1);
+        sheet.SheetView.SplitRow.ShouldBe(HeaderRow);
         sheet.AutoFilter.IsEnabled.ShouldBeTrue();
-        sheet.AutoFilter.Range.RangeAddress.ToString().ShouldBe("A1:H3");
+        sheet.AutoFilter.Range.RangeAddress.ToString().ShouldBe("A2:G4");
     }
 
     [TestMethod]
@@ -311,10 +331,10 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(day: day)]);
+        AddTo(workbook, Request(day: day));
 
         //then
-        Reloaded(workbook).Cell(2, 1).GetText().ShouldBe(expected);
+        Reloaded(workbook).Cell(FirstRequestRow, 1).GetText().ShouldBe(expected);
     }
 
     [TestMethod]
@@ -328,10 +348,10 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(window: window)]);
+        AddTo(workbook, Request(window: window));
 
         //then
-        Reloaded(workbook).Cell(2, 2).GetText().ShouldBe(expected);
+        Reloaded(workbook).Cell(FirstRequestRow, 2).GetText().ShouldBe(expected);
     }
 
     [TestMethod]
@@ -343,10 +363,10 @@ public class RequestDetailSheetTest
         var workbook = new XLWorkbook();
 
         //when
-        RequestDetailSheet.AddTo(workbook, [Request(sessionType: sessionType)]);
+        AddTo(workbook, Request(sessionType: sessionType));
 
         //then
-        Reloaded(workbook).Cell(2, 5).GetText().ShouldBe(expected);
+        Reloaded(workbook).Cell(FirstRequestRow, SessionTypeColumn).GetText().ShouldBe(expected);
     }
 
     private static SlotRequestDetail Request(
@@ -354,8 +374,6 @@ public class RequestDetailSheetTest
         DayOfWeek day = DayOfWeek.Sunday,
         SlotWindowType window = SlotWindowType.Morning,
         string studentName = "Smoke Student A",
-        Guid? carId = null,
-        string carName = "Smoke Auto",
         SessionType sessionType = SessionType.Single,
         int targetCount = 1,
         int pickCount = 1,
@@ -366,21 +384,31 @@ public class RequestDetailSheetTest
             day,
             window,
             studentName,
-            carId ?? Guid.NewGuid(),
-            carName,
+            CarId,
+            CarName,
             sessionType,
             targetCount,
             pickCount,
             constraint);
     }
 
+    private static void AddTo(XLWorkbook workbook, params SlotRequestDetail[] requests)
+    {
+        RequestDetailSheet.AddTo(workbook, SheetName, CarName, requests);
+    }
+
     private static IXLWorksheet Reloaded(XLWorkbook workbook)
+    {
+        return Reloaded(workbook, SheetName);
+    }
+
+    private static IXLWorksheet Reloaded(XLWorkbook workbook, string sheetName)
     {
         var stream = new MemoryStream();
         workbook.SaveAs(stream);
         stream.Position = 0;
 
-        return new XLWorkbook(stream).Worksheet(RequestDetailSheet.Name);
+        return new XLWorkbook(stream).Worksheet(sheetName);
     }
 
     private static string[] RowOf(IXLWorksheet sheet, int row)
@@ -396,7 +424,7 @@ public class RequestDetailSheetTest
         var lastRow = sheet.LastRowUsed()!.RowNumber();
 
         return Enumerable
-                   .Range(2, lastRow - 1)
+                   .Range(FirstRequestRow, lastRow - HeaderRow)
                    .Select(row => RowOf(sheet, row))
                    .ToList();
     }

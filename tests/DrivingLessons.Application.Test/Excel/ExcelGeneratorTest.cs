@@ -14,6 +14,9 @@ namespace DrivingLessons.Application.Test.Excel;
 [TestClass]
 public class ExcelGeneratorTest
 {
+    private const int FirstRequestRow = 3;
+    private const int StudentNameColumn = 3;
+
     private IPublicationRepository publicationRepository = null!;
     private IWeekScheduleQueries weekScheduleQueries = null!;
     private ISubmissionQueries submissionQueries = null!;
@@ -42,32 +45,97 @@ public class ExcelGeneratorTest
     }
 
     [TestMethod]
-    public async Task Detail_Sheet_Lists_The_Requests_Of_The_Teacher_And_Publication()
+    public async Task Workbook_Is_The_Summary_Only_When_There_Are_No_Requests()
     {
         //given
-        var request = new SlotRequestDetail(
-            Guid.NewGuid(),
-            DayOfWeek.Sunday,
-            SlotWindowType.Morning,
-            "Smoke Student A",
-            Guid.NewGuid(),
-            "Smoke Auto",
-            SessionType.Single,
-            2,
-            2,
-            null);
-
-        A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(publication.Id.Value, teacherId.Value))
-            .Returns([request]);
 
         //when
         var excel = await generator.GenerateAsync(publication.Id, teacherId);
 
         //then
-        var detail = WorkbookOf(excel).Worksheet(RequestDetailSheet.Name);
-        detail.LastRowUsed()!.RowNumber().ShouldBe(2);
-        detail.Cell(2, 3).GetText().ShouldBe("Smoke Student A");
-        detail.Cell(2, 4).GetText().ShouldBe("Smoke Auto");
+        WorkbookOf(excel).Worksheets.Select(x => x.Name).ShouldBe([SummarySheet.Name]);
+    }
+
+    [TestMethod]
+    public async Task Workbook_Has_The_Summary_Then_A_Sheet_Per_Car_By_Name()
+    {
+        //given
+        SlotRequestDetail[] requests =
+        [
+            Request(Guid.NewGuid(), "Zeta", "Smoke Student A"),
+            Request(Guid.NewGuid(), "Alpha", "Smoke Student B")
+        ];
+
+        A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(publication.Id.Value, teacherId.Value))
+            .Returns(requests);
+
+        //when
+        var excel = await generator.GenerateAsync(publication.Id, teacherId);
+
+        //then
+        WorkbookOf(excel).Worksheets.Select(x => x.Name).ShouldBe(
+            [
+                SummarySheet.Name,
+                "Alpha",
+                "Zeta"
+            ]);
+    }
+
+    [TestMethod]
+    public async Task Each_Car_Sheet_Lists_Only_That_Cars_Requests()
+    {
+        //given
+        var alpha = Guid.NewGuid();
+        var zeta = Guid.NewGuid();
+        SlotRequestDetail[] requests =
+        [
+            Request(zeta, "Zeta", "Smoke Student B"),
+            Request(alpha, "Alpha", "Smoke Student A"),
+            Request(zeta, "Zeta", "Smoke Student C")
+        ];
+
+        A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(publication.Id.Value, teacherId.Value))
+            .Returns(requests);
+
+        //when
+        var excel = await generator.GenerateAsync(publication.Id, teacherId);
+
+        //then
+        var workbook = WorkbookOf(excel);
+        StudentsOn(workbook.Worksheet("Alpha")).ShouldBe(["Smoke Student A"]);
+        StudentsOn(workbook.Worksheet("Zeta")).ShouldBe(["Smoke Student B", "Smoke Student C"]);
+    }
+
+    [TestMethod]
+    public async Task Two_Cars_With_The_Same_Name_Get_A_Sheet_Each()
+    {
+        //given
+        var first = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var second = Guid.Parse("00000000-0000-0000-0000-000000000002");
+        SlotRequestDetail[] requests =
+        [
+            Request(second, "Corolla", "Smoke Student B"),
+            Request(first, "Corolla", "Smoke Student A")
+        ];
+
+        A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(publication.Id.Value, teacherId.Value))
+            .Returns(requests);
+
+        //when
+        var excel = await generator.GenerateAsync(publication.Id, teacherId);
+
+        //then
+        var workbook = WorkbookOf(excel);
+        workbook.Worksheets.Select(x => x.Name).ShouldBe(
+            [
+                SummarySheet.Name,
+                "Corolla",
+                "Corolla (2)"
+            ]);
+        workbook.Worksheet("Corolla").Cell(1, 1).GetText().ShouldBe("Corolla");
+        workbook.Worksheet("Corolla (2)").Cell(1, 1).GetText().ShouldBe("Corolla");
+        StudentsOn(workbook.Worksheet("Corolla")).ShouldBe(["Smoke Student A"]);
+        StudentsOn(workbook.Worksheet("Corolla (2)")).ShouldBe(["Smoke Student B"]);
     }
 
     [TestMethod]
@@ -121,22 +189,6 @@ public class ExcelGeneratorTest
     }
 
     [TestMethod]
-    public async Task Workbook_Has_The_Summary_Then_The_Request_Detail_Sheet()
-    {
-        //given
-
-        //when
-        var excel = await generator.GenerateAsync(publication.Id, teacherId);
-
-        //then
-        WorkbookOf(excel).Worksheets.Select(x => x.Name).ShouldBe(
-            [
-                SummarySheet.Name,
-                RequestDetailSheet.Name
-            ]);
-    }
-
-    [TestMethod]
     public async Task Keeps_The_File_Name_And_Content_Type()
     {
         //given
@@ -147,6 +199,31 @@ public class ExcelGeneratorTest
         //then
         excel.FileName.ShouldBe($"week-2026-10-04-{teacherId.Value}.xlsx");
         excel.ContentType.ShouldBe("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+
+    private static SlotRequestDetail Request(Guid carId, string carName, string studentName)
+    {
+        return new SlotRequestDetail(
+            Guid.NewGuid(),
+            DayOfWeek.Sunday,
+            SlotWindowType.Morning,
+            studentName,
+            carId,
+            carName,
+            SessionType.Single,
+            1,
+            1,
+            null);
+    }
+
+    private static string[] StudentsOn(IXLWorksheet sheet)
+    {
+        var lastRow = sheet.LastRowUsed()!.RowNumber();
+
+        return Enumerable
+                   .Range(FirstRequestRow, lastRow - FirstRequestRow + 1)
+                   .Select(row => sheet.Cell(row, StudentNameColumn).GetText())
+                   .ToArray();
     }
 
     private static XLWorkbook WorkbookOf(ExcelFile excel)
