@@ -16,6 +16,7 @@ Slice roadmap for the `module:excel` backlog (3 open issues). Each slice ships a
 | 4. Customer feedback ([plan](detail-sheet-feedback-plan/README.md)) | Sheet 2 drops National ID, Phone and Transmission, and adds the student's car name and "requested lessons" as `{target} מתוך {picks}` | none (customer feedback, 18 October 2026) |
 | 5. Chronological picks ([intent](chronological-picks-intent.md) · [plan](chronological-picks-plan/README.md)) | Sheet 2 drops rank, numbers each student's slots `{position} מתוך {picks}` from Sunday morning to Friday evening, and keeps the target count in its own column | none (customer feedback, 26 October 2026) |
 | 6. Sheet per car ([plan](sheet-per-car-plan/README.md)) | The detail sheet splits into one sheet per car, named after the car, with the car's name as a title row and no car column | none (customer request, 1 November 2026) |
+| 7. All-teachers file ([plan](school-file-plan/README.md)) | Administrators download one file per week: every Teacher's summary grid stacked on `סיכום`, then one sheet per car across all Teachers with a Teacher column | none (customer request, 1 November 2026) |
 
 Slice 1 goes first because the detail sheet is what a teacher books from; slice 3 goes last because it only changes delivery of a file the first two slices finish.
 
@@ -32,3 +33,4 @@ Slice 1 goes first because the detail sheet is what a teacher books from; slice 
 | 7 | **Sheet 2 carries the car name and `{target} מתוך {picks}`, and no national ID, phone or transmission** (customer feedback, 18 October 2026; slice 4). Its `{target} מתוך {picks}` column was replaced by decision 8, and its car column became a sheet per car in decision 9. |
 | 8 | **Sheet 2 numbers each student's slots `{position} מתוך {picks}` from Sunday morning to Friday evening, shows the target count as a number, and carries no rank** (customer feedback, 26 October 2026; slice 5). |
 | 9 | **One request-detail sheet per car that has requests, after the teacher-wide summary**, named after the car (made safe and unique), ordered by car name, with the car's full name in row 1 and no car column; with no requests the file is the summary only (customer request, 1 November 2026; slice 6). |
+| 10 | **Administrators also get one all-teachers file per Publication** next to the per-teacher files: `סיכום` stacks every Teacher's grid (by name, with a title row), then one sheet per car across all Teachers with a `מורה` column after the slot. Download only, no email or version (customer request, 1 November 2026; slice 7). |

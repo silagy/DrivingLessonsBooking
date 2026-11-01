@@ -38,27 +38,28 @@ Customer request (1 November 2026), applied to the [Excel roadmap](../README.md)
 ## Tasks
 
 ### Task 1: Read models
-- [ ] `SlotRequestDetail` gains `string TeacherName` after `StudentName`; update the three test helpers and `SubmissionQueries` (join `Teachers` with `IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])` on the Week Schedule's teacher)
-- [ ] `ISubmissionQueries.GetSlotRequestCountsAsync(Guid publicationId)` and `GetSlotRequestDetailsAsync(Guid publicationId)`: the per-teacher versions narrow the publication-wide query
-- [ ] `IWeekScheduleQueries.FindByWeekAsync(DateOnly weekStart)` → `IReadOnlyList<TeacherWeekGrid>`
+- [x] `SlotRequestDetail` gains `string TeacherName` after `StudentName`; update the three test helpers and `SubmissionQueries` (join `Teachers` with `IgnoreQueryFilters([QueryFilters.TeacherNotDeleted])` on the Week Schedule's teacher)
+- [x] `ISubmissionQueries.GetSlotRequestCountsAsync(Guid publicationId)` and `GetSlotRequestDetailsAsync(Guid publicationId)`: the per-teacher versions narrow the publication-wide query
+- [x] `IWeekScheduleQueries.FindByWeekAsync(DateOnly weekStart)` → `IReadOnlyList<TeacherWeekGrid>`
 
 ### Task 2: Sheets (TDD)
-- [ ] `RequestDetailSheet.AddWithTeacherTo`: header, title merged A1:H1, teacher column, teacher tie-break in the sort
-- [ ] `SummarySheet.AddForTeachersTo`: one titled block per Teacher, seven rows apart
+- [x] `RequestDetailSheet.AddWithTeacherTo`: header, title merged A1:H1, teacher column, teacher tie-break in the sort
+- [x] `SummarySheet.AddForTeachersTo`: one titled block per Teacher, seven rows apart
 
 ### Task 3: Generator, interactor, endpoint (TDD)
-- [ ] `IExcelGenerator.GenerateForSchoolAsync(PublicationId)`; `ExcelGenerator` builds `סיכום` + car sheets with the teacher column
-- [ ] `DownloadPublicationSchoolExcelInteractor` (`PublicationNotFoundException` when missing), registered in DI
-- [ ] `PublicationSchoolExcelQueryController.DownloadSchoolExcel`, Administrator policy; `ControllerAuthorizationTest` pins it
-- [ ] `ExcelTypographyTest` also checks the school file
+- [x] `IExcelGenerator.GenerateForSchoolAsync(PublicationId)`; `ExcelGenerator` builds `סיכום` + car sheets with the teacher column
+- [x] `DownloadPublicationSchoolExcelInteractor` (`PublicationNotFoundException` when missing), registered in DI
+- [x] `PublicationSchoolExcelQueryController.DownloadSchoolExcel`, Administrator policy; `ControllerAuthorizationTest` pins it
+- [x] `ExcelTypographyTest` also checks the school file
 
 ### Task 4: Client
-- [ ] `PublicationsApiService.downloadSchoolExcel(id)`; `PublicationsStore.downloadSchoolExcel(publicationId?, weekStart?)` saving `week-{date}-school.xlsx`
-- [ ] Dashboard: "Download all teachers" button for Administrators in Open and Closed
-- [ ] History: `withSchoolRows` pure function in `domain\history-rows.ts` (spec'd); page renders the week row with its own action
-- [ ] `en.json` / `he.json` keys
+- [x] `PublicationsApiService.downloadSchoolExcel(id)`; `PublicationsStore.downloadSchoolExcel(publicationId?, weekStart?)` saving `week-{date}-school.xlsx`
+- [x] Dashboard: "Download all teachers" button for Administrators in Open and Closed
+- [x] History: `withSchoolRows` pure function in `domain\history-rows.ts` (spec'd); page renders the week row with its own action
+- [x] `en.json` / `he.json` keys
 
 ### Task 5: Docs, checks, push
-- [ ] requirements §9 (school file section), roadmap slice 7 row + locked decision 10
-- [ ] Client `npm test` + build; backend `dotnet test` (in CI when the SDK is not available locally)
-- [ ] Push `excel-school-file`. No PR unless your human partner asks for one
+- [x] requirements §9 (school file section), roadmap slice 7 row + locked decision 10
+- [x] Client `npm test` + build
+- [ ] Backend `dotnet test`: the .NET SDK could not be installed in the session (network policy), so CI runs it
+- [x] Push `excel-school-file`. No PR unless your human partner asks for one
