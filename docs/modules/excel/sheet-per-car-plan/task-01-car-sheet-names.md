@@ -39,6 +39,10 @@ public void Cuts_A_Long_Name_To_31_Characters()
     // [new string('א', 40)] -> [new string('א', 31)]
 
 [TestMethod]
+public void Replaces_An_Apostrophe_The_Cut_Leaves_At_The_End()
+    // [30 × 'א' + "'בבב"] -> [30 × 'א' + "-"]
+
+[TestMethod]
 public void Numbers_Repeated_Names_Ignoring_Case()
     // ["Corolla", "Corolla", "corolla"] -> ["Corolla", "Corolla (2)", "corolla (3)"]
 
@@ -71,7 +75,7 @@ Expected: FAIL. The build breaks because `CarSheetNames` does not exist.
 `public static class CarSheetNames` in `DrivingLessons.Infrastructure.Excel`:
 - Constants `MaxLength = 31`, `Replacement = '-'`, `Apostrophe = '\''`; `private static readonly char[] RefusedCharacters = [':', '\\', '/', '?', '*', '[', ']']`; `private static readonly string[] ReservedNames = [SummarySheet.Name, "History"]`.
 - `For`: a `HashSet<string>` with `StringComparer.OrdinalIgnoreCase` seeded with `ReservedNames`; for each car name, `Safe(name)` then `Unique(safe, taken)`, add the result to `taken`, collect in order.
-- `Safe`: replace refused characters, replace a leading and a trailing apostrophe, then `Cut(value, MaxLength)`.
+- `Safe`: `Cut(value, MaxLength)` first, then replace refused characters and a leading and a trailing apostrophe (cutting first means the cut can't leave an apostrophe at the end).
 - `Unique`: return the name if free; otherwise for `number = 2, 3, …` build `suffix = $" ({number})"` and `Cut(name, MaxLength - suffix.Length) + suffix` until free.
 - No nested calls, no magic numbers, early returns (code-style.md).
 
