@@ -50,6 +50,7 @@ public class ExcelGeneratorTest
             DayOfWeek.Sunday,
             SlotWindowType.Morning,
             "Smoke Student A",
+            Guid.NewGuid(),
             "Smoke Auto",
             SessionType.Single,
             2,

@@ -53,6 +53,7 @@ public class ExcelTypographyTest
             DayOfWeek.Sunday,
             SlotWindowType.Afternoon,
             "Smoke Student A",
+            Guid.NewGuid(),
             "Smoke Auto",
             SessionType.Double,
             2,
