@@ -359,6 +359,7 @@
     "reopenWindow": "Reopen window...",
     "copyLink": "Copy link",
     "downloadExcel": "Download Excel",
+    "downloadAllTeachersExcel": "Excel for all teachers",
     "refresh": "Refresh",
     "timezoneNote": "All times Asia/Jerusalem.",
     "shareLink": {
@@ -430,6 +431,8 @@
       "status": "Status",
       "lastExcel": "Last Excel",
       "redownload": "Re-download",
+      "downloadAllTeachers": "Download all teachers",
+      "allTeachers": "All teachers",
       "viewDashboard": "View dashboard",
       "empty": "No publications yet.",
       "loadFailed": "Failed to load history.",

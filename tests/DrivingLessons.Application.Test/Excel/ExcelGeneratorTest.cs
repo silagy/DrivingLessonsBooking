@@ -1,5 +1,6 @@
 using ClosedXML.Excel;
 using DrivingLessons.Application.Abstractions;
+using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.GetWeekSchedule;
 using DrivingLessons.Domain.Entities;
@@ -14,8 +15,11 @@ namespace DrivingLessons.Application.Test.Excel;
 [TestClass]
 public class ExcelGeneratorTest
 {
+    private const int HeaderRow = 2;
     private const int FirstRequestRow = 3;
     private const int StudentNameColumn = 3;
+    private const int TeacherColumnWithTeacher = 3;
+    private const int StudentNameColumnWithTeacher = 4;
 
     private IPublicationRepository publicationRepository = null!;
     private IWeekScheduleQueries weekScheduleQueries = null!;
@@ -41,6 +45,12 @@ public class ExcelGeneratorTest
         A.CallTo(() => submissionQueries.GetSlotRequestCountsAsync(A<Guid>._, A<Guid>._))
             .Returns(new Dictionary<Guid, int>());
         A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(A<Guid>._, A<Guid>._))
+            .Returns(Array.Empty<SlotRequestDetail>());
+        A.CallTo(() => weekScheduleQueries.FindByWeekAsync(A<DateOnly>._))
+            .Returns(Array.Empty<TeacherWeekGrid>());
+        A.CallTo(() => submissionQueries.GetSlotRequestCountsAsync(A<Guid>._))
+            .Returns(new Dictionary<Guid, int>());
+        A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(A<Guid>._))
             .Returns(Array.Empty<SlotRequestDetail>());
     }
 
@@ -201,13 +211,139 @@ public class ExcelGeneratorTest
         excel.ContentType.ShouldBe("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     }
 
+    [TestMethod]
+    public async Task School__Workbook_Is_The_Summary_Only_When_There_Are_No_Requests()
+    {
+        //given
+
+        //when
+        var excel = await generator.GenerateForSchoolAsync(publication.Id);
+
+        //then
+        WorkbookOf(excel).Worksheets.Select(x => x.Name).ShouldBe([SummarySheet.Name]);
+    }
+
+    [TestMethod]
+    public async Task School__One_Sheet_Per_Car_Holds_The_Requests_Of_Every_Teacher()
+    {
+        //given
+        var shared = Guid.NewGuid();
+        var alpha = Guid.NewGuid();
+        SlotRequestDetail[] requests =
+        [
+            Request(shared, "Corolla", "Smoke Student B", "Smoke Teacher B"),
+            Request(alpha, "Alpha", "Smoke Student C", "Smoke Teacher B"),
+            Request(shared, "Corolla", "Smoke Student A", "Smoke Teacher A")
+        ];
+
+        A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(publication.Id.Value))
+            .Returns(requests);
+
+        //when
+        var excel = await generator.GenerateForSchoolAsync(publication.Id);
+
+        //then
+        var workbook = WorkbookOf(excel);
+        workbook.Worksheets.Select(x => x.Name).ShouldBe(
+            [
+                SummarySheet.Name,
+                "Alpha",
+                "Corolla"
+            ]);
+        var corolla = workbook.Worksheet("Corolla");
+        corolla.Cell(HeaderRow, TeacherColumnWithTeacher).GetText().ShouldBe("מורה");
+        corolla.Cell(FirstRequestRow, TeacherColumnWithTeacher).GetText().ShouldBe("Smoke Teacher A");
+        corolla.Cell(FirstRequestRow, StudentNameColumnWithTeacher).GetText().ShouldBe("Smoke Student A");
+        corolla.Cell(FirstRequestRow + 1, TeacherColumnWithTeacher).GetText().ShouldBe("Smoke Teacher B");
+        corolla.Cell(FirstRequestRow + 1, StudentNameColumnWithTeacher).GetText().ShouldBe("Smoke Student B");
+    }
+
+    [TestMethod]
+    public async Task School__Summary_Stacks_Every_Teachers_Grid_By_Teacher_Name()
+    {
+        //given
+        var bSlot = Slot();
+        var aSlot = Slot();
+        TeacherWeekGrid[] grids =
+        [
+            new(Guid.NewGuid(), "Smoke Teacher B", [bSlot]),
+            new(Guid.NewGuid(), "Smoke Teacher A", [aSlot])
+        ];
+        var counts = new Dictionary<Guid, int>
+        {
+            [aSlot.Id] = 1,
+            [bSlot.Id] = 3
+        };
+
+        A.CallTo(() => weekScheduleQueries.FindByWeekAsync(publication.WeekStart.Value))
+            .Returns(grids);
+        A.CallTo(() => submissionQueries.GetSlotRequestCountsAsync(publication.Id.Value))
+            .Returns(counts);
+
+        //when
+        var excel = await generator.GenerateForSchoolAsync(publication.Id);
+
+        //then
+        var summary = WorkbookOf(excel).Worksheet(SummarySheet.Name);
+        summary.Cell(1, 1).GetText().ShouldBe("Smoke Teacher A");
+        summary.Cell(3, 2).GetValue<int>().ShouldBe(1);
+        summary.Cell(8, 1).GetText().ShouldBe("Smoke Teacher B");
+        summary.Cell(10, 2).GetValue<int>().ShouldBe(3);
+    }
+
+    [TestMethod]
+    public async Task School__Names_The_File_After_The_Week()
+    {
+        //given
+
+        //when
+        var excel = await generator.GenerateForSchoolAsync(publication.Id);
+
+        //then
+        excel.FileName.ShouldBe("week-2026-10-04-school.xlsx");
+        excel.ContentType.ShouldBe("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+
+    [TestMethod]
+    public async Task School__Publication_Must_Exist()
+    {
+        //given
+        var missingId = PublicationId.New();
+
+        A.CallTo(() => publicationRepository.GetAsync(missingId))
+            .Returns((Publication?)null);
+
+        //when
+        var act = () => generator.GenerateForSchoolAsync(missingId);
+
+        //then
+        await Should.ThrowAsync<PublicationNotFoundException>(act);
+    }
+
+    private static SlotForGetWeekScheduleResponse Slot()
+    {
+        return new SlotForGetWeekScheduleResponse
+        {
+            Id = Guid.NewGuid(),
+            Day = DayOfWeek.Sunday,
+            Window = SlotWindowType.Morning,
+            State = SlotState.Open
+        };
+    }
+
     private static SlotRequestDetail Request(Guid carId, string carName, string studentName)
+    {
+        return Request(carId, carName, studentName, "Smoke Teacher");
+    }
+
+    private static SlotRequestDetail Request(Guid carId, string carName, string studentName, string teacherName)
     {
         return new SlotRequestDetail(
             Guid.NewGuid(),
             DayOfWeek.Sunday,
             SlotWindowType.Morning,
             studentName,
+            teacherName,
             carId,
             carName,
             SessionType.Single,

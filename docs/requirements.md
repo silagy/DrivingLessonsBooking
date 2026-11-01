@@ -82,7 +82,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Carries one **submission window**: start datetime and end datetime (Asia/Jerusalem timezone), applying to all teachers at once.
 - States: `Draft` → `Published (window not yet open)` → `Open` → `Closed`
 - Admin may **extend** the end time or **reopen** a closed window at any time; these act on the whole week.
-- Excel is still generated **per teacher** (one file per teacher per publication; see §9), versioned per teacher on each close.
+- Excel is still generated **per teacher** (one file per teacher per publication; see §9), versioned per teacher on each close. Administrators can also download one all-teachers file for the week (§9).
 ### 5.5 Student
 - Identified uniquely by **national ID (ת.ז)** (per school)
 - Students enter the system through the **roster (CSV)** or are **added by hand by an Administrator**; there is no self-registration. An unknown ID cannot submit (see §7).
@@ -195,7 +195,7 @@ The same holds for the student's target: a `Double` pick counts once toward "pic
 - Light, Dark or System (the default) appearance, chosen per device in the admin drawer or user menu; sign-in and the Student form follow the device's saved choice or its system setting.
 ## 9. Excel Output Specification
  
-One file per teacher per publication: a summary sheet, then one request-detail sheet per car.
+One file per teacher per publication: a summary sheet, then one request-detail sheet per car. Administrators can also download one file for all teachers (see All-Teachers File below).
  
 ### Sheet 1: Summary Grid
 - Rows: slots (Morning / Noon / Afternoon / Evening)
@@ -223,6 +223,13 @@ The car column became a sheet per car at the customer's request (November 2026).
 ### Delivery
 - **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4)
 - **On-demand:** download button in the app, available at any time
+
+### All-Teachers File
+Administrators can also download one file for the whole week (customer request, November 2026), named `week-{date}-school.xlsx`. It is generated on demand from current data, has no version and is not emailed. Teachers keep their own file.
+
+- **`סיכום`:** one grid per Teacher with a Week Schedule that week, ordered by Teacher name, including Teachers without requests. Each grid has the Teacher's name as a bold title row, then the same day × slot grid as the teacher's file (counts, Unavailable slots blocked), then a blank row.
+- **Car sheets:** one sheet per car with slot requests, across all Teachers. A car shared by several Teachers has one sheet holding every Teacher's requests. Names, order and the title row follow the teacher's file; a Teacher column (`מורה`) comes after the slot column, and rows sort by day, then slot, then Teacher, then student name. The Teacher is the one whose Week Schedule the request was made against.
+- **Where:** a button on the dashboard (Open and Closed weeks) and an "All teachers" row above each closed week in History, both for Administrators only.
 ## 10. Non-Functional Requirements
  
 - Student form must be fully usable on mobile browsers (primary distribution channel is WhatsApp)

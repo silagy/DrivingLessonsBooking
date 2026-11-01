@@ -34,6 +34,21 @@ public class ExcelTypographyTest
         TextsWithTypographicPunctuation(excel).ShouldBeEmpty();
     }
 
+    [TestMethod]
+    public async Task School_Workbook_Uses_A_Plain_Hyphen_And_Three_Dots_Only()
+    {
+        //given
+        var publication = Publication.Create(WeekStart.Of(new DateOnly(2026, 10, 4)));
+        var teacherId = TeacherId.New();
+        var generator = GeneratorFor(publication, teacherId);
+
+        //when
+        var excel = await generator.GenerateForSchoolAsync(publication.Id);
+
+        //then
+        TextsWithTypographicPunctuation(excel).ShouldBeEmpty();
+    }
+
     private static ExcelGenerator GeneratorFor(Publication publication, TeacherId teacherId)
     {
         var publicationRepository = A.Fake<IPublicationRepository>();
@@ -53,6 +68,7 @@ public class ExcelTypographyTest
             DayOfWeek.Sunday,
             SlotWindowType.Afternoon,
             "Smoke Student A",
+            "Smoke Teacher",
             Guid.NewGuid(),
             "Smoke Auto",
             SessionType.Double,
@@ -67,6 +83,12 @@ public class ExcelTypographyTest
         A.CallTo(() => submissionQueries.GetSlotRequestCountsAsync(publication.Id.Value, teacherId.Value))
             .Returns(counts);
         A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(publication.Id.Value, teacherId.Value))
+            .Returns([request]);
+        A.CallTo(() => weekScheduleQueries.FindByWeekAsync(publication.WeekStart.Value))
+            .Returns([new TeacherWeekGrid(teacherId.Value, "Smoke Teacher", slots)]);
+        A.CallTo(() => submissionQueries.GetSlotRequestCountsAsync(publication.Id.Value))
+            .Returns(counts);
+        A.CallTo(() => submissionQueries.GetSlotRequestDetailsAsync(publication.Id.Value))
             .Returns([request]);
 
         return new ExcelGenerator(publicationRepository, weekScheduleQueries, submissionQueries);

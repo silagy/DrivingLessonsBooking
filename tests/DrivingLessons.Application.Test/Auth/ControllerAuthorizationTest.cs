@@ -74,6 +74,7 @@ public class ControllerAuthorizationTest
     [DataRow("PublicationCommandController.Publish")]
     [DataRow("PublicationCommandController.ExtendWindow")]
     [DataRow("PublicationCommandController.Reopen")]
+    [DataRow("PublicationSchoolExcelQueryController.DownloadSchoolExcel")]
     public void Week_Schedule_Creation_And_The_Publication_Lifecycle_Stay_Administrator_Only(string endpoint)
     {
         //when

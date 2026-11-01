@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.GetWeekSchedule;
 using DrivingLessons.Domain.Values;
 using DrivingLessons.Infrastructure.Excel;
@@ -204,6 +205,74 @@ public class SummarySheetTest
         sheet.Range(MorningRow, FirstDayColumn, EveningRow, FridayColumn).IsEmpty().ShouldBeTrue();
         sheet.Cell(1, FirstDayColumn).GetText().ShouldBe("ראשון 4.10");
         sheet.Cell(MorningRow, 1).GetText().ShouldBe("בוקר 07:00-12:00");
+    }
+
+    [TestMethod]
+    public void For_Teachers__Stacks_A_Titled_Grid_Per_Teacher_With_A_Blank_Row_Between()
+    {
+        //given
+        var workbook = new XLWorkbook();
+        TeacherWeekGrid[] grids =
+        [
+            new(Guid.NewGuid(), "Smoke Teacher A", Grid()),
+            new(Guid.NewGuid(), "Smoke Teacher B", Grid())
+        ];
+
+        //when
+        SummarySheet.AddForTeachersTo(workbook, WeekStart, grids, NoCounts());
+
+        //then
+        var sheet = Reloaded(workbook);
+        sheet.Cell(1, 1).GetText().ShouldBe("Smoke Teacher A");
+        sheet.Cell(1, 1).Style.Font.Bold.ShouldBeTrue();
+        sheet.Cell(1, 1).MergedRange().RangeAddress.ToString().ShouldBe("A1:G1");
+        sheet.Cell(2, FirstDayColumn).GetText().ShouldBe("ראשון 4.10");
+        sheet.Cell(3, 1).GetText().ShouldBe("בוקר 07:00-12:00");
+        sheet.Range(7, 1, 7, FridayColumn).IsEmpty(XLCellsUsedOptions.Contents).ShouldBeTrue();
+        sheet.Cell(8, 1).GetText().ShouldBe("Smoke Teacher B");
+        sheet.Cell(9, FirstDayColumn).GetText().ShouldBe("ראשון 4.10");
+        sheet.Cell(10, 1).GetText().ShouldBe("בוקר 07:00-12:00");
+    }
+
+    [TestMethod]
+    public void For_Teachers__Each_Grid_Shows_Its_Own_Counts_And_Unavailable_Slots()
+    {
+        //given
+        var workbook = new XLWorkbook();
+        var first = Grid();
+        var second = Grid((DayOfWeek.Sunday, SlotWindowType.Morning));
+        var counts = new Dictionary<Guid, int>
+        {
+            [SlotAt(first, DayOfWeek.Sunday, SlotWindowType.Morning)] = 2
+        };
+        TeacherWeekGrid[] grids =
+        [
+            new(Guid.NewGuid(), "Smoke Teacher A", first),
+            new(Guid.NewGuid(), "Smoke Teacher B", second)
+        ];
+
+        //when
+        SummarySheet.AddForTeachersTo(workbook, WeekStart, grids, counts);
+
+        //then
+        var sheet = Reloaded(workbook);
+        sheet.Cell(3, FirstDayColumn).GetValue<int>().ShouldBe(2);
+        sheet.Cell(10, FirstDayColumn).GetText().ShouldBe("לא זמין");
+    }
+
+    [TestMethod]
+    public void For_Teachers__Is_An_Empty_Right_To_Left_Summary_Without_Week_Schedules()
+    {
+        //given
+        var workbook = new XLWorkbook();
+
+        //when
+        SummarySheet.AddForTeachersTo(workbook, WeekStart, [], NoCounts());
+
+        //then
+        var sheet = Reloaded(workbook);
+        sheet.RightToLeft.ShouldBeTrue();
+        sheet.Range(1, 1, 7, FridayColumn).IsEmpty(XLCellsUsedOptions.Contents).ShouldBeTrue();
     }
 
     private static void ShouldBeOutsideTheGrid(IXLCell cell)

@@ -300,6 +300,26 @@ export class PublicationsStore {
         }
     }
 
+    async downloadSchoolExcel(publicationId?: string, weekStart?: string): Promise<void> {
+        const id = publicationId ?? this.publication()?.id;
+        const week = weekStart ?? this.selectedWeekStartState();
+
+        if (!id) {
+            return;
+        }
+
+        this.mutating.set(true);
+
+        try {
+            const blob = await firstValueFrom(this.api.downloadSchoolExcel(id));
+            this.fileDownload.download(blob, `week-${week}-school.xlsx`);
+        } catch (error) {
+            this.toast.apiError(error);
+        } finally {
+            this.mutating.set(false);
+        }
+    }
+
     refresh(): void {
         this.publicationResource.reload();
     }

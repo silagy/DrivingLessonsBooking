@@ -38,7 +38,9 @@ function fakeStore(overrides: Record<string, unknown>) {
         historyIsLoading: signal(false),
         historyError: signal<string | null>(null),
         historyIsEmpty: signal(false),
+        canManageLifecycle: signal(false),
         downloadExcel: vi.fn(async () => undefined),
+        downloadSchoolExcel: vi.fn(async () => undefined),
         ...overrides,
     };
 }
@@ -117,5 +119,41 @@ describe('PublicationsHistoryPage', () => {
 
         //then
         expect(details[1]).toContain('v2');
+    });
+
+    it('offers a Teacher no all-teachers row', async () => {
+        //given
+        const page = await render(fakeStore({}));
+
+        //when
+        const allTeachers = page.querySelectorAll('li.history-card--all-teachers');
+
+        //then
+        expect(allTeachers.length).toBe(0);
+    });
+
+    it('puts an all-teachers card above the teachers of a closed week for an Administrator', async () => {
+        //given
+        const page = await render(fakeStore({ canManageLifecycle: signal(true) }));
+
+        //when
+        const teachers = [...page.querySelectorAll('li.history-card .history-card__teacher')].map((name) =>
+            name.textContent?.trim(),
+        );
+
+        //then
+        expect(teachers).toEqual(['Ziv Peer', 'publications.history.allTeachers', 'Ziv Peer']);
+    });
+
+    it('downloads the all-teachers file of the closed week from its card', async () => {
+        //given
+        const store = fakeStore({ canManageLifecycle: signal(true) });
+        const page = await render(store);
+
+        //when
+        page.querySelector<HTMLButtonElement>('li.history-card--all-teachers button.history-card__action')!.click();
+
+        //then
+        expect(store.downloadSchoolExcel).toHaveBeenCalledWith('publication-closed', '2026-10-11');
     });
 });

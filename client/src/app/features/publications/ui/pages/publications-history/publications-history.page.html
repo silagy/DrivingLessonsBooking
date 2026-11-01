@@ -13,7 +13,7 @@
     } @else {
         <div class="history__table-wrap">
             <div class="history__card">
-                <p-table [value]="store.history()" [rows]="20" styleClass="history__table">
+                <p-table [value]="rows()" [rows]="20" styleClass="history__table">
                     <ng-template pTemplate="header">
                         <tr>
                             <th>{{ 'publications.history.week' | transloco }}</th>
@@ -24,90 +24,127 @@
                             <th></th>
                         </tr>
                     </ng-template>
-                    <ng-template pTemplate="body" let-row>
-                        <tr>
-                            <td><bdi>{{ weekLabel(row) }}</bdi></td>
-                            <td>{{ row.teacherName }}</td>
-                            <td class="history__window">
-                                @if (row.windowStartUtc && row.windowEndUtc) {
-                                    <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
-                                } @else {
-                                    <span class="history__dash">-</span>
-                                }
-                            </td>
-                            <td><app-publication-state-tag [state]="row.state" /></td>
-                            <td>
-                                @if (row.latestExcelVersion !== null) {
-                                    <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
-                                } @else {
-                                    <span class="history__dash">-</span>
-                                }
-                            </td>
-                            <td class="history__action">
-                                @if (canRedownload(row)) {
+                    <ng-template pTemplate="body" let-entry>
+                        @if (entry.kind === 'allTeachers') {
+                            <tr class="history__all-teachers">
+                                <td><bdi>{{ weekLabel(entry.week) }}</bdi></td>
+                                <td>{{ 'publications.history.allTeachers' | transloco }}</td>
+                                <td><span class="history__dash">-</span></td>
+                                <td><app-publication-state-tag [state]="entry.week.state" /></td>
+                                <td><span class="history__dash">-</span></td>
+                                <td class="history__action">
                                     <p-button
-                                        [label]="'publications.history.redownload' | transloco"
+                                        [label]="'publications.history.downloadAllTeachers' | transloco"
                                         severity="secondary"
                                         text
                                         size="small"
-                                        (onClick)="onRedownload(row)" />
-                                } @else {
-                                    <p-button
-                                        [label]="'publications.history.viewDashboard' | transloco"
-                                        severity="secondary"
-                                        text
-                                        size="small"
-                                        (onClick)="onViewDashboard(row)" />
-                                }
-                            </td>
-                        </tr>
+                                        (onClick)="onDownloadAllTeachers(entry.week)" />
+                                </td>
+                            </tr>
+                        } @else {
+                            @let row = entry.item;
+                            <tr>
+                                <td><bdi>{{ weekLabel(row) }}</bdi></td>
+                                <td>{{ row.teacherName }}</td>
+                                <td class="history__window">
+                                    @if (row.windowStartUtc && row.windowEndUtc) {
+                                        <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
+                                    } @else {
+                                        <span class="history__dash">-</span>
+                                    }
+                                </td>
+                                <td><app-publication-state-tag [state]="row.state" /></td>
+                                <td>
+                                    @if (row.latestExcelVersion !== null) {
+                                        <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
+                                    } @else {
+                                        <span class="history__dash">-</span>
+                                    }
+                                </td>
+                                <td class="history__action">
+                                    @if (canRedownload(row)) {
+                                        <p-button
+                                            [label]="'publications.history.redownload' | transloco"
+                                            severity="secondary"
+                                            text
+                                            size="small"
+                                            (onClick)="onRedownload(row)" />
+                                    } @else {
+                                        <p-button
+                                            [label]="'publications.history.viewDashboard' | transloco"
+                                            severity="secondary"
+                                            text
+                                            size="small"
+                                            (onClick)="onViewDashboard(row)" />
+                                    }
+                                </td>
+                            </tr>
+                        }
                     </ng-template>
                 </p-table>
             </div>
         </div>
 
         <ul class="history__cards">
-            @for (row of store.history(); track row.publicationId + row.teacherId) {
-                <li class="history-card">
-                    <div class="history-card__top">
-                        <div class="history-card__identity">
-                            <bdi class="history-card__week">{{ weekLabel(row) }}</bdi>
-                            <span class="history-card__teacher">{{ row.teacherName }}</span>
+            @for (entry of rows(); track entry.key) {
+                @if (entry.kind === 'allTeachers') {
+                    <li class="history-card history-card--all-teachers">
+                        <div class="history-card__top">
+                            <div class="history-card__identity">
+                                <bdi class="history-card__week">{{ weekLabel(entry.week) }}</bdi>
+                                <span class="history-card__teacher">{{ 'publications.history.allTeachers' | transloco }}</span>
+                            </div>
+                            <app-publication-state-tag [state]="entry.week.state" />
                         </div>
-                        <app-publication-state-tag [state]="row.state" />
-                    </div>
-                    <dl class="history-card__details">
-                        <dt>{{ 'publications.history.window' | transloco }}</dt>
-                        <dd>
-                            @if (row.windowStartUtc && row.windowEndUtc) {
-                                <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
-                            } @else {
-                                <span class="history__dash">-</span>
-                            }
-                        </dd>
-                        <dt>{{ 'publications.history.lastExcel' | transloco }}</dt>
-                        <dd>
-                            @if (row.latestExcelVersion !== null) {
-                                <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
-                            } @else {
-                                <span class="history__dash">-</span>
-                            }
-                        </dd>
-                    </dl>
-                    @if (canRedownload(row)) {
                         <p-button
                             styleClass="history-card__action"
-                            [label]="'publications.history.redownload' | transloco"
+                            [label]="'publications.history.downloadAllTeachers' | transloco"
                             text
-                            (onClick)="onRedownload(row)" />
-                    } @else {
-                        <p-button
-                            styleClass="history-card__action"
-                            [label]="'publications.history.viewDashboard' | transloco"
-                            text
-                            (onClick)="onViewDashboard(row)" />
-                    }
-                </li>
+                            (onClick)="onDownloadAllTeachers(entry.week)" />
+                    </li>
+                } @else {
+                    @let row = entry.item;
+                    <li class="history-card">
+                        <div class="history-card__top">
+                            <div class="history-card__identity">
+                                <bdi class="history-card__week">{{ weekLabel(row) }}</bdi>
+                                <span class="history-card__teacher">{{ row.teacherName }}</span>
+                            </div>
+                            <app-publication-state-tag [state]="row.state" />
+                        </div>
+                        <dl class="history-card__details">
+                            <dt>{{ 'publications.history.window' | transloco }}</dt>
+                            <dd>
+                                @if (row.windowStartUtc && row.windowEndUtc) {
+                                    <bdi>{{ 'publications.history.windowRange' | transloco: { start: formatInstant(row.windowStartUtc), end: formatInstant(row.windowEndUtc) } }}</bdi>
+                                } @else {
+                                    <span class="history__dash">-</span>
+                                }
+                            </dd>
+                            <dt>{{ 'publications.history.lastExcel' | transloco }}</dt>
+                            <dd>
+                                @if (row.latestExcelVersion !== null) {
+                                    <span class="history__version-pill"><bdi>v{{ row.latestExcelVersion }}</bdi></span>
+                                } @else {
+                                    <span class="history__dash">-</span>
+                                }
+                            </dd>
+                        </dl>
+                        @if (canRedownload(row)) {
+                            <p-button
+                                styleClass="history-card__action"
+                                [label]="'publications.history.redownload' | transloco"
+                                text
+                                (onClick)="onRedownload(row)" />
+                        } @else {
+                            <p-button
+                                styleClass="history-card__action"
+                                [label]="'publications.history.viewDashboard' | transloco"
+                                text
+                                (onClick)="onViewDashboard(row)" />
+                        }
+                    </li>
+                }
             }
         </ul>
     }

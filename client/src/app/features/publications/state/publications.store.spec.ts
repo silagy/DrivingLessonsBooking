@@ -135,6 +135,7 @@ function createStore(
                     getDashboard: () => NEVER,
                     findHistory: vi.fn(() => of([])),
                     downloadExcel: vi.fn(() => of(new Blob())),
+                    downloadSchoolExcel: vi.fn(() => of(new Blob())),
                     findSlotRequests: vi.fn(() => NEVER),
                     ...api,
                 },
@@ -228,6 +229,33 @@ describe('PublicationsStore', () => {
 
         //then
         expect(fileDownload.download).toHaveBeenCalledWith(expect.any(Blob), 'week-2026-10-04.xlsx');
+    });
+
+    it('names the all-teachers download of the selected week after the week', async () => {
+        //given
+        const store = await loadedStore();
+        const fileDownload = TestBed.inject(FileDownloadService);
+        store.selectWeek('2026-10-04');
+
+        //when
+        await store.downloadSchoolExcel('publication-1');
+
+        //then
+        expect(TestBed.inject(PublicationsApiService).downloadSchoolExcel).toHaveBeenCalledWith('publication-1');
+        expect(fileDownload.download).toHaveBeenCalledWith(expect.any(Blob), 'week-2026-10-04-school.xlsx');
+    });
+
+    it('names an all-teachers history download after the row week', async () => {
+        //given
+        const store = await loadedStore();
+        const fileDownload = TestBed.inject(FileDownloadService);
+        store.selectWeek('2026-10-04');
+
+        //when
+        await store.downloadSchoolExcel('publication-week-38', '2026-09-13');
+
+        //then
+        expect(fileDownload.download).toHaveBeenCalledWith(expect.any(Blob), 'week-2026-09-13-school.xlsx');
     });
 
     it('reports the load error instead of throwing when the week fails to load', async () => {

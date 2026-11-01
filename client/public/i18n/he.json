@@ -359,6 +359,7 @@
     "reopenWindow": "פתיחה מחדש...",
     "copyLink": "העתקת קישור",
     "downloadExcel": "הורדת אקסל",
+    "downloadAllTeachersExcel": "הורדת אקסל כל המורים",
     "refresh": "רענון",
     "timezoneNote": "כל השעות באזור אסיה/ירושלים.",
     "shareLink": {
@@ -430,6 +431,8 @@
       "status": "סטטוס",
       "lastExcel": "אקסל אחרון",
       "redownload": "הורדה חוזרת",
+      "downloadAllTeachers": "הורדת אקסל כל המורים",
+      "allTeachers": "כל המורים",
       "viewDashboard": "צפייה בלוח",
       "empty": "אין פרסומים עדיין.",
       "loadFailed": "טעינת ההיסטוריה נכשלה.",
