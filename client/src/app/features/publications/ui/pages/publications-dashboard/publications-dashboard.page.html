@@ -27,12 +27,18 @@
                     }
                     <p-button [label]="'general.refresh' | transloco" severity="secondary" outlined size="small" (onClick)="store.refresh()" />
                     <p-button [label]="'publications.downloadExcel' | transloco" size="small" (onClick)="store.downloadExcel()" />
+                    @if (store.canManageLifecycle()) {
+                        <p-button [label]="'publications.downloadAllTeachersExcel' | transloco" severity="secondary" outlined size="small" (onClick)="store.downloadSchoolExcel()" />
+                    }
                 }
                 @case (PublicationState.closed) {
                     @if (store.canManageLifecycle()) {
                         <p-button [label]="'publications.reopenWindow' | transloco" severity="secondary" size="small" (onClick)="onReopen()" />
                     }
                     <p-button [label]="'publications.downloadExcel' | transloco" size="small" (onClick)="store.downloadExcel()" />
+                    @if (store.canManageLifecycle()) {
+                        <p-button [label]="'publications.downloadAllTeachersExcel' | transloco" severity="secondary" outlined size="small" (onClick)="store.downloadSchoolExcel()" />
+                    }
                 }
             }
         </div>

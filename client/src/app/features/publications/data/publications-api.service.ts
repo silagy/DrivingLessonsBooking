@@ -55,4 +55,8 @@ export class PublicationsApiService {
 
         return this.http.get(`${this.baseUrl}/${id}/excel`, { params, responseType: 'blob' });
     }
+
+    downloadSchoolExcel(id: string): Observable<Blob> {
+        return this.http.get(`${this.baseUrl}/${id}/school-excel`, { responseType: 'blob' });
+    }
 }

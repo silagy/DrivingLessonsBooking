@@ -53,6 +53,7 @@ function fakeStore(overrides: Record<string, unknown>) {
         copyLink: async () => undefined,
         refresh: () => undefined,
         downloadExcel: async () => undefined,
+        downloadSchoolExcel: vi.fn(async () => undefined),
         openedSlot: signal(undefined),
         slotRequests: signal([]),
         slotRequestsAreLoading: signal(false),
@@ -114,6 +115,13 @@ function buttonLabels(page: HTMLElement): string[] {
     return Array.from(page.querySelectorAll('.dashboard__actions .p-button-label')).map(
         (label) => label.textContent?.trim() ?? '',
     );
+}
+
+function buttonNamed(page: HTMLElement, label: string): HTMLButtonElement {
+    const labels = Array.from(page.querySelectorAll('.dashboard__actions .p-button-label'));
+    const match = labels.find((candidate) => candidate.textContent?.trim() === label);
+
+    return match!.closest('button')!;
 }
 
 const AS_TEACHER = { canChooseTeacher: signal(false), canManageLifecycle: signal(false) };
@@ -229,8 +237,24 @@ describe('PublicationsDashboardPage', () => {
         const page = await render(store);
 
         //then
-        expect(buttonLabels(page)).toEqual(['publications.reopenWindow', 'publications.downloadExcel']);
+        expect(buttonLabels(page)).toEqual([
+            'publications.reopenWindow',
+            'publications.downloadExcel',
+            'publications.downloadAllTeachersExcel',
+        ]);
         expect(page.querySelector('.week-heading__teacher-select')).not.toBeNull();
+    });
+
+    it('downloads the all-teachers file of the open week for an Administrator', async () => {
+        //given
+        const store = fakeStore({ state: signal(PublicationState.open) });
+        const page = await render(store);
+
+        //when
+        buttonNamed(page, 'publications.downloadAllTeachersExcel').click();
+
+        //then
+        expect(store.downloadSchoolExcel).toHaveBeenCalled();
     });
 
     it('hides the Teacher picker from a Teacher', async () => {

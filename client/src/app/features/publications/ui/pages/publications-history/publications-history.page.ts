@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +13,7 @@ import { parseIsoDate } from '../../../../../shared/dates/parse-iso-date';
 import { LanguageService } from '../../../../../core/language.service';
 import { PublicationsStore } from '../../../state/publications.store';
 import { ItemForFindPublicationHistoryResponse } from '../../../data/item-for-find-publication-history.response';
+import { HistoryWeek, historyRowsOf } from '../../../domain/history-rows';
 
 @Component({
     selector: 'app-publications-history-page',
@@ -34,8 +35,10 @@ export class PublicationsHistoryPage {
 
     protected readonly PublicationState = PublicationState;
 
-    protected weekLabel(row: ItemForFindPublicationHistoryResponse): string {
-        const weekStart = parseIsoDate(row.weekStart);
+    protected readonly rows = computed(() => historyRowsOf(this.store.history(), this.store.canManageLifecycle()));
+
+    protected weekLabel(week: HistoryWeek): string {
+        const weekStart = parseIsoDate(week.weekStart);
 
         return weekRangeLabel(weekStart, this.language.locale());
     }
@@ -46,6 +49,10 @@ export class PublicationsHistoryPage {
 
     protected onRedownload(row: ItemForFindPublicationHistoryResponse): void {
         void this.store.downloadExcel(row.publicationId, row.teacherId, row.weekStart);
+    }
+
+    protected onDownloadAllTeachers(week: HistoryWeek): void {
+        void this.store.downloadSchoolExcel(week.publicationId, week.weekStart);
     }
 
     protected onViewDashboard(row: ItemForFindPublicationHistoryResponse): void {

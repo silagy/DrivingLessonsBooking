@@ -125,3 +125,12 @@
         display: flex;
     }
 }
+
+.history__all-teachers td {
+    background: var(--app-bg-muted);
+    font-weight: 600;
+}
+
+.history-card--all-teachers {
+    background: var(--app-bg-muted);
+}
