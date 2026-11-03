@@ -11,7 +11,7 @@
                 [placeholder]="'publications.selectTeacher' | transloco"
                 [ariaLabel]="'publications.selectTeacher' | transloco">
                 <ng-template pTemplate="selectedItem" let-teacher>
-                    <span>{{ teacher.name }}</span>
+                    <span class="week-heading__teacher-name" dir="auto">{{ teacher.name }}</span>
                     @if (teacher.isMe) {
                         <span class="week-heading__me">{{ 'publications.me' | transloco }}</span>
                     }
