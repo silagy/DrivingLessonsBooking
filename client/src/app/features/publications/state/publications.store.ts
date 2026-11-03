@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, linkedSignal, resource, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AppRoutes } from '../../../shared/config/app-routes';
 import { PublicationState } from '../../../shared/models/publication-state.enum';
@@ -17,16 +18,23 @@ import { GetPublicationDashboardResponse } from '../data/get-publication-dashboa
 import { GetPublicationResponse } from '../data/get-publication.response';
 import { ItemForFindPublicationHistoryResponse } from '../data/item-for-find-publication-history.response';
 import { ItemForFindSlotRequestsResponse } from '../data/item-for-find-slot-requests.response';
+import { ItemForFindStudentsWithoutSubmissionResponse } from '../data/item-for-find-students-without-submission.response';
 import { PublicationsApiService } from '../data/publications-api.service';
 import { PublishPublicationRequest } from '../data/publish-publication.request';
 import { ReopenPublicationRequest } from '../data/reopen-publication.request';
 import { TeacherOptionsApiService } from '../data/teacher-options-api.service';
 import { SlotCountForGetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
+import { ReminderRow } from '../domain/reminder-row.model';
 import { TeacherOption } from '../domain/teacher-option.model';
+import { ReminderMessageInput, reminderMessageParams, whatsAppChatUrl } from '../domain/whatsapp-reminder';
 import { buildWeekOptions, WeekOption, weekRangeLabel, withWeekOption } from '../domain/week-options';
 import { parseIsoDate } from '../../../shared/dates/parse-iso-date';
 
 const HTTP_NOT_FOUND = 404;
+const REMINDER_LANGUAGE = 'he';
+const REMINDER_MESSAGE_KEY = 'publications.reminders.message';
+
+type ReminderWeek = Omit<ReminderMessageInput, 'studentName' | 'teacherName'>;
 
 @Injectable({ providedIn: 'root' })
 export class PublicationsStore {
@@ -35,6 +43,7 @@ export class PublicationsStore {
     private readonly teachersApi = inject(TeacherOptionsApiService);
     private readonly toast = inject(ToastService);
     private readonly language = inject(LanguageService);
+    private readonly transloco = inject(TranslocoService);
     private readonly clipboard = inject(ClipboardService);
     private readonly fileDownload = inject(FileDownloadService);
     private readonly document = inject(DOCUMENT);
@@ -68,6 +77,40 @@ export class PublicationsStore {
 
             return dashboard;
         },
+    });
+
+    private readonly remindersResource = resource({
+        params: () => {
+            const publication = this.publication();
+
+            if (publication?.state !== PublicationState.open) {
+                return undefined;
+            }
+
+            if (this.auth.isAdministrator()) {
+                return { publicationId: publication.id, teacherId: null };
+            }
+
+            const teacherId = this.auth.teacherId();
+
+            return teacherId ? { publicationId: publication.id, teacherId } : undefined;
+        },
+        loader: ({ params }) =>
+            firstValueFrom(
+                params.teacherId
+                    ? this.api.findStudentsWithoutSubmission(params.publicationId, params.teacherId)
+                    : this.api.findSchoolStudentsWithoutSubmission(params.publicationId),
+            ),
+    });
+
+    private readonly hebrewResource = resource({
+        params: () => (this.state() === PublicationState.open ? true : undefined),
+        loader: () => firstValueFrom(this.transloco.load(REMINDER_LANGUAGE)),
+    });
+
+    private readonly reminderTeacherIdState = linkedSignal<string | undefined, string | null>({
+        source: () => this.publication()?.id,
+        computation: () => null,
     });
 
     private readonly historyResource = resource({
@@ -193,6 +236,38 @@ export class PublicationsStore {
         this.slotRequestsResource.error() ? 'publications.slotRequests.loadFailed' : null,
     );
 
+    readonly reminderTeacherId = this.reminderTeacherIdState.asReadonly();
+
+    readonly reminderRows = computed<ReminderRow[]>(() => {
+        const publication = this.publication();
+        const windowEndUtc = publication?.windowEndUtc;
+
+        if (!publication || !windowEndUtc || !this.remindersResource.hasValue() || !this.hebrewResource.hasValue()) {
+            return [];
+        }
+
+        const teacherId = this.reminderTeacherIdState();
+        const week: ReminderWeek = {
+            weekNumber: publication.weekNumber,
+            weekStart: publication.weekStart,
+            windowEndUtc,
+            link: this.shareLink(),
+        };
+
+        return this.remindersResource
+            .value()
+            .filter((student) => !teacherId || student.teacherId === teacherId)
+            .map((student) => this.reminderRowOf(student, week));
+    });
+
+    readonly remindersAreLoading = computed(
+        () => this.remindersResource.isLoading() || this.hebrewResource.isLoading(),
+    );
+
+    readonly remindersError = computed(() =>
+        this.remindersResource.error() ? 'publications.reminders.loadFailed' : null,
+    );
+
     readonly hasPublication = computed(() => this.publication() !== undefined);
 
     readonly isLoading = computed(
@@ -229,6 +304,14 @@ export class PublicationsStore {
 
     closeSlotRequests(): void {
         this.openedSlotIdState.set(null);
+    }
+
+    selectReminderTeacher(teacherId: string | null): void {
+        if (!this.auth.isAdministrator()) {
+            return;
+        }
+
+        this.reminderTeacherIdState.set(teacherId);
     }
 
     async publish(request: PublishPublicationRequest): Promise<void> {
@@ -326,6 +409,28 @@ export class PublicationsStore {
 
     reloadHistory(): void {
         this.historyResource.reload();
+    }
+
+    private reminderRowOf(student: ItemForFindStudentsWithoutSubmissionResponse, week: ReminderWeek): ReminderRow {
+        return {
+            studentId: student.studentId,
+            studentName: student.studentName,
+            teacherName: student.teacherName,
+            phone: student.phone,
+            whatsAppUrl: student.whatsAppNumber
+                ? whatsAppChatUrl(student.whatsAppNumber, this.reminderMessage(student, week))
+                : null,
+        };
+    }
+
+    private reminderMessage(student: ItemForFindStudentsWithoutSubmissionResponse, week: ReminderWeek): string {
+        const params = reminderMessageParams({
+            ...week,
+            studentName: student.studentName,
+            teacherName: student.teacherName,
+        });
+
+        return this.transloco.translate(REMINDER_MESSAGE_KEY, params, REMINDER_LANGUAGE);
     }
 
     private buildShareLink(token: string): string {

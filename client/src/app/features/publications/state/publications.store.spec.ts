@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApplicationRef, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { TranslocoTestingModule } from '@jsverse/transloco';
 import { NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { LanguageService } from '../../../core/language.service';
@@ -13,6 +14,7 @@ import { SlotState } from '../../../shared/models/slot-state.enum';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
 import { GetPublicationDashboardResponse } from '../data/get-publication-dashboard.response';
 import { ItemForFindSlotRequestsResponse } from '../data/item-for-find-slot-requests.response';
+import { ItemForFindStudentsWithoutSubmissionResponse } from '../data/item-for-find-students-without-submission.response';
 import { GetPublicationResponse } from '../data/get-publication.response';
 import { ItemForFindTeachersResponse } from '../data/item-for-find-teachers.response';
 import { PublicationsApiService } from '../data/publications-api.service';
@@ -79,6 +81,30 @@ const SLOT_B_REQUESTS: ItemForFindSlotRequestsResponse[] = [
     { studentId: 'student-maya', studentName: 'Maya Cohen', rank: 3, pickCount: 3 },
 ];
 
+const REMINDER_TRANSLATIONS = {
+    en: { publications: { reminders: { message: 'EN {{name}}' } } },
+    he: { publications: { reminders: { message: 'HE {{name}} {{link}}' } } },
+};
+
+const STUDENTS_WITHOUT_SUBMISSION: ItemForFindStudentsWithoutSubmissionResponse[] = [
+    {
+        studentId: 'student-noa',
+        studentName: 'Noa',
+        teacherId: 'teacher-a',
+        teacherName: 'Teacher A',
+        phone: '050-1234567',
+        whatsAppNumber: '972501234567',
+    },
+    {
+        studentId: 'student-omer',
+        studentName: 'Omer',
+        teacherId: 'teacher-b',
+        teacherName: 'Teacher B',
+        phone: '03-1234567',
+        whatsAppNumber: null,
+    },
+];
+
 interface SignedInAs {
     userId: string;
     isAdministrator: boolean;
@@ -88,6 +114,7 @@ interface SignedInAs {
 
 const ADMINISTRATOR: SignedInAs = { userId: 'user-admin', isAdministrator: true, isTeacher: false, teacherId: null };
 const TEACHER: SignedInAs = { userId: 'user-yael', isAdministrator: false, isTeacher: true, teacherId: 'teacher-yael' };
+const TEACHER_A: SignedInAs = { userId: 'user-a', isAdministrator: false, isTeacher: true, teacherId: 'teacher-a' };
 const LINKED_ADMINISTRATOR: SignedInAs = { userId: 'user-levi', isAdministrator: true, isTeacher: false, teacherId: 'teacher-levi' };
 
 const UNLISTED_LINKED_ADMINISTRATOR: SignedInAs = {
@@ -137,12 +164,21 @@ function createStore(
                     downloadExcel: vi.fn(() => of(new Blob())),
                     downloadSchoolExcel: vi.fn(() => of(new Blob())),
                     findSlotRequests: vi.fn(() => NEVER),
+                    findStudentsWithoutSubmission: vi.fn(() => of([])),
+                    findSchoolStudentsWithoutSubmission: vi.fn(() => of([])),
                     ...api,
                 },
             },
             { provide: ToastService, useValue: { success: () => undefined, apiError: () => undefined } },
             { provide: ClipboardService, useValue: { copy: async () => true } },
             { provide: FileDownloadService, useValue: { download: vi.fn() } },
+        ],
+        imports: [
+            TranslocoTestingModule.forRoot({
+                langs: REMINDER_TRANSLATIONS,
+                translocoConfig: { availableLangs: ['he', 'en'], defaultLang: 'en' },
+                preloadLangs: false,
+            }),
         ],
     });
 
@@ -516,5 +552,168 @@ describe('PublicationsStore slot requests', () => {
 
         //then
         expect(store.openedSlot()).toBeUndefined();
+    });
+});
+
+describe('PublicationsStore reminders', () => {
+    const NEXT_WEEK_PUBLICATION: GetPublicationResponse = {
+        ...OPEN_PUBLICATION,
+        id: 'publication-2',
+        weekStart: '2026-10-11',
+        weekNumber: 42,
+        linkToken: 'next-link-token',
+    };
+
+    function openWeek(
+        user: SignedInAs = ADMINISTRATOR,
+        api: Partial<Record<keyof PublicationsApiService, unknown>> = {},
+    ) {
+        const store = createStore(of(TEACHERS), of(OPEN_PUBLICATION), user, {
+            findSchoolStudentsWithoutSubmission: vi.fn(() => of(STUDENTS_WITHOUT_SUBMISSION)),
+            findStudentsWithoutSubmission: vi.fn(() => of([STUDENTS_WITHOUT_SUBMISSION[0]])),
+            ...api,
+        });
+
+        return { store, api: TestBed.inject(PublicationsApiService) };
+    }
+
+    function namesOf(store: PublicationsStore): string[] {
+        return store.reminderRows().map((row) => row.studentName);
+    }
+
+    it('loads every teacher\'s students for an administrator while open', async () => {
+        //given
+        const { store, api } = openWeek();
+
+        //when
+        await vi.waitFor(() => expect(store.reminderRows()).toHaveLength(2));
+
+        //then
+        expect(api.findSchoolStudentsWithoutSubmission).toHaveBeenCalledTimes(1);
+        expect(api.findSchoolStudentsWithoutSubmission).toHaveBeenCalledWith('publication-1');
+        expect(api.findStudentsWithoutSubmission).not.toHaveBeenCalled();
+        expect(store.reminderRows().map((row) => [row.studentName, row.teacherName])).toEqual([
+            ['Noa', 'Teacher A'],
+            ['Omer', 'Teacher B'],
+        ]);
+    });
+
+    it('loads only the teacher\'s own students for a teacher', async () => {
+        //given
+        const { store, api } = openWeek(TEACHER_A);
+
+        //when
+        await vi.waitFor(() => expect(store.reminderRows()).toHaveLength(1));
+
+        //then
+        expect(api.findStudentsWithoutSubmission).toHaveBeenCalledTimes(1);
+        expect(api.findStudentsWithoutSubmission).toHaveBeenCalledWith('publication-1', 'teacher-a');
+        expect(api.findSchoolStudentsWithoutSubmission).not.toHaveBeenCalled();
+        expect(namesOf(store)).toEqual(['Noa']);
+    });
+
+    it('loads no reminder list unless the publication is open', async () => {
+        for (const state of [PublicationState.draft, PublicationState.published, PublicationState.closed]) {
+            //given
+            TestBed.resetTestingModule();
+            const { store, api } = openWeek(ADMINISTRATOR, {
+                getByWeek: () => of({ ...OPEN_PUBLICATION, state }),
+                getDashboard: () => of({ ...OPEN_DASHBOARD, state }),
+            });
+
+            //when
+            await vi.waitFor(() => expect(store.state()).toBe(state));
+            await TestBed.inject(ApplicationRef).whenStable();
+
+            //then
+            expect(api.findSchoolStudentsWithoutSubmission).not.toHaveBeenCalled();
+            expect(api.findStudentsWithoutSubmission).not.toHaveBeenCalled();
+            expect(store.reminderRows()).toEqual([]);
+        }
+    });
+
+    it('narrows the administrator\'s list to one teacher and back to all', async () => {
+        //given
+        const { store, api } = openWeek();
+        await vi.waitFor(() => expect(store.reminderRows()).toHaveLength(2));
+
+        //when
+        store.selectReminderTeacher('teacher-b');
+
+        //then
+        expect(store.reminderTeacherId()).toBe('teacher-b');
+        expect(namesOf(store)).toEqual(['Omer']);
+
+        //when
+        store.selectReminderTeacher(null);
+
+        //then
+        expect(store.reminderTeacherId()).toBeNull();
+        expect(namesOf(store)).toEqual(['Noa', 'Omer']);
+        expect(api.findSchoolStudentsWithoutSubmission).toHaveBeenCalledTimes(1);
+    });
+
+    it('resets the teacher filter when the week changes', async () => {
+        //given
+        const { store } = openWeek(ADMINISTRATOR, {
+            getByWeek: (week: string) =>
+                of(week === NEXT_WEEK_PUBLICATION.weekStart ? NEXT_WEEK_PUBLICATION : OPEN_PUBLICATION),
+        });
+        await vi.waitFor(() => expect(store.reminderRows()).toHaveLength(2));
+        store.selectReminderTeacher('teacher-b');
+
+        //when
+        store.selectWeek(NEXT_WEEK_PUBLICATION.weekStart);
+        await vi.waitFor(() => expect(store.publication()?.id).toBe('publication-2'));
+
+        //then
+        expect(store.reminderTeacherId()).toBeNull();
+    });
+
+    it('writes the message in Hebrew when the UI is English', async () => {
+        //given
+        const { store } = openWeek();
+
+        //when
+        await vi.waitFor(() => expect(store.reminderRows()).toHaveLength(2));
+
+        //then
+        const url = store.reminderRows()[0].whatsAppUrl ?? '';
+        const prefix = 'https://wa.me/972501234567?text=';
+        expect(url.startsWith(prefix)).toBe(true);
+        expect(decodeURIComponent(url.slice(prefix.length))).toBe('HE Noa ' + store.shareLink());
+    });
+
+    it('gives no link to a student without a WhatsApp number', async () => {
+        //given
+        const { store } = openWeek();
+
+        //when
+        await vi.waitFor(() => expect(store.reminderRows()).toHaveLength(2));
+
+        //then
+        expect(store.reminderRows()[1]).toEqual({
+            studentId: 'student-omer',
+            studentName: 'Omer',
+            teacherName: 'Teacher B',
+            phone: '03-1234567',
+            whatsAppUrl: null,
+        });
+    });
+
+    it('reports a failed reminder list', async () => {
+        //given
+        const { store } = openWeek(ADMINISTRATOR, {
+            findSchoolStudentsWithoutSubmission: vi.fn(() =>
+                throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR })),
+            ),
+        });
+
+        //when
+        await vi.waitFor(() => expect(store.remindersError()).toBe('publications.reminders.loadFailed'));
+
+        //then
+        expect(store.reminderRows()).toEqual([]);
+        expect(store.remindersAreLoading()).toBe(false);
     });
 });

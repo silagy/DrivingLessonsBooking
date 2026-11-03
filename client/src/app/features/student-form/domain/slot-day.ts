@@ -2,7 +2,7 @@ import { DayOfWeek } from '../../../shared/models/day-of-week.enum';
 import { SlotState } from '../../../shared/models/slot-state.enum';
 import { SlotWindow } from '../../../shared/models/slot-window.enum';
 import { rankOf, SlotPick } from './slot-pick';
-import { dateInWeek } from './week-label';
+import { dateInWeek } from '../../../shared/dates/week-label';
 
 const GRID_DAYS: readonly DayOfWeek[] = [
     DayOfWeek.sunday,

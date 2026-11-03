@@ -438,6 +438,9 @@
       "loadFailed": "טעינת ההיסטוריה נכשלה.",
       "windowRange": "{{start}} - {{end}}"
     },
+    "reminders": {
+      "message": "שלום {{name}}, עוד לא קיבלנו מכם את השיעורים האפשריים לשבוע {{weekNumber}} ({{weekRange}}) אצל {{teacherName}}.\nאפשר לשלוח אותם עד {{closesAt}} בקישור הזה:\n{{link}}\nככל שתיתנו יותר שיעורים אפשריים, כך גדל הסיכוי שתקבלו את כל השיעורים שביקשתם."
+    },
     "dialogs": {
       "publishTitle": "פרסום השבוע",
       "extendTitle": "הארכת מועד",
