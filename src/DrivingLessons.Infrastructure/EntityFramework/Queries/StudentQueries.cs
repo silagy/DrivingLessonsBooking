@@ -1,5 +1,6 @@
 using DrivingLessons.Application.Queries;
 using DrivingLessons.Application.Queries.FindStudents;
+using DrivingLessons.Application.Queries.FindStudentsWithoutSubmission;
 using DrivingLessons.Application.Queries.GetStudent;
 using DrivingLessons.Application.Queries.IdentifyStudent;
 using DrivingLessons.Domain.Values;
@@ -96,6 +97,65 @@ public class StudentQueries : IStudentQueries
         return await dbContext
                          .Students
                          .AnyAsync(x => x.NationalId == nationalId && !x.IsActive);
+    }
+
+    public async Task<IReadOnlyList<ItemForFindStudentsWithoutSubmissionResponse>?> FindWithoutSubmissionAsync(
+        Guid publicationId,
+        Guid? teacherId)
+    {
+        var resolvedPublicationId = PublicationId.Of(publicationId);
+
+        var weekStart = await dbContext
+                                  .Publications
+                                  .Where(x => x.Id == resolvedPublicationId)
+                                  .Select(x => x.WeekStart)
+                                  .FirstOrDefaultAsync();
+
+        if (weekStart is null)
+        {
+            return null;
+        }
+
+        var students = dbContext.Students.Where(x => x.IsActive);
+
+        if (teacherId is not null)
+        {
+            var resolvedTeacherId = TeacherId.Of(teacherId.Value);
+            students = students.Where(x => x.TeacherId == resolvedTeacherId);
+        }
+
+        var query = from student in students
+                    join weekSchedule in dbContext.WeekSchedules
+                        on student.TeacherId equals weekSchedule.TeacherId
+                    join teacher in dbContext.Teachers
+                        on student.TeacherId equals teacher.Id
+                    where weekSchedule.WeekStart == weekStart
+                          && !dbContext.Submissions.Any(submission =>
+                                 submission.PublicationId == resolvedPublicationId
+                                 && submission.StudentId == student.Id)
+                    orderby teacher.Name, student.Name, student.Id
+                    select new
+                    {
+                        StudentId = student.Id,
+                        StudentName = student.Name,
+                        student.Phone,
+                        TeacherId = teacher.Id,
+                        TeacherName = teacher.Name
+                    };
+
+        var rows = await query.ToListAsync();
+
+        return rows
+                   .Select(x => new ItemForFindStudentsWithoutSubmissionResponse
+                   {
+                       StudentId = x.StudentId.Value,
+                       StudentName = x.StudentName.Value,
+                       TeacherId = x.TeacherId.Value,
+                       TeacherName = x.TeacherName.Value,
+                       Phone = x.Phone.Value,
+                       WhatsAppNumber = x.Phone.ToWhatsAppNumber()?.Value
+                   })
+                   .ToList();
     }
 
     public async Task<IdentifyStudentResponse?> GetActiveByNationalIdAsync(NationalId nationalId, DateOnly weekStart)

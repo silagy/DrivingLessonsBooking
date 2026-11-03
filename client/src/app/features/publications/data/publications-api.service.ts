@@ -6,6 +6,7 @@ import { GetPublicationDashboardResponse } from './get-publication-dashboard.res
 import { GetPublicationResponse } from './get-publication.response';
 import { ItemForFindPublicationHistoryResponse } from './item-for-find-publication-history.response';
 import { ItemForFindSlotRequestsResponse } from './item-for-find-slot-requests.response';
+import { ItemForFindStudentsWithoutSubmissionResponse } from './item-for-find-students-without-submission.response';
 import { PublishPublicationRequest } from './publish-publication.request';
 import { ReopenPublicationRequest } from './reopen-publication.request';
 
@@ -46,7 +47,25 @@ export class PublicationsApiService {
         });
     }
 
-    findHistory(): Observable<ItemForFindPublicationHistoryResponse[]> {
+    findStudentsWithoutSubmission(
+        id: string,
+        teacherId: string,
+    ): Observable<ItemForFindStudentsWithoutSubmissionResponse[]> {
+        const params = new HttpParams().set('teacherId', teacherId);
+
+        return this.http.get<ItemForFindStudentsWithoutSubmissionResponse[]>(
+            `${this.baseUrl}/${id}/students-without-submission`,
+            { params },
+        );
+    }
+
+    findSchoolStudentsWithoutSubmission(id: string): Observable<ItemForFindStudentsWithoutSubmissionResponse[]> {
+        return this.http.get<ItemForFindStudentsWithoutSubmissionResponse[]>(
+            `${this.baseUrl}/${id}/school-students-without-submission`,
+        );
+    }
+
+    findHistory():Observable<ItemForFindPublicationHistoryResponse[]> {
         return this.http.get<ItemForFindPublicationHistoryResponse[]>(`${this.baseUrl}/history`);
     }
 

@@ -16,6 +16,7 @@ import { SlotCountCellComponent } from '../../components/slot-count-cell/slot-co
 import { PublicationStatChipComponent } from '../../components/publication-stat-chip/publication-stat-chip.component';
 import { ShareLinkBoxComponent } from '../../components/share-link-box/share-link-box.component';
 import { PublicationWeekHeadingComponent } from '../../components/publication-week-heading/publication-week-heading.component';
+import { StudentsWithoutSubmissionComponent } from '../../components/students-without-submission/students-without-submission.component';
 import { PublishWeekDialog, PublishWeekResult } from '../../dialogs/publish-week/publish-week.dialog';
 import { ExtendWindowDialog, WindowEndResult } from '../../dialogs/extend-window/extend-window.dialog';
 import { ReopenWindowDialog } from '../../dialogs/reopen-window/reopen-window.dialog';
@@ -41,6 +42,7 @@ const SLOT_REQUESTS_MASK_CLASS = 'slot-requests-mask';
         PublicationStatChipComponent,
         ShareLinkBoxComponent,
         PublicationWeekHeadingComponent,
+        StudentsWithoutSubmissionComponent,
     ],
     providers: [DialogService],
     templateUrl: './publications-dashboard.page.html',

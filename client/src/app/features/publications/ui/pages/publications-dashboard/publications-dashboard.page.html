@@ -103,6 +103,16 @@
                     </app-week-grid>
                     <app-week-grid-legend class="dashboard__legend" firstLabelKey="publications.dashboard.legendRequests" />
                 </section>
+                <app-students-without-submission
+                    class="dashboard__reminders"
+                    [rows]="store.reminderRows()"
+                    [isLoading]="store.remindersAreLoading()"
+                    [errorKey]="store.remindersError()"
+                    [showTeacher]="store.canChooseTeacher()"
+                    [teachers]="store.teachers()"
+                    [selectedTeacherId]="store.reminderTeacherId()"
+                    [dataAsOf]="store.dataAsOf()"
+                    (teacherFiltered)="store.selectReminderTeacher($event)" />
             }
             @case (PublicationState.closed) {
                 <section class="dashboard__card dashboard__notice">

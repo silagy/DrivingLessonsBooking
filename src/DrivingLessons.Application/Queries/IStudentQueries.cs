@@ -1,4 +1,5 @@
 using DrivingLessons.Application.Queries.FindStudents;
+using DrivingLessons.Application.Queries.FindStudentsWithoutSubmission;
 using DrivingLessons.Application.Queries.GetStudent;
 using DrivingLessons.Application.Queries.IdentifyStudent;
 using DrivingLessons.Domain.Values;
@@ -14,4 +15,8 @@ public interface IStudentQueries
     Task<IdentifyStudentResponse?> GetActiveByNationalIdAsync(NationalId nationalId, DateOnly weekStart);
 
     Task<bool> IsInactiveAsync(NationalId nationalId);
+
+    Task<IReadOnlyList<ItemForFindStudentsWithoutSubmissionResponse>?> FindWithoutSubmissionAsync(
+        Guid publicationId,
+        Guid? teacherId);
 }

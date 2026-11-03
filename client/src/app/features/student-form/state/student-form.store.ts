@@ -23,7 +23,7 @@ import { viewForPublicationState } from '../domain/student-form-view';
 import { StudentFormView } from '../domain/student-form-view.enum';
 import { SubmitStatus } from '../domain/submit-status.enum';
 import { leavesLittleRoom, MIN_TARGET_COUNT, missingPickCount } from '../domain/target-count';
-import { weekRangeLabel } from '../domain/week-label';
+import { weekRangeLabel } from '../../../shared/dates/week-label';
 import { WelcomeBack } from '../domain/welcome-back';
 import { isolateDirection } from '../../../shared/text/isolate-direction';
 import { ProblemDetails } from '../../../shared/models/problem-details';

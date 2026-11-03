@@ -26,7 +26,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 - Admin preparation of weekly availability grids, per teacher, published once per week as a single school-wide link
 - Sign-in for **Users** holding one of two **Roles**: Administrator (everything) or Teacher (their own teacher's Week Schedules and Publications); Administrators add, edit, delete and restore Users, and every User changes their own password
 - Student-facing submission flow via the shared weekly link, identified by national ID
-- Live admin dashboard during the submission window
+- Live admin dashboard during the submission window, listing the Students who haven't submitted yet, each with a WhatsApp reminder button
 - Excel generation (on-demand download and automatic email at window close)
 - Hebrew + English UI with full RTL support
 ### Out of scope (v1)
@@ -142,6 +142,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 4. Distribute the single link (outside the system, e.g., WhatsApp). Every teacher's students use the same link; each student's record routes them to the right grid.
 ### 6.3 During the window
 - **Dashboard:** the summary grid (day × slot) shows the current request count per slot at any point during the window. Data reflects the state at page load; the admin refreshes the page to see new submissions. No push/auto-refresh requirement. Selecting a count with one or more requests lists the Students who requested that Slot, in submission order, each with which of their picks it was ("choice 2 of 3"); counts of 0 and Unavailable Slots open nothing. The list is read when it opens.
+- **Students who haven't submitted:** while the Publication is `Open`, the dashboard lists, under the grid, the active Students whose current Teacher has a Week Schedule that week and who have no Submission in the Publication, ordered by Teacher and then Student name. An Administrator sees the whole school, with a teacher filter (all teachers by default, independent of the grid's teacher picker); a Teacher-role User sees only their own teacher's Students. Each Student's row has a WhatsApp button: a click-to-chat link that opens the sender's own WhatsApp in a chat with the Student, with a fixed Hebrew reminder already written (the Student's name, the week, the teacher, when the window closes in Asia/Jerusalem, and the weekly link), whatever the UI language. Only Israeli mobiles get a button; any other phone is shown with a note and no button. DriveCal records nothing: loading the list or pressing a button writes nothing (decision #27).
 ### 6.4 Window close and reopen
 - At end time, the link becomes read-only for students and the Excel is **automatically emailed** to the teacher's contact email.
 - The admin may extend the deadline before close, or reopen after close.
@@ -150,7 +151,7 @@ One number: **minutes from submission-window close to a usable Excel file.** Tar
 ### 6.5 Teacher-role User
 1. Sign in and land on the teacher's own Week Schedules.
 2. Mark the teacher's own slots Open or Unavailable for a week the Administrator created.
-3. See the teacher's own Publications with their state, submissions, share link and Excel download.
+3. See the teacher's own Publications with their state, submissions, share link and Excel download, and the teacher's own Students who haven't submitted, with their phones.
 4. Teachers & Cars, Students, Roster and Users are not shown, and reaching another teacher's data, even by typing a URL, is refused.
 ## 7. Student Flow
  
@@ -267,6 +268,7 @@ Administrators can also download one file for the whole week (customer request, 
 | 24 | **Users with exactly one of two Roles**: Administrator (everything) or Teacher (only the linked teacher's Week Schedules and Publications, marking that teacher's slots). A Teacher-role User is linked to exactly one teacher, the link never changes, a teacher has at most one User, and the last active Administrator can never be deleted or demoted | Teachers report their own availability instead of the owner doing it for everyone; two fixed Roles cover one school without a permissions model (see [ADR 0006](decisions/0006-user-aggregate-and-roles.md), spec #82) |
 | 25 | **Administrators manage students by hand**: add, edit details (national ID included), Change Teacher with one of the new teacher's cars, Change Car among the current teacher's cars, deactivate and reactivate. A teacher or car can't be deleted, and a car can't be unassigned from a teacher, while active students depend on it; a student can't be reactivated onto a deleted teacher or car or a car that isn't the teacher's | Students change teacher or car mid-course and the school must record it in the app; since the roster no longer overwrites it (#23), the rule that a student's car is one of their teacher's cars is enforced at every entry point (spec #82) |
 | 26 | **More slots, better chance**: the student form says the number of slots doesn't have to match the number of lessons, calls a slot שיעור אפשרי in Hebrew, and suggests adding slots while a list holds fewer than the target plus two | Customer feedback (October 2026): students sent one slot for one lesson, or two for two, which left no room to schedule them. The minimum was deliberately not raised: it would block students who truly have little time, instead of persuading the rest |
+| 27 | **WhatsApp reminders are click-to-chat links from the sender's own WhatsApp; DriveCal records nothing** | Students forget to submit; the list and the pre-written message replace writing to each one by hand, and need no Meta onboarding (the notifications module stays the automated route) |
  
 ## 12. Explicitly Deferred (v2 candidates)
  

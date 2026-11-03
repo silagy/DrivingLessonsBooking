@@ -1,4 +1,4 @@
-import { parseIsoDate } from '../../../shared/dates/parse-iso-date';
+import { parseIsoDate } from './parse-iso-date';
 
 const GRID_LAST_DAY_OFFSET = 5;
 const THIN_SPACE = /\u2009/g;
