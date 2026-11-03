@@ -110,6 +110,7 @@
     flex: 0 0 150px;
     color: var(--app-ink);
     font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
 }
 
 .reminders__action {
