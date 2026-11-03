@@ -22,7 +22,14 @@ Each task has its own file. Execute in order.
 
 **Tech Stack:** .NET (ASP.NET Core, EF Core, Npgsql), MSTest + Shouldly + FakeItEasy, Angular 21 (standalone, zoneless, OnPush, signals), PrimeNG 21, Transloco, SCSS, Vitest under jsdom.
 
-**Spec:** [WhatsApp Reminders - Intent](../whatsapp-reminders-intent.md) (3 November 2026), decisions 1 to 5. Rules: `.claude\rules\code-style.md`, `ddd-architecture.md`, `domain-building-blocks.md`, `api-guidelines.md`, `domain-testing.md`, `client-architecture.md`, `client-state.md`, `client-primeng.md`, `client-i18n.md`. No design file. The section follows the dashboard's existing cards and the admin-mobile phone rules.
+**Spec:** [WhatsApp Reminders - Intent](../whatsapp-reminders-intent.md) (3 November 2026), decisions 1 to 5. Rules: `.claude\rules\code-style.md`, `ddd-architecture.md`, `domain-building-blocks.md`, `api-guidelines.md`, `domain-testing.md`, `client-architecture.md`, `client-state.md`, `client-primeng.md`, `client-i18n.md`. Design: the canvas [DriveCal WhatsApp Reminders](https://claude.ai/artifact/CwEh4rfo2W18iEqJPTXMFT) (3 November 2026; private until shared). Its frames:
+- **Dashboard (desktop) - Administrator, Open**: the section under the grid, with a working teacher filter;
+- **Phone - Administrator**;
+- **Phone - Teacher-role User**: no filter, no teacher name;
+- **What opens in WhatsApp**: the chat with the message already written;
+- **Section states**: loading, everyone submitted, load failed.
+
+The design uses DriveCal's own tokens. The org's Comply365 design system serves no token files, and the app's palette already comes from it. Where the design shows a hex value, the code uses the matching `--app-*` token.
 
 **Branch:** `whatsapp-reminders`, from `origin/main` at `bac6d1c` (no upstream set; push with `-u origin whatsapp-reminders`). The intent and this plan are committed on the branch before task 1. The PR targets `main`. CI (`ci.yml`) runs on the PR. Auto-merge is off, so merge by hand with `--merge`.
 

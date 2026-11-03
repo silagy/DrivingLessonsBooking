@@ -57,6 +57,15 @@ Expected: FAIL (no component).
 
 - [ ] **Step 4.3: Implement the component**
 
+Build it to the design's frames **Dashboard (desktop) - Administrator, Open**, **Phone - Administrator**, **Phone - Teacher-role User** and **Section states** (README Spec). They show, in order: the title with its count, the hint, then the filter at the inline end. Each row has initials, name and teacher, the LTR phone, and the pill WhatsApp button (primary, chat icon). Below 640px the row stacks name, teacher and phone, with a 44px button at the inline end. The no-WhatsApp note is a muted pill. The design's hex values map to `--app-*` tokens:
+- `#0057FF` → `--p-primary-color`;
+- `#52555C` → `--app-text-secondary`;
+- `#E6E8F6` → `--app-border`;
+- `#C3CFE5` → `--app-border-interactive`;
+- `#EAF1FF` / `#003293` → `--app-tag-sky-bg` / `--app-tag-sky-fg`;
+- `#F5F6FF` → `--app-bg-muted`;
+- the error box → `--app-error-*`.
+
 - A `section` card in the dashboard's card style (`dashboard__card` look, through tokens in the component SCSS).
   - **Heading:** `title` with `count: rows().length`.
   - **Hint:** `hint` with `time: dataAsOf()`.
