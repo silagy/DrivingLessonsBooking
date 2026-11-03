@@ -41,6 +41,7 @@ using DrivingLessons.Application.Queries.FindCars;
 using DrivingLessons.Application.Queries.FindPublicationHistory;
 using DrivingLessons.Application.Queries.FindSlotRequests;
 using DrivingLessons.Application.Queries.FindStudents;
+using DrivingLessons.Application.Queries.FindStudentsWithoutSubmission;
 using DrivingLessons.Application.Queries.FindTeachers;
 using DrivingLessons.Application.Queries.FindUsers;
 using DrivingLessons.Application.Queries.GetCar;
@@ -106,6 +107,8 @@ public static class DependencyInjection
         services.AddScoped<DownloadPublicationSchoolExcelInteractor>();
         services.AddScoped<ImportRosterInteractor>();
         services.AddScoped<FindStudentsInteractor>();
+        services.AddScoped<FindStudentsWithoutSubmissionInteractor>();
+        services.AddScoped<FindSchoolStudentsWithoutSubmissionInteractor>();
         services.AddScoped<CreateStudentInteractor>();
         services.AddScoped<ChangeStudentDetailsInteractor>();
         services.AddScoped<DeactivateStudentInteractor>();
