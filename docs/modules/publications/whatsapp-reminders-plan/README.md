@@ -163,4 +163,38 @@ Client facts:
 
 ## Manual verification
 
-Left empty; filled in by task 5.
+Task 5, 3 November 2026, against the running app (API on port 5480, the client dev server proxied to it, the compose Postgres) in the built-in browser. Publication `8c1e95c9` (week 2026-10-25) is the Open week from Task 2. The dev data holds real-looking names and phones, so the walk-through compared through the DOM and the API and recorded counts only. Test variations, all fake and all reverted afterwards: one Student's phone set to a landline (`03-6123456`), another renamed to a 40-character Hebrew name with a long unbroken phone (three, then five, numbers joined without spaces), one Teacher's name made 36 characters long, a throwaway Teacher with no Week Schedule (soft-deleted after), and Task 2's smoke Teacher-role User restored with a temporary password (soft-deleted again after).
+
+| # | Check | Result |
+|---|-------|--------|
+| 1 | Administrator, Hebrew: the list against `school-students-without-submission` | 54 rows = 54 from the API, same order, names, teachers and phones; 2 Teachers; the hrefs are `https://wa.me/{whatsAppNumber}?text=` exactly where the API has a number |
+| 1 | Page teacher picker set to another Teacher | still 54 rows, 2 Teachers, filter on "כל המורים" |
+| 1 | Filter to one Teacher, then back | 29 rows (= SQL), 1 Teacher; back to all: 54 |
+| 1 | Filter to the Teacher with no Week Schedule | offered; "עוד לא שלחו (0)" and "כל התלמידים שלחו.", filter still shown (the deferred minor, as reviewed) |
+| 2 | Submit for a listed Student (API, the weekly link) while the page is open, then Refresh | 53 → 52, the Student gone |
+| 3 | Decode a row's `text` | "שלום {name}, עוד לא קיבלנו מכם את השיעורים האפשריים לשבוע 44 (25-30 באוק׳) אצל {teacher}." then "אפשר לשלוח אותם עד יום חמישי, 5 בנוב׳, 11:21 בקישור הזה:", the weekly link (same as the share box), and the closing line: intent §4.4. 11:21 is the window end 09:21Z in Asia/Jerusalem |
+| 4 | English UI | every section string English ("Haven't submitted yet (54)", "Teacher", "All teachers", "WhatsApp", "Not a WhatsApp number", aria "Send {name} a WhatsApp reminder"); the decoded text is the same Hebrew |
+| 4 | English UI with `/i18n/he.json` unavailable (file moved aside for one page load, then put back) | "Haven't submitted yet" with "Couldn't load the list. Refresh the page." (`role="alert"`), no rows, no "everyone submitted" |
+| 5 | Landline and the unbroken multi-number phone | phone shown, "המספר לא מתאים לוואטסאפ", no button |
+| 6 | Teacher-role User (smoke User, linked to a Teacher with 29 missing) | Hebrew and English: 29 rows = own API list, same order, no teacher column, no filter, Hebrew message; the school list 403, another Teacher's list 404 |
+| 7 | Closed week (2026-10-18) and Draft week (2026-09-27); the current week with no Publication | no section. No Published-state Publication exists in the dev data; that state is covered by the store test |
+| 8 | Writes | `pg_stat_user_tables` insert+update+delete total 13 before and after two list loads; the API log's only `UPDATE`s are the test setup's |
+| 9 | Desktop (1024) with the stress phone | phone column 150px, wraps inside it, no overlap with name or button |
+
+Phone measurement (admin-mobile) on `/publications?week=2026-10-25`, Administrator, after the fix below:
+
+| Width | Lang | Scheme | `scrollWidth` | `pageOverflows` | `clippedAtInlineEdge` | `shortTargets` | `smallText` | Stress row | Buttons |
+|-------|------|--------|---------------|-----------------|-----------------------|----------------|-------------|------------|---------|
+| 390 | he | light | 390 | false | [] | [] | [] | name 2 lines, phone 2 lines, inside row | 52 of 52 at 44px, on their rows |
+| 390 | en | dark | 390 | false | [] | [] | [] | name 2, phone 2, inside | 52/52 |
+| 360 | he | dark | 360 | false | [] | [] | [] | name 2, phone 2, inside | 52/52 |
+| 360 | en | dark | 360 | false | [] | [] | [] | name 2, phone 2, inside | 52/52 |
+
+Teacher-role User at 360 he: `scrollWidth` 360, nothing clipped, no short targets, every button on its row. Below 640px the avatar is hidden, as the Phone frames draw. With the 36-character Teacher name (he, 390 and 360) the teacher line wraps to 2 lines and its row's button stays 44px on the row.
+
+Code fix made by this task: a 54-character unbroken phone overflowed its row at 360px (376px in a 298px row) and widened the page to 407px. `.reminders__phone` now has `overflow-wrap: anywhere`; after it the page is 360 wide and the phone wraps to 2 lines.
+
+Not verified:
+- Opening a `wa.me` link. The dev phones may belong to real people, and the browser pane has no WhatsApp sign-in, so no link was opened; the href and its decoded text were checked instead.
+- Screenshots. The session's window wasn't visible, so the pane rendered in the background and a capture came back stale (memory note); every check above is a DOM or API measurement.
+- Found in passing, outside this feature: with a 36-character Teacher name, the page's teacher picker in `app-publication-week-heading` (`nowrap` label) widens the page to 459px at 390 and 360. That component is unchanged on this branch.

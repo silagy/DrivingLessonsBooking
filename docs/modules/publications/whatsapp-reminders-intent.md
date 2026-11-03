@@ -1,6 +1,6 @@
 # WhatsApp Reminders for Students Who Haven't Submitted - Intent
 
-**Status:** Agreed intent, input to planning
+**Status:** Agreed intent, input to planning ([plan](whatsapp-reminders-plan/README.md))
 **Date:** 3 November 2026
 **Module:** `module:publications`
 
