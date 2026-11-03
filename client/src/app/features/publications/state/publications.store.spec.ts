@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApplicationRef, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { TranslocoTestingModule } from '@jsverse/transloco';
+import { TranslocoService, TranslocoTestingModule } from '@jsverse/transloco';
 import { NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import { AuthService } from '../../../core/auth.service';
 import { LanguageService } from '../../../core/language.service';
@@ -708,6 +708,21 @@ describe('PublicationsStore reminders', () => {
                 throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR })),
             ),
         });
+
+        //when
+        await vi.waitFor(() => expect(store.remindersError()).toBe('publications.reminders.loadFailed'));
+
+        //then
+        expect(store.reminderRows()).toEqual([]);
+        expect(store.remindersAreLoading()).toBe(false);
+    });
+
+    it('reports a failed reminder list when the Hebrew message cannot load', async () => {
+        //given
+        const { store } = openWeek();
+        vi.spyOn(TestBed.inject(TranslocoService), 'load').mockReturnValue(
+            throwError(() => new HttpErrorResponse({ status: HTTP_INTERNAL_SERVER_ERROR })),
+        );
 
         //when
         await vi.waitFor(() => expect(store.remindersError()).toBe('publications.reminders.loadFailed'));

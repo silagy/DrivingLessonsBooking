@@ -265,7 +265,7 @@ export class PublicationsStore {
     );
 
     readonly remindersError = computed(() =>
-        this.remindersResource.error() ? 'publications.reminders.loadFailed' : null,
+        this.remindersResource.error() || this.hebrewResource.error() ? 'publications.reminders.loadFailed' : null,
     );
 
     readonly hasPublication = computed(() => this.publication() !== undefined);
