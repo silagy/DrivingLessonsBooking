@@ -60,6 +60,11 @@ function fakeStore(overrides: Record<string, unknown>) {
         slotRequestsError: signal(null),
         openSlotRequests: vi.fn(),
         closeSlotRequests: vi.fn(),
+        reminderRows: signal([]),
+        remindersAreLoading: signal(false),
+        remindersError: signal(null),
+        reminderTeacherId: signal(null),
+        selectReminderTeacher: vi.fn(),
         ...overrides,
     };
 }
@@ -402,6 +407,38 @@ describe('PublicationsDashboardPage', () => {
 
         //then
         expect(page.querySelector('.week-heading__extend')).toBeNull();
+    });
+
+    it('shows the students who haven\'t submitted only while open', async () => {
+        //given
+        const open = await render(fakeStore({ state: signal(PublicationState.open) }));
+        const otherStates: (Element | null)[] = [];
+
+        //when
+        for (const state of [PublicationState.draft, PublicationState.published, PublicationState.closed]) {
+            TestBed.resetTestingModule();
+            const page = await render(fakeStore({ state: signal(state) }));
+            otherStates.push(page.querySelector('app-students-without-submission'));
+        }
+
+        //then
+        expect(open.querySelector('app-students-without-submission')).not.toBeNull();
+        expect(otherStates).toEqual([null, null, null]);
+    });
+
+    it('passes the teacher filter through to the store', async () => {
+        //given
+        const store = fakeStore({});
+        const fixture = await renderFixture(store);
+        const filter = fixture.debugElement
+            .queryAll(By.directive(NgModel))
+            .find((element) => (element.nativeElement as HTMLElement).matches('.reminders__teacher-select'));
+
+        //when
+        filter!.injector.get(NgModel).viewToModelUpdate('teacher-cohen');
+
+        //then
+        expect(store.selectReminderTeacher).toHaveBeenCalledWith('teacher-cohen');
     });
 
     describe('slot requests', () => {

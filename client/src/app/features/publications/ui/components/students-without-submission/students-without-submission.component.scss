@@ -1,0 +1,263 @@
+:host {
+    display: block;
+}
+
+.reminders {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--app-bg-card);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-card);
+    padding: 22px 24px;
+}
+
+.reminders__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.reminders__heading {
+    display: flex;
+    flex: 1 1 360px;
+    flex-direction: column;
+    gap: 4px;
+    min-inline-size: 0;
+}
+
+.reminders__title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--app-ink);
+}
+
+.reminders__hint {
+    margin: 0;
+    font-size: 0.84375rem;
+    color: var(--app-text-secondary);
+}
+
+.reminders__filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reminders__filter-label {
+    font-size: 0.8125rem;
+    color: var(--app-text-secondary);
+}
+
+:host ::ng-deep .reminders__teacher-select {
+    min-inline-size: 180px;
+}
+
+.reminders__list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.reminders__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding-block: 12px;
+    border-block-start: 1px solid var(--app-border);
+}
+
+.reminders__avatar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    inline-size: 36px;
+    block-size: 36px;
+    border-radius: 999px;
+    background: var(--app-tag-sky-bg);
+    color: var(--app-tag-sky-fg);
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.reminders__who {
+    display: flex;
+    flex: 1 1 220px;
+    flex-direction: column;
+    min-inline-size: 0;
+}
+
+.reminders__name {
+    font-weight: 600;
+    color: var(--app-ink);
+    overflow-wrap: anywhere;
+}
+
+.reminders__teacher {
+    font-size: 0.8125rem;
+    color: var(--app-text-secondary);
+    overflow-wrap: anywhere;
+}
+
+.reminders__phone {
+    flex: 0 0 150px;
+    color: var(--app-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.reminders__action {
+    display: flex;
+    flex: 0 0 180px;
+    justify-content: flex-end;
+}
+
+.reminders__send {
+    block-size: 40px;
+    white-space: nowrap;
+}
+
+.reminders__no-whatsapp {
+    padding-block: 6px;
+    padding-inline: 12px;
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    background: var(--app-bg-muted);
+    font-size: 0.8125rem;
+    color: var(--app-text-secondary);
+}
+
+.reminders__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    block-size: 180px;
+
+    p-progressspinner {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+}
+
+.reminders__error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-block: 12px;
+    padding-inline: 14px;
+    border: 1px solid var(--app-error-border);
+    border-radius: 10px;
+    background: var(--app-error-bg);
+    color: var(--app-error-strong);
+}
+
+.reminders__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-block-size: 140px;
+    padding: 16px;
+    border-radius: 10px;
+    background: var(--app-bg-muted);
+    text-align: center;
+}
+
+.reminders__empty-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: 999px;
+    background: var(--app-tag-ocean-bg);
+    color: var(--app-tag-ocean-fg);
+}
+
+.reminders__empty-text {
+    font-weight: 600;
+    color: var(--app-ink);
+}
+
+@media screen and (max-width: 639px) {
+    .reminders {
+        gap: 12px;
+        padding-block: 16px;
+        padding-inline: 14px;
+    }
+
+    .reminders__title {
+        font-size: 1.0625rem;
+    }
+
+    .reminders__hint {
+        font-size: 0.8125rem;
+    }
+
+    .reminders__heading {
+        flex-basis: 100%;
+    }
+
+    .reminders__filter {
+        flex: 1 1 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+    }
+
+    :host ::ng-deep .reminders__teacher-select {
+        inline-size: 100%;
+        block-size: 2.75rem;
+    }
+
+    .reminders__row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 10px;
+        row-gap: 0;
+    }
+
+    .reminders__avatar {
+        display: none;
+    }
+
+    .reminders__who {
+        grid-column: 1;
+    }
+
+    .reminders__phone {
+        grid-column: 1;
+        justify-self: start;
+        font-size: 0.8125rem;
+    }
+
+    .reminders__action {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+    }
+
+    .reminders__action--note {
+        grid-column: 1;
+        grid-row: auto;
+        justify-content: flex-start;
+        margin-block-start: 4px;
+    }
+
+    .reminders__no-whatsapp {
+        padding: 0;
+        border: 0;
+        background: none;
+    }
+
+    .reminders__send {
+        block-size: 2.75rem;
+    }
+}

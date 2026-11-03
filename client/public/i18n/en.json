@@ -439,7 +439,17 @@
       "windowRange": "{{start}} - {{end}}"
     },
     "reminders": {
-      "message": "Hi {{name}}, we haven't received your possible lessons for week {{weekNumber}} ({{weekRange}}) with {{teacherName}} yet.\nYou can send them until {{closesAt}} at this link:\n{{link}}\nThe more possible lessons you give, the better your chance of getting all the lessons you asked for."
+      "heading": "Haven't submitted yet",
+      "title": "Haven't submitted yet ({{count}})",
+      "hint": "As of page load ({{time}}). Refresh before you start sending.",
+      "teacherFilter": "Teacher",
+      "allTeachers": "All teachers",
+      "send": "WhatsApp",
+      "sendAria": "Send {{name}} a WhatsApp reminder",
+      "noWhatsApp": "Not a WhatsApp number",
+      "empty": "Every student has submitted.",
+      "loadFailed": "Couldn't load the list. Refresh the page.",
+      "message":"Hi {{name}}, we haven't received your possible lessons for week {{weekNumber}} ({{weekRange}}) with {{teacherName}} yet.\nYou can send them until {{closesAt}} at this link:\n{{link}}\nThe more possible lessons you give, the better your chance of getting all the lessons you asked for."
     },
     "dialogs": {
       "publishTitle": "Publish week",
