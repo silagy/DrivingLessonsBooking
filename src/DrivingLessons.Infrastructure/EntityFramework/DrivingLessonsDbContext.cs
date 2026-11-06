@@ -2,6 +2,7 @@ using DrivingLessons.Application.Common;
 using DrivingLessons.Application.Common.Exceptions;
 using DrivingLessons.Domain.Common;
 using DrivingLessons.Domain.Entities;
+using DrivingLessons.Infrastructure.Email;
 using DrivingLessons.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,8 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public DbSet<OutboxDelivery> OutboxDeliveries => Set<OutboxDelivery>();
+
+    public DbSet<SentTeacherExcelEmail> SentTeacherExcelEmails => Set<SentTeacherExcelEmail>();
 
     public DrivingLessonsDbContext(DbContextOptions<DrivingLessonsDbContext> options, IDomainEventDispatcher dispatcher)
         : base(options)

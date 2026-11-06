@@ -29,7 +29,7 @@
 
 After this task a close writes one outbox message and one delivery, and the outbox job sends the emails a few seconds later.
 
-- [ ] **Step 1: Move the US-44 tests to the consumer**
+- [x] **Step 1: Move the US-44 tests to the consumer**
 
 ```bash
 mkdir -p tests/DrivingLessons.Application.Test/Consumers
@@ -226,7 +226,7 @@ and keep the two existing `//then` assertions below it (drop the old `//then` ma
 
 `ShouldThrowAsync<T>` returns the exception, so `exception.TeacherIds` can be checked.
 
-- [ ] **Step 2: Write the new handler tests**
+- [x] **Step 2: Write the new handler tests**
 
 Create `tests\DrivingLessons.Application.Test\EventHandlers\PublicationClosedHandlerTest.cs`:
 
@@ -334,7 +334,7 @@ public class PublicationClosedHandlerTest
 }
 ```
 
-- [ ] **Step 3: Run the tests to confirm they fail to compile**
+- [x] **Step 3: Run the tests to confirm they fail to compile**
 
 ```bash
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~PublicationClosedHandlerTest|FullyQualifiedName~SendTeacherExcelEmailsConsumerTest"
@@ -342,7 +342,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: build errors for the missing integration event, consumer, log and exception types.
 
-- [ ] **Step 4: Create the event, the log port and the exception**
+- [x] **Step 4: Create the event, the log port and the exception**
 
 `src\DrivingLessons.Application\IntegrationEvents\Publications\PublicationClosedIntegrationEvent.cs`:
 
@@ -404,7 +404,7 @@ public class TeacherExcelEmailFailedException : Exception
 
 It is not a `DomainException`: it never reaches HTTP, it only tells the outbox to retry. Its message carries a count and a GUID, no name or address, because the processor stores it in `last_error` (README decision 14).
 
-- [ ] **Step 5: Create the consumer and slim the handler**
+- [x] **Step 5: Create the consumer and slim the handler**
 
 `src\DrivingLessons.Application\Consumers\TeacherExcelEmail\SendTeacherExcelEmailsConsumer.cs`. The subject, body and attachment-name code is moved **unchanged** from `PublicationClosedHandler` (US-44):
 
@@ -608,7 +608,7 @@ public class PublicationClosedHandler : IDomainEventHandler<PublicationClosed>
 
 `repository.GetAsync` returns the Publication the close interactor already tracks, with the versions the close just incremented. `TeacherVersions` also lists a Teacher who had a version on an earlier close but no Week Schedule now. Today that Teacher gets their old version again on every close; with the guard (`WasSentAsync`) the old version is already recorded and skipped. That's a small improvement, not a behavior to preserve.
 
-- [ ] **Step 6: Register the event and the consumer**
+- [x] **Step 6: Register the event and the consumer**
 
 In `src\DrivingLessons.Application\DependencyInjection.cs`, add `using DrivingLessons.Application.Consumers.TeacherExcelEmail;` and `using DrivingLessons.Application.IntegrationEvents.Publications;`, and after the two `IDomainEventHandler` registrations:
 
@@ -619,7 +619,7 @@ In `src\DrivingLessons.Application\DependencyInjection.cs`, add `using DrivingLe
 
 `TimeProvider` is already registered (`AddInfrastructure`), so the consumer resolves.
 
-- [ ] **Step 7: Store the sent emails**
+- [x] **Step 7: Store the sent emails**
 
 `src\DrivingLessons.Infrastructure\Email\SentTeacherExcelEmail.cs`:
 
@@ -743,7 +743,7 @@ In `src\DrivingLessons.Infrastructure\DependencyInjection.cs`, after `services.A
         services.AddScoped<ITeacherExcelEmailLog, TeacherExcelEmailLog>();
 ```
 
-- [ ] **Step 8: Generate and read the migration**
+- [x] **Step 8: Generate and read the migration**
 
 ```bash
 dotnet ef migrations add AddSentTeacherExcelEmails --project src/DrivingLessons.Infrastructure --startup-project src/DrivingLessons.Presentation.Web --output-dir EntityFramework/Migrations
@@ -752,7 +752,7 @@ dotnet ef migrations has-pending-model-changes --project src/DrivingLessons.Infr
 
 The migration must create only `sent_teacher_excel_emails` with the composite primary key. No backfill: emails sent before this slice have no row, and no outbox event exists for them, so nothing will try to send them again.
 
-- [ ] **Step 9: Run the tests**
+- [x] **Step 9: Run the tests**
 
 ```bash
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~PublicationClosedHandlerTest|FullyQualifiedName~SendTeacherExcelEmailsConsumerTest"
@@ -763,7 +763,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: handler 3 passed; consumer: the 13 moved test runs plus the 6 new ones pass; full suites pass.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add src/DrivingLessons.Application/IntegrationEvents/Publications src/DrivingLessons.Application/Abstractions/ITeacherExcelEmailLog.cs src/DrivingLessons.Application/Consumers src/DrivingLessons.Application/EventHandlers/PublicationClosedHandler.cs src/DrivingLessons.Application/DependencyInjection.cs src/DrivingLessons.Infrastructure/Email/SentTeacherExcelEmail.cs src/DrivingLessons.Infrastructure/Email/TeacherExcelEmailLog.cs src/DrivingLessons.Infrastructure/EntityFramework/EntityConfigurations/SentTeacherExcelEmailConfiguration.cs src/DrivingLessons.Infrastructure/EntityFramework/DrivingLessonsDbContext.cs src/DrivingLessons.Infrastructure/EntityFramework/Migrations src/DrivingLessons.Infrastructure/DependencyInjection.cs tests/DrivingLessons.Application.Test/Consumers tests/DrivingLessons.Application.Test/EventHandlers/PublicationClosedHandlerTest.cs

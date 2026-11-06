@@ -306,6 +306,29 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("week_schedules", (string)null);
                 });
 
+            modelBuilder.Entity("DrivingLessons.Infrastructure.Email.SentTeacherExcelEmail", b =>
+                {
+                    b.Property<Guid>("PublicationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("publication_id");
+
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("teacher_id");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
+                    b.Property<DateTimeOffset>("SentAtUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("sent_at_utc");
+
+                    b.HasKey("PublicationId", "TeacherId", "Version");
+
+                    b.ToTable("sent_teacher_excel_emails", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Infrastructure.Outbox.OutboxDelivery", b =>
                 {
                     b.Property<Guid>("Id")
