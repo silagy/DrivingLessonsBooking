@@ -159,6 +159,20 @@ curl -s https://<domain>/api/health
 df -h / && free -h
 ```
 
+### Outbox: emails that didn't go out
+
+Emails (and, later, WhatsApp messages) are sent by the outbox job a few seconds after the change that owes them. A failed delivery is retried with growing gaps (1, 2, 4 … 60 minutes); after 8 attempts, about two hours, it is `Dead` and logged at Error ("Outbox delivery [...] of [publication-closed.v1] to [SendTeacherExcelEmailsConsumer] is dead after [8] attempts."). A delivery whose event or consumer the running release no longer knows is dead after its first attempt. To list them:
+
+```bash
+./dl-compose.sh exec -T postgres psql -U app -d drivinglessons -c "SELECT d.id, m.event_name, d.consumer, d.attempts, d.last_error, d.completed_at_utc FROM outbox_deliveries d JOIN outbox_messages m ON m.id = d.message_id WHERE d.state = 'Dead' ORDER BY d.completed_at_utc DESC;"
+```
+
+After fixing the cause (for example SES credentials), re-arm one delivery; the job picks it up within seconds, and Teachers already sent that version are skipped (`sent_teacher_excel_emails`):
+
+```bash
+./dl-compose.sh exec -T postgres psql -U app -d drivinglessons -c "UPDATE outbox_deliveries SET state = 'Pending', attempts = 0, next_attempt_at_utc = now(), locked_until_utc = NULL, completed_at_utc = NULL WHERE id = '<delivery id>';"
+```
+
 ### Refreshing Caddy and Postgres
 
 Deploy pulls only the app image, so a release never restarts the database or the proxy. Their images (`caddy:2`, `postgres:17`) get security fixes only when you pull them. Once a month, outside a submission window:

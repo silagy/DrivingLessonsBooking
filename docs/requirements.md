@@ -220,7 +220,7 @@ One row per slot request, sorted by day, then slot, then student rank:
 National ID, phone and transmission were removed at the customer's request (October 2026).
  
 ### Delivery
-- **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4)
+- **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4). A failed send is retried for about two hours; a Teacher never receives the same version twice
 - **On-demand:** download button in the app, available at any time
 ## 10. Non-Functional Requirements
  

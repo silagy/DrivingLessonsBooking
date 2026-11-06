@@ -72,6 +72,8 @@ docs\
 | Typed ID | `Domain\Values\{Entity}Id.cs` | `{Entity}Id` |
 | Value object | `Domain\Values\{Value}.cs` | `{Value}` |
 | Domain event | `Domain\Events\{Entity}{Action}.cs` | `{Entity}{Action}` |
+| Integration event | `Application\IntegrationEvents\{Context}\{Entity}{Action}IntegrationEvent.cs` | `{Entity}{Action}IntegrationEvent` |
+| Integration event consumer | `Application\Consumers\{Job}\{Consumer}Consumer.cs` | `{Consumer}Consumer` |
 | Domain exception | `Domain\Exceptions\{Entity}{Rule}Exception.cs` | `{Entity}{Rule}Exception` |
 | Not-found exception | `Application\Common\Exceptions\{Entity}NotFoundException.cs` | `{Entity}NotFoundException` |
 | Repository interface | `Domain\Repositories\I{Entity}Repository.cs` | `I{Entity}Repository` |
@@ -138,5 +140,6 @@ Timezone rules (requirements §8.3): instants in UTC, slot windows as local time
 ### During implementation
 - [ ] `MustBe*` guards with domain-specific exceptions on every state-changing method
 - [ ] Domain event per state change, named `{Entity}{Action}` in past tense
+- [ ] Side effects outside the database go through an integration event and a consumer ([ADR 0010](docs/decisions/0010-integration-events-and-outbox.md)), never inline in a handler
 - [ ] Value objects at the application boundary — no primitives into the domain
 - [ ] Tests per `domain-testing.md`: happy path, `__Add_Event`, `__Must_Be_*` guards with `[DataRow]`

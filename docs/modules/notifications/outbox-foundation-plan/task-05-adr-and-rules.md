@@ -15,7 +15,7 @@
 - Consumes: what tasks 1–4 built, as built. Before writing each fact, re-check it against the code on this branch (class names, table and column names, option defaults, the event name `publication-closed.v1`). Where the code differs from this task's text, the code wins and the text changes.
 - Produces: no code change.
 
-- [ ] **Step 1: Write ADR 0010**
+- [x] **Step 1: Write ADR 0010**
 
 Create `docs\decisions\0010-integration-events-and-outbox.md`:
 
@@ -58,7 +58,7 @@ Domain events are dispatched in-process by `DrivingLessonsDbContext.CommitAsync`
 - Outbox rows are infrastructure records, not domain entities.
 ```
 
-- [ ] **Step 2: Amend ADR 0005**
+- [x] **Step 2: Amend ADR 0005**
 
 At the end of `docs\decisions\0005-email-over-ses-smtp.md` add:
 
@@ -68,7 +68,7 @@ At the end of `docs\decisions\0005-email-over-ses-smtp.md` add:
 The Excel email is no longer sent by `PublicationClosedHandler` during the close. The handler queues a `publication-closed.v1` integration event, and `SendTeacherExcelEmailsConsumer` sends one email per Teacher from the outbox job ([ADR 0010](0010-integration-events-and-outbox.md)). A failed send is now **retried** (up to 8 attempts over about two hours) and each sent (Publication, Teacher, version) is recorded in `sent_teacher_excel_emails`, so a retry never sends a Teacher the same version twice. The SMTP transport, MailKit and every setting above are unchanged. The Consequences bullet "Delivery problems are visible only in the logs" now reads: visible in the logs and as `Dead` rows in `outbox_deliveries`.
 ```
 
-- [ ] **Step 3: Update the architecture rules**
+- [x] **Step 3: Update the architecture rules**
 
 In `.claude\rules\ddd-architecture.md`:
 
@@ -108,11 +108,11 @@ Facts published for consumers outside the aggregate's transaction: notifications
 
 5. **Infrastructure Layer**: add one line to the DbContext section: "`CommitAsync` opens a transaction when none is open, so the aggregate, the domain-event handlers' rows and the outbox rows commit together. Outbox rows (`Infrastructure\Outbox\`) are infrastructure records: plain classes with EF configurations, no `AggregateRoot`, no typed IDs."
 
-- [ ] **Step 4: Update CLAUDE.md**
+- [x] **Step 4: Update CLAUDE.md**
 
 In the **File Location Quick Reference** table, after the `Domain event` row add the same two rows as Step 3.1. In **Implementation Checklist → During implementation** add: `- [ ] Side effects outside the database go through an integration event and a consumer (ADR 0010), never inline in a handler`.
 
-- [ ] **Step 5: Update tech-stack, requirements and runbook**
+- [x] **Step 5: Update tech-stack, requirements and runbook**
 
 `docs\tech-stack.md`, **Background Processing**: replace the paragraph with:
 
@@ -146,7 +146,7 @@ docker compose exec postgres psql -U drivinglessons -d drivinglessons -c "UPDATE
 
 Check the `psql` user and database names against the runbook's existing commands and use the same ones.
 
-- [ ] **Step 6: Check links and commit**
+- [x] **Step 6: Check links and commit**
 
 ```bash
 grep -rn "0010-integration-events-and-outbox" docs .claude CLAUDE.md
