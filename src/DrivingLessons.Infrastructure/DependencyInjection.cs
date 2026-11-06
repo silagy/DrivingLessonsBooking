@@ -12,6 +12,7 @@ using DrivingLessons.Infrastructure.EntityFramework.Queries;
 using DrivingLessons.Infrastructure.EntityFramework.Repositories;
 using DrivingLessons.Infrastructure.Excel;
 using DrivingLessons.Infrastructure.Options;
+using DrivingLessons.Infrastructure.Outbox;
 using DrivingLessons.Infrastructure.Scheduling;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DrivingLessonsDbContext>());
         services.AddScoped<ITeacherAndCarLocks, TeacherAndCarLocks>();
+        services.AddScoped<IOutbox, Outbox.Outbox>();
 
         services.AddHealthChecks()
                 .AddDbContextCheck<DrivingLessonsDbContext>();

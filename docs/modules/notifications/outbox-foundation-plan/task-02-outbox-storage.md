@@ -29,7 +29,7 @@
 
 Nothing calls `IOutbox` until task 4 and nothing reads the tables until task 3.
 
-- [ ] **Step 1: Write the failing delivery tests**
+- [x] **Step 1: Write the failing delivery tests**
 
 Create `tests\DrivingLessons.Application.Test\Outbox\OutboxDeliveryTest.cs`:
 
@@ -287,7 +287,7 @@ public class OutboxDeliveryTest
 }
 ```
 
-- [ ] **Step 2: Write the failing serializer and outbox tests**
+- [x] **Step 2: Write the failing serializer and outbox tests**
 
 Create `tests\DrivingLessons.Application.Test\Outbox\OutboxSerializerTest.cs`:
 
@@ -466,7 +466,7 @@ public class OutboxTest
 
 `TimeProvider` is faked with FakeItEasy, as in `ReviseSubmissionInteractorTest`; the test project has no `FakeTimeProvider` package and this slice adds none.
 
-- [ ] **Step 3: Run the tests to confirm they fail to compile**
+- [x] **Step 3: Run the tests to confirm they fail to compile**
 
 ```bash
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~DrivingLessons.Application.Test.Outbox"
@@ -474,7 +474,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: build error, `DrivingLessons.Infrastructure.Outbox` does not exist.
 
-- [ ] **Step 4: Create the outbox records**
+- [x] **Step 4: Create the outbox records**
 
 `src\DrivingLessons.Infrastructure\Outbox\OutboxDeliveryState.cs`:
 
@@ -666,7 +666,7 @@ public class OutboxDelivery
 
 These are infrastructure records (README conventions): no `AggregateRoot`, no typed IDs, no events. Only Infrastructure creates and changes them.
 
-- [ ] **Step 5: Create the serializer and the outbox**
+- [x] **Step 5: Create the serializer and the outbox**
 
 `src\DrivingLessons.Infrastructure\Outbox\OutboxSerializer.cs`:
 
@@ -742,7 +742,7 @@ public class Outbox : IOutbox
 
 The class is named `Outbox` in the namespace `…Infrastructure.Outbox`; the tests refer to it as `Infrastructure.Outbox.Outbox` to avoid the clash. If the compiler still finds the name ambiguous anywhere, rename the class to `EntityFrameworkOutbox` and the test field type with it; the rest of the plan only uses `IOutbox`.
 
-- [ ] **Step 6: Map the tables and commit in one transaction**
+- [x] **Step 6: Map the tables and commit in one transaction**
 
 `src\DrivingLessons.Infrastructure\EntityFramework\EntityConfigurations\OutboxMessageConfiguration.cs`:
 
@@ -908,7 +908,7 @@ Why: when no transaction is open, `SaveAndDispatchAsync` saves the aggregate und
 
 Checked at planning time: no interactor calls `CommitAsync` more than once. Task 4's consumer does, once per Teacher; after the dispose `Database.CurrentTransaction` is `null` again, so each call opens its own transaction.
 
-- [ ] **Step 7: Register the outbox**
+- [x] **Step 7: Register the outbox**
 
 In `src\DrivingLessons.Infrastructure\DependencyInjection.cs`, add `using DrivingLessons.Infrastructure.Outbox;` and, after `services.AddScoped<ITeacherAndCarLocks, TeacherAndCarLocks>();`:
 
@@ -918,7 +918,7 @@ In `src\DrivingLessons.Infrastructure\DependencyInjection.cs`, add `using Drivin
 
 `IntegrationEventCatalog` is registered by `AddApplication` the first time an event is added (task 4). Until then `Outbox` can't be resolved, and nothing resolves it.
 
-- [ ] **Step 8: Run the tests**
+- [x] **Step 8: Run the tests**
 
 ```bash
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~DrivingLessons.Application.Test.Outbox"
@@ -926,7 +926,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: all `OutboxDeliveryTest`, `OutboxSerializerTest` and `OutboxTest` tests pass.
 
-- [ ] **Step 9: Generate and read the migration**
+- [x] **Step 9: Generate and read the migration**
 
 ```bash
 dotnet ef migrations add AddOutbox --project src/DrivingLessons.Infrastructure --startup-project src/DrivingLessons.Presentation.Web --output-dir EntityFramework/Migrations
@@ -940,7 +940,7 @@ dotnet ef migrations has-pending-model-changes --project src/DrivingLessons.Infr
 
 Expected: no pending changes.
 
-- [ ] **Step 10: Full build and suites**
+- [x] **Step 10: Full build and suites**
 
 ```bash
 dotnet build
@@ -950,7 +950,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: everything passes. Existing interactor tests fake `IUnitOfWork`, so the transaction change doesn't reach them; the smoke in task 6 proves it on Postgres.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add src/DrivingLessons.Infrastructure/Outbox src/DrivingLessons.Infrastructure/EntityFramework/EntityConfigurations/OutboxMessageConfiguration.cs src/DrivingLessons.Infrastructure/EntityFramework/EntityConfigurations/OutboxDeliveryConfiguration.cs src/DrivingLessons.Infrastructure/EntityFramework/DrivingLessonsDbContext.cs src/DrivingLessons.Infrastructure/EntityFramework/Migrations src/DrivingLessons.Infrastructure/DependencyInjection.cs tests/DrivingLessons.Application.Test/Outbox

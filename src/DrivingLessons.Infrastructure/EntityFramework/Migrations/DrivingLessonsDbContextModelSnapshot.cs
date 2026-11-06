@@ -306,6 +306,85 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                     b.ToTable("week_schedules", (string)null);
                 });
 
+            modelBuilder.Entity("DrivingLessons.Infrastructure.Outbox.OutboxDelivery", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("completed_at_utc");
+
+                    b.Property<string>("Consumer")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("consumer");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("last_error");
+
+                    b.Property<DateTimeOffset?>("LockedUntilUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("locked_until_utc");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("message_id");
+
+                    b.Property<DateTimeOffset>("NextAttemptAtUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("next_attempt_at_utc");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("state");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId", "Consumer")
+                        .IsUnique();
+
+                    b.HasIndex("State", "NextAttemptAtUtc");
+
+                    b.ToTable("outbox_deliveries", (string)null);
+                });
+
+            modelBuilder.Entity("DrivingLessons.Infrastructure.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("event_name");
+
+                    b.Property<DateTimeOffset>("OccurredAtUtc")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("occurred_at_utc");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("payload");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("outbox_messages", (string)null);
+                });
+
             modelBuilder.Entity("DrivingLessons.Domain.Entities.Car", b =>
                 {
                     b.OwnsMany("DrivingLessons.Domain.Entities.TeacherAssignment", "TeacherAssignments", b1 =>
@@ -535,6 +614,15 @@ namespace DrivingLessons.Infrastructure.EntityFramework.Migrations
                         });
 
                     b.Navigation("Slots");
+                });
+
+            modelBuilder.Entity("DrivingLessons.Infrastructure.Outbox.OutboxDelivery", b =>
+                {
+                    b.HasOne("DrivingLessons.Infrastructure.Outbox.OutboxMessage", null)
+                        .WithMany()
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
