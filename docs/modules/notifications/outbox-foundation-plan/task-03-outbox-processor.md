@@ -20,7 +20,7 @@
 
 After this task the job runs every 5 seconds against empty tables. Task 4 gives it the first event.
 
-- [ ] **Step 1: Write the failing options test**
+- [x] **Step 1: Write the failing options test**
 
 Create `tests\DrivingLessons.Application.Test\Outbox\OutboxOptionsTest.cs`:
 
@@ -88,7 +88,7 @@ public class OutboxOptionsTest
 }
 ```
 
-- [ ] **Step 2: Create the options and the processor**
+- [x] **Step 2: Create the options and the processor**
 
 `src\DrivingLessons.Infrastructure\Options\OutboxOptions.cs`:
 
@@ -324,7 +324,7 @@ How it works:
 
 If `SqlQuery` turns out to wrap the `UPDATE` in a sub-select at runtime (task 6 Step 3 shows a Postgres syntax error in the log), run the same SQL through `context.Database.GetDbConnection()` with an `NpgsqlCommand` and read the `id`s from its reader. Keep the statement unchanged.
 
-- [ ] **Step 3: Create the jobs**
+- [x] **Step 3: Create the jobs**
 
 `src\DrivingLessons.Infrastructure\Scheduling\ProcessOutboxJob.cs`:
 
@@ -380,7 +380,7 @@ public class PurgeOutboxJob : IJob
 
 `OpenPublicationJob` swallows `DomainException` because its interactor may legitimately refuse. These jobs let an exception from the lease or the purge (database down) reach Quartz, which logs it; the next run tries again.
 
-- [ ] **Step 4: Register and schedule**
+- [x] **Step 4: Register and schedule**
 
 In `src\DrivingLessons.Infrastructure\DependencyInjection.cs`:
 
@@ -433,7 +433,7 @@ The interval is read once at startup to build the trigger; the same values are b
 
 Quartz's DI job factory creates a scope per job run (the existing `OpenPublicationJob` already relies on it for its scoped interactor), so each run gets a fresh `OutboxProcessor` and `DbContext`.
 
-- [ ] **Step 5: Configuration**
+- [x] **Step 5: Configuration**
 
 In `src\DrivingLessons.Presentation.Web\appsettings.json`, add after the `Email` section:
 
@@ -449,7 +449,7 @@ In `src\DrivingLessons.Presentation.Web\appsettings.json`, add after the `Email`
 
 Keep the JSON valid (commas). No environment variable is needed: these are defaults, and `Outbox__PollSeconds` etc. override them if ever needed.
 
-- [ ] **Step 6: Run the tests and build**
+- [x] **Step 6: Run the tests and build**
 
 ```bash
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~OutboxOptionsTest"
@@ -460,11 +460,11 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: `OutboxOptionsTest` 6 passed; everything else passes.
 
-- [ ] **Step 7: Start the app once**
+- [x] **Step 7: Start the app once**
 
 Start the API against your local development database (as in `docs/development/running-the-project.md`) and watch the log for 30 seconds. Expected: it starts, applies `AddOutbox` if not applied, and logs no error from `ProcessOutboxJob` or `PurgeOutboxJob` (the catalog is registered by `AddApplication` since task 1, empty until task 4). Stop the app.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/DrivingLessons.Infrastructure/Options/OutboxOptions.cs src/DrivingLessons.Infrastructure/Outbox/OutboxProcessor.cs src/DrivingLessons.Infrastructure/Scheduling/ProcessOutboxJob.cs src/DrivingLessons.Infrastructure/Scheduling/PurgeOutboxJob.cs src/DrivingLessons.Infrastructure/DependencyInjection.cs src/DrivingLessons.Presentation.Web/appsettings.json tests/DrivingLessons.Application.Test/Outbox/OutboxOptionsTest.cs

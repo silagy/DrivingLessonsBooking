@@ -52,6 +52,11 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<OutboxOptions>()
+            .Bind(configuration.GetSection(OutboxOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserQueries, UserQueries>();
         services.AddScoped<ITeacherRepository, TeacherRepository>();
@@ -76,11 +81,36 @@ public static class DependencyInjection
 
         services.AddSingleton(TimeProvider.System);
 
-        services.AddQuartz();
+        var outboxSection = configuration.GetSection(OutboxOptions.SectionName);
+        var outboxOptions = outboxSection.Get<OutboxOptions>() ?? new OutboxOptions();
+
+        services.AddQuartz(quartz =>
+        {
+            quartz.ScheduleJob<ProcessOutboxJob>(
+                trigger => trigger
+                           .WithIdentity("process-outbox", ProcessOutboxJob.JobGroup)
+                           .StartNow()
+                           .WithSimpleSchedule(schedule => schedule
+                                                           .WithIntervalInSeconds(outboxOptions.PollSeconds)
+                                                           .RepeatForever()),
+                job => job.WithIdentity("process-outbox", ProcessOutboxJob.JobGroup));
+
+            quartz.ScheduleJob<PurgeOutboxJob>(
+                trigger => trigger
+                           .WithIdentity("purge-outbox", ProcessOutboxJob.JobGroup)
+                           .StartNow()
+                           .WithSimpleSchedule(schedule => schedule
+                                                           .WithIntervalInHours(1)
+                                                           .RepeatForever()),
+                job => job.WithIdentity("purge-outbox", ProcessOutboxJob.JobGroup));
+        });
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         services.AddTransient<OpenPublicationJob>();
         services.AddTransient<ClosePublicationJob>();
+        services.AddScoped<OutboxProcessor>();
+        services.AddTransient<ProcessOutboxJob>();
+        services.AddTransient<PurgeOutboxJob>();
         services.AddScoped<IPublicationScheduler, PublicationScheduler>();
 
         services.AddHostedService<PublicationReconciliationHostedService>();
