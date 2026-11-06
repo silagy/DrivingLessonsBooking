@@ -585,9 +585,17 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public async Task CommitAsync()
     {
-        await SaveChangesAsync();
+        if (Database.CurrentTransaction is null)
+        {
+            await Database.BeginTransactionAsync();
+        }
 
-        await DispatchDomainEventsAsync();
+        await SaveAndDispatchAsync();
+
+        var transaction = Database.CurrentTransaction!;
+
+        await transaction.CommitAsync();
+        await transaction.DisposeAsync();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
