@@ -432,10 +432,10 @@ public class IntegrationEventCatalog
             throw new IntegrationEventCatalogException($"Consumer [{consumerName}] of [{eventName}] is already registered.");
         }
 
-        var registration = new IntegrationEventConsumerRegistration(consumerName, InvokeAsync);
+        var registration = new IntegrationEventConsumerRegistration(consumerName, ConsumeAsync);
         consumers.Add(registration);
 
-        static Task<DeliveryOutcome> InvokeAsync(IServiceProvider provider, IIntegrationEvent integrationEvent)
+        static Task<DeliveryOutcome> ConsumeAsync(IServiceProvider provider, IIntegrationEvent integrationEvent)
         {
             var consumer = provider.GetRequiredService<TConsumer>();
 
@@ -490,6 +490,8 @@ public class IntegrationEventCatalog
     }
 }
 ```
+
+`ConsumeAsync` is a static local function, declared after the line that uses it, which C# allows. `AddConsumer` knows `TEvent` and `TConsumer`; the processor later knows neither, only the consumer's name and an `IIntegrationEvent` read back from JSON. So the local function captures the two types, and is stored in the registration's `InvokeAsync` property: calling `registration.InvokeAsync(provider, integrationEvent)` resolves `TConsumer` from that provider, casts the event to `TEvent` and calls the consumer, with no reflection.
 
 The `out var` in `TryGetValue` is the dictionary API, not a method of ours, so the "avoid `out`" rule doesn't apply.
 
