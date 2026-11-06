@@ -35,6 +35,7 @@ using DrivingLessons.Application.Commands.SeedFirstAdministrator;
 using DrivingLessons.Application.Commands.SetUserTemporaryPassword;
 using DrivingLessons.Application.Commands.UnassignCarFromTeacher;
 using DrivingLessons.Application.EventHandlers;
+using DrivingLessons.Application.IntegrationEvents;
 using DrivingLessons.Application.Queries.DownloadPublicationExcel;
 using DrivingLessons.Application.Queries.FindCars;
 using DrivingLessons.Application.Queries.FindPublicationHistory;
@@ -62,6 +63,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddIntegrationEventCatalog();
+
         services.AddScoped<LoginInteractor>();
         services.AddScoped<CheckSignedInUserInteractor>();
         services.AddScoped<SeedFirstAdministratorInteractor>();

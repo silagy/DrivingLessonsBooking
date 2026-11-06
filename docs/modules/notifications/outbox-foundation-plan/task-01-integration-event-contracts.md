@@ -28,7 +28,7 @@
 
 Nothing registers an event yet, and nothing implements `IOutbox` until task 2, so the running app is unchanged.
 
-- [ ] **Step 1: Write the failing catalog tests**
+- [x] **Step 1: Write the failing catalog tests**
 
 Create `tests\DrivingLessons.Application.Test\IntegrationEvents\IntegrationEventCatalogTest.cs`:
 
@@ -290,7 +290,7 @@ public class IntegrationEventCatalogTest
 }
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail to compile**
+- [x] **Step 2: Run the tests to confirm they fail to compile**
 
 ```bash
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~IntegrationEventCatalogTest"
@@ -298,7 +298,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: build error, `DrivingLessons.Application.IntegrationEvents` does not exist.
 
-- [ ] **Step 3: Create the contracts**
+- [x] **Step 3: Create the contracts**
 
 `src\DrivingLessons.Application\IntegrationEvents\IIntegrationEvent.cs`:
 
@@ -384,7 +384,7 @@ public interface IOutbox
 }
 ```
 
-- [ ] **Step 4: Create the catalog**
+- [x] **Step 4: Create the catalog**
 
 `src\DrivingLessons.Application\IntegrationEvents\IntegrationEventCatalog.cs`:
 
@@ -495,7 +495,7 @@ public class IntegrationEventCatalog
 
 The `out var` in `TryGetValue` is the dictionary API, not a method of ours, so the "avoid `out`" rule doesn't apply.
 
-- [ ] **Step 5: Create the registration extension**
+- [x] **Step 5: Create the registration extension**
 
 `src\DrivingLessons.Application\IntegrationEvents\IntegrationEventServiceCollectionExtension.cs`:
 
@@ -559,7 +559,7 @@ In `src\DrivingLessons.Application\DependencyInjection.cs`, add `using DrivingLe
 
 The catalog is then always registered, even before any event is (task 3's job resolves it on every run).
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 ```bash
 dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Test.csproj --filter "FullyQualifiedName~IntegrationEventCatalogTest"
@@ -567,7 +567,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: 16 passed (15 test methods; the `DataRow` test runs twice).
 
-- [ ] **Step 7: Full build and suites**
+- [x] **Step 7: Full build and suites**
 
 ```bash
 dotnet build
@@ -577,7 +577,7 @@ dotnet test tests/DrivingLessons.Application.Test/DrivingLessons.Application.Tes
 
 Expected: build without warnings introduced by this task; all tests pass.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/DrivingLessons.Application/IntegrationEvents src/DrivingLessons.Application/Abstractions/IOutbox.cs src/DrivingLessons.Application/DependencyInjection.cs tests/DrivingLessons.Application.Test/IntegrationEvents
