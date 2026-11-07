@@ -17,7 +17,7 @@ Behind this, the system gets a simple, durable way to publish **integration even
 
 ## 2. Why
 
-- The weekly link is still sent by hand (requirements §6.2 step 4). Chasing students who haven't submitted is the part of the old WhatsApp workload that remains, and that workload is what this system exists to remove (requirements §1).
+- The weekly link is still sent by hand (requirements §6.2 step 4). Since #138 (requirements decision #27), the dashboard lists the Students who haven't submitted, each with a click-to-chat button that opens the sender's own WhatsApp with a Hebrew reminder already written. That removes the typing, but someone still has to open each chat and press send, one Student at a time, and nothing records who was reached. The automated route sends to everyone at once from the school's number and records sent / failed / skipped per Student; it is what this system exists to remove (requirements §1).
 - Side effects run today inside the caller's unit of work. `DrivingLessonsDbContext.SaveAndDispatchAsync` dispatches domain events synchronously, between saves and, when an explicit transaction is open (`TeacherAndCarLocks`), before it commits. `PublicationClosedHandler` sends the teacher's email inline. Nothing durable records that a send is owed: if the process stops between the save and the send, the email is lost, and a failed send is only logged, with no retry (ADR 0005). Adding WhatsApp the same way would multiply these problems, and it would mean dozens of outbound HTTP calls inside one request or job. Stage 1 fixes this for the teacher's email too, not only for the new WhatsApp messages.
 - We want a structure that can grow: more channels (SMS, email, push), more events, and maybe a real broker one day, without paying for SNS/SQS-level infrastructure now.
 
@@ -54,7 +54,11 @@ Behind this, the system gets a simple, durable way to publish **integration even
 
 ### 4.1 Recipients
 
-A **recipient** of a Publication is an active Student whose Teacher has a Week Schedule in that Publication, and who has a phone number that converts to a valid WhatsApp number. Inactive Students and Students of Teachers absent from that week are never messaged. A Student whose number can't be converted is recorded as **skipped** with that reason.
+A **recipient** of a Publication is an active Student whose current Teacher has a Week Schedule in that Publication, and whose phone converts to a WhatsApp number. Inactive Students and Students of Teachers absent from that week are never messaged. A Student whose number can't be converted is recorded as **skipped** with that reason.
+
+This is the same set of Students #138 lists on the dashboard, and the same conversion: reuse them rather than build new ones.
+- **Who hasn't submitted:** `IStudentQueries.FindWithoutSubmissionAsync` (per Teacher) and `FindSchoolStudentsWithoutSubmissionInteractor` (school-wide), from #138. A reminder's recipients are exactly that list at the moment the reminder is processed; the opening and window change notifications use the same rule without the Submission filter.
+- **Which numbers can be messaged:** `PhoneNumber.ToWhatsAppNumber()` returns a `WhatsAppNumber` (international digits, `9725…`) for an Israeli mobile written locally, internationally or with a dial-out prefix, and `null` for anything else (landlines, foreign numbers, typos). `null` is the "skipped: invalid number" case.
 
 ### 4.2 Opening notification
 
@@ -75,6 +79,8 @@ A **recipient** of a Publication is an active Student whose Teacher has a Week S
 - Available only while the Publication is `Open`. Asking for one on a Publication in any other state is refused with the existing `PublicationMustBeOpenException` (409), not silently ignored. That's what CLAUDE.md rule 1, "operations are not idempotent", asks for: a command that can't do what it says fails loudly. Sending a second reminder while the window is still open is not a repeat of the same transition, so it is allowed, and the limits in §4.5 decide who actually gets it.
 - The dashboard shows how many recipients have no Submission yet. The person confirms, and the reminder is queued. The request returns immediately; sending happens in the background.
 - Who may send it: the **Administrator** only, for the whole Publication (decision 1, §8).
+- **It sits beside #138's click-to-chat buttons, it doesn't replace them.** The automated reminder goes to every recipient without a Submission at once, from the school's number. The per-Student WhatsApp button on the same list stays for one-off chasing, and stays available to Teacher-role Users for their own Students. The two never interfere: DriveCal records nothing about click-to-chat messages (decision #27), so they don't count toward the automated reminder's limits (§4.5).
+- The reminder template's wording follows #138's message (`docs/modules/publications/whatsapp-reminders-intent.md` §4.4): Hebrew, plural address, a slot is a **שיעור אפשרי** (requirements decision #26), the week, the closing time and the link.
 - Who is reminded is decided **when the reminder is processed**, not when it was requested: a Student who submitted in between is not reminded.
 
 ### 4.5 Scheduled reminders
@@ -93,7 +99,9 @@ Not captured in DriveCal. Students reach DriveCal through the Roster, which the 
 
 ### 4.7 What the Administrator sees
 
-On the Publication dashboard, per Publication: recipients, opening and window change notifications sent / failed / skipped, reminders sent, Students not yet submitted, and whether each Teacher's Excel email was sent. Failures and skips are listed by Student with their reason (e.g. invalid number, provider error).
+On the Publication dashboard, per Publication: recipients, opening and window change notifications sent / failed / skipped, reminders sent, and whether each Teacher's Excel email was sent. Failures and skips are listed by Student with their reason (e.g. invalid number, provider error).
+
+"Students not yet submitted" already exists: it is #138's list under the grid. The delivery view extends that list (for example, a column with each Student's last automated message and its result) rather than adding a second list of the same Students.
 
 ## 5. Architecture intent
 
@@ -171,13 +179,13 @@ Manual and scheduled reminders differ only in their trigger. They share one cons
 
 - Port in Application (an `IWhatsAppSender`-style abstraction, like `IEmailSender`). Implementation in Infrastructure over `HttpClient` to the Cloud API (`graph.facebook.com`), with no third-party SDK unless planning finds a reason.
 - Configuration through environment variables, like `EMAIL_*` (`.env.example`): access token, Phone Number ID, WhatsApp Business Account ID, template names and language, an `Enabled` switch. Disabled, the sender logs and records the message as skipped. Locally, it stays disabled or points at a fake.
-- Phone numbers: `PhoneNumber` keeps the roster text as entered. A conversion to international format (`05X-XXXXXXX` → `9725XXXXXXXX`) is added, and a number that can't convert is a recorded skip, never an exception that stops the batch.
+- Phone numbers: reuse `PhoneNumber.ToWhatsAppNumber()` from #138 (§4.1). The Cloud API takes the same international digits (`9725XXXXXXXX`). A `null` result is a recorded skip, never an exception that stops the batch.
 - Templates are created and approved in the client's WhatsApp Manager (Utility, Hebrew). The template names in configuration must match.
-- **The school's existing number sends the messages** (Meta's Coexistence): the same number stays active in the WhatsApp Business app on the manager's phone and is connected to the Cloud API. Messages DriveCal sends also appear in the app's chats, and a Student's reply lands there too, so the manager answers by hand as today and DriveCal never handles replies (§3 non-goals). The code is the same as with a dedicated number; only onboarding differs (§9).
+- **The school's existing number sends the messages** (Meta's Coexistence; still to be arranged, see §9): the same number stays active in the WhatsApp Business app on the manager's phone and is connected to the Cloud API. Messages DriveCal sends also appear in the app's chats, and a Student's reply lands there too, so the manager answers by hand as today and DriveCal never handles replies (§3 non-goals). The code is the same as with a dedicated number; only onboarding differs (§9).
 
 ## 6. Documentation and decisions this will change
 
-- `docs/requirements.md`: §3 in scope, §6.2 step 4 (the link is sent by the system; manual distribution stays possible), §6.3 (reminders during the window), and a new decision #26 in §11. Decision #13 stays, narrowed to "final schedule notification".
+- `docs/requirements.md`: §3 in scope, §6.2 step 4 (the link is sent by the system; manual distribution stays possible), §6.3 (automated reminders next to #138's list and buttons), and a new decision **#28** in §11 (decisions #26 and #27 were taken while this was postponed). Decision #13 stays, narrowed to "final schedule notification". Decision #27 (click-to-chat, DriveCal records nothing) stays as it is: it already names the notifications module as the automated route.
 - `CONTEXT.md`: new glossary terms (e.g. Opening Notification, Window Change Notification, Submission Reminder, Recipient), with words to avoid.
 - New ADRs: **0010** integration events and transactional outbox (processor and reminder checks run by Quartz, per-consumer delivery, no broker); **0011** WhatsApp over the Cloud API (templates, configuration, consent held by the school's own system, cost).
 - ADR 0005 amended: the teacher's email is sent by an outbox consumer, with retries, instead of inline with no retry.
@@ -208,11 +216,11 @@ All open questions are answered (19 October 2026). Questions 2 and 6 were not di
 | 5 | Scheduled reminders on or off by default for each Publication? | **On**; an Administrator can switch them off per Publication |
 | 6 | Retention of processed outbox rows and delivery records | **30 days** for succeeded outbox deliveries; message records per Student are kept with the Publication (configuration, default value) |
 
-Also decided since the first draft: reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), Quartz runs the outbox processor and the scheduled reminder checks (§5.3), messages go out from the school's existing number through Coexistence (§5.7), and a window change notification is sent right away, even during quiet hours (§4.3).
+Also decided since the first draft: reopen and extend send the window change notification (§4.3), the teacher's Excel email moves onto the outbox in stage 1 (§3 item 8), there is no RabbitMQ or other broker (§3 non-goals), consent is held by the school's own system, not DriveCal (§4.6), Quartz runs the outbox processor and the scheduled reminder checks (§5.3), messages go out from the school's existing number through Coexistence (§5.7; Meta's self-serve setup refused it, so this now needs a partner or a second number, §9), and a window change notification is sent right away, even during quiet hours (§4.3).
 
 ## 9. Prerequisites outside the code
 
 - The client's Meta Business portfolio, WhatsApp Business Account and a payment method (see the client guide shared in conversation).
-- The school's existing WhatsApp Business app number connected to the Cloud API through Coexistence, with the manager's phone at hand for the verification code. Coexistence is offered through Meta's Embedded Signup and depends on the region; if Meta's direct onboarding doesn't offer it for Israel, a provider that supports Coexistence is used for onboarding, which changes only the sender's configuration, not the design.
+- **The sending number. This is what the WhatsApp slices wait for.** Meta's self-serve setup refused the school's existing number ("This phone number is not eligible to register or migrate", 20 October 2026), and offered no Coexistence option. Two ways forward, to choose before slice 2: a Meta partner that supports Coexistence for Israeli numbers (same number, replies stay on the manager's phone, a partner fee, and slice 2's sender calls the partner's API), or a second number registered directly with Meta (only Meta's per-message cost, the planned sender, but Students see a new number). The rest of the design doesn't change either way.
 - Three Hebrew Utility templates approved: opening notification, window change notification, and reminder.
 - A permanent system-user access token, stored only in the production `.env`, never in git, chat or email.
