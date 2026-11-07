@@ -40,7 +40,7 @@ One repository, one deployable. The frontend and backend are versioned, branched
 
 ## Background Processing
 
-Requirements §6.4 demands an automatic Excel email at every window close. This is handled by a .NET `BackgroundService` inside the app process that periodically finds open publications past their window end, closes them, and triggers the versioned email. No external scheduler, no cron, no queue.
+Quartz runs everything that happens on a clock inside the app process: opening and closing each Publication at its window times (`OpenPublicationJob`, `ClosePublicationJob`, re-registered at startup by `PublicationReconciliationHostedService`), and delivering integration events from the PostgreSQL outbox every few seconds (`ProcessOutboxJob`, `PurgeOutboxJob`; [ADR 0010](decisions/0010-integration-events-and-outbox.md)). The teacher's Excel email at every close (requirements §6.4) is the first outbox consumer. No external scheduler, no cron, no broker.
 
 This constraint is why hosting must be **always-on** — spin-down free tiers and static/serverless splits are ruled out.
 

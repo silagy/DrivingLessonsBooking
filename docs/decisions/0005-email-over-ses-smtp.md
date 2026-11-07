@@ -29,3 +29,7 @@ Send over **SMTP with MailKit** to SES's SMTP endpoint (`email-smtp.<region>.ama
 - The provider can change (any SMTP relay) with configuration only.
 - SES setup is an operational step outside the code: verify the domain, leave the sandbox, create SMTP credentials, fill `EMAIL_*` on the host.
 - Delivery problems are visible only in the logs until a failure record is added (US-44 plan open item 1).
+
+## Amendment (6 November 2026): the close email goes through the outbox
+
+The Excel email is no longer sent by `PublicationClosedHandler` during the close. The handler queues a `publication-closed.v1` integration event, and `SendTeacherExcelEmailsConsumer` sends one email per Teacher from the outbox job ([ADR 0010](0010-integration-events-and-outbox.md)). A failed send is now **retried** (up to 8 attempts over about two hours) and each sent (Publication, Teacher, version) is recorded in `sent_teacher_excel_emails`, so a retry never sends a Teacher the same version twice. The SMTP transport, MailKit and every setting above are unchanged. The Consequences bullet "Delivery problems are visible only in the logs until a failure record is added" now reads: visible in the logs and as `Dead` rows in `outbox_deliveries`.

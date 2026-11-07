@@ -12,6 +12,7 @@ using DrivingLessons.Infrastructure.EntityFramework.Queries;
 using DrivingLessons.Infrastructure.EntityFramework.Repositories;
 using DrivingLessons.Infrastructure.Excel;
 using DrivingLessons.Infrastructure.Options;
+using DrivingLessons.Infrastructure.Outbox;
 using DrivingLessons.Infrastructure.Scheduling;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<DrivingLessonsDbContext>());
         services.AddScoped<ITeacherAndCarLocks, TeacherAndCarLocks>();
+        services.AddScoped<IOutbox, Outbox.Outbox>();
 
         services.AddHealthChecks()
                 .AddDbContextCheck<DrivingLessonsDbContext>();
@@ -47,6 +49,11 @@ public static class DependencyInjection
 
         services.AddOptions<EmailOptions>()
             .Bind(configuration.GetSection(EmailOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddOptions<OutboxOptions>()
+            .Bind(configuration.GetSection(OutboxOptions.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
@@ -69,16 +76,42 @@ public static class DependencyInjection
         services.AddScoped<IRosterCsvParser, RosterCsvParser>();
         services.AddScoped<IExcelGenerator, ExcelGenerator>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();
+        services.AddScoped<ITeacherExcelEmailLog, TeacherExcelEmailLog>();
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddSingleton(TimeProvider.System);
 
-        services.AddQuartz();
+        var outboxSection = configuration.GetSection(OutboxOptions.SectionName);
+        var outboxOptions = outboxSection.Get<OutboxOptions>() ?? new OutboxOptions();
+
+        services.AddQuartz(quartz =>
+        {
+            quartz.ScheduleJob<ProcessOutboxJob>(
+                trigger => trigger
+                           .WithIdentity("process-outbox", ProcessOutboxJob.JobGroup)
+                           .StartNow()
+                           .WithSimpleSchedule(schedule => schedule
+                                                           .WithIntervalInSeconds(outboxOptions.PollSeconds)
+                                                           .RepeatForever()),
+                job => job.WithIdentity("process-outbox", ProcessOutboxJob.JobGroup));
+
+            quartz.ScheduleJob<PurgeOutboxJob>(
+                trigger => trigger
+                           .WithIdentity("purge-outbox", ProcessOutboxJob.JobGroup)
+                           .StartNow()
+                           .WithSimpleSchedule(schedule => schedule
+                                                           .WithIntervalInHours(1)
+                                                           .RepeatForever()),
+                job => job.WithIdentity("purge-outbox", ProcessOutboxJob.JobGroup));
+        });
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         services.AddTransient<OpenPublicationJob>();
         services.AddTransient<ClosePublicationJob>();
+        services.AddScoped<OutboxProcessor>();
+        services.AddTransient<ProcessOutboxJob>();
+        services.AddTransient<PurgeOutboxJob>();
         services.AddScoped<IPublicationScheduler, PublicationScheduler>();
 
         services.AddHostedService<PublicationReconciliationHostedService>();

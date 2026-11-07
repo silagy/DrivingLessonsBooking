@@ -41,6 +41,8 @@ Domain.Test       → Domain
 | Typed ID | `Domain\Values\{Entity}Id.cs` | `{Entity}Id` |
 | Value object | `Domain\Values\{Value}.cs` | `{Value}` |
 | Domain event | `Domain\Events\{Entity}{Action}.cs` | `{Entity}{Action}` |
+| Integration event | `Application\IntegrationEvents\{Context}\{Entity}{Action}IntegrationEvent.cs` | `{Entity}{Action}IntegrationEvent` |
+| Integration event consumer | `Application\Consumers\{Job}\{Consumer}Consumer.cs` | `{Consumer}Consumer` |
 | Domain exception | `Domain\Exceptions\{Entity}{Rule}Exception.cs` | `{Entity}{Rule}Exception` |
 | Not-found exception | `Application\Common\Exceptions\{Entity}NotFoundException.cs` | `{Entity}NotFoundException` |
 | Repository interface | `Domain\Repositories\I{Entity}Repository.cs` | `I{Entity}Repository` |
@@ -377,7 +379,18 @@ Key rules:
 - Carry enough context for a handler to react without querying back — but only what changed (property-change events carry the new value, lifecycle events carry a snapshot of relevant state)
 - **One event class per distinct operation** — never a shared catch-all `PropertyChangedEvent`
 - **Prefer new events over modifying existing ones** — preserve existing consumers' behavior
-- Events are dispatched after `SaveChanges` succeeds (in-process handlers, e.g. the Excel email on `PublicationClosed`), then `CommitEvents()` clears them
+- Events are dispatched in-process inside `CommitAsync`'s transaction, after each save, then `CommitEvents()` clears them. Handlers change only the database: anything outside it (email, WhatsApp, HTTP) is an integration event queued with `IOutbox.Add` (see Integration Events)
+
+### Integration Events
+
+Facts published for consumers outside the aggregate's transaction: notifications, emails, anything that calls out. They go through the transactional outbox ([ADR 0010](../../docs/decisions/0010-integration-events-and-outbox.md)).
+
+- A record implementing `IIntegrationEvent`, primitives only (`Guid`, `int`, `string`, lists of records), in `Application\IntegrationEvents\{Context}\`, named `{Entity}{Action}IntegrationEvent` with a `const string Name = "{entity}-{action}.v{n}"` (`PublicationClosedIntegrationEvent.Name` is `publication-closed.v1`)
+- Raised by a domain-event handler that maps the domain event (`PublicationClosedHandler` → `PublicationClosedIntegrationEvent`), or by an interactor or job with no domain change behind it; queued with `IOutbox.Add`, written by `CommitAsync`
+- Registered in `AddApplication` with `AddIntegrationEvent<T>(T.Name)`; never rename a published name, add `.v{n+1}` for a breaking change
+- A consumer implements `IIntegrationEventConsumer<T>` (`ConsumeAsync`), does one job, lives in `Application\Consumers\{Job}\` (`Consumers\TeacherExcelEmail\SendTeacherExcelEmailsConsumer.cs`), and is registered with `AddIntegrationEventConsumer<TEvent, TConsumer>()`. An event can have many consumers; they never know about each other or about the producer
+- Consumers turn the event's `Guid`s into typed IDs with `.Of()` before touching the domain, use their own `IUnitOfWork`, and **must be safe to run twice** (delivery is at least once): check a guard record before the side effect, record it right after
+- A consumer returns `DeliveryOutcome.Done` when finished, returns `DeliveryOutcome.HoldUntil(instant)` when the job can't be done yet (quiet hours, for example: no failure is counted), and **throws** when it failed: the outbox retries with backoff and marks the delivery dead after the last attempt. A delivery whose event or consumer is no longer registered, or whose payload no longer deserializes, is dead at once
 
 ### Repository Interfaces
 
@@ -572,9 +585,17 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
 
     public async Task CommitAsync()
     {
-        await SaveChangesAsync();
+        if (Database.CurrentTransaction is null)
+        {
+            await Database.BeginTransactionAsync();
+        }
 
-        await DispatchDomainEventsAsync();
+        await SaveAndDispatchAsync();
+
+        var transaction = Database.CurrentTransaction!;
+
+        await transaction.CommitAsync();
+        await transaction.DisposeAsync();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -583,6 +604,8 @@ public class DrivingLessonsDbContext : DbContext, IUnitOfWork
     }
 }
 ```
+
+`CommitAsync` opens a transaction when none is open, so the aggregate, the domain-event handlers' rows and the outbox rows commit together. Outbox rows (`Infrastructure\Outbox\`) are infrastructure records: plain classes with EF configurations, no `AggregateRoot`, no typed IDs.
 
 ### Repositories
 
@@ -712,7 +735,7 @@ public class PublicationConfiguration : IEntityTypeConfiguration<Publication>
 These patterns exist in larger systems but are **out of scope here** — do not introduce them without an explicit decision:
 
 - Microservices / schema-per-service — this is one deployable, one schema
-- Outbox pattern + message broker integration events — domain events are handled in-process
+- A message broker (RabbitMQ, SNS/SQS, Kafka): integration events go through the PostgreSQL outbox and a Quartz job in the app ([ADR 0010](../../docs/decisions/0010-integration-events-and-outbox.md))
 - Batch-update command envelopes — each operation is its own endpoint and interactor
 - A separate ReadModel project — response DTOs live in Application
 - ETag / If-Match on the API: concurrent admin writes are settled on the server instead, by row locks on Teacher and Car and an `xmin` token on Student ([ADR 0007](../../docs/decisions/0007-locking-for-the-active-student-guards.md)); concurrent student submissions are protected by the DB transaction

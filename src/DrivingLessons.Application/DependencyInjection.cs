@@ -34,7 +34,10 @@ using DrivingLessons.Application.Commands.ReviseSubmission;
 using DrivingLessons.Application.Commands.SeedFirstAdministrator;
 using DrivingLessons.Application.Commands.SetUserTemporaryPassword;
 using DrivingLessons.Application.Commands.UnassignCarFromTeacher;
+using DrivingLessons.Application.Consumers.TeacherExcelEmail;
 using DrivingLessons.Application.EventHandlers;
+using DrivingLessons.Application.IntegrationEvents;
+using DrivingLessons.Application.IntegrationEvents.Publications;
 using DrivingLessons.Application.Queries.DownloadPublicationExcel;
 using DrivingLessons.Application.Queries.DownloadPublicationSchoolExcel;
 using DrivingLessons.Application.Queries.FindCars;
@@ -64,6 +67,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddIntegrationEventCatalog();
+
         services.AddScoped<LoginInteractor>();
         services.AddScoped<CheckSignedInUserInteractor>();
         services.AddScoped<SeedFirstAdministratorInteractor>();
@@ -123,6 +128,8 @@ public static class DependencyInjection
         services.AddScoped<GetLatestRosterImportInteractor>();
         services.AddScoped<IDomainEventHandler<WeekScheduleCreated>, WeekScheduleCreatedHandler>();
         services.AddScoped<IDomainEventHandler<PublicationClosed>, PublicationClosedHandler>();
+        services.AddIntegrationEvent<PublicationClosedIntegrationEvent>(PublicationClosedIntegrationEvent.Name);
+        services.AddIntegrationEventConsumer<PublicationClosedIntegrationEvent, SendTeacherExcelEmailsConsumer>();
         return services;
     }
 }

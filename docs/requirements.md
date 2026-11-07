@@ -222,7 +222,7 @@ Rank was removed at the customer's request (October 2026); students still rank t
 The car column became a sheet per car at the customer's request (November 2026).
  
 ### Delivery
-- **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4)
+- **Automatic:** emailed to the teacher's contact email at every window close (versioned per 6.4). A failed send is retried for about two hours; a Teacher never receives the same version twice
 - **On-demand:** download button in the app, available at any time
 
 ### All-Teachers File
