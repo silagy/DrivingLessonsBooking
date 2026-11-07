@@ -1,6 +1,6 @@
 # Student Notifications - Intent
 
-**Status:** Agreed intent, input to planning
+**Status:** Agreed intent. Slice 1 (outbox and the teacher's Excel email) is built; the WhatsApp slices are postponed until WhatsApp Business API access is in place (see the [roadmap](README.md#slices))
 **Date:** 19 October 2026
 **Module:** `module:notifications` (new)
 

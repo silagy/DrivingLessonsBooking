@@ -35,10 +35,12 @@ Each slice ships as its own branch and PR. Slice 1 has its plan; the others get 
 | Slice | Content | Plan |
 |-------|---------|------|
 | 1. Outbox foundation | Integration events, the transactional outbox, per-consumer deliveries with retries, the Quartz outbox job, and the teacher's Excel email moved onto it as the first consumer. No visible change for Administrators; the email gains retries and never goes out twice | [plan](outbox-foundation-plan/README.md) |
-| 2. WhatsApp and the opening notification | Recipients, Israeli numbers to international format, the per-Student message record, the WhatsApp Cloud API sender (Coexistence, log-only when disabled), the opening template; requirements decision #26, glossary terms, ADR 0011 | when the slice starts |
-| 3. Window change notification | Extend and reopen send the new end time to every recipient, right away; a newer change supersedes messages still waiting | when the slice starts |
-| 4. Manual reminder and what the Administrator sees | "Send reminder" on the dashboard (Administrator only, 202), recipients without a Submission, the shared reminder limits, sent / failed / skipped counts and the per-Student list | when the slice starts |
-| 5. Scheduled reminders | A cron trigger per open Publication (Asia/Jerusalem), quiet hours (nights and Shabbat), the last-call reminder, the per-Publication on/off switch (default on) | when the slice starts |
+| 2. WhatsApp and the opening notification | Recipients, Israeli numbers to international format, the per-Student message record, the WhatsApp Cloud API sender (Coexistence, log-only when disabled), the opening template; requirements decision #26, glossary terms, ADR 0011 | **postponed** (see below) |
+| 3. Window change notification | Extend and reopen send the new end time to every recipient, right away; a newer change supersedes messages still waiting | **postponed** (see below) |
+| 4. Manual reminder and what the Administrator sees | "Send reminder" on the dashboard (Administrator only, 202), recipients without a Submission, the shared reminder limits, sent / failed / skipped counts and the per-Student list | **postponed** (see below) |
+| 5. Scheduled reminders | A cron trigger per open Publication (Asia/Jerusalem), quiet hours (nights and Shabbat), the last-call reminder, the per-Publication on/off switch (default on) | **postponed** (see below) |
+
+**Slices 2–5 are postponed (7 November 2026)** until the school has WhatsApp Business API access. Meta's self-serve setup refused to connect the school's existing number, so sending needs either a Meta partner that supports Coexistence or a second number, and that is still open. Until then, Administrators send reminders by hand with the click-to-chat links from #138 (requirements decision 27). When the slices resume, re-plan them on top of #138: reuse its WhatsApp phone number and its "Students without a Submission" query, decide whether the automated manual reminder replaces or sits beside the links, and add the new requirements decision as #28 (26 and 27 are taken).
 
 Slice 1 goes first because every later slice writes integration events and consumers, and moving an existing, well-tested email onto the outbox proves it before any Student is messaged. Slices 2 to 5 follow the order a Publication lives through: open, change, remind by hand, remind on a schedule.
 
